@@ -1,0 +1,11 @@
+﻿
+Hash                                                             File                       
+----                                                             ----                       
+F0E76EB1AAA3735661D152FD6991EF9B35A4FA667279678484DA55BDC763431C Tweakora.exe               
+F0E76EB1AAA3735661D152FD6991EF9B35A4FA667279678484DA55BDC763431C Tweakora.App.exe           
+B91368E9C1CFE3A865A81D4FD586F8BD39B8BE0A090BB20F272A49F9BC30165A tweakora-cli.exe           
+753B2525ADDE362124AAF9C9AA0FA5CFB89F891E90887E712C21AB757F891382 Tweakora-v0.1.0-win-x64.zip
+5BE3A8F4F9FCA675FA95D987EA0CBE340B1F0AF9DD6F36438C20D98F441CE7A3 Tweakora-v0.1.0-source.zip 
+
+
+
