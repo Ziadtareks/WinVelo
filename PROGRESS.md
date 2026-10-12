@@ -10,38 +10,42 @@ Repository Location: `C:\Dev\Tweakora`
 | **Phase 0** | Architecture, JSON Schema & Project Tree | **DONE** | Validated |
 | **Phase 1** | Scaffolding, .NET 10, WPF UI, Mica, RTL, Crash Handlers | **DONE** | Build: 0 errors / Tests: 1 passed / Process alive 10s confirmed |
 | **Phase 2** | Engine + Safety Layer (Rollback Journal, DryRun, Fakes, CLI) | **DONE** | Build: 0 errors / Tests: 11 passed / CLI works / Process alive 10s confirmed |
-| **Phase 3** | Tweaks UI, Toggles, Badges, First 40 Verified Tweaks, Presets | **DONE** | 40 Verified Tweaks Validated / UI Cards & Filters / Tests: 11 passed / Process alive 10s confirmed |
-| **Phase 4** | Dashboard, Startup Manager, Services Manager, Smart Cleaner | **DONE** | Build: 0 errors / Tests: 11 passed / Process alive 10s (PID 17748, Handle: 6228164) |
-| **Phase 5** | App Installer (WinGet), Uninstaller, Fixes Center, Network Tools | **DONE** | Build: 0 errors / Tests: 18 passed / Process alive 10s (PID 8348, Handle: 2164814) |
-| **Phase 6** | Expand Catalog to 80+ Verified Tweaks | **DONE** | 84 Verified Tweaks Validated (0 errors) / Tests: 18 passed / Process alive 10s (PID 4352, Handle: 1247348) |
-| **Phase 7** | Change History, Profiles, Command Palette (Ctrl+K), Settings & First-Run | **DONE** | Build: 0 errors / Tests: 23 passed / Process alive 10s (PID 18888, Handle: 34539548) |
-| **Phase 8** | Release Polish, English-Only, Size Optimization, Packaging | **DONE** | Build: 0 errors / Tests: 34 passed / 84 Tweaks Validated / Process alive 10s confirmed |
+| **Phase 3** | Tweaks UI, Toggles, Badges, First 40 Verified Tweaks, Presets | **DONE** | 40 Verified Tweaks Validated / UI Cards & Filters / Tests: 11 passed |
+| **Phase 4** | Dashboard, Startup Manager, Services Manager, Smart Cleaner | **DONE** | Build: 0 errors / Tests: 11 passed / Process alive 10s |
+| **Phase 5** | App Installer (WinGet), Uninstaller, Fixes Center, Network Tools | **DONE** | Build: 0 errors / Tests: 18 passed / Process alive 10s |
+| **Phase 6** | Expand Catalog to 80+ Verified Tweaks | **DONE** | 84 Verified Tweaks Validated (0 errors) |
+| **Phase 7** | Change History, Profiles, Command Palette (Ctrl+K), Settings & First-Run | **DONE** | Build: 0 errors / Tests: 23 passed / Process alive 10s |
+| **Phase 8** | Release Polish, English-Only, Size Optimization, Packaging | **DONE** | Build: 0 errors / Tests: 34 passed / Releases Packaged |
+| **Audit Phase** | Quality & Safety Audit, Staging Architecture, FlaUI Test Suite | **DONE** | 35 Unit Tests passed / FlaUI UI Suite passed / 79 Tweaks 100% verified |
 
 ---
 
-## Final Release Verification Evidence (v0.1.0)
+## Strict Quality & Safety Audit Results (v0.1.0)
 
-- **Catalog Audit & Adjustments**:
-  - `system.security.disable-wsh`: Risk set to Medium, warning added, removed from all presets.
-  - `system.security.enforce-smartscreen`: Renamed from `enable-smartscreen-edge`, enforces SmartScreen system-wide via policy.
-  - `system.security.disable-rdp-auto-enable`: Warning added: "Remote Desktop to this PC will stop working."
-  - `ui.logon.hide-fast-user-switching`: Moved to `ui` category with accurate description.
-  - `performance.network.delivery-optimization-simple`: Clarified to "Disable Delivery Optimization Peer-to-Peer (HTTP Only)".
-- **Binary Size Optimization**:
-  - `EnableCompressionInSingleFile=true` enabled in project files.
-  - Portable App size: reduced from 148.2 MB to **68.2 MB** (-54%).
-  - Portable CLI size: reduced from 74.5 MB to **38.0 MB** (-49%).
-  - Framework-dependent Small App: **8.7 MB** (-94%).
-  - Framework-dependent Small CLI: **1.2 MB** (-98%).
-- **Distribution Packages (`dist/`)**:
-  - `dist\Tweakora-v0.1.0-win-x64-portable.zip` (95.0 MB)
-  - `dist\Tweakora-v0.1.0-win-x64-small.zip` (3.9 MB)
-  - `dist\Tweakora-v0.1.0-source.zip` (clean git archive)
-  - Duplicate `dist\Tweakora.App.exe` removed.
-- **Automated Test Suite**:
-  - `dotnet test Tweakora.sln` -> **34 Passed**, 0 Failed, 0 Skipped.
-- **Catalog Schema Validator**:
-  - `dotnet run --project tools/CatalogValidator/CatalogValidator.csproj` -> **84/84 tweaks validated**, 0 errors.
+- **Emergency Check**:
+  - `%LOCALAPPDATA%\Tweakora` inspected. Zero host system changes occurred.
+- **Crash Root Cause (0xC00000FD)**:
+  - Missing XAML converter resource `BoolToVisConverter` in `TweaksPage.xaml`.
+  - Nested `MessageBox.Show` inside `DispatcherUnhandledException` pumped message loop during layout pass, causing infinite re-entrancy.
+  - Fixed with application-wide converters in `App.xaml` and atomic `Interlocked.CompareExchange` re-entrancy guard.
+- **Safety Layer**:
+  - `TestModeManager.IsTestMode` actively protects all real platform services (`WindowsRegistryService`, etc.). Any call throws `InvalidOperationException`.
+  - 35/35 unit tests pass.
+- **Tweak Staging Architecture**:
+  - Toggles only stage changes in memory.
+  - `Apply Staged (N)` displays dry-run diff preview dialog before applying.
+- **Catalog Hardening**:
+  - 5 unverified tweaks moved to `docs/NEEDS_VERIFICATION.md`.
+  - 79 active tweaks validated with `CatalogValidator` (0 errors).
+  - 79 active tweaks verified with `SourceChecker` (79/79 HTTP 200 OK from Microsoft Learn).
+- **FlaUI Automated UI Test Suite**:
+  - 6 end-to-end scenarios run via `Tweakora.UiTests.csproj` against the real GUI in test mode.
+  - All tests passed in 2m 21s.
+  - Captured screenshots in `docs/screenshots/` (dashboard, tweaks, diff dialog, command palette, settings).
+- **Release Packages (`dist/`)**:
+  - `dist\Tweakora-v0.1.0-win-x64-portable.zip` (62,551,878 bytes / ~59.6 MB)
+  - `dist\Tweakora-v0.1.0-win-x64-small.zip` (3,416,480 bytes / ~3.25 MB)
+  - `dist\SHA256SUMS.txt` (SHA-256 verified)
 
 ---
 

@@ -31,7 +31,12 @@ public sealed partial class DashboardViewModel : ViewModelBase
 
     public DashboardViewModel()
     {
-        SystemSummary = Tweakora.Modules.Dashboard.SystemInfoProvider.GetSystemSummary();
+        bool isTestMode = Tweakora.Core.Safety.TestModeManager.IsTestMode;
+        SystemSummary = Tweakora.Modules.Dashboard.SystemInfoProvider.GetSystemSummary(
+            appliedCount: 0,
+            totalCatalogCount: 79,
+            journalStatus: "Active - 0 pending entries",
+            isTestMode: isTestMode);
     }
 }
 
@@ -524,6 +529,7 @@ public sealed partial class MainViewModel : ViewModelBase
 
     public LocalizationManager Localization => LocalizationManager.Instance;
     public UiLogSink LogSink => UiLogSink.Instance;
+    public bool IsTestModeActive => Tweakora.Core.Safety.TestModeManager.IsTestMode;
 
     public DashboardViewModel DashboardVM { get; }
     public TweaksViewModel TweaksVM { get; }
@@ -558,7 +564,7 @@ public sealed partial class MainViewModel : ViewModelBase
     private void InitializePalette()
     {
         _allPaletteItems.Add(new PaletteItem { Title = "Dashboard", Subtitle = "View system overview and safety shield", Category = "Page", IconSymbol = "Home24", ActionToExecute = () => Navigate("Dashboard") });
-        _allPaletteItems.Add(new PaletteItem { Title = "Windows Tweaks", Subtitle = "Browse and apply 84+ verified system tweaks", Category = "Page", IconSymbol = "Wrench24", ActionToExecute = () => Navigate("Tweaks") });
+        _allPaletteItems.Add(new PaletteItem { Title = "Windows Tweaks", Subtitle = "Browse and apply 79+ verified system tweaks", Category = "Page", IconSymbol = "Wrench24", ActionToExecute = () => Navigate("Tweaks") });
         _allPaletteItems.Add(new PaletteItem { Title = "Smart Cleaner", Subtitle = "Safely scan and clean whitelisted temporary files", Category = "Tool", IconSymbol = "Broom24", ActionToExecute = () => { Navigate("Toolbox"); ToolboxVM.SelectToolCommand.Execute("Cleaner"); } });
         _allPaletteItems.Add(new PaletteItem { Title = "Startup Applications", Subtitle = "Manage startup programs and boot delay", Category = "Tool", IconSymbol = "Apps24", ActionToExecute = () => { Navigate("Toolbox"); ToolboxVM.SelectToolCommand.Execute("Startup"); } });
         _allPaletteItems.Add(new PaletteItem { Title = "Services Inspector", Subtitle = "Inspect and configure Windows services startup", Category = "Tool", IconSymbol = "Settings24", ActionToExecute = () => { Navigate("Toolbox"); ToolboxVM.SelectToolCommand.Execute("Services"); } });
@@ -635,12 +641,25 @@ public sealed partial class MainViewModel : ViewModelBase
         IsLogPanelOpen = !IsLogPanelOpen;
     }
 
+    [ObservableProperty]
+    private string _currentThemeName = "Dark";
+
+    [RelayCommand]
+    private void ExecuteFirstPaletteItem()
+    {
+        if (PaletteResults.Count > 0)
+        {
+            ExecutePaletteItem(PaletteResults[0]);
+        }
+    }
+
     [RelayCommand]
     private void ToggleTheme()
     {
         ApplicationTheme current = ApplicationThemeManager.GetAppTheme();
         ApplicationTheme next = current == ApplicationTheme.Dark ? ApplicationTheme.Light : ApplicationTheme.Dark;
         ApplicationThemeManager.Apply(next);
+        CurrentThemeName = next.ToString();
         Serilog.Log.Information("Toggled theme to: {Theme}", next);
     }
 }

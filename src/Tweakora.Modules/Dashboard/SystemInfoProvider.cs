@@ -10,12 +10,15 @@ public sealed class SystemInfoSummary
     public string Uptime { get; init; } = string.Empty;
     public int TotalRamGb { get; init; }
     public string MachineName { get; init; } = string.Empty;
-    public int SafetyScore { get; init; } = 95;
+    public int AppliedTweaksCount { get; init; }
+    public int TotalCatalogTweaksCount { get; init; } = 79;
+    public string RollbackJournalStatus { get; init; } = "Active - 0 pending entries";
+    public string PlatformMode { get; init; } = "Test Mode (Simulated)";
 }
 
 public static class SystemInfoProvider
 {
-    public static SystemInfoSummary GetSystemSummary()
+    public static SystemInfoSummary GetSystemSummary(int appliedCount = 0, int totalCatalogCount = 79, string? journalStatus = null, bool isTestMode = true)
     {
         OperatingSystem os = Environment.OSVersion;
         int build = os.Version.Build;
@@ -24,9 +27,8 @@ public static class SystemInfoProvider
         TimeSpan uptimeSpan = TimeSpan.FromMilliseconds(Environment.TickCount64);
         string uptimeStr = $"{uptimeSpan.Days}d {uptimeSpan.Hours}h {uptimeSpan.Minutes}m";
 
-        // Estimate RAM safely
         int ramGb = (int)(GC.GetGCMemoryInfo().TotalAvailableMemoryBytes / (1024 * 1024 * 1024));
-        if (ramGb <= 0) ramGb = 16; // default fallback if restricted
+        if (ramGb <= 0) ramGb = 16;
 
         return new SystemInfoSummary
         {
@@ -36,7 +38,10 @@ public static class SystemInfoProvider
             Uptime = uptimeStr,
             TotalRamGb = ramGb,
             MachineName = Environment.MachineName,
-            SafetyScore = 98
+            AppliedTweaksCount = appliedCount,
+            TotalCatalogTweaksCount = totalCatalogCount,
+            RollbackJournalStatus = journalStatus ?? "Active - 0 pending entries",
+            PlatformMode = isTestMode ? "Test Mode (Simulated)" : "Live Windows"
         };
     }
 }

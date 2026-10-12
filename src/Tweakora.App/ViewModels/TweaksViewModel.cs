@@ -19,7 +19,45 @@ public sealed partial class TweakCardModel : ObservableObject
     private bool _isActive;
 
     [ObservableProperty]
+    private bool _isStaged;
+
+    [ObservableProperty]
+    private bool _stagedTargetState;
+
+    [ObservableProperty]
     private bool _isBusy;
+
+    public bool IsCheckedInUi
+    {
+        get => IsStaged ? StagedTargetState : IsActive;
+        set
+        {
+            if (value == IsActive)
+            {
+                IsStaged = false;
+            }
+            else
+            {
+                IsStaged = true;
+                StagedTargetState = value;
+            }
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(IsStaged));
+        }
+    }
+
+    public void DiscardStaged()
+    {
+        IsStaged = false;
+        OnPropertyChanged(nameof(IsCheckedInUi));
+    }
+
+    public void MarkApplied(bool active)
+    {
+        IsActive = active;
+        IsStaged = false;
+        OnPropertyChanged(nameof(IsCheckedInUi));
+    }
 
     public string Id => Tweak.Id;
     public string Category => Tweak.Category;
@@ -32,6 +70,9 @@ public sealed partial class TweakCardModel : ObservableObject
     public string LocalizedDescription => Tweak.Description;
     public string? LocalizedEffectNote => Tweak.EffectNote;
     public string? LocalizedWarning => Tweak.Warnings;
+
+    public bool HasEffectNote => !string.IsNullOrWhiteSpace(LocalizedEffectNote);
+    public bool HasWarning => !string.IsNullOrWhiteSpace(LocalizedWarning);
 
     public string RiskBadgeBackground => Risk switch
     {
@@ -60,6 +101,8 @@ public sealed partial class TweakCardModel : ObservableObject
             OnPropertyChanged(nameof(LocalizedDescription));
             OnPropertyChanged(nameof(LocalizedEffectNote));
             OnPropertyChanged(nameof(LocalizedWarning));
+            OnPropertyChanged(nameof(HasEffectNote));
+            OnPropertyChanged(nameof(HasWarning));
         };
     }
 }
@@ -93,6 +136,18 @@ public sealed partial class TweaksViewModel : ViewModelBase
 
     [ObservableProperty]
     private bool _isPreviewDialogOpen;
+
+    [ObservableProperty]
+    private int _stagedCount;
+
+    [ObservableProperty]
+    private bool _hasStagedChanges;
+
+    [ObservableProperty]
+    private bool _hasPageError;
+
+    [ObservableProperty]
+    private string _pageErrorMessage = string.Empty;
 
     public TweaksViewModel()
     {
@@ -131,44 +186,64 @@ public sealed partial class TweaksViewModel : ViewModelBase
 
     private void LoadCatalogTweaks()
     {
-        string rootDir = AppDomain.CurrentDomain.BaseDirectory;
-        string tweaksDir = Path.Combine(rootDir, "Catalog", "Tweaks");
-        if (!Directory.Exists(tweaksDir))
+        try
         {
-            string? parent = Directory.GetParent(rootDir)?.FullName;
-            while (parent != null)
+            string rootDir = AppDomain.CurrentDomain.BaseDirectory;
+            string tweaksDir = Path.Combine(rootDir, "Catalog", "Tweaks");
+            if (!Directory.Exists(tweaksDir))
             {
-                string candidate = Path.Combine(parent, "Catalog", "Tweaks");
-                if (Directory.Exists(candidate))
+                string? parent = Directory.GetParent(rootDir)?.FullName;
+                while (parent != null)
                 {
-                    tweaksDir = candidate;
-                    break;
-                }
-                parent = Directory.GetParent(parent)?.FullName;
-            }
-        }
-
-        if (Directory.Exists(tweaksDir))
-        {
-            foreach (string file in Directory.GetFiles(tweaksDir, "*.json", SearchOption.AllDirectories))
-            {
-                try
-                {
-                    string json = File.ReadAllText(file);
-                    List<TweakDefinition>? list = JsonSerializer.Deserialize<List<TweakDefinition>>(json);
-                    if (list != null)
+                    string candidate = Path.Combine(parent, "Catalog", "Tweaks");
+                    if (Directory.Exists(candidate))
                     {
-                        foreach (TweakDefinition t in list)
+                        tweaksDir = candidate;
+                        break;
+                    }
+                    parent = Directory.GetParent(parent)?.FullName;
+                }
+            }
+
+            if (Directory.Exists(tweaksDir))
+            {
+                foreach (string file in Directory.GetFiles(tweaksDir, "*.json", SearchOption.AllDirectories))
+                {
+                    try
+                    {
+                        string json = File.ReadAllText(file);
+                        List<TweakDefinition>? list = JsonSerializer.Deserialize<List<TweakDefinition>>(json);
+                        if (list != null)
                         {
-                            _allTweaks.Add(new TweakCardModel(t));
+                            foreach (TweakDefinition t in list)
+                            {
+                                var card = new TweakCardModel(t);
+                                card.PropertyChanged += (s, e) =>
+                                {
+                                    if (e.PropertyName == nameof(TweakCardModel.IsStaged))
+                                    {
+                                        UpdateStagedState();
+                                    }
+                                };
+                                _allTweaks.Add(card);
+                            }
                         }
                     }
+                    catch (Exception ex)
+                    {
+                        Serilog.Log.Warning(ex, "Failed to read tweak file: {File}", file);
+                    }
                 }
-                catch { }
             }
-        }
 
-        ApplyFilter();
+            ApplyFilter();
+        }
+        catch (Exception ex)
+        {
+            HasPageError = true;
+            PageErrorMessage = $"Error loading tweaks: {ex.Message}";
+            Serilog.Log.Error(ex, "Failed to load catalog");
+        }
     }
 
     partial void OnSearchQueryChanged(string value) => ApplyFilter();
@@ -212,34 +287,119 @@ public sealed partial class TweaksViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private async Task ToggleTweakAsync(TweakCardModel card)
+    private void ToggleTweak(TweakCardModel card)
     {
-        if (card.IsBusy) return;
-        card.IsBusy = true;
+        // Strictly staging in-memory only. NEVER touches real PC or calls runner apply.
+        if (card.IsStaged)
+        {
+            card.IsStaged = false;
+            card.IsCheckedInUi = card.IsActive;
+        }
+        else
+        {
+            card.IsStaged = true;
+            card.StagedTargetState = !card.IsActive;
+            card.IsCheckedInUi = card.StagedTargetState;
+        }
+        UpdateStagedState();
+    }
+
+    private void UpdateStagedState()
+    {
+        StagedCount = _allTweaks.Count(t => t.IsStaged);
+        HasStagedChanges = StagedCount > 0;
+    }
+
+    [RelayCommand]
+    private void DiscardStagedChanges()
+    {
+        foreach (var card in _allTweaks.Where(t => t.IsStaged))
+        {
+            card.DiscardStaged();
+        }
+        UpdateStagedState();
+        Serilog.Log.Information("Discarded all staged tweaks.");
+    }
+
+    [RelayCommand]
+    private void ApplyStagedChanges()
+    {
+        var staged = _allTweaks.Where(t => t.IsStaged).ToList();
+        if (staged.Count == 0) return;
+
+        List<TweakDefinition> tweaksToPreview = staged.Select(c => c.Tweak).ToList();
+        List<TweakPreview> previews = _dryRun.GeneratePreview(tweaksToPreview);
+
+        StringWriter sw = new();
+        sw.WriteLine($"Diff Preview for {staged.Count} Staged Tweak(s):\n");
+
+        foreach (var card in staged)
+        {
+            string actionVerb = card.StagedTargetState ? "ENABLE / APPLY" : "REVERT / DISABLE";
+            sw.WriteLine($"• {card.LocalizedName} [{card.Risk}] ({card.Id}) -> Target: {actionVerb}");
+
+            var p = previews.FirstOrDefault(pr => pr.TweakId == card.Id);
+            if (p != null)
+            {
+                foreach (var a in p.Actions)
+                {
+                    sw.WriteLine($"    - {a.ActionType} {a.Target}");
+                    sw.WriteLine($"      Operation: {a.Operation} | Current: {a.CurrentState} -> Proposed: {a.ProposedState}");
+                }
+            }
+            sw.WriteLine();
+        }
+
+        PreviewReportText = sw.ToString();
+        IsPreviewDialogOpen = true;
+    }
+
+    [RelayCommand]
+    private async Task ConfirmApplyStagedAsync()
+    {
+        var staged = _allTweaks.Where(t => t.IsStaged).ToList();
+        if (staged.Count == 0)
+        {
+            IsPreviewDialogOpen = false;
+            return;
+        }
 
         try
         {
-            if (card.IsActive)
+            foreach (var card in staged)
             {
-                // Revert
-                await _runner.UndoTweakAsync(card.Tweak);
-                card.IsActive = false;
-                Serilog.Log.Information("Undone tweak: {TweakId}", card.Id);
-            }
-            else
-            {
-                // Apply
-                BatchExecutionReport report = await _runner.ApplyBatchAsync(new[] { card.Tweak });
-                if (report.AppliedCount > 0)
+                card.IsBusy = true;
+                try
                 {
-                    card.IsActive = true;
-                    Serilog.Log.Information("Applied tweak: {TweakId}", card.Id);
+                    if (card.StagedTargetState)
+                    {
+                        var report = await _runner.ApplyBatchAsync(new[] { card.Tweak });
+                        if (report.AppliedCount > 0)
+                        {
+                            card.MarkApplied(true);
+                        }
+                    }
+                    else
+                    {
+                        await _runner.UndoTweakAsync(card.Tweak);
+                        card.MarkApplied(false);
+                    }
+                }
+                finally
+                {
+                    card.IsBusy = false;
                 }
             }
+
+            UpdateStagedState();
+            IsPreviewDialogOpen = false;
+            Serilog.Log.Information("Applied {Count} staged tweaks successfully in test environment.", staged.Count);
         }
-        finally
+        catch (Exception ex)
         {
-            card.IsBusy = false;
+            HasPageError = true;
+            PageErrorMessage = $"Failed to apply staged tweaks: {ex.Message}";
+            Serilog.Log.Error(ex, "Failed to apply staged tweaks");
         }
     }
 

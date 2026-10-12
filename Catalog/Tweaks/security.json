@@ -229,7 +229,7 @@
         "valueName": "EnableSmartScreen"
       }
     ],
-    "source": "https://learn.microsoft.com/en-us/windows/security/operating-system-security/virus-and-threat-protection/windows-defender-smartscreen/",
+    "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-smartscreen",
     "verifiedOnBuild": "26100"
   },
   {
@@ -297,7 +297,7 @@
     "warnings": "Remote Desktop to this PC will stop working.",
     "category": "system",
     "subcategory": "Security",
-    "risk": "Safe",
+    "risk": "Low",
     "impacts": [
       "security"
     ],
@@ -404,7 +404,7 @@
         "valueName": "NoLockScreenCamera"
       }
     ],
-    "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-personalization#nolockscreencamera",
+    "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-devicelock#preventenablinglockscreencamera",
     "verifiedOnBuild": "26100"
   }
 ]

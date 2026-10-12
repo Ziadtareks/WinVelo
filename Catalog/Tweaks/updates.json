@@ -118,7 +118,8 @@
     "description": "Configures Automatic Updates to AUOptions 2 (notify before downloading) to prevent unexpected bandwidth spikes.",
     "category": "updates",
     "subcategory": "schedule",
-    "risk": "Safe",
+    "risk": "Medium",
+    "warnings": "Requires manual confirmation to download and install updates.",
     "impacts": [
       "performance",
       "network"
@@ -128,9 +129,7 @@
       "bandwidth",
       "notification"
     ],
-    "presets": [
-      "recommended"
-    ],
+    "presets": [],
     "windows": {
       "minBuild": 19041,
       "maxBuild": null

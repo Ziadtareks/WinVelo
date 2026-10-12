@@ -55,7 +55,7 @@
         "operation": "Set"
       }
     ],
-    "source": "https://support.microsoft.com/en-us/windows/use-game-mode-on-your-pc-5896ee1a-1e64-44b7-a3f2-892f33c37574",
+    "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-applicationmanagement#allowgamedvr",
     "verifiedOnBuild": "22631.4317"
   },
   {
@@ -113,7 +113,7 @@
         "operation": "Set"
       }
     ],
-    "source": "https://support.microsoft.com/en-us/windows/troubleshoot-xbox-game-bar-on-windows-574a4cf7-775b-4395-5c1a-ddc99d63645c",
+    "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-applicationmanagement#allowgamedvr",
     "verifiedOnBuild": "22631.4317"
   },
   {
@@ -172,7 +172,7 @@
         "operation": "Set"
       }
     ],
-    "source": "https://support.microsoft.com/en-us/windows/adjust-capture-settings-for-xbox-game-bar-83be3e98-294b-4654-8e2b-f1f31f9b3ec7",
+    "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-applicationmanagement#allowgamedvr",
     "verifiedOnBuild": "22631.4317"
   },
   {

@@ -64,27 +64,28 @@
                             <TextBlock Text="{Binding SystemSummary.MachineName, StringFormat='PC: {0}'}" Foreground="{DynamicResource TextFillColorTertiaryBrush}" FontSize="11" Margin="0,2,0,0" />
                         </StackPanel>
 
-                        <!-- Safety Score -->
+                        <!-- Applied Tweaks Metric -->
                         <StackPanel Grid.Row="2" Grid.Column="0">
-                            <TextBlock Text="System Safety Score" Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12" />
+                            <TextBlock Text="Active Tweaks" Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12" />
                             <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
-                                <TextBlock Text="{Binding SystemSummary.SafetyScore, StringFormat='{}{0}%'}" FontSize="16" FontWeight="Bold" Foreground="#107C41" />
-                                <TextBlock Text=" (Optimal)" Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12" VerticalAlignment="Center" Margin="6,0,0,0" />
+                                <TextBlock Text="{Binding SystemSummary.AppliedTweaksCount}" FontSize="16" FontWeight="Bold" Foreground="#107C41" />
+                                <TextBlock Text="{Binding SystemSummary.TotalCatalogTweaksCount, StringFormat=' / {0} Tweaks'}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12" VerticalAlignment="Center" Margin="4,0,0,0" />
                             </StackPanel>
+                            <TextBlock Text="Catalog active &amp; ready" Foreground="{DynamicResource TextFillColorTertiaryBrush}" FontSize="11" Margin="0,2,0,0" />
                         </StackPanel>
 
                         <!-- Rollback Journal Status -->
                         <StackPanel Grid.Row="2" Grid.Column="1">
                             <TextBlock Text="Rollback Engine" Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12" />
-                            <TextBlock Text="Write-Ahead Journal Ready" FontSize="14" FontWeight="SemiBold" Foreground="#0078D4" Margin="0,4,0,0" />
-                            <TextBlock Text="Preserves original baseline" Foreground="{DynamicResource TextFillColorTertiaryBrush}" FontSize="11" Margin="0,2,0,0" />
+                            <TextBlock Text="{Binding SystemSummary.RollbackJournalStatus}" FontSize="14" FontWeight="SemiBold" Foreground="#0078D4" Margin="0,4,0,0" />
+                            <TextBlock Text="Write-Ahead log active" Foreground="{DynamicResource TextFillColorTertiaryBrush}" FontSize="11" Margin="0,2,0,0" />
                         </StackPanel>
 
-                        <!-- Catalog Status -->
+                        <!-- Platform Engine Mode -->
                         <StackPanel Grid.Row="2" Grid.Column="2">
-                            <TextBlock Text="Catalog Verification" Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12" />
-                            <TextBlock Text="100% Verified Tweaks" FontSize="14" FontWeight="SemiBold" Foreground="#8764B8" Margin="0,4,0,0" />
-                            <TextBlock Text="MS Learn &amp; Policy compliant" Foreground="{DynamicResource TextFillColorTertiaryBrush}" FontSize="11" Margin="0,2,0,0" />
+                            <TextBlock Text="Platform Mode" Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12" />
+                            <TextBlock Text="{Binding SystemSummary.PlatformMode}" FontSize="14" FontWeight="SemiBold" Foreground="#8764B8" Margin="0,4,0,0" />
+                            <TextBlock Text="Host protection verified" Foreground="{DynamicResource TextFillColorTertiaryBrush}" FontSize="11" Margin="0,2,0,0" />
                         </StackPanel>
                     </Grid>
                 </StackPanel>

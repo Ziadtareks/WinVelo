@@ -56,7 +56,7 @@
         "operation": "Set"
       }
     ],
-    "source": "https://learn.microsoft.com/en-us/windows/configuration/visual-effects",
+    "source": "https://learn.microsoft.com/en-us/windows-hardware/customize/desktop/unattend/microsoft-windows-shell-setup-themes",
     "verifiedOnBuild": "22631.4317"
   },
   {
@@ -115,63 +115,7 @@
         "operation": "Set"
       }
     ],
-    "source": "https://learn.microsoft.com/en-us/windows/configuration/visual-effects",
-    "verifiedOnBuild": "22631.4317"
-  },
-  {
-    "schemaVersion": "1.0.0",
-    "id": "performance.system.disable-startup-delay",
-    "name": "Disable Windows Startup App Delay",
-    "description": "Eliminates the built-in 10-second startup delay Windows imposes on autostart apps.",
-    "category": "performance",
-    "subcategory": "startup",
-    "risk": "Safe",
-    "impacts": [
-      "performance"
-    ],
-    "tags": [
-      "startup",
-      "boot"
-    ],
-    "presets": [
-      "recommended",
-      "gaming"
-    ],
-    "windows": {
-      "minBuild": 19041,
-      "maxBuild": null
-    },
-    "requiresReboot": false,
-    "requiresExplorerRestart": false,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKCU",
-      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Serialize",
-      "valueName": "StartupDelayInMSec",
-      "matchType": "Equals",
-      "expectedValue": 0
-    },
-    "apply": [
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Serialize",
-        "valueName": "StartupDelayInMSec",
-        "valueKind": "DWord",
-        "data": 0,
-        "operation": "Set"
-      }
-    ],
-    "undo": [
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Serialize",
-        "valueName": "StartupDelayInMSec",
-        "operation": "DeleteValue"
-      }
-    ],
-    "source": "https://learn.microsoft.com/en-us/windows/client-management/client-tools/startup-apps",
+    "source": "https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-systemparametersinfoa",
     "verifiedOnBuild": "22631.4317"
   },
   {
@@ -229,7 +173,7 @@
         "operation": "Set"
       }
     ],
-    "source": "https://learn.microsoft.com/en-us/windows/client-management/client-tools/storage-sense",
+    "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-storage#allowstoragesenseglobal",
     "verifiedOnBuild": "22631.4317"
   },
   {
@@ -400,7 +344,7 @@
         "data": 1
       }
     ],
-    "source": "https://learn.microsoft.com/en-us/windows-hardware/customize/desktop/unattend/microsoft-windows-shell-setup-automaticmaintenance-wakeuptimer",
+    "source": "https://learn.microsoft.com/en-us/windows-hardware/customize/power-settings/sleep-settings-automatically-wake-for-tasks",
     "verifiedOnBuild": "26100"
   },
   {
@@ -457,7 +401,7 @@
         "valueName": "PreventIndexingOnBattery"
       }
     ],
-    "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-admx-search#search_preventindexingonbattery",
+    "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-search",
     "verifiedOnBuild": "26100"
   },
   {
@@ -637,65 +581,6 @@
       }
     ],
     "source": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/rdc/about-remote-differential-compression",
-    "verifiedOnBuild": "26100"
-  },
-  {
-    "schemaVersion": "1.0.0",
-    "id": "performance.system.clear-pagefile-shutdown",
-    "name": "Ensure Pagefile is Not Overwritten on Every Shutdown",
-    "description": "Ensures ClearPageFileAtShutdown is disabled so Windows powers down rapidly without waiting for disk zeroing.",
-    "category": "performance",
-    "subcategory": "system",
-    "risk": "Safe",
-    "impacts": [
-      "performance"
-    ],
-    "tags": [
-      "pagefile",
-      "shutdown",
-      "speed"
-    ],
-    "presets": [
-      "recommended",
-      "gaming"
-    ],
-    "windows": {
-      "minBuild": 19041,
-      "maxBuild": null
-    },
-    "requiresReboot": false,
-    "requiresExplorerRestart": false,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKLM",
-      "key": "SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management",
-      "valueName": "ClearPageFileAtShutdown",
-      "expectedValue": 0,
-      "matchType": "Equals"
-    },
-    "apply": [
-      {
-        "type": "Registry",
-        "operation": "Set",
-        "hive": "HKLM",
-        "key": "SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management",
-        "valueName": "ClearPageFileAtShutdown",
-        "valueKind": "DWord",
-        "data": 0
-      }
-    ],
-    "undo": [
-      {
-        "type": "Registry",
-        "operation": "Set",
-        "hive": "HKLM",
-        "key": "SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management",
-        "valueName": "ClearPageFileAtShutdown",
-        "valueKind": "DWord",
-        "data": 1
-      }
-    ],
-    "source": "https://learn.microsoft.com/en-us/troubleshoot/windows-server/performance/clear-page-file-at-shutdown",
     "verifiedOnBuild": "26100"
   }
 ]

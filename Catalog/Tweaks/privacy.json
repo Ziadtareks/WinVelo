@@ -291,7 +291,7 @@
         "operation": "Set"
       }
     ],
-    "source": "https://learn.microsoft.com/en-us/windows/privacy/speech-inking-typing-and-privacy",
+    "source": "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services",
     "verifiedOnBuild": "22631.4317"
   },
   {
@@ -363,7 +363,7 @@
         "operation": "DeleteValue"
       }
     ],
-    "source": "https://learn.microsoft.com/en-us/windows/privacy/speech-inking-typing-and-privacy",
+    "source": "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services",
     "verifiedOnBuild": "22631.4317"
   },
   {
@@ -421,7 +421,7 @@
         "operation": "Set"
       }
     ],
-    "source": "https://learn.microsoft.com/en-us/windows/privacy/windows-11-start-menu-and-privacy",
+    "source": "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services",
     "verifiedOnBuild": "22631.4317"
   },
   {
@@ -478,7 +478,7 @@
         "operation": "DeleteValue"
       }
     ],
-    "source": "https://learn.microsoft.com/en-us/windows/privacy/feedback-diagnostics-privacy-windows",
+    "source": "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services",
     "verifiedOnBuild": "22631.4317"
   },
   {
@@ -834,7 +834,8 @@
     "description": "Disables hardware and software geolocation sensor overrides to prevent physical tracking.",
     "category": "privacy",
     "subcategory": "location",
-    "risk": "Safe",
+    "risk": "Low",
+    "warnings": "Disables location sensor for apps like Maps, Weather, and Time Zone sync.",
     "impacts": [
       "privacy"
     ],
@@ -844,7 +845,6 @@
       "privacy"
     ],
     "presets": [
-      "recommended",
       "privacy"
     ],
     "windows": {
@@ -1063,7 +1063,7 @@
   {
     "schemaVersion": "1.0.0",
     "id": "privacy.consent.deny-notifications",
-    "name": "Deny Apps Access to User Notifications",
+    "name": "Deny UWP Apps Access to User Notifications",
     "description": "Blocks applications from intercepting or reading private notification listener messages.",
     "category": "privacy",
     "subcategory": "permissions",
@@ -1346,64 +1346,6 @@
       }
     ],
     "source": "https://learn.microsoft.com/en-us/windows/uwp/packaging/app-capability-declarations",
-    "verifiedOnBuild": "26100"
-  },
-  {
-    "schemaVersion": "1.0.0",
-    "id": "privacy.feedback.disable-frequency",
-    "name": "Disable Windows Feedback Request Frequency",
-    "description": "Configures Windows feedback prompt frequency to Never, suppressing feedback survey popups.",
-    "category": "privacy",
-    "subcategory": "feedback",
-    "risk": "Safe",
-    "impacts": [
-      "privacy",
-      "ui"
-    ],
-    "tags": [
-      "feedback",
-      "telemetry"
-    ],
-    "presets": [
-      "privacy",
-      "recommended",
-      "minimal"
-    ],
-    "windows": {
-      "minBuild": 19041,
-      "maxBuild": null
-    },
-    "requiresReboot": false,
-    "requiresExplorerRestart": false,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKCU",
-      "key": "Software\\Microsoft\\Siuf\\Rules",
-      "valueName": "NumberOfSIFInGracePeriod",
-      "expectedValue": 0,
-      "matchType": "Equals"
-    },
-    "apply": [
-      {
-        "type": "Registry",
-        "operation": "Set",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\Siuf\\Rules",
-        "valueName": "NumberOfSIFInGracePeriod",
-        "valueKind": "DWord",
-        "data": 0
-      }
-    ],
-    "undo": [
-      {
-        "type": "Registry",
-        "operation": "DeleteValue",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\Siuf\\Rules",
-        "valueName": "NumberOfSIFInGracePeriod"
-      }
-    ],
-    "source": "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services#7-feedback-and-diagnostics",
     "verifiedOnBuild": "26100"
   }
 ]

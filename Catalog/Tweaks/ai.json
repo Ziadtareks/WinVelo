@@ -238,7 +238,7 @@
         "operation": "DeleteValue"
       }
     ],
-    "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-admx-search#disablesearchboxsuggestions",
+    "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-search",
     "verifiedOnBuild": "22631.4317"
   }
 ]

@@ -1,5 +1,2 @@
-﻿33fdaac5099b2298a749908388592b652dcce6ce459fa383bf7a165729e8f3d6  Tweakora.exe
-740e5971e375fffe9cec8a5c4e2b38eaf5d976529a5583d84ba6ace6f4f8f723  tweakora-cli.exe
-25a5e1f5ffce88f6bb1fbb3a04fe78dd15cda9ea49ff0971facd0ba9056e4263  Tweakora-v0.1.0-win-x64-portable.zip
-f855bce733085c1d577ff8515bd94daffda1ffe17d9feddead9a8a7b78637a73  Tweakora-v0.1.0-win-x64-small.zip
-c860ea40e3de2ba4707b6dcf2ed19e25776da996724f368e206027417d91a4ea  Tweakora-v0.1.0-source.zip
+﻿9d1bce974e65a261134283db7c1fbd80cb0adef5ed225b32b6789e9efda7669a  Tweakora-v0.1.0-win-x64-portable.zip
+b40df8f97b5155d693711af505b896341b3c369e3c9d87af3aef040bc20c3d80  Tweakora-v0.1.0-win-x64-small.zip

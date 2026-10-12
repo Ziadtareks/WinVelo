@@ -9,7 +9,8 @@
                   Height="780" Width="1180"
                   MinHeight="600" MinWidth="900"
                   WindowStartupLocation="CenterScreen"
-                  ExtendsContentIntoTitleBar="True">
+                  ExtendsContentIntoTitleBar="True"
+                  AutomationProperties.AutomationId="TweakoraMainWindow">
 
     <Window.InputBindings>
         <KeyBinding Modifiers="Control" Key="K" Command="{Binding ToggleCommandPaletteCommand}" />
@@ -39,9 +40,10 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" /> <!-- TitleBar -->
+            <RowDefinition Height="Auto" /> <!-- Test Mode Warning Banner -->
+            <RowDefinition Height="*" />    <!-- Main Workspace (Nav + Page Content) -->
+            <RowDefinition Height="Auto" /> <!-- Activity Log Panel -->
         </Grid.RowDefinitions>
 
         <!-- Fluent Titlebar with Icon, Title, and Action Buttons -->
@@ -56,24 +58,41 @@
             </ui:TitleBar.Icon>
             <ui:TitleBar.TrailingContent>
                 <StackPanel Orientation="Horizontal" Margin="0,0,8,0">
-                    <ui:Button Icon="{ui:SymbolIcon Search24}"
+                    <ui:Button AutomationProperties.AutomationId="OpenCommandPaletteButton"
+                               Icon="{ui:SymbolIcon Search24}"
                                ToolTip="Command Palette &amp; Search (Ctrl+K)"
                                Command="{Binding ToggleCommandPaletteCommand}"
                                Appearance="Transparent" Margin="0,0,4,0" />
-                    <ui:Button Icon="{ui:SymbolIcon DarkTheme24}"
+                    <ui:Button AutomationProperties.AutomationId="ToggleThemeButton"
+                               Icon="{ui:SymbolIcon DarkTheme24}"
                                ToolTip="Toggle Dark / Light Theme"
                                Command="{Binding ToggleThemeCommand}"
                                Appearance="Transparent" Margin="0,0,4,0" />
-                    <ui:Button Icon="{ui:SymbolIcon DocumentBulletList24}"
+                    <ui:Button AutomationProperties.AutomationId="ToggleLogButton"
+                               Icon="{ui:SymbolIcon DocumentBulletList24}"
                                ToolTip="Toggle Activity Log"
                                Command="{Binding ToggleLogPanelCommand}"
                                Appearance="Transparent" />
+                    <TextBlock AutomationProperties.AutomationId="CurrentThemeText"
+                               Text="{Binding CurrentThemeName}"
+                               Width="0" Height="0" Opacity="0" />
                 </StackPanel>
             </ui:TitleBar.TrailingContent>
         </ui:TitleBar>
 
+        <!-- Test Mode Warning Banner (Visible when simulated platform is active) -->
+        <Border Grid.Row="1" Background="#FFF3CD" BorderBrush="#FFEEBA" BorderThickness="0,0,0,1" Padding="12,6"
+                Visibility="{Binding IsTestModeActive, Converter={StaticResource BoolToVisConverter}}">
+            <DockPanel>
+                <ui:SymbolIcon Symbol="Warning24" Foreground="#856404" FontSize="18" Margin="0,0,10,0" VerticalAlignment="Center" />
+                <TextBlock AutomationProperties.AutomationId="TestModeBanner"
+                           Text="TEST MODE ACTIVE — Simulated Platform Engine. Real Windows system is untouched."
+                           FontWeight="Bold" Foreground="#856404" FontSize="12" VerticalAlignment="Center" />
+            </DockPanel>
+        </Border>
+
         <!-- Main Workspace: Left Nav + Content -->
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="220" />
                 <ColumnDefinition Width="*" />
@@ -89,35 +108,41 @@
                         <TextBlock Text="Tweakora" FontSize="18" FontWeight="Bold" Margin="12,0,0,16"
                                    Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}" />
 
-                        <!-- Nav Buttons -->
-                        <ui:Button Content="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[NavHome]}"
+                        <!-- Nav Buttons with AutomationProperties -->
+                        <ui:Button AutomationProperties.AutomationId="Nav_Dashboard"
+                                   Content="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[NavHome]}"
                                    Icon="{ui:SymbolIcon Home24}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
                                    Appearance="Transparent" Margin="0,0,0,4"
                                    Command="{Binding NavigateCommand}" CommandParameter="Dashboard" />
 
-                        <ui:Button Content="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[NavTweaks]}"
+                        <ui:Button AutomationProperties.AutomationId="Nav_Tweaks"
+                                   Content="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[NavTweaks]}"
                                    Icon="{ui:SymbolIcon Wrench24}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
                                    Appearance="Transparent" Margin="0,0,0,4"
                                    Command="{Binding NavigateCommand}" CommandParameter="Tweaks" />
 
-                        <ui:Button Content="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[NavTools]}"
+                        <ui:Button AutomationProperties.AutomationId="Nav_Toolbox"
+                                   Content="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[NavTools]}"
                                    Icon="{ui:SymbolIcon Toolbox24}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
                                    Appearance="Transparent" Margin="0,0,0,4"
                                    Command="{Binding NavigateCommand}" CommandParameter="Toolbox" />
 
-                        <ui:Button Content="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[NavApps]}"
+                        <ui:Button AutomationProperties.AutomationId="Nav_Apps"
+                                   Content="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[NavApps]}"
                                    Icon="{ui:SymbolIcon Apps24}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
                                    Appearance="Transparent" Margin="0,0,0,4"
                                    Command="{Binding NavigateCommand}" CommandParameter="Apps" />
 
-                        <ui:Button Content="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[NavPresets]}"
+                        <ui:Button AutomationProperties.AutomationId="Nav_Presets"
+                                   Content="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[NavPresets]}"
                                    Icon="{ui:SymbolIcon Bookmark24}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
                                    Appearance="Transparent" Margin="0,0,0,4"
                                    Command="{Binding NavigateCommand}" CommandParameter="Presets" />
                     </StackPanel>
 
                     <StackPanel DockPanel.Dock="Bottom" Margin="8,8,8,16">
-                        <ui:Button Content="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[NavSettings]}"
+                        <ui:Button AutomationProperties.AutomationId="Nav_Settings"
+                                   Content="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[NavSettings]}"
                                    Icon="{ui:SymbolIcon Settings24}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
                                    Appearance="Transparent"
                                    Command="{Binding NavigateCommand}" CommandParameter="Settings" />
@@ -130,7 +155,7 @@
         </Grid>
 
         <!-- Collapsible Bottom Log Panel -->
-        <Border Grid.Row="2" Height="140"
+        <Border Grid.Row="3" Height="140"
                 Visibility="{Binding IsLogPanelOpen, Converter={StaticResource BoolToVisConverter}}"
                 BorderThickness="0,1,0,0"
                 BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
@@ -158,7 +183,7 @@
         </Border>
 
         <!-- ==================== COMMAND PALETTE (Ctrl+K) OVERLAY ==================== -->
-        <Grid Grid.Row="0" Grid.RowSpan="3" Background="#70000000"
+        <Grid Grid.Row="0" Grid.RowSpan="4" Background="#70000000"
               Visibility="{Binding IsCommandPaletteOpen, Converter={StaticResource BoolToVisConverter}}">
             <Border Background="{DynamicResource SolidBackgroundFillColorBaseBrush}"
                     BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
@@ -172,10 +197,16 @@
                     <!-- Search Header -->
                     <DockPanel Grid.Row="0" Margin="0,0,0,12">
                         <ui:Button DockPanel.Dock="Right" Icon="{ui:SymbolIcon Dismiss16}" Appearance="Transparent"
+                                   AutomationProperties.AutomationId="CloseCommandPaletteButton"
                                    Command="{Binding ToggleCommandPaletteCommand}" Margin="8,0,0,0" />
-                        <ui:TextBox PlaceholderText="Search tweaks, tools, apps, and actions... (Ctrl+K)"
+                        <ui:TextBox AutomationProperties.AutomationId="CommandPaletteSearchBox"
+                                    PlaceholderText="Search tweaks, tools, apps, and actions... (Ctrl+K)"
                                     Text="{Binding PaletteQuery, UpdateSourceTrigger=PropertyChanged}"
-                                    Icon="{ui:SymbolIcon Search24}" />
+                                    Icon="{ui:SymbolIcon Search24}">
+                            <ui:TextBox.InputBindings>
+                                <KeyBinding Key="Enter" Command="{Binding ExecuteFirstPaletteItemCommand}" />
+                            </ui:TextBox.InputBindings>
+                        </ui:TextBox>
                     </DockPanel>
 
                     <!-- Results List -->
@@ -183,10 +214,13 @@
                         <ItemsControl ItemsSource="{Binding PaletteResults}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <ui:CardAction Margin="0,0,0,6" Padding="10"
-                                                   Command="{Binding DataContext.ExecutePaletteItemCommand, RelativeSource={RelativeSource AncestorType=ui:FluentWindow}}"
-                                                   CommandParameter="{Binding}">
-                                        <Grid>
+                                    <ui:Button AutomationProperties.AutomationId="{Binding Title, StringFormat='PaletteItem_{0}'}"
+                                               HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
+                                               Appearance="Transparent"
+                                               Margin="0,0,0,6" Padding="10"
+                                               Command="{Binding DataContext.ExecutePaletteItemCommand, RelativeSource={RelativeSource AncestorType=ui:FluentWindow}}"
+                                               CommandParameter="{Binding}">
+                                        <Grid HorizontalAlignment="Stretch">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="*" />
                                                 <ColumnDefinition Width="Auto" />
@@ -199,7 +233,7 @@
                                                 <TextBlock Text="{Binding Category}" FontSize="11" Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}" FontWeight="Medium" />
                                             </Border>
                                         </Grid>
-                                    </ui:CardAction>
+                                    </ui:Button>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
