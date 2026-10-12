@@ -1,0 +1,14 @@
+{
+  "id": "preset.privacy",
+  "name": {
+    "en": "Privacy",
+    "ar": "الخصوصية"
+  },
+  "description": {
+    "en": "Minimizes telemetry, diagnostic collection, tailored experiences, and targeted advertising.",
+    "ar": "تقليل إرسال البيانات التشخيصية والتتبع والإعلانات الموجهة إلى أدنى حد ممكن."
+  },
+  "tweakIds": [
+    "privacy.telemetry.diagnostic-data"
+  ]
+}

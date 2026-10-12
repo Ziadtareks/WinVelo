@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <RootNamespace>Tweakora.Modules</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Tweakora.Core\Tweakora.Core.csproj" />
+    <ProjectReference Include="..\Tweakora.Platform\Tweakora.Platform.csproj" />
+  </ItemGroup>
+
+</Project>

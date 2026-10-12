@@ -1,0 +1,65 @@
+[
+  {
+    "schemaVersion": "1.0.0",
+    "id": "privacy.telemetry.diagnostic-data",
+    "name": {
+      "en": "Diagnostic Data Level",
+      "ar": "مستوى البيانات التشخيصية"
+    },
+    "description": {
+      "en": "Reduces diagnostic data sent to Microsoft to the lowest allowed level.",
+      "ar": "تقليل البيانات التشخيصية المرسلة إلى مايكروسوفت إلى أدنى حد مسموح به."
+    },
+    "effectNote": {
+      "en": "On Windows Enterprise and Education, this sets data collection to 0 (Security). On Windows Home and Pro, Windows treats 0 as 1 (Required diagnostic data).",
+      "ar": "على نسختي Enterprise و Education، يضبط القيمة إلى 0 (أمني). أما على Home و Pro، فيعتبر ويندوز القيمة 0 بمثابة 1 (البيانات المطلوبة فقط)."
+    },
+    "category": "privacy",
+    "subcategory": "telemetry",
+    "risk": "Safe",
+    "impacts": ["privacy"],
+    "tags": ["telemetry", "privacy", "diagnostics"],
+    "presets": ["recommended", "privacy"],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null,
+      "editions": ["Home", "Pro", "Enterprise", "Education", "IoTEnterprise"]
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection",
+      "valueName": "AllowTelemetry",
+      "matchType": "Equals",
+      "expectedValue": 0
+    },
+    "apply": [
+      {
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection",
+        "valueName": "AllowTelemetry",
+        "valueKind": "DWord",
+        "data": 0,
+        "operation": "Set"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection",
+        "valueName": "AllowTelemetry",
+        "operation": "DeleteValue"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/privacy/configure-windows-diagnostic-data-in-your-organization",
+    "verifiedOnBuild": "22631.4317",
+    "warnings": {
+      "en": "Windows Settings will display 'Some settings are managed by your organization'. This is normal when Group Policy registry keys are set.",
+      "ar": "ستظهر رسالة 'تتم إدارة بعض الإعدادات بواسطة مؤسستك' داخل إعدادات ويندوز. هذا أمر طبيعي عند تفعيل مفاتيح سياسات النظام."
+    }
+  }
+]

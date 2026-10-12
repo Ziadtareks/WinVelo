@@ -1,0 +1,14 @@
+{
+  "id": "preset.recommended",
+  "name": {
+    "en": "Recommended",
+    "ar": "الموصى به"
+  },
+  "description": {
+    "en": "Safe baseline settings that balance privacy, system responsiveness, and clean UI without breaking any features.",
+    "ar": "إعدادات أساسية آمنة توازن بين الخصوصية وسرعة النظام والمظهر النظيف دون تعطيل أي ميزة أساسية."
+  },
+  "tweakIds": [
+    "privacy.telemetry.diagnostic-data"
+  ]
+}

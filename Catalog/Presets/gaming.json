@@ -1,0 +1,14 @@
+{
+  "id": "preset.gaming",
+  "name": {
+    "en": "Gaming",
+    "ar": "الألعاب"
+  },
+  "description": {
+    "en": "Disables background Xbox Game Bar recording overlays, Game DVR, and enables Windows Game Mode.",
+    "ar": "تعطيل تسجيل شريط ألعاب إكس بوكس في الخلفية و Game DVR وتفعيل وضع الألعاب في ويندوز."
+  },
+  "tweakIds": [
+    "privacy.telemetry.diagnostic-data"
+  ]
+}
