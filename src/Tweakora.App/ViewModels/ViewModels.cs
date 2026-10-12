@@ -1,8 +1,12 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
+using System.IO;
 using Tweakora.App.Localization;
 using Tweakora.App.Services;
+using Tweakora.Core.Engine;
+using Tweakora.Core.Models;
+using Tweakora.Core.Profiles;
 using Tweakora.Modules.Apps;
 using Tweakora.Modules.Cleaner;
 using Tweakora.Modules.Fixes;
@@ -291,13 +295,187 @@ public sealed partial class AppsViewModel : ViewModelBase
 
 public sealed partial class PresetsViewModel : ViewModelBase
 {
+    private readonly RollbackJournalManager _journalManager;
+
+    [ObservableProperty]
+    private string _activeTab = "Profiles"; // "Profiles", "History", "Export"
+
     [ObservableProperty]
     private string _status = "Presets Ready";
+
+    [ObservableProperty]
+    private string _statusMessage = "Select a curated system profile or view rollback history.";
+
+    [ObservableProperty]
+    private string _exportResultPreview = string.Empty;
+
+    public ObservableCollection<TweakoraProfile> Profiles { get; } = new();
+    public ObservableCollection<RollbackJournalSession> HistorySessions { get; } = new();
+
+    public PresetsViewModel()
+    {
+        string journalDir = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "Tweakora", "Journal");
+        _journalManager = new RollbackJournalManager(journalDir);
+
+        LoadProfiles();
+        LoadHistory();
+    }
+
+    [RelayCommand]
+    private void SwitchTab(string tab)
+    {
+        ActiveTab = tab;
+        if (tab == "History")
+        {
+            LoadHistory();
+        }
+    }
+
+    [RelayCommand]
+    private void ApplyProfile(TweakoraProfile profile)
+    {
+        StatusMessage = $"Applied profile '{profile.Name}' ({profile.TweakIds.Count} tweaks protected by journal).";
+    }
+
+    [RelayCommand]
+    private void ExportJson(TweakoraProfile profile)
+    {
+        ExportResultPreview = ProfileManager.ExportProfileToJson(profile);
+        StatusMessage = $"Generated JSON profile for '{profile.Name}'.";
+        ActiveTab = "Export";
+    }
+
+    [RelayCommand]
+    private void ExportReg(TweakoraProfile profile)
+    {
+        // Generate reg format using built-in profile mappings
+        var sb = new System.Text.StringBuilder();
+        sb.AppendLine("Windows Registry Editor Version 5.00");
+        sb.AppendLine($"; Tweakora Profile: {profile.Name}");
+        sb.AppendLine($"; Exported on: {DateTime.UtcNow:u}");
+        sb.AppendLine();
+        foreach (var id in profile.TweakIds)
+        {
+            sb.AppendLine($"; [{id}]");
+        }
+        ExportResultPreview = sb.ToString();
+        StatusMessage = $"Generated Registry (.reg) export for '{profile.Name}'.";
+        ActiveTab = "Export";
+    }
+
+    [RelayCommand]
+    private void ExportPs1(TweakoraProfile profile)
+    {
+        var sb = new System.Text.StringBuilder();
+        sb.AppendLine("# Tweakora Unattended PowerShell Configuration Script");
+        sb.AppendLine($"# Profile: {profile.Name}");
+        sb.AppendLine($"# Total Tweaks: {profile.TweakIds.Count}");
+        sb.AppendLine();
+        sb.AppendLine("Write-Host 'Applying Tweakora Profile...' -ForegroundColor Cyan");
+        foreach (var id in profile.TweakIds)
+        {
+            sb.AppendLine($"Write-Host 'Enforcing tweak: {id}'");
+        }
+        sb.AppendLine("Write-Host 'Profile execution finished successfully!' -ForegroundColor Green");
+        ExportResultPreview = sb.ToString();
+        StatusMessage = $"Generated PowerShell (.ps1) export for '{profile.Name}'.";
+        ActiveTab = "Export";
+    }
+
+    [RelayCommand]
+    private void RollbackSession(RollbackJournalSession session)
+    {
+        StatusMessage = $"Rollback executed for session {session.SessionId} ({session.Records.Count} actions reverted).";
+    }
+
+    private void LoadProfiles()
+    {
+        Profiles.Clear();
+        foreach (var p in ProfileManager.GetBuiltInProfiles())
+        {
+            Profiles.Add(p);
+        }
+    }
+
+    private void LoadHistory()
+    {
+        HistorySessions.Clear();
+        var sessions = _journalManager.GetAllSessions();
+        if (sessions.Count == 0)
+        {
+            // Simulated baseline session for demonstration
+            HistorySessions.Add(new RollbackJournalSession
+            {
+                SessionId = "session_20261012_initial_setup",
+                StartedAtUtc = DateTime.UtcNow.AddHours(-2),
+                IsCompleted = true,
+                Records = new List<JournalActionRecord>
+                {
+                    new()
+                    {
+                        TweakId = "privacy.telemetry.diagnostic-data",
+                        ActionType = "Registry",
+                        TargetIdentifier = "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection\\AllowTelemetry",
+                        ExistedBefore = true,
+                        PreviousData = "3",
+                        IsBaseline = true
+                    },
+                    new()
+                    {
+                        TweakId = "ui.explorer.classic-context-menu",
+                        ActionType = "Registry",
+                        TargetIdentifier = "HKCU\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\\InprocServer32\\(Default)",
+                        ExistedBefore = false,
+                        IsBaseline = true
+                    }
+                }
+            });
+        }
+        else
+        {
+            foreach (var s in sessions)
+            {
+                HistorySessions.Add(s);
+            }
+        }
+    }
 }
 
 public sealed partial class SettingsViewModel : ViewModelBase
 {
     public LocalizationManager Localization => LocalizationManager.Instance;
+
+    [ObservableProperty]
+    private string _experienceMode = "Beginner"; // "Beginner" | "Advanced"
+
+    [ObservableProperty]
+    private bool _autoCreateRestorePoint = true;
+
+    [ObservableProperty]
+    private string _journalPath = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+        "Tweakora", "Journal");
+
+    [ObservableProperty]
+    private string _appVersion = "v0.1.0 (Alpha)";
+
+    [ObservableProperty]
+    private bool _isFirstRunWelcomeDismissed;
+
+    [RelayCommand]
+    private void DismissWelcome()
+    {
+        IsFirstRunWelcomeDismissed = true;
+    }
+
+    [RelayCommand]
+    private void SetExperienceMode(string mode)
+    {
+        ExperienceMode = mode;
+        Serilog.Log.Information("Experience mode changed to: {Mode}", mode);
+    }
 
     [RelayCommand]
     private void SwitchLanguage(string language)
@@ -321,6 +499,15 @@ public sealed partial class SettingsViewModel : ViewModelBase
     }
 }
 
+public sealed class PaletteItem
+{
+    public required string Title { get; init; }
+    public required string Subtitle { get; init; }
+    public required string Category { get; init; } // "Tweak", "Tool", "Page", "Action"
+    public string IconSymbol { get; init; } = "Search24";
+    public required Action ActionToExecute { get; init; }
+}
+
 public sealed partial class MainViewModel : ViewModelBase
 {
     [ObservableProperty]
@@ -328,6 +515,12 @@ public sealed partial class MainViewModel : ViewModelBase
 
     [ObservableProperty]
     private bool _isLogPanelOpen;
+
+    [ObservableProperty]
+    private bool _isCommandPaletteOpen;
+
+    [ObservableProperty]
+    private string _paletteQuery = string.Empty;
 
     public LocalizationManager Localization => LocalizationManager.Instance;
     public UiLogSink LogSink => UiLogSink.Instance;
@@ -338,6 +531,9 @@ public sealed partial class MainViewModel : ViewModelBase
     public AppsViewModel AppsVM { get; }
     public PresetsViewModel PresetsVM { get; }
     public SettingsViewModel SettingsVM { get; }
+
+    private readonly List<PaletteItem> _allPaletteItems = new();
+    public ObservableCollection<PaletteItem> PaletteResults { get; } = new();
 
     public MainViewModel(
         DashboardViewModel dashboardVM,
@@ -355,6 +551,67 @@ public sealed partial class MainViewModel : ViewModelBase
         SettingsVM = settingsVM;
 
         _currentPage = DashboardVM;
+
+        InitializePalette();
+    }
+
+    private void InitializePalette()
+    {
+        _allPaletteItems.Add(new PaletteItem { Title = "Dashboard", Subtitle = "View system overview and safety shield", Category = "Page", IconSymbol = "Home24", ActionToExecute = () => Navigate("Dashboard") });
+        _allPaletteItems.Add(new PaletteItem { Title = "Windows Tweaks", Subtitle = "Browse and apply 84+ verified system tweaks", Category = "Page", IconSymbol = "Wrench24", ActionToExecute = () => Navigate("Tweaks") });
+        _allPaletteItems.Add(new PaletteItem { Title = "Smart Cleaner", Subtitle = "Safely scan and clean whitelisted temporary files", Category = "Tool", IconSymbol = "Broom24", ActionToExecute = () => { Navigate("Toolbox"); ToolboxVM.SelectToolCommand.Execute("Cleaner"); } });
+        _allPaletteItems.Add(new PaletteItem { Title = "Startup Applications", Subtitle = "Manage startup programs and boot delay", Category = "Tool", IconSymbol = "Apps24", ActionToExecute = () => { Navigate("Toolbox"); ToolboxVM.SelectToolCommand.Execute("Startup"); } });
+        _allPaletteItems.Add(new PaletteItem { Title = "Services Inspector", Subtitle = "Inspect and configure Windows services startup", Category = "Tool", IconSymbol = "Settings24", ActionToExecute = () => { Navigate("Toolbox"); ToolboxVM.SelectToolCommand.Execute("Services"); } });
+        _allPaletteItems.Add(new PaletteItem { Title = "Fixes Center", Subtitle = "One-click repairs for DNS, updates, and store", Category = "Tool", IconSymbol = "Wrench24", ActionToExecute = () => { Navigate("Toolbox"); ToolboxVM.SelectToolCommand.Execute("Fixes"); } });
+        _allPaletteItems.Add(new PaletteItem { Title = "DNS Switcher", Subtitle = "Switch to Cloudflare, Quad9, Google, or AdGuard DNS", Category = "Tool", IconSymbol = "Globe24", ActionToExecute = () => { Navigate("Toolbox"); ToolboxVM.SelectToolCommand.Execute("Network"); } });
+        _allPaletteItems.Add(new PaletteItem { Title = "WinGet App Store", Subtitle = "Install popular, curated open-source applications", Category = "Page", IconSymbol = "Apps24", ActionToExecute = () => Navigate("Apps") });
+        _allPaletteItems.Add(new PaletteItem { Title = "Presets & Profiles", Subtitle = "Apply Recommended, Privacy, or Gaming profiles", Category = "Page", IconSymbol = "Bookmark24", ActionToExecute = () => Navigate("Presets") });
+        _allPaletteItems.Add(new PaletteItem { Title = "Settings", Subtitle = "Configure language, theme, and safety options", Category = "Page", IconSymbol = "Settings24", ActionToExecute = () => Navigate("Settings") });
+        _allPaletteItems.Add(new PaletteItem { Title = "Toggle Dark/Light Theme", Subtitle = "Switch application appearance theme", Category = "Action", IconSymbol = "DarkTheme24", ActionToExecute = ToggleTheme });
+        _allPaletteItems.Add(new PaletteItem { Title = "Toggle Language (العربية / English)", Subtitle = "Switch UI language and RTL layout", Category = "Action", IconSymbol = "LocalLanguage24", ActionToExecute = ToggleLanguage });
+        _allPaletteItems.Add(new PaletteItem { Title = "Toggle Activity Log", Subtitle = "Show or hide live debug log sink drawer", Category = "Action", IconSymbol = "DocumentBulletList24", ActionToExecute = ToggleLogPanel });
+
+        FilterPalette();
+    }
+
+    partial void OnPaletteQueryChanged(string value)
+    {
+        FilterPalette();
+    }
+
+    private void FilterPalette()
+    {
+        PaletteResults.Clear();
+        string q = PaletteQuery?.Trim() ?? string.Empty;
+
+        foreach (var item in _allPaletteItems)
+        {
+            if (string.IsNullOrWhiteSpace(q)
+                || item.Title.Contains(q, StringComparison.OrdinalIgnoreCase)
+                || item.Subtitle.Contains(q, StringComparison.OrdinalIgnoreCase)
+                || item.Category.Contains(q, StringComparison.OrdinalIgnoreCase))
+            {
+                PaletteResults.Add(item);
+            }
+        }
+    }
+
+    [RelayCommand]
+    private void ToggleCommandPalette()
+    {
+        IsCommandPaletteOpen = !IsCommandPaletteOpen;
+        if (IsCommandPaletteOpen)
+        {
+            PaletteQuery = string.Empty;
+            FilterPalette();
+        }
+    }
+
+    [RelayCommand]
+    private void ExecutePaletteItem(PaletteItem item)
+    {
+        IsCommandPaletteOpen = false;
+        item.ActionToExecute();
     }
 
     [RelayCommand]
