@@ -16,11 +16,6 @@ public sealed partial class DashboardViewModel : ViewModelBase
     private string _status = "System Ready";
 }
 
-public sealed partial class TweaksViewModel : ViewModelBase
-{
-    [ObservableProperty]
-    private string _status = "Catalog Loaded";
-}
 
 public sealed partial class ToolboxViewModel : ViewModelBase
 {

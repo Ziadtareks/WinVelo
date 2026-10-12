@@ -1,0 +1,262 @@
+[
+  {
+    "schemaVersion": "1.0.0",
+    "id": "gaming.mode.enable",
+    "name": {
+      "en": "Enable Windows Game Mode",
+      "ar": "تفعيل وضع الألعاب في ويندوز"
+    },
+    "description": {
+      "en": "Prioritizes CPU and GPU resources for active games and suppresses background tasks.",
+      "ar": "إعطاء الأولوية في المعالج وكارت الشاشة للعبة النشطة وإيقاف المهام الخلفية المزعجة."
+    },
+    "category": "gaming",
+    "subcategory": "mode",
+    "risk": "Safe",
+    "impacts": ["gaming", "performance"],
+    "tags": ["gaming", "gamemode"],
+    "presets": ["recommended", "gaming"],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Microsoft\\GameBar",
+      "valueName": "AutoGameModeEnabled",
+      "matchType": "Equals",
+      "expectedValue": 1
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\GameBar",
+        "valueName": "AutoGameModeEnabled",
+        "valueKind": "DWord",
+        "data": 1,
+        "operation": "Set"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\GameBar",
+        "valueName": "AutoGameModeEnabled",
+        "valueKind": "DWord",
+        "data": 0,
+        "operation": "Set"
+      }
+    ],
+    "source": "https://support.microsoft.com/en-us/windows/use-game-mode-on-your-pc-5896ee1a-1e64-44b7-a3f2-892f33c37574",
+    "verifiedOnBuild": "22631.4317"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "gaming.xbox.disable-game-bar",
+    "name": {
+      "en": "Disable Xbox Game Bar Overlay",
+      "ar": "تعطيل واجهة شريط ألعاب إكس بوكس"
+    },
+    "description": {
+      "en": "Disables the Game Bar overlay to prevent accidental opening and reduce background memory usage.",
+      "ar": "تعطيل شريط ألعاب إكس بوكس لمنع فتحه بالخطأ أثناء اللعب وتوفير الذاكرة."
+    },
+    "category": "gaming",
+    "subcategory": "gamebar",
+    "risk": "Safe",
+    "impacts": ["gaming", "performance"],
+    "tags": ["xbox", "gamebar"],
+    "presets": ["gaming"],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\GameDVR",
+      "valueName": "AppCaptureEnabled",
+      "matchType": "Equals",
+      "expectedValue": 0
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\GameDVR",
+        "valueName": "AppCaptureEnabled",
+        "valueKind": "DWord",
+        "data": 0,
+        "operation": "Set"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\GameDVR",
+        "valueName": "AppCaptureEnabled",
+        "valueKind": "DWord",
+        "data": 1,
+        "operation": "Set"
+      }
+    ],
+    "source": "https://support.microsoft.com/en-us/windows/troubleshoot-xbox-game-bar-on-windows-574a4cf7-775b-4395-5c1a-ddc99d63645c",
+    "verifiedOnBuild": "22631.4317"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "gaming.dvr.disable-background-recording",
+    "name": {
+      "en": "Disable Background Game DVR Recording",
+      "ar": "تعطيل التسجيل التلقائي في الخلفية (Game DVR)"
+    },
+    "description": {
+      "en": "Stops Windows from constantly recording game clips in the background to eliminate disk and GPU write overhead.",
+      "ar": "إيقاف تصوير وحفظ لقطات الألعاب في الخلفية باستمرار لإراحة القرص والمعالج الرسومي."
+    },
+    "category": "gaming",
+    "subcategory": "dvr",
+    "risk": "Safe",
+    "impacts": ["gaming", "performance", "storage"],
+    "tags": ["dvr", "recording"],
+    "presets": ["gaming"],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "System\\GameConfigStore",
+      "valueName": "GameDVR_Enabled",
+      "matchType": "Equals",
+      "expectedValue": 0
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "System\\GameConfigStore",
+        "valueName": "GameDVR_Enabled",
+        "valueKind": "DWord",
+        "data": 0,
+        "operation": "Set"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "System\\GameConfigStore",
+        "valueName": "GameDVR_Enabled",
+        "valueKind": "DWord",
+        "data": 1,
+        "operation": "Set"
+      }
+    ],
+    "source": "https://support.microsoft.com/en-us/windows/adjust-capture-settings-for-xbox-game-bar-83be3e98-294b-4654-8e2b-f1f31f9b3ec7",
+    "verifiedOnBuild": "22631.4317"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "gaming.input.disable-mouse-acceleration",
+    "name": {
+      "en": "Disable Pointer Acceleration (Enhance Pointer Precision)",
+      "ar": "تعطيل تسارع مؤشر الفأرة (Enhance Pointer Precision)"
+    },
+    "description": {
+      "en": "Disables non-linear pointer acceleration for 1:1 true raw mouse input in games and desktop.",
+      "ar": "تعطيل تسريع الماوس المتغير لضمان دقة تصويب 1:1 ثابتة في الألعاب."
+    },
+    "category": "gaming",
+    "subcategory": "input",
+    "risk": "Safe",
+    "impacts": ["gaming", "ui"],
+    "tags": ["mouse", "aim", "input"],
+    "presets": ["gaming"],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Control Panel\\Mouse",
+      "valueName": "MouseSpeed",
+      "matchType": "Equals",
+      "expectedValue": "0"
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Control Panel\\Mouse",
+        "valueName": "MouseSpeed",
+        "valueKind": "String",
+        "data": "0",
+        "operation": "Set"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Control Panel\\Mouse",
+        "valueName": "MouseThreshold1",
+        "valueKind": "String",
+        "data": "0",
+        "operation": "Set"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Control Panel\\Mouse",
+        "valueName": "MouseThreshold2",
+        "valueKind": "String",
+        "data": "0",
+        "operation": "Set"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Control Panel\\Mouse",
+        "valueName": "MouseSpeed",
+        "valueKind": "String",
+        "data": "1",
+        "operation": "Set"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Control Panel\\Mouse",
+        "valueName": "MouseThreshold1",
+        "valueKind": "String",
+        "data": "6",
+        "operation": "Set"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Control Panel\\Mouse",
+        "valueName": "MouseThreshold2",
+        "valueKind": "String",
+        "data": "10",
+        "operation": "Set"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-systemparametersinfoa",
+    "verifiedOnBuild": "22631.4317"
+  }
+]

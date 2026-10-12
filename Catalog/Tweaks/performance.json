@@ -1,0 +1,332 @@
+[
+  {
+    "schemaVersion": "1.0.0",
+    "id": "performance.visual.disable-transparency",
+    "name": {
+      "en": "Disable Transparency Effects",
+      "ar": "تعطيل تأثيرات الشفافية"
+    },
+    "description": {
+      "en": "Turns off transparency on taskbar, Start menu, and windows to reduce GPU overhead.",
+      "ar": "إيقاف شفافية النوافذ وشريط المهام لتقليل الحمل على كارت الشاشة وتحسين الاستجابة."
+    },
+    "category": "performance",
+    "subcategory": "visual",
+    "risk": "Safe",
+    "impacts": ["performance", "battery", "ui"],
+    "tags": ["transparency", "gpu"],
+    "presets": ["gaming", "minimal"],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
+      "valueName": "EnableTransparency",
+      "matchType": "Equals",
+      "expectedValue": 0
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
+        "valueName": "EnableTransparency",
+        "valueKind": "DWord",
+        "data": 0,
+        "operation": "Set"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
+        "valueName": "EnableTransparency",
+        "valueKind": "DWord",
+        "data": 1,
+        "operation": "Set"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/configuration/visual-effects",
+    "verifiedOnBuild": "22631.4317"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "performance.visual.disable-animations",
+    "name": {
+      "en": "Disable Window Minimize/Maximize Animations",
+      "ar": "تعطيل حركات تصغير وتكبير النوافذ"
+    },
+    "description": {
+      "en": "Speeds up desktop responsiveness by eliminating window transition animations.",
+      "ar": "تسريع التنقل عبر النوافذ بإلغاء الرسوم المتحركة عند التصغير والتكبير."
+    },
+    "category": "performance",
+    "subcategory": "visual",
+    "risk": "Safe",
+    "impacts": ["performance", "ui"],
+    "tags": ["animations", "speed"],
+    "presets": ["gaming", "minimal"],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": true,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Control Panel\\Desktop\\WindowMetrics",
+      "valueName": "MinAnimate",
+      "matchType": "Equals",
+      "expectedValue": "0"
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Control Panel\\Desktop\\WindowMetrics",
+        "valueName": "MinAnimate",
+        "valueKind": "String",
+        "data": "0",
+        "operation": "Set"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Control Panel\\Desktop\\WindowMetrics",
+        "valueName": "MinAnimate",
+        "valueKind": "String",
+        "data": "1",
+        "operation": "Set"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/configuration/visual-effects",
+    "verifiedOnBuild": "22631.4317"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "performance.system.disable-startup-delay",
+    "name": {
+      "en": "Disable Windows Startup App Delay",
+      "ar": "إلغاء مهلة تأخير تشغيل تطبيقات الإقلاع"
+    },
+    "description": {
+      "en": "Eliminates the built-in 10-second startup delay Windows imposes on autostart apps.",
+      "ar": "إلغاء فترة التأخير التلقائية التي يفرضها ويندوز عند تشغيل البرامج مع إقلاع النظام."
+    },
+    "category": "performance",
+    "subcategory": "startup",
+    "risk": "Safe",
+    "impacts": ["performance"],
+    "tags": ["startup", "boot"],
+    "presets": ["recommended", "gaming"],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Serialize",
+      "valueName": "StartupDelayInMSec",
+      "matchType": "Equals",
+      "expectedValue": 0
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Serialize",
+        "valueName": "StartupDelayInMSec",
+        "valueKind": "DWord",
+        "data": 0,
+        "operation": "Set"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Serialize",
+        "valueName": "StartupDelayInMSec",
+        "operation": "DeleteValue"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/client-management/client-tools/startup-apps",
+    "verifiedOnBuild": "22631.4317"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "performance.system.storage-sense",
+    "name": {
+      "en": "Enable Storage Sense Auto-Cleanup",
+      "ar": "تفعيل مستشعر مساحة التخزين التلقائي"
+    },
+    "description": {
+      "en": "Automatically frees up disk space by deleting old temp files and recycled items.",
+      "ar": "تنظيف القرص تلقائياً بحذف الملفات المؤقتة والمهملات عند انخفاض مساحة التخزين."
+    },
+    "category": "performance",
+    "subcategory": "storage",
+    "risk": "Safe",
+    "impacts": ["performance", "storage"],
+    "tags": ["storage", "cleaner"],
+    "presets": ["recommended"],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\StorageSense\\Parameters\\StoragePolicy",
+      "valueName": "01",
+      "matchType": "Equals",
+      "expectedValue": 1
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\StorageSense\\Parameters\\StoragePolicy",
+        "valueName": "01",
+        "valueKind": "DWord",
+        "data": 1,
+        "operation": "Set"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\StorageSense\\Parameters\\StoragePolicy",
+        "valueName": "01",
+        "valueKind": "DWord",
+        "data": 0,
+        "operation": "Set"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/client-management/client-tools/storage-sense",
+    "verifiedOnBuild": "22631.4317"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "performance.network.delivery-optimization-simple",
+    "name": {
+      "en": "Restrict Delivery Optimization to Local Network",
+      "ar": "تقييد تحسين التسليم على الشبكة المحلية فقط"
+    },
+    "description": {
+      "en": "Stops Windows Update from uploading update files to external internet peers (Mode 0: HTTP only / No P2P).",
+      "ar": "منع ويندوز من استخدام سرعة الإنترنت لديك لرفع التحديثات لأجهزة أخرى عبر الإنترنت."
+    },
+    "category": "performance",
+    "subcategory": "network",
+    "risk": "Safe",
+    "impacts": ["network", "performance"],
+    "tags": ["bandwidth", "updates"],
+    "presets": ["recommended", "gaming"],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\DeliveryOptimization",
+      "valueName": "DODownloadMode",
+      "matchType": "Equals",
+      "expectedValue": 0
+    },
+    "apply": [
+      {
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\DeliveryOptimization",
+        "valueName": "DODownloadMode",
+        "valueKind": "DWord",
+        "data": 0,
+        "operation": "Set"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\DeliveryOptimization",
+        "valueName": "DODownloadMode",
+        "operation": "DeleteValue"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/deployment/do/waas-delivery-optimization-reference#download-mode",
+    "verifiedOnBuild": "22631.4317"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "performance.memory.svchost-split-threshold",
+    "name": {
+      "en": "Tune SvcHost Split Threshold",
+      "ar": "تحسين عتبة تجزئة عمليات الخدمات (SvcHost)"
+    },
+    "description": {
+      "en": "Groups system services into fewer svchost processes on systems with moderate RAM to reduce memory overhead.",
+      "ar": "تجميع خدمات النظام في عدد أقل من عمليات svchost لتوفير استهلاك الذاكرة العشوائية (RAM)."
+    },
+    "category": "performance",
+    "subcategory": "memory",
+    "risk": "Low",
+    "impacts": ["performance"],
+    "tags": ["svchost", "ram"],
+    "presets": ["recommended"],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": true,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SYSTEM\\CurrentControlSet\\Control",
+      "valueName": "SvcHostSplitThresholdInKB",
+      "matchType": "Equals",
+      "expectedValue": 380000
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SYSTEM\\CurrentControlSet\\Control",
+        "valueName": "SvcHostSplitThresholdInKB",
+        "valueKind": "DWord",
+        "data": 380000,
+        "operation": "Set"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SYSTEM\\CurrentControlSet\\Control",
+        "valueName": "SvcHostSplitThresholdInKB",
+        "operation": "DeleteValue"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/application-management/svchost-service-refactoring",
+    "verifiedOnBuild": "22631.4317"
+  }
+]

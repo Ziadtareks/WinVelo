@@ -1,0 +1,557 @@
+[
+  {
+    "schemaVersion": "1.0.0",
+    "id": "ui.explorer.classic-context-menu",
+    "name": {
+      "en": "Restore Classic Right-Click Menu",
+      "ar": "استعادة قائمة الزر الأيمن الكلاسيكية"
+    },
+    "description": {
+      "en": "Restores the Windows 10 full context menu in Windows 11 File Explorer without 'Show more options'.",
+      "ar": "استعادة قائمة الزر الأيمن الكاملة في ويندوز 11 بدون الحاجة للضغط على 'إظهار المزيد من الخيارات'."
+    },
+    "category": "ui",
+    "subcategory": "explorer",
+    "risk": "Safe",
+    "impacts": ["ui", "performance"],
+    "tags": ["contextmenu", "explorer", "win11"],
+    "presets": ["recommended", "minimal"],
+    "windows": {
+      "minBuild": 22000,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": true,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\\InprocServer32",
+      "matchType": "Exists"
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\\InprocServer32",
+        "valueName": "",
+        "valueKind": "String",
+        "data": "",
+        "operation": "Set"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\\InprocServer32",
+        "operation": "DeleteKey"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/win32/shell/context-menu-handlers",
+    "verifiedOnBuild": "22631.4317"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "ui.explorer.show-file-extensions",
+    "name": {
+      "en": "Always Show Known File Extensions",
+      "ar": "إظهار امتدادات وصيغ الملفات دائماً"
+    },
+    "description": {
+      "en": "Displays file extensions (.exe, .txt, .pdf) in File Explorer for transparency and security.",
+      "ar": "إظهار امتداد الملفات (مثل .exe و .txt) في مستكشف الملفات لزيادة الأمان والوضوح."
+    },
+    "category": "ui",
+    "subcategory": "explorer",
+    "risk": "Safe",
+    "impacts": ["ui", "security"],
+    "tags": ["extensions", "explorer"],
+    "presets": ["recommended", "minimal"],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": true,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+      "valueName": "HideFileExt",
+      "matchType": "Equals",
+      "expectedValue": 0
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "valueName": "HideFileExt",
+        "valueKind": "DWord",
+        "data": 0,
+        "operation": "Set"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "valueName": "HideFileExt",
+        "valueKind": "DWord",
+        "data": 1,
+        "operation": "Set"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/security/operating-system-security/device-management/windows-security-configuration-framework/security-compliance-toolkit-10",
+    "verifiedOnBuild": "22631.4317"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "ui.explorer.show-hidden-files",
+    "name": {
+      "en": "Show Hidden Files and Folders",
+      "ar": "إظهار الملفات والمجلدات المخفية"
+    },
+    "description": {
+      "en": "Makes hidden files and folders visible in Windows File Explorer.",
+      "ar": "جعل الملفات والمجلدات المخفية مرئية في مستكشف الملفات."
+    },
+    "category": "ui",
+    "subcategory": "explorer",
+    "risk": "Safe",
+    "impacts": ["ui"],
+    "tags": ["hidden", "explorer"],
+    "presets": ["minimal"],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": true,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+      "valueName": "Hidden",
+      "matchType": "Equals",
+      "expectedValue": 1
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "valueName": "Hidden",
+        "valueKind": "DWord",
+        "data": 1,
+        "operation": "Set"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "valueName": "Hidden",
+        "valueKind": "DWord",
+        "data": 2,
+        "operation": "Set"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/client-management/client-tools/show-hidden-files",
+    "verifiedOnBuild": "22631.4317"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "ui.explorer.open-to-this-pc",
+    "name": {
+      "en": "Open File Explorer to This PC",
+      "ar": "فتح مستكشف الملفات على 'هذا الكمبيوتر'"
+    },
+    "description": {
+      "en": "Configures File Explorer to launch into 'This PC' view instead of Quick Access / Home.",
+      "ar": "ضبط مستكشف الملفات ليفتح على 'هذا الكمبيوتر' بدلاً من الصفحة الرئيسية أو الوصول السريع."
+    },
+    "category": "ui",
+    "subcategory": "explorer",
+    "risk": "Safe",
+    "impacts": ["ui"],
+    "tags": ["thispc", "explorer"],
+    "presets": ["recommended", "minimal"],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+      "valueName": "LaunchTo",
+      "matchType": "Equals",
+      "expectedValue": 1
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "valueName": "LaunchTo",
+        "valueKind": "DWord",
+        "data": 1,
+        "operation": "Set"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "valueName": "LaunchTo",
+        "valueKind": "DWord",
+        "data": 2,
+        "operation": "Set"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/client-management/client-tools/file-explorer",
+    "verifiedOnBuild": "22631.4317"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "ui.taskbar.end-task-right-click",
+    "name": {
+      "en": "Enable 'End Task' in Taskbar Context Menu",
+      "ar": "تفعيل خيار 'إنهاء المهمة' عند النقر بالزر الأيمن على شريط المهام"
+    },
+    "description": {
+      "en": "Adds an 'End Task' option when right-clicking running applications in the taskbar.",
+      "ar": "إضافة خيار مباشر لإنهاء مهمة البرنامج فوراً عند النقر عليه بالزر الأيمن في شريط المهام."
+    },
+    "category": "ui",
+    "subcategory": "taskbar",
+    "risk": "Safe",
+    "impacts": ["ui", "performance"],
+    "tags": ["taskbar", "endtask"],
+    "presets": ["recommended", "minimal"],
+    "windows": {
+      "minBuild": 22621,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": true,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced\\TaskbarDeveloperSettings",
+      "valueName": "TaskbarEndTask",
+      "matchType": "Equals",
+      "expectedValue": 1
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced\\TaskbarDeveloperSettings",
+        "valueName": "TaskbarEndTask",
+        "valueKind": "DWord",
+        "data": 1,
+        "operation": "Set"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced\\TaskbarDeveloperSettings",
+        "valueName": "TaskbarEndTask",
+        "valueKind": "DWord",
+        "data": 0,
+        "operation": "Set"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/powertoys/developer-settings",
+    "verifiedOnBuild": "22631.4317"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "ui.taskbar.show-seconds-clock",
+    "name": {
+      "en": "Show Seconds in Taskbar Clock",
+      "ar": "إظهار الثواني في ساعة شريط المهام"
+    },
+    "description": {
+      "en": "Enables seconds display in the Windows system tray clock.",
+      "ar": "إظهار عداد الثواني بجوار الساعة في شريط مهام النظام."
+    },
+    "category": "ui",
+    "subcategory": "taskbar",
+    "risk": "Safe",
+    "impacts": ["ui"],
+    "tags": ["clock", "taskbar"],
+    "presets": ["minimal"],
+    "windows": {
+      "minBuild": 22621,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": true,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+      "valueName": "ShowSecondsInSystemClock",
+      "matchType": "Equals",
+      "expectedValue": 1
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "valueName": "ShowSecondsInSystemClock",
+        "valueKind": "DWord",
+        "data": 1,
+        "operation": "Set"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "valueName": "ShowSecondsInSystemClock",
+        "valueKind": "DWord",
+        "data": 0,
+        "operation": "Set"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/client-management/client-tools/taskbar-configuration",
+    "verifiedOnBuild": "22631.4317"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "ui.system.enable-long-paths",
+    "name": {
+      "en": "Enable Win32 Long Paths (>260 Chars)",
+      "ar": "تفعيل المسارات الطويلة لملفات النظام (> 260 حرف)"
+    },
+    "description": {
+      "en": "Removes the historical 260-character path length limitation for Win32 file APIs.",
+      "ar": "إلغاء الحد الأقصى القديم لطول مسار الملفات (260 حرفاً) لتمكين فتح المسارات العميقة."
+    },
+    "category": "ui",
+    "subcategory": "filesystem",
+    "risk": "Safe",
+    "impacts": ["storage"],
+    "tags": ["filesystem", "paths"],
+    "presets": ["recommended"],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SYSTEM\\CurrentControlSet\\Control\\FileSystem",
+      "valueName": "LongPathsEnabled",
+      "matchType": "Equals",
+      "expectedValue": 1
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SYSTEM\\CurrentControlSet\\Control\\FileSystem",
+        "valueName": "LongPathsEnabled",
+        "valueKind": "DWord",
+        "data": 1,
+        "operation": "Set"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SYSTEM\\CurrentControlSet\\Control\\FileSystem",
+        "valueName": "LongPathsEnabled",
+        "valueKind": "DWord",
+        "data": 0,
+        "operation": "Set"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation",
+    "verifiedOnBuild": "22631.4317"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "ui.taskbar.alignment-left",
+    "name": {
+      "en": "Align Taskbar Icons to the Left",
+      "ar": "محاذاة أيقونات شريط المهام إلى اليسار"
+    },
+    "description": {
+      "en": "Moves Windows 11 taskbar icons to the left side like Windows 10.",
+      "ar": "نقل أيقونات شريط المهام في ويندوز 11 إلى الجانب الأيسر مثل ويندوز 10."
+    },
+    "category": "ui",
+    "subcategory": "taskbar",
+    "risk": "Safe",
+    "impacts": ["ui"],
+    "tags": ["taskbar", "win11"],
+    "presets": ["minimal"],
+    "windows": {
+      "minBuild": 22000,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": true,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+      "valueName": "TaskbarAl",
+      "matchType": "Equals",
+      "expectedValue": 0
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "valueName": "TaskbarAl",
+        "valueKind": "DWord",
+        "data": 0,
+        "operation": "Set"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "valueName": "TaskbarAl",
+        "valueKind": "DWord",
+        "data": 1,
+        "operation": "Set"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/client-management/client-tools/taskbar-configuration",
+    "verifiedOnBuild": "22631.4317"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "ui.explorer.compact-view",
+    "name": {
+      "en": "Enable Compact View in File Explorer",
+      "ar": "تفعيل العرض المضغوط في مستكشف الملفات"
+    },
+    "description": {
+      "en": "Reduces vertical padding between files in File Explorer for denser file listings.",
+      "ar": "تقليل المسافات العمودية بين الملفات في مستكشف ويندوز 11 لعرض عدد أكبر من الملفات."
+    },
+    "category": "ui",
+    "subcategory": "explorer",
+    "risk": "Safe",
+    "impacts": ["ui"],
+    "tags": ["compact", "explorer"],
+    "presets": ["recommended", "minimal"],
+    "windows": {
+      "minBuild": 22000,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": true,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+      "valueName": "UseCompactMode",
+      "matchType": "Equals",
+      "expectedValue": 1
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "valueName": "UseCompactMode",
+        "valueKind": "DWord",
+        "data": 1,
+        "operation": "Set"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "valueName": "UseCompactMode",
+        "valueKind": "DWord",
+        "data": 0,
+        "operation": "Set"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/client-management/client-tools/file-explorer",
+    "verifiedOnBuild": "22631.4317"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "ui.system.disable-snap-assist",
+    "name": {
+      "en": "Disable Snap Assist Suggestions",
+      "ar": "تعطيل اقتراحات محاذاة النوافذ التلقائية"
+    },
+    "description": {
+      "en": "Stops Windows from displaying what else can be snapped after docking a window.",
+      "ar": "منع ظهور النوافذ المقترحة بعد تثبيت نافذة على أحد جانبي الشاشة."
+    },
+    "category": "ui",
+    "subcategory": "windowing",
+    "risk": "Safe",
+    "impacts": ["ui"],
+    "tags": ["snap", "multitasking"],
+    "presets": ["minimal"],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+      "valueName": "SnapAssist",
+      "matchType": "Equals",
+      "expectedValue": 0
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "valueName": "SnapAssist",
+        "valueKind": "DWord",
+        "data": 0,
+        "operation": "Set"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "valueName": "SnapAssist",
+        "valueKind": "DWord",
+        "data": 1,
+        "operation": "Set"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/client-management/client-tools/multitasking-configuration",
+    "verifiedOnBuild": "22631.4317"
+  }
+]

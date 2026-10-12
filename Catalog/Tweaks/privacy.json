@@ -61,5 +61,737 @@
       "en": "Windows Settings will display 'Some settings are managed by your organization'. This is normal when Group Policy registry keys are set.",
       "ar": "ستظهر رسالة 'تتم إدارة بعض الإعدادات بواسطة مؤسستك' داخل إعدادات ويندوز. هذا أمر طبيعي عند تفعيل مفاتيح سياسات النظام."
     }
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "privacy.advertising.advertising-id",
+    "name": {
+      "en": "Disable Advertising ID",
+      "ar": "تعطيل معرّف الإعلانات"
+    },
+    "description": {
+      "en": "Prevents apps from using the advertising ID for relevant ads across experiences.",
+      "ar": "منع التطبيقات من استخدام معرّف الإعلانات لتقديم إعلانات موجهة."
+    },
+    "category": "privacy",
+    "subcategory": "advertising",
+    "risk": "Safe",
+    "impacts": ["privacy"],
+    "tags": ["ads", "tracking"],
+    "presets": ["recommended", "privacy"],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\AdvertisingInfo",
+      "valueName": "Enabled",
+      "matchType": "Equals",
+      "expectedValue": 0
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\AdvertisingInfo",
+        "valueName": "Enabled",
+        "valueKind": "DWord",
+        "data": 0,
+        "operation": "Set"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\AdvertisingInfo",
+        "valueName": "Enabled",
+        "valueKind": "DWord",
+        "data": 1,
+        "operation": "Set"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services#1-advertising-id",
+    "verifiedOnBuild": "22631.4317"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "privacy.experiences.tailored-experiences",
+    "name": {
+      "en": "Disable Tailored Experiences",
+      "ar": "تعطيل التجارب المخصصة"
+    },
+    "description": {
+      "en": "Stops Windows from offering personalized tips, ads, and recommendations based on diagnostic data.",
+      "ar": "منع ويندوز من تقديم نصائح وتوصيات وإعلانات مخصصة بناءً على البيانات التشخيصية."
+    },
+    "category": "privacy",
+    "subcategory": "telemetry",
+    "risk": "Safe",
+    "impacts": ["privacy"],
+    "tags": ["ads", "tips"],
+    "presets": ["recommended", "privacy"],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Privacy",
+      "valueName": "TailoredExperiencesWithDiagnosticDataEnabled",
+      "matchType": "Equals",
+      "expectedValue": 0
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Privacy",
+        "valueName": "TailoredExperiencesWithDiagnosticDataEnabled",
+        "valueKind": "DWord",
+        "data": 0,
+        "operation": "Set"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Privacy",
+        "valueName": "TailoredExperiencesWithDiagnosticDataEnabled",
+        "valueKind": "DWord",
+        "data": 1,
+        "operation": "Set"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services#30-tailored-experiences",
+    "verifiedOnBuild": "22631.4317"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "privacy.activity.activity-history",
+    "name": {
+      "en": "Disable Activity History Publishing",
+      "ar": "تعطيل نشر سجل الأنشطة"
+    },
+    "description": {
+      "en": "Prevents publishing and syncing of user activity history across devices.",
+      "ar": "منع نشر ومزامنة سجل أنشطة المستخدم عبر الأجهزة."
+    },
+    "category": "privacy",
+    "subcategory": "activity",
+    "risk": "Safe",
+    "impacts": ["privacy"],
+    "tags": ["timeline", "activity"],
+    "presets": ["recommended", "privacy"],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\System",
+      "valueName": "PublishUserActivities",
+      "matchType": "Equals",
+      "expectedValue": 0
+    },
+    "apply": [
+      {
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\System",
+        "valueName": "PublishUserActivities",
+        "valueKind": "DWord",
+        "data": 0,
+        "operation": "Set"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\System",
+        "valueName": "PublishUserActivities",
+        "operation": "DeleteValue"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-system#publishuseractivities",
+    "verifiedOnBuild": "22631.4317"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "privacy.speech.online-speech-recognition",
+    "name": {
+      "en": "Disable Online Speech Recognition",
+      "ar": "تعطيل التعرف على الصوت عبر الإنترنت"
+    },
+    "description": {
+      "en": "Disables cloud-based speech services, keeping dictation and speech processing offline.",
+      "ar": "تعطيل خدمات الصوت السحابية والاعتماد على المعالجة المحلية بدون إرسال الصوت عبر الإنترنت."
+    },
+    "category": "privacy",
+    "subcategory": "speech",
+    "risk": "Safe",
+    "impacts": ["privacy"],
+    "tags": ["speech", "voice"],
+    "presets": ["privacy"],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Microsoft\\Speech_OneCore\\Settings\\OnlineSpeechPrivacy",
+      "valueName": "HasAccepted",
+      "matchType": "Equals",
+      "expectedValue": 0
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Speech_OneCore\\Settings\\OnlineSpeechPrivacy",
+        "valueName": "HasAccepted",
+        "valueKind": "DWord",
+        "data": 0,
+        "operation": "Set"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Speech_OneCore\\Settings\\OnlineSpeechPrivacy",
+        "valueName": "HasAccepted",
+        "valueKind": "DWord",
+        "data": 1,
+        "operation": "Set"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/privacy/speech-inking-typing-and-privacy",
+    "verifiedOnBuild": "22631.4317"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "privacy.typing.inking-typing-personalization",
+    "name": {
+      "en": "Disable Inking & Typing Data Collection",
+      "ar": "تعطيل جمع بيانات الكتابة بالقلم والمفاتيح"
+    },
+    "description": {
+      "en": "Stops sending typing and handwriting sample data to Microsoft for dictionary improvements.",
+      "ar": "إيقاف إرسال عينات الكتابة بخط اليد والمفاتيح إلى مايكروسوفت لتحسين القاموس."
+    },
+    "category": "privacy",
+    "subcategory": "typing",
+    "risk": "Safe",
+    "impacts": ["privacy"],
+    "tags": ["typing", "inking"],
+    "presets": ["recommended", "privacy"],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Microsoft\\InputPersonalization",
+      "valueName": "RestrictImplicitInkCollection",
+      "matchType": "Equals",
+      "expectedValue": 1
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\InputPersonalization",
+        "valueName": "RestrictImplicitInkCollection",
+        "valueKind": "DWord",
+        "data": 1,
+        "operation": "Set"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\InputPersonalization",
+        "valueName": "RestrictImplicitTextCollection",
+        "valueKind": "DWord",
+        "data": 1,
+        "operation": "Set"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\InputPersonalization",
+        "valueName": "RestrictImplicitInkCollection",
+        "operation": "DeleteValue"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\InputPersonalization",
+        "valueName": "RestrictImplicitTextCollection",
+        "operation": "DeleteValue"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/privacy/speech-inking-typing-and-privacy",
+    "verifiedOnBuild": "22631.4317"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "privacy.tracking.app-launch-tracking",
+    "name": {
+      "en": "Disable App Launch Tracking",
+      "ar": "تعطيل تتبع تشغيل التطبيقات"
+    },
+    "description": {
+      "en": "Prevents Windows from tracking app launches to improve Start menu and search results.",
+      "ar": "منع ويندوز من تتبع التطبيقات التي تقوم بتشغيلها لتعديل قائمة ابدأ."
+    },
+    "category": "privacy",
+    "subcategory": "tracking",
+    "risk": "Safe",
+    "impacts": ["privacy"],
+    "tags": ["tracking", "startmenu"],
+    "presets": ["recommended", "privacy"],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+      "valueName": "Start_TrackProgs",
+      "matchType": "Equals",
+      "expectedValue": 0
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "valueName": "Start_TrackProgs",
+        "valueKind": "DWord",
+        "data": 0,
+        "operation": "Set"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "valueName": "Start_TrackProgs",
+        "valueKind": "DWord",
+        "data": 1,
+        "operation": "Set"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/privacy/windows-11-start-menu-and-privacy",
+    "verifiedOnBuild": "22631.4317"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "privacy.feedback.feedback-prompts",
+    "name": {
+      "en": "Disable Feedback Frequency Prompts",
+      "ar": "تعطيل مطالبات الملاحظات التلقائية"
+    },
+    "description": {
+      "en": "Disables periodic popups asking for user feedback about Windows features.",
+      "ar": "تعطيل النوافذ المنبثقة الدورية التي تسألك عن رأيك في ميزات ويندوز."
+    },
+    "category": "privacy",
+    "subcategory": "feedback",
+    "risk": "Safe",
+    "impacts": ["privacy", "ui"],
+    "tags": ["feedback", "popups"],
+    "presets": ["recommended", "privacy"],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Microsoft\\Siuf\\Rules",
+      "valueName": "NumberOfSIUFInPeriod",
+      "matchType": "Equals",
+      "expectedValue": 0
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Siuf\\Rules",
+        "valueName": "NumberOfSIUFInPeriod",
+        "valueKind": "DWord",
+        "data": 0,
+        "operation": "Set"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Siuf\\Rules",
+        "valueName": "NumberOfSIUFInPeriod",
+        "operation": "DeleteValue"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/privacy/feedback-diagnostics-privacy-windows",
+    "verifiedOnBuild": "22631.4317"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "privacy.reporting.windows-error-reporting",
+    "name": {
+      "en": "Disable Windows Error Reporting",
+      "ar": "تعطيل تقارير أخطاء ويندوز"
+    },
+    "description": {
+      "en": "Disables automatic sending of crash dumps and error logs to Microsoft.",
+      "ar": "تعطيل الإرسال التلقائي لتقارير انهيار البرامج وملفات الذاكرة إلى مايكروسوفت."
+    },
+    "category": "privacy",
+    "subcategory": "diagnostics",
+    "risk": "Low",
+    "impacts": ["privacy", "network"],
+    "tags": ["wer", "crashes"],
+    "presets": ["privacy"],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Error Reporting",
+      "valueName": "Disabled",
+      "matchType": "Equals",
+      "expectedValue": 1
+    },
+    "apply": [
+      {
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Error Reporting",
+        "valueName": "Disabled",
+        "valueKind": "DWord",
+        "data": 1,
+        "operation": "Set"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Error Reporting",
+        "valueName": "Disabled",
+        "operation": "DeleteValue"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/win32/wer/wer-settings",
+    "verifiedOnBuild": "22631.4317"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "privacy.ceip.customer-experience-improvement",
+    "name": {
+      "en": "Disable Customer Experience Program (CEIP)",
+      "ar": "تعطيل برنامج تحسين تجربة المستخدم (CEIP)"
+    },
+    "description": {
+      "en": "Disables participation in the Windows Customer Experience Improvement telemetry program.",
+      "ar": "تعطيل المشاركة في برنامج مايكروسوفت لتحسين تجربة المستخدم والقياس عن بعد."
+    },
+    "category": "privacy",
+    "subcategory": "telemetry",
+    "risk": "Safe",
+    "impacts": ["privacy"],
+    "tags": ["ceip", "telemetry"],
+    "presets": ["recommended", "privacy"],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SOFTWARE\\Policies\\Microsoft\\SQMClient\\Windows",
+      "valueName": "CEIPEnable",
+      "matchType": "Equals",
+      "expectedValue": 0
+    },
+    "apply": [
+      {
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\SQMClient\\Windows",
+        "valueName": "CEIPEnable",
+        "valueKind": "DWord",
+        "data": 0,
+        "operation": "Set"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\SQMClient\\Windows",
+        "valueName": "CEIPEnable",
+        "operation": "DeleteValue"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services#4-customer-experience-improvement-program",
+    "verifiedOnBuild": "22631.4317"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "privacy.clipboard.cloud-clipboard-sync",
+    "name": {
+      "en": "Disable Cloud Clipboard Sync",
+      "ar": "تعطيل مزامنة الحافظة السحابية"
+    },
+    "description": {
+      "en": "Stops clipboard content from synchronizing across multiple Windows devices.",
+      "ar": "منع مزامنة النصوص المنسوخة في الحافظة سحابياً عبر الأجهزة المختلفة."
+    },
+    "category": "privacy",
+    "subcategory": "clipboard",
+    "risk": "Safe",
+    "impacts": ["privacy", "network"],
+    "tags": ["clipboard", "cloud"],
+    "presets": ["privacy"],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\System",
+      "valueName": "AllowCrossDeviceClipboard",
+      "matchType": "Equals",
+      "expectedValue": 0
+    },
+    "apply": [
+      {
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\System",
+        "valueName": "AllowCrossDeviceClipboard",
+        "valueKind": "DWord",
+        "data": 0,
+        "operation": "Set"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\System",
+        "valueName": "AllowCrossDeviceClipboard",
+        "operation": "DeleteValue"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-system#allowcrossdeviceclipboard",
+    "verifiedOnBuild": "22631.4317"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "privacy.search.device-search-history",
+    "name": {
+      "en": "Disable Device Search History",
+      "ar": "تعطيل سجل البحث على الجهاز"
+    },
+    "description": {
+      "en": "Prevents Windows Search from saving local device search history.",
+      "ar": "منع بحث ويندوز من حفظ سجل عمليات البحث التي تجريها على جهازك محلياً."
+    },
+    "category": "privacy",
+    "subcategory": "search",
+    "risk": "Safe",
+    "impacts": ["privacy"],
+    "tags": ["search", "history"],
+    "presets": ["recommended", "privacy"],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\SearchSettings",
+      "valueName": "IsDeviceSearchHistoryEnabled",
+      "matchType": "Equals",
+      "expectedValue": 0
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\SearchSettings",
+        "valueName": "IsDeviceSearchHistoryEnabled",
+        "valueKind": "DWord",
+        "data": 0,
+        "operation": "Set"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\SearchSettings",
+        "valueName": "IsDeviceSearchHistoryEnabled",
+        "valueKind": "DWord",
+        "data": 1,
+        "operation": "Set"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services#32-search",
+    "verifiedOnBuild": "22631.4317"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "privacy.spotlight.lockscreen-ads",
+    "name": {
+      "en": "Disable Lock Screen Tips & Spotlight Ads",
+      "ar": "تعطيل النصائح والإعلانات على شاشة القفل"
+    },
+    "description": {
+      "en": "Removes suggestions, tips, and promotional overlays from the Windows lock screen.",
+      "ar": "إزالة التلميحات والنصائح والإعلانات الترويجية من شاشة القفل."
+    },
+    "category": "privacy",
+    "subcategory": "spotlight",
+    "risk": "Safe",
+    "impacts": ["privacy", "ui"],
+    "tags": ["lockscreen", "ads"],
+    "presets": ["recommended", "privacy", "minimal"],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+      "valueName": "RotatingLockScreenOverlayEnabled",
+      "matchType": "Equals",
+      "expectedValue": 0
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+        "valueName": "RotatingLockScreenOverlayEnabled",
+        "valueKind": "DWord",
+        "data": 0,
+        "operation": "Set"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+        "valueName": "RotatingLockScreenOverlayEnabled",
+        "valueKind": "DWord",
+        "data": 1,
+        "operation": "Set"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/configuration/windows-spotlight",
+    "verifiedOnBuild": "22631.4317"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "privacy.suggestions.start-menu-promotions",
+    "name": {
+      "en": "Disable Start Menu Suggested App Ads",
+      "ar": "تعطيل التطبيقات المقترحة والإعلانية في ابدأ"
+    },
+    "description": {
+      "en": "Prevents Windows from displaying recommended app store suggestions in the Start menu.",
+      "ar": "منع ويندوز من اقتراح وتثبيت تطبيقات المتجر الترويجية داخل قائمة ابدأ."
+    },
+    "category": "privacy",
+    "subcategory": "suggestions",
+    "risk": "Safe",
+    "impacts": ["privacy", "ui"],
+    "tags": ["startmenu", "promotions"],
+    "presets": ["recommended", "privacy", "minimal"],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": true,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+      "valueName": "SubscribedContent-338388Enabled",
+      "matchType": "Equals",
+      "expectedValue": 0
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+        "valueName": "SubscribedContent-338388Enabled",
+        "valueKind": "DWord",
+        "data": 0,
+        "operation": "Set"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+        "valueName": "SubscribedContent-338388Enabled",
+        "valueKind": "DWord",
+        "data": 1,
+        "operation": "Set"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/configuration/windows-spotlight",
+    "verifiedOnBuild": "22631.4317"
   }
 ]

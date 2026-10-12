@@ -1,0 +1,221 @@
+[
+  {
+    "schemaVersion": "1.0.0",
+    "id": "ai.copilot.disable-taskbar-button",
+    "name": {
+      "en": "Hide Copilot Taskbar Button",
+      "ar": "إخفاء زر كوبايلوت من شريط المهام"
+    },
+    "description": {
+      "en": "Hides the Copilot button from the Windows 11 taskbar.",
+      "ar": "إخفاء أيقونة مساعد كوبايلوت من شريط مهام ويندوز 11."
+    },
+    "category": "ai",
+    "subcategory": "copilot",
+    "risk": "Safe",
+    "impacts": ["ui"],
+    "tags": ["copilot", "taskbar", "ai"],
+    "presets": ["recommended", "privacy", "minimal"],
+    "windows": {
+      "minBuild": 22621,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": true,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+      "valueName": "ShowCopilotButton",
+      "matchType": "Equals",
+      "expectedValue": 0
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "valueName": "ShowCopilotButton",
+        "valueKind": "DWord",
+        "data": 0,
+        "operation": "Set"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "valueName": "ShowCopilotButton",
+        "valueKind": "DWord",
+        "data": 1,
+        "operation": "Set"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/client-management/manage-windows-copilot",
+    "verifiedOnBuild": "22631.4317"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "ai.copilot.disable-policy",
+    "name": {
+      "en": "Disable Windows Copilot Globally",
+      "ar": "تعطيل ويندوز كوبايلوت كلياً"
+    },
+    "description": {
+      "en": "Turns off the Windows Copilot assistant system-wide using policy.",
+      "ar": "تعطيل مساعد ويندوز كوبايلوت على كامل النظام باستخدام سياسة النظام."
+    },
+    "category": "ai",
+    "subcategory": "copilot",
+    "risk": "Low",
+    "impacts": ["privacy", "ui"],
+    "tags": ["copilot", "ai", "policy"],
+    "presets": ["privacy"],
+    "windows": {
+      "minBuild": 22621,
+      "maxBuild": null,
+      "editions": ["Pro", "Enterprise", "Education", "IoTEnterprise"]
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": true,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsCopilot",
+      "valueName": "TurnOffWindowsCopilot",
+      "matchType": "Equals",
+      "expectedValue": 1
+    },
+    "apply": [
+      {
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsCopilot",
+        "valueName": "TurnOffWindowsCopilot",
+        "valueKind": "DWord",
+        "data": 1,
+        "operation": "Set"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsCopilot",
+        "valueName": "TurnOffWindowsCopilot",
+        "operation": "DeleteValue"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/client-management/manage-windows-copilot",
+    "verifiedOnBuild": "22631.4317"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "ai.recall.disable-snapshots",
+    "name": {
+      "en": "Disable Windows Recall Snapshots",
+      "ar": "تعطيل التقاط لقطات ميزة الاسترجاع (Recall)"
+    },
+    "description": {
+      "en": "Prevents Windows from saving photographic snapshots of screen activities for Recall.",
+      "ar": "منع ويندوز من التقاط وحفظ لقطات شاشة دورية لأنشطتك لميزة الاسترجاع."
+    },
+    "category": "ai",
+    "subcategory": "recall",
+    "risk": "Safe",
+    "impacts": ["privacy", "storage", "performance"],
+    "tags": ["recall", "snapshots", "ai"],
+    "presets": ["recommended", "privacy"],
+    "windows": {
+      "minBuild": 26100,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsAI",
+      "valueName": "DisableAIDataAnalysis",
+      "matchType": "Equals",
+      "expectedValue": 1
+    },
+    "apply": [
+      {
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsAI",
+        "valueName": "DisableAIDataAnalysis",
+        "valueKind": "DWord",
+        "data": 1,
+        "operation": "Set"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsAI",
+        "valueName": "DisableAIDataAnalysis",
+        "operation": "DeleteValue"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/client-management/manage-recall",
+    "verifiedOnBuild": "26100.1742"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "ai.search.disable-bing-web-search",
+    "name": {
+      "en": "Disable Bing Web Search in Start Menu",
+      "ar": "تعطيل بحث بينغ السحابي في قائمة ابدأ"
+    },
+    "description": {
+      "en": "Restricts Start menu search to local files, settings, and apps without querying Bing.",
+      "ar": "قصر البحث في قائمة ابدأ على الملفات والتطبيقات المحلية فقط بدون البحث في بينغ عبر الويب."
+    },
+    "category": "ai",
+    "subcategory": "search",
+    "risk": "Safe",
+    "impacts": ["privacy", "performance", "ui"],
+    "tags": ["bing", "search", "websearch"],
+    "presets": ["recommended", "privacy", "minimal"],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": true,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Policies\\Microsoft\\Windows\\Explorer",
+      "valueName": "DisableSearchBoxSuggestions",
+      "matchType": "Equals",
+      "expectedValue": 1
+    },
+    "apply": [
+      {
+        "type": "Policy",
+        "hive": "HKCU",
+        "key": "Software\\Policies\\Microsoft\\Windows\\Explorer",
+        "valueName": "DisableSearchBoxSuggestions",
+        "valueKind": "DWord",
+        "data": 1,
+        "operation": "Set"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Policy",
+        "hive": "HKCU",
+        "key": "Software\\Policies\\Microsoft\\Windows\\Explorer",
+        "valueName": "DisableSearchBoxSuggestions",
+        "operation": "DeleteValue"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-admx-search#disablesearchboxsuggestions",
+    "verifiedOnBuild": "22631.4317"
+  }
+]

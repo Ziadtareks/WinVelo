@@ -1,0 +1,110 @@
+[
+  {
+    "schemaVersion": "1.0.0",
+    "id": "updates.drivers.exclude-from-updates",
+    "name": {
+      "en": "Exclude Hardware Drivers from Windows Update",
+      "ar": "استبعاد تعريفات العتاد من تحديثات ويندوز"
+    },
+    "description": {
+      "en": "Prevents Windows Update from automatically replacing your dedicated GPU or chipset drivers.",
+      "ar": "منع تحديثات ويندوز من استبدال تعريفات كارت الشاشة أو اللوحة الأم بتعريفات افتراضية."
+    },
+    "category": "updates",
+    "subcategory": "drivers",
+    "risk": "Low",
+    "impacts": ["gaming", "performance"],
+    "tags": ["drivers", "windowsupdate"],
+    "presets": ["recommended", "gaming"],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate",
+      "valueName": "ExcludeWUDriversInQualityUpdate",
+      "matchType": "Equals",
+      "expectedValue": 1
+    },
+    "apply": [
+      {
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate",
+        "valueName": "ExcludeWUDriversInQualityUpdate",
+        "valueKind": "DWord",
+        "data": 1,
+        "operation": "Set"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate",
+        "valueName": "ExcludeWUDriversInQualityUpdate",
+        "operation": "DeleteValue"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/deployment/update/waas-wu-settings#do-not-include-drivers-with-windows-updates",
+    "verifiedOnBuild": "22631.4317"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "updates.reboot.disable-auto-reboot-logged-on",
+    "name": {
+      "en": "Prevent Forced Auto-Reboot While Logged On",
+      "ar": "منع إعادة التشغيل الإجباري أثناء استخدام الجهاز"
+    },
+    "description": {
+      "en": "Stops Windows Update from forcibly restarting your PC when updates install while you are logged in.",
+      "ar": "منع ويندوز من إعادة التشغيل المفاجئ لتثبيت التحديثات أثناء وجودك وتسجيل دخولك على الجهاز."
+    },
+    "category": "updates",
+    "subcategory": "reboot",
+    "risk": "Safe",
+    "impacts": ["performance"],
+    "tags": ["reboot", "windowsupdate"],
+    "presets": ["recommended"],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\\AU",
+      "valueName": "NoAutoRebootWithLoggedOnUsers",
+      "matchType": "Equals",
+      "expectedValue": 1
+    },
+    "apply": [
+      {
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\\AU",
+        "valueName": "NoAutoRebootWithLoggedOnUsers",
+        "valueKind": "DWord",
+        "data": 1,
+        "operation": "Set"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\\AU",
+        "valueName": "NoAutoRebootWithLoggedOnUsers",
+        "operation": "DeleteValue"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/deployment/update/waas-wu-settings#no-auto-reboot-with-logged-on-users-for-scheduled-automatic-updates-installations",
+    "verifiedOnBuild": "22631.4317"
+  }
+]
