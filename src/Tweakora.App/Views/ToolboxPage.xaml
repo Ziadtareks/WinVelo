@@ -16,14 +16,18 @@
                        FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,20" />
 
             <!-- Tool Selection Buttons -->
-            <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
-                <ui:Button Content="Smart Cleaner" Icon="{ui:SymbolIcon Broom24}" Margin="0,0,8,0"
+            <WrapPanel Margin="0,0,0,20">
+                <ui:Button Content="Smart Cleaner" Icon="{ui:SymbolIcon Broom24}" Margin="0,0,8,8"
                            Command="{Binding SelectToolCommand}" CommandParameter="Cleaner" />
-                <ui:Button Content="Startup Apps" Icon="{ui:SymbolIcon Apps24}" Margin="0,0,8,0"
+                <ui:Button Content="Startup Apps" Icon="{ui:SymbolIcon Apps24}" Margin="0,0,8,8"
                            Command="{Binding SelectToolCommand}" CommandParameter="Startup" />
-                <ui:Button Content="Services Manager" Icon="{ui:SymbolIcon Settings24}" Margin="0,0,8,0"
+                <ui:Button Content="Services Manager" Icon="{ui:SymbolIcon Settings24}" Margin="0,0,8,8"
                            Command="{Binding SelectToolCommand}" CommandParameter="Services" />
-            </StackPanel>
+                <ui:Button Content="Fixes Center" Icon="{ui:SymbolIcon Wrench24}" Margin="0,0,8,8"
+                           Command="{Binding SelectToolCommand}" CommandParameter="Fixes" />
+                <ui:Button Content="DNS Switcher" Icon="{ui:SymbolIcon Globe24}" Margin="0,0,8,8"
+                           Command="{Binding SelectToolCommand}" CommandParameter="Network" />
+            </WrapPanel>
 
             <!-- ==================== SECTION 1: SMART CLEANER ==================== -->
             <Border>
@@ -182,6 +186,125 @@
                                                 Background="{DynamicResource ControlFillColorTertiaryBrush}">
                                             <TextBlock Text="{Binding StartupType, StringFormat='Startup: {0}'}" FontSize="12" FontWeight="Medium" />
                                         </Border>
+                                    </Grid>
+                                </ui:Card>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
+            <!-- ==================== SECTION 4: FIXES CENTER ==================== -->
+            <Border>
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ActiveTool}" Value="Fixes">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <StackPanel>
+                    <ui:Card Margin="0,0,0,16" Padding="16">
+                        <StackPanel>
+                            <TextBlock Text="Windows Repairs &amp; Diagnostic Fixes" FontSize="18" FontWeight="SemiBold" />
+                            <TextBlock Text="One-click safe repair actions for network, update cache, and Windows subsystem health."
+                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12" Margin="0,4,0,8" />
+                            <TextBlock Text="{Binding FixStatusText}" FontWeight="Medium" Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}" FontSize="13" />
+                        </StackPanel>
+                    </ui:Card>
+
+                    <ItemsControl ItemsSource="{Binding FixesList}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <ui:Card Margin="0,0,0,10" Padding="14">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0">
+                                            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                                <TextBlock Text="{Binding Title}" FontSize="16" FontWeight="SemiBold" Margin="0,0,8,0" />
+                                                <Border Background="{DynamicResource ControlFillColorSecondaryBrush}" CornerRadius="4" Padding="6,2" VerticalAlignment="Center" Margin="0,0,6,0">
+                                                    <TextBlock Text="{Binding Category}" FontSize="11" Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}" FontWeight="Medium" />
+                                                </Border>
+                                                <Border Background="{DynamicResource ControlFillColorTertiaryBrush}" CornerRadius="4" Padding="6,2" VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding Severity}" FontSize="11" FontWeight="Medium" />
+                                                </Border>
+                                            </StackPanel>
+                                            <TextBlock Text="{Binding Description}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12" Margin="0,0,0,6" TextWrapping="Wrap" />
+                                            <Border Background="{DynamicResource ControlFillColorSecondaryBrush}" CornerRadius="4" Padding="8,4" HorizontalAlignment="Left">
+                                                <TextBlock Text="{Binding Script, StringFormat='Command: {0}'}" FontFamily="Consolas" FontSize="11" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                                            </Border>
+                                        </StackPanel>
+                                        <ui:Button Grid.Column="1" Content="Run Repair" Icon="{ui:SymbolIcon Play24}" Appearance="Primary" VerticalAlignment="Center" Margin="16,0,0,0"
+                                                   Command="{Binding DataContext.RunFixCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                   CommandParameter="{Binding}" />
+                                    </Grid>
+                                </ui:Card>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
+            <!-- ==================== SECTION 5: DNS SWITCHER ==================== -->
+            <Border>
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ActiveTool}" Value="Network">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <StackPanel>
+                    <ui:Card Margin="0,0,0,16" Padding="16">
+                        <StackPanel>
+                            <TextBlock Text="Secure DNS Switcher" FontSize="18" FontWeight="SemiBold" />
+                            <TextBlock Text="Switch between verified high-speed, privacy, and malware-blocking DNS providers."
+                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12" Margin="0,4,0,8" />
+                            <TextBlock Text="{Binding DnsStatusText}" FontWeight="Medium" Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}" FontSize="13" />
+                        </StackPanel>
+                    </ui:Card>
+
+                    <ItemsControl ItemsSource="{Binding DnsProviders}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <ui:Card Margin="0,0,0,10" Padding="14">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="8" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0">
+                                            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                                <TextBlock Text="{Binding Name}" FontSize="16" FontWeight="SemiBold" Margin="0,0,8,0" />
+                                                <Border Background="#107C41" CornerRadius="4" Padding="6,2" VerticalAlignment="Center"
+                                                        Visibility="{Binding IsActive, Converter={StaticResource BoolToVisConverter}}">
+                                                    <TextBlock Text="Active" FontSize="11" Foreground="White" FontWeight="Bold" />
+                                                </Border>
+                                            </StackPanel>
+                                            <TextBlock Text="{Binding Description}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12" Margin="0,0,0,4" TextWrapping="Wrap" />
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{Binding PrimaryDns, StringFormat='Primary: {0}'}" FontSize="12" FontWeight="SemiBold" Margin="0,0,16,0" />
+                                                <TextBlock Text="{Binding SecondaryDns, StringFormat='Secondary: {0}'}" FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,16,0" />
+                                                <TextBlock Text="{Binding PingMs, StringFormat='Latency: {0} ms'}" FontSize="12" Foreground="#0078D4" FontWeight="Medium" />
+                                            </StackPanel>
+                                        </StackPanel>
+                                        <ui:Button Grid.Column="1" Content="Ping Test" Icon="{ui:SymbolIcon AntennaBars24}" VerticalAlignment="Center"
+                                                   Command="{Binding DataContext.TestDnsLatencyCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                   CommandParameter="{Binding}" />
+                                        <ui:Button Grid.Column="3" Content="Apply DNS" Icon="{ui:SymbolIcon Checkmark24}" Appearance="Primary" VerticalAlignment="Center"
+                                                   Command="{Binding DataContext.ApplyDnsCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                   CommandParameter="{Binding}" />
                                     </Grid>
                                 </ui:Card>
                             </DataTemplate>

@@ -1,0 +1,162 @@
+[
+  {
+    "id": "Mozilla.Firefox",
+    "name": "Mozilla Firefox",
+    "category": "Browsers",
+    "description": "Fast, private, and independent web browser by Mozilla.",
+    "publisher": "Mozilla",
+    "iconSymbol": "Globe24"
+  },
+  {
+    "id": "Google.Chrome",
+    "name": "Google Chrome",
+    "category": "Browsers",
+    "description": "Fast and secure web browser built for the modern web.",
+    "publisher": "Google LLC",
+    "iconSymbol": "Globe24"
+  },
+  {
+    "id": "Brave.Brave",
+    "name": "Brave Browser",
+    "category": "Browsers",
+    "description": "Privacy-focused browser that blocks ads and trackers by default.",
+    "publisher": "Brave Software",
+    "iconSymbol": "Shield24"
+  },
+  {
+    "id": "7zip.7zip",
+    "name": "7-Zip",
+    "category": "Utilities",
+    "description": "High-compression open-source file archiver for ZIP, 7z, and RAR.",
+    "publisher": "Igor Pavlov",
+    "iconSymbol": "FolderZip24"
+  },
+  {
+    "id": "Microsoft.PowerToys",
+    "name": "Microsoft PowerToys",
+    "category": "Utilities",
+    "description": "Set of utilities for power users to tune and streamline Windows.",
+    "publisher": "Microsoft Corporation",
+    "iconSymbol": "Wrench24"
+  },
+  {
+    "id": "Git.Git",
+    "name": "Git for Windows",
+    "category": "Developer Tools",
+    "description": "Fast, scalable, distributed revision control system.",
+    "publisher": "The Git Development Community",
+    "iconSymbol": "BranchFork24"
+  },
+  {
+    "id": "Microsoft.VisualStudioCode",
+    "name": "Visual Studio Code",
+    "category": "Developer Tools",
+    "description": "Lightweight but powerful source code editor and IDE.",
+    "publisher": "Microsoft Corporation",
+    "iconSymbol": "Code24"
+  },
+  {
+    "id": "VideoLAN.VLC",
+    "name": "VLC Media Player",
+    "category": "Media",
+    "description": "Free and open-source cross-platform multimedia player for all codecs.",
+    "publisher": "VideoLAN",
+    "iconSymbol": "Play24"
+  },
+  {
+    "id": "Audacity.Audacity",
+    "name": "Audacity",
+    "category": "Media",
+    "description": "Easy-to-use, multi-track audio editor and recorder.",
+    "publisher": "Audacity Team",
+    "iconSymbol": "MusicNote224"
+  },
+  {
+    "id": "OBSProject.OBSStudio",
+    "name": "OBS Studio",
+    "category": "Media",
+    "description": "Free and open source software for video recording and live streaming.",
+    "publisher": "OBS Project",
+    "iconSymbol": "Video24"
+  },
+  {
+    "id": "Notepad++.Notepad++",
+    "name": "Notepad++",
+    "category": "Utilities",
+    "description": "Fast, tabbed text and source code editor supporting various languages.",
+    "publisher": "Don Ho",
+    "iconSymbol": "DocumentEdit24"
+  },
+  {
+    "id": "voidtools.Everything",
+    "name": "Everything",
+    "category": "Utilities",
+    "description": "Blazing fast desktop search engine that instantly locates files and folders.",
+    "publisher": "voidtools",
+    "iconSymbol": "Search24"
+  },
+  {
+    "id": "ShareX.ShareX",
+    "name": "ShareX",
+    "category": "Utilities",
+    "description": "Screen capture, file sharing and productivity tool.",
+    "publisher": "ShareX Team",
+    "iconSymbol": "Camera24"
+  },
+  {
+    "id": "Discord.Discord",
+    "name": "Discord",
+    "category": "Communication",
+    "description": "Voice, video and text chat service for communities and friends.",
+    "publisher": "Discord Inc.",
+    "iconSymbol": "Chat24"
+  },
+  {
+    "id": "Telegram.TelegramDesktop",
+    "name": "Telegram Desktop",
+    "category": "Communication",
+    "description": "Fast and secure messaging app with cloud synchronization.",
+    "publisher": "Telegram FZ-LLC",
+    "iconSymbol": "Send24"
+  },
+  {
+    "id": "Spotify.Spotify",
+    "name": "Spotify",
+    "category": "Media",
+    "description": "Digital music service providing access to millions of songs and podcasts.",
+    "publisher": "Spotify AB",
+    "iconSymbol": "MusicNote124"
+  },
+  {
+    "id": "GIMP.GIMP",
+    "name": "GIMP",
+    "category": "Media",
+    "description": "GNU Image Manipulation Program for photo retouching and authoring.",
+    "publisher": "The GIMP Team",
+    "iconSymbol": "DrawImage24"
+  },
+  {
+    "id": "BleachBit.BleachBit",
+    "name": "BleachBit",
+    "category": "Utilities",
+    "description": "Open-source system cleaner that frees disk space and guards privacy.",
+    "publisher": "Andrew Ziem",
+    "iconSymbol": "Broom24"
+  },
+  {
+    "id": "Valve.Steam",
+    "name": "Steam",
+    "category": "Gaming",
+    "description": "Ultimate gaming platform for playing, discussing, and creating games.",
+    "publisher": "Valve Corporation",
+    "iconSymbol": "Games24"
+  },
+  {
+    "id": "EpicGames.EpicGamesLauncher",
+    "name": "Epic Games Launcher",
+    "category": "Gaming",
+    "description": "Store and launcher for games and Unreal Engine tools.",
+    "publisher": "Epic Games Inc.",
+    "iconSymbol": "Games24"
+  }
+]

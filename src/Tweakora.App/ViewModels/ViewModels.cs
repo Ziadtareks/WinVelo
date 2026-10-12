@@ -1,7 +1,15 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using System.Collections.ObjectModel;
 using Tweakora.App.Localization;
 using Tweakora.App.Services;
+using Tweakora.Modules.Apps;
+using Tweakora.Modules.Cleaner;
+using Tweakora.Modules.Fixes;
+using Tweakora.Modules.Network;
+using Tweakora.Modules.Services;
+using Tweakora.Modules.Startup;
+using Tweakora.Modules.Uninstaller;
 using Wpf.Ui.Appearance;
 
 namespace Tweakora.App.ViewModels;
@@ -23,18 +31,19 @@ public sealed partial class DashboardViewModel : ViewModelBase
     }
 }
 
-
 public sealed partial class ToolboxViewModel : ViewModelBase
 {
-    private readonly Tweakora.Modules.Cleaner.SmartCleaner _cleaner = new(isSimulationMode: true);
-    private readonly Tweakora.Modules.Startup.StartupManager _startupManager;
-    private readonly Tweakora.Modules.Services.ServicesManager _servicesManager;
+    private readonly SmartCleaner _cleaner = new(isSimulationMode: true);
+    private readonly StartupManager _startupManager;
+    private readonly ServicesManager _servicesManager;
+    private readonly FixesCenter _fixesCenter = new(isSimulationMode: true);
+    private readonly DnsSwitcher _dnsSwitcher = new(isSimulationMode: true);
 
     [ObservableProperty]
     private string _status = "Tools Available";
 
     [ObservableProperty]
-    private string _activeTool = "Cleaner"; // "Cleaner", "Startup", "Services"
+    private string _activeTool = "Cleaner"; // "Cleaner", "Startup", "Services", "Fixes", "Network"
 
     [ObservableProperty]
     private bool _isScanningCleaner;
@@ -42,17 +51,25 @@ public sealed partial class ToolboxViewModel : ViewModelBase
     [ObservableProperty]
     private string _cleanerStatusText = "Ready to scan temporary caches.";
 
-    public System.Collections.ObjectModel.ObservableCollection<Tweakora.Modules.Cleaner.CleanerCategoryScan> CleanerCategories { get; } = new();
-    public System.Collections.ObjectModel.ObservableCollection<Tweakora.Modules.Startup.StartupEntry> StartupItems { get; } = new();
-    public System.Collections.ObjectModel.ObservableCollection<Tweakora.Modules.Services.ServiceItem> ServicesList { get; } = new();
+    [ObservableProperty]
+    private string _fixStatusText = "Select a repair to diagnose and restore system components.";
+
+    [ObservableProperty]
+    private string _dnsStatusText = "Select a verified DNS provider to apply.";
+
+    public ObservableCollection<CleanerCategoryScan> CleanerCategories { get; } = new();
+    public ObservableCollection<StartupEntry> StartupItems { get; } = new();
+    public ObservableCollection<ServiceItem> ServicesList { get; } = new();
+    public ObservableCollection<SystemFix> FixesList { get; } = new();
+    public ObservableCollection<DnsProvider> DnsProviders { get; } = new();
 
     public ToolboxViewModel()
     {
         Tweakora.Core.Fakes.FakeRegistryService fakeReg = new();
         Tweakora.Core.Fakes.FakeServicesService fakeSvc = new();
 
-        _startupManager = new Tweakora.Modules.Startup.StartupManager(fakeReg);
-        _servicesManager = new Tweakora.Modules.Services.ServicesManager(fakeSvc);
+        _startupManager = new StartupManager(fakeReg);
+        _servicesManager = new ServicesManager(fakeSvc);
 
         LoadToolsData();
     }
@@ -99,9 +116,38 @@ public sealed partial class ToolboxViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void ToggleStartupItem(Tweakora.Modules.Startup.StartupEntry item)
+    private void ToggleStartupItem(StartupEntry item)
     {
         _startupManager.SetEntryState(item, !item.IsEnabled);
+    }
+
+    [RelayCommand]
+    private async Task RunFixAsync(SystemFix fix)
+    {
+        FixStatusText = $"Running repair: {fix.Title}...";
+        bool result = await _fixesCenter.RunFixAsync(fix);
+        FixStatusText = result ? $"Successfully completed: {fix.Title}." : $"Repair encountered a non-fatal warning: {fix.Title}.";
+    }
+
+    [RelayCommand]
+    private async Task ApplyDnsAsync(DnsProvider provider)
+    {
+        DnsStatusText = $"Applying {provider.Name} ({provider.PrimaryDns})...";
+        bool ok = await _dnsSwitcher.ApplyDnsAsync(provider);
+        foreach (var p in DnsProviders)
+        {
+            p.IsActive = (p.Id == provider.Id);
+        }
+        DnsStatusText = ok ? $"Applied {provider.Name} successfully." : "Failed to apply DNS configuration.";
+    }
+
+    [RelayCommand]
+    private async Task TestDnsLatencyAsync(DnsProvider provider)
+    {
+        DnsStatusText = $"Pinging {provider.PrimaryDns}...";
+        int ping = await _dnsSwitcher.PingDnsAsync(provider.PrimaryDns);
+        provider.PingMs = ping;
+        DnsStatusText = ping >= 0 ? $"{provider.Name} latency: {ping} ms" : $"{provider.Name} ping timed out or unavailable.";
     }
 
     private void LoadToolsData()
@@ -119,13 +165,128 @@ public sealed partial class ToolboxViewModel : ViewModelBase
         {
             ServicesList.Add(svc);
         }
+
+        // Populate fixes
+        FixesList.Clear();
+        foreach (var fix in _fixesCenter.GetAvailableFixes())
+        {
+            FixesList.Add(fix);
+        }
+
+        // Populate DNS providers
+        DnsProviders.Clear();
+        foreach (var dns in _dnsSwitcher.GetProviders())
+        {
+            DnsProviders.Add(dns);
+        }
     }
 }
 
 public sealed partial class AppsViewModel : ViewModelBase
 {
+    private readonly WinGetManager _wingetManager = new(isSimulationMode: true);
+    private readonly AppUninstaller _uninstaller;
+    private readonly List<WinGetApp> _allCuratedApps = new();
+
     [ObservableProperty]
-    private string _status = "WinGet Ready";
+    private string _activeTab = "Store"; // "Store" or "Uninstaller"
+
+    [ObservableProperty]
+    private string _selectedCategory = "All";
+
+    [ObservableProperty]
+    private string _searchQuery = string.Empty;
+
+    [ObservableProperty]
+    private string _statusMessage = "WinGet Store ready.";
+
+    public ObservableCollection<WinGetApp> AppsList { get; } = new();
+    public ObservableCollection<InstalledAppItem> InstalledApps { get; } = new();
+
+    public AppsViewModel()
+    {
+        Tweakora.Core.Fakes.FakeRegistryService fakeReg = new();
+        _uninstaller = new AppUninstaller(fakeReg, isSimulationMode: true);
+
+        LoadData();
+    }
+
+    private void LoadData()
+    {
+        _allCuratedApps.Clear();
+        var catalog = _wingetManager.LoadAppsCatalog();
+        _allCuratedApps.AddRange(catalog);
+
+        ApplyFilter();
+
+        InstalledApps.Clear();
+        foreach (var app in _uninstaller.GetInstalledApps())
+        {
+            InstalledApps.Add(app);
+        }
+    }
+
+    [RelayCommand]
+    private void SwitchTab(string tab)
+    {
+        ActiveTab = tab;
+    }
+
+    [RelayCommand]
+    private void SelectCategory(string category)
+    {
+        SelectedCategory = category;
+        ApplyFilter();
+    }
+
+    partial void OnSearchQueryChanged(string value)
+    {
+        ApplyFilter();
+    }
+
+    private void ApplyFilter()
+    {
+        AppsList.Clear();
+        var query = SearchQuery?.Trim() ?? string.Empty;
+
+        foreach (var app in _allCuratedApps)
+        {
+            bool matchesCategory = SelectedCategory == "All" || app.Category.Equals(SelectedCategory, StringComparison.OrdinalIgnoreCase);
+            bool matchesSearch = string.IsNullOrWhiteSpace(query)
+                || app.Name.Contains(query, StringComparison.OrdinalIgnoreCase)
+                || app.Description.Contains(query, StringComparison.OrdinalIgnoreCase)
+                || app.Publisher.Contains(query, StringComparison.OrdinalIgnoreCase);
+
+            if (matchesCategory && matchesSearch)
+            {
+                AppsList.Add(app);
+            }
+        }
+    }
+
+    [RelayCommand]
+    private async Task InstallAppAsync(WinGetApp app)
+    {
+        StatusMessage = $"Installing {app.Name}...";
+        bool result = await _wingetManager.InstallAppAsync(app);
+        StatusMessage = result ? $"Successfully installed {app.Name}." : $"Failed to install {app.Name}.";
+    }
+
+    [RelayCommand]
+    private async Task UninstallAppAsync(InstalledAppItem app)
+    {
+        StatusMessage = $"Uninstalling {app.Name}...";
+        bool result = await _uninstaller.UninstallAppAsync(app);
+        if (result)
+        {
+            InstalledApps.Remove(app);
+            StatusMessage = $"Uninstalled {app.Name}.";
+        }
+        else
+        {
+            StatusMessage = $"Could not complete uninstallation for {app.Name}.";
+        }
+    }
 }
 
 public sealed partial class PresetsViewModel : ViewModelBase

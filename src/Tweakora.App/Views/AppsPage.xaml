@@ -4,22 +4,152 @@
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              xmlns:loc="clr-namespace:Tweakora.App.Localization">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <StackPanel Margin="32" MaxWidth="1000" HorizontalAlignment="Stretch">
+        <StackPanel Margin="32" MaxWidth="1100" HorizontalAlignment="Stretch">
+            <!-- Header -->
             <TextBlock Text="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[AppsTitle]}"
-                       FontSize="26" FontWeight="SemiBold" Margin="0,0,0,8" />
+                       FontSize="26" FontWeight="SemiBold" Margin="0,0,0,6" />
             <TextBlock Text="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[AppsSubtitle]}"
-                       FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,24" />
+                       FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,16" />
 
-            <ui:TextBox PlaceholderText="Search 300+ curated WinGet software packages..."
-                        Icon="{ui:SymbolIcon Apps24}" Margin="0,0,0,16" />
+            <!-- Tab Switcher -->
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                <ui:Button Content="WinGet Software Catalog" Icon="{ui:SymbolIcon Apps24}" Margin="0,0,8,0"
+                           Command="{Binding SwitchTabCommand}" CommandParameter="Store" />
+                <ui:Button Content="Installed Apps Uninstaller" Icon="{ui:SymbolIcon Delete24}" Margin="0,0,8,0"
+                           Command="{Binding SwitchTabCommand}" CommandParameter="Uninstaller" />
+            </StackPanel>
 
-            <ui:Card>
-                <StackPanel Margin="8">
-                    <TextBlock Text="Categories" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,8" />
-                    <TextBlock Text="Browsers, Developer Tools, Utilities, Media, Gaming, and Runtimes."
-                               Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="13" />
+            <!-- Status Banner -->
+            <Border Background="{DynamicResource ControlFillColorSecondaryBrush}" CornerRadius="6" Padding="12,8" Margin="0,0,0,16">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <ui:SymbolIcon Symbol="Info24" Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}" Margin="0,0,10,0" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="1" Text="{Binding StatusMessage}" VerticalAlignment="Center" FontWeight="Medium" FontSize="13" />
+                </Grid>
+            </Border>
+
+            <!-- ==================== TAB 1: WINGET STORE ==================== -->
+            <Border>
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ActiveTab}" Value="Store">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <StackPanel>
+                    <!-- Search Bar and Category Chips -->
+                    <ui:TextBox PlaceholderText="Search software by name, publisher, or description..."
+                                Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}"
+                                Icon="{ui:SymbolIcon Search24}" Margin="0,0,0,12" />
+
+                    <!-- Categories Filter -->
+                    <WrapPanel Margin="0,0,0,16">
+                        <ui:Button Content="All" Margin="0,0,6,6" Command="{Binding SelectCategoryCommand}" CommandParameter="All" />
+                        <ui:Button Content="Browsers" Margin="0,0,6,6" Command="{Binding SelectCategoryCommand}" CommandParameter="Browsers" />
+                        <ui:Button Content="Utilities" Margin="0,0,6,6" Command="{Binding SelectCategoryCommand}" CommandParameter="Utilities" />
+                        <ui:Button Content="Developer Tools" Margin="0,0,6,6" Command="{Binding SelectCategoryCommand}" CommandParameter="Developer Tools" />
+                        <ui:Button Content="Media" Margin="0,0,6,6" Command="{Binding SelectCategoryCommand}" CommandParameter="Media" />
+                        <ui:Button Content="Communication" Margin="0,0,6,6" Command="{Binding SelectCategoryCommand}" CommandParameter="Communication" />
+                        <ui:Button Content="Gaming" Margin="0,0,6,6" Command="{Binding SelectCategoryCommand}" CommandParameter="Gaming" />
+                    </WrapPanel>
+
+                    <!-- Apps Grid -->
+                    <ItemsControl ItemsSource="{Binding AppsList}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <ui:Card Margin="0,0,0,10" Padding="14">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel Grid.Column="0">
+                                            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                                <TextBlock Text="{Binding Name}" FontSize="16" FontWeight="SemiBold" Margin="0,0,8,0" />
+                                                <Border Background="{DynamicResource ControlFillColorSecondaryBrush}" CornerRadius="4" Padding="6,2" VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding Category}" FontSize="11" Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}" FontWeight="Medium" />
+                                                </Border>
+                                            </StackPanel>
+                                            <TextBlock Text="{Binding Description}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12" Margin="0,0,0,4" TextWrapping="Wrap" />
+                                            <TextBlock Text="{Binding Publisher, StringFormat='Publisher: {0}'}" Foreground="{DynamicResource TextFillColorTertiaryBrush}" FontSize="11" />
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="16,0,0,0">
+                                            <ui:Button Content="Install" Icon="{ui:SymbolIcon ArrowDownload24}" Appearance="Primary"
+                                                       Command="{Binding DataContext.InstallAppCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                       CommandParameter="{Binding}" />
+                                        </StackPanel>
+                                    </Grid>
+                                </ui:Card>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
                 </StackPanel>
-            </ui:Card>
+            </Border>
+
+            <!-- ==================== TAB 2: INSTALLED APPS UNINSTALLER ==================== -->
+            <Border>
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ActiveTab}" Value="Uninstaller">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <StackPanel>
+                    <ui:Card Margin="0,0,0,16" Padding="14">
+                        <StackPanel>
+                            <TextBlock Text="Installed Programs Manager" FontSize="16" FontWeight="SemiBold" />
+                            <TextBlock Text="Cleanly review and uninstall desktop programs and Store packages."
+                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12" Margin="0,2,0,0" />
+                        </StackPanel>
+                    </ui:Card>
+
+                    <ItemsControl ItemsSource="{Binding InstalledApps}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <ui:Card Margin="0,0,0,8" Padding="12">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="16" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="{Binding Name}" FontSize="15" FontWeight="SemiBold" />
+                                            <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+                                                <TextBlock Text="{Binding Publisher}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="11" Margin="0,0,12,0" />
+                                                <TextBlock Text="{Binding Version, StringFormat='v{0}'}" Foreground="{DynamicResource TextFillColorTertiaryBrush}" FontSize="11" Margin="0,0,12,0" />
+                                                <TextBlock Text="{Binding EstimatedSize}" Foreground="{DynamicResource TextFillColorTertiaryBrush}" FontSize="11" />
+                                            </StackPanel>
+                                        </StackPanel>
+
+                                        <TextBlock Grid.Column="1" Text="{Binding InstallDate}" VerticalAlignment="Center"
+                                                   Foreground="{DynamicResource TextFillColorTertiaryBrush}" FontSize="12" />
+
+                                        <ui:Button Grid.Column="3" Content="Uninstall" Icon="{ui:SymbolIcon Delete24}" Appearance="Danger"
+                                                   Command="{Binding DataContext.UninstallAppCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                   CommandParameter="{Binding}" VerticalAlignment="Center" />
+                                    </Grid>
+                                </ui:Card>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
         </StackPanel>
     </ScrollViewer>
 </UserControl>
