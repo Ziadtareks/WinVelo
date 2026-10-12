@@ -13,9 +13,19 @@
     "category": "performance",
     "subcategory": "visual",
     "risk": "Safe",
-    "impacts": ["performance", "battery", "ui"],
-    "tags": ["transparency", "gpu"],
-    "presets": ["gaming", "minimal"],
+    "impacts": [
+      "performance",
+      "battery",
+      "ui"
+    ],
+    "tags": [
+      "transparency",
+      "gpu"
+    ],
+    "presets": [
+      "gaming",
+      "minimal"
+    ],
     "windows": {
       "minBuild": 19041,
       "maxBuild": null
@@ -69,9 +79,18 @@
     "category": "performance",
     "subcategory": "visual",
     "risk": "Safe",
-    "impacts": ["performance", "ui"],
-    "tags": ["animations", "speed"],
-    "presets": ["gaming", "minimal"],
+    "impacts": [
+      "performance",
+      "ui"
+    ],
+    "tags": [
+      "animations",
+      "speed"
+    ],
+    "presets": [
+      "gaming",
+      "minimal"
+    ],
     "windows": {
       "minBuild": 19041,
       "maxBuild": null
@@ -125,9 +144,17 @@
     "category": "performance",
     "subcategory": "startup",
     "risk": "Safe",
-    "impacts": ["performance"],
-    "tags": ["startup", "boot"],
-    "presets": ["recommended", "gaming"],
+    "impacts": [
+      "performance"
+    ],
+    "tags": [
+      "startup",
+      "boot"
+    ],
+    "presets": [
+      "recommended",
+      "gaming"
+    ],
     "windows": {
       "minBuild": 19041,
       "maxBuild": null
@@ -179,9 +206,17 @@
     "category": "performance",
     "subcategory": "storage",
     "risk": "Safe",
-    "impacts": ["performance", "storage"],
-    "tags": ["storage", "cleaner"],
-    "presets": ["recommended"],
+    "impacts": [
+      "performance",
+      "storage"
+    ],
+    "tags": [
+      "storage",
+      "cleaner"
+    ],
+    "presets": [
+      "recommended"
+    ],
     "windows": {
       "minBuild": 19041,
       "maxBuild": null
@@ -235,9 +270,18 @@
     "category": "performance",
     "subcategory": "network",
     "risk": "Safe",
-    "impacts": ["network", "performance"],
-    "tags": ["bandwidth", "updates"],
-    "presets": ["recommended", "gaming"],
+    "impacts": [
+      "network",
+      "performance"
+    ],
+    "tags": [
+      "bandwidth",
+      "updates"
+    ],
+    "presets": [
+      "recommended",
+      "gaming"
+    ],
     "windows": {
       "minBuild": 19041,
       "maxBuild": null
@@ -289,9 +333,16 @@
     "category": "performance",
     "subcategory": "memory",
     "risk": "Low",
-    "impacts": ["performance"],
-    "tags": ["svchost", "ram"],
-    "presets": ["recommended"],
+    "impacts": [
+      "performance"
+    ],
+    "tags": [
+      "svchost",
+      "ram"
+    ],
+    "presets": [
+      "recommended"
+    ],
     "windows": {
       "minBuild": 19041,
       "maxBuild": null
@@ -328,5 +379,395 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/application-management/svchost-service-refactoring",
     "verifiedOnBuild": "22631.4317"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "performance.system.disable-maintenance-wake",
+    "name": {
+      "en": "Disable Automatic Maintenance Wake-Up Timers",
+      "ar": "تعطيل مؤقتات إيقاظ الجهاز للصيانة التلقائية"
+    },
+    "description": {
+      "en": "Prevents Windows Automatic Maintenance from waking the PC from sleep during the night.",
+      "ar": "منع مهام الصيانة التلقائية في ويندوز من إيقاظ الحاسوب ليلاً أثناء وضع السكون أو النوم."
+    },
+    "category": "performance",
+    "subcategory": "power",
+    "risk": "Safe",
+    "impacts": [
+      "performance",
+      "battery"
+    ],
+    "tags": [
+      "maintenance",
+      "power",
+      "sleep"
+    ],
+    "presets": [
+      "recommended"
+    ],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Schedule\\Maintenance",
+      "valueName": "WakeUp",
+      "expectedValue": 0,
+      "matchType": "Equals"
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Schedule\\Maintenance",
+        "valueName": "WakeUp",
+        "valueKind": "DWord",
+        "data": 0
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Schedule\\Maintenance",
+        "valueName": "WakeUp",
+        "valueKind": "DWord",
+        "data": 1
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows-hardware/customize/desktop/unattend/microsoft-windows-shell-setup-automaticmaintenance-wakeuptimer",
+    "verifiedOnBuild": "26100"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "performance.search.prevent-indexing-on-battery",
+    "name": {
+      "en": "Prevent Search Indexing While on Battery Power",
+      "ar": "إيقاف فهرسة البحث التلقائية عند تشغيل البطارية"
+    },
+    "description": {
+      "en": "Pauses Windows Search background indexing while running on laptop battery to prolong battery life.",
+      "ar": "إيقاف فهرسة وبناء قاعدة بيانات البحث تلقائياً عند العمل على طاقة البطارية للحفاظ على شحن الحاسوب المحمول."
+    },
+    "category": "performance",
+    "subcategory": "battery",
+    "risk": "Safe",
+    "impacts": [
+      "performance",
+      "battery"
+    ],
+    "tags": [
+      "battery",
+      "indexing",
+      "search"
+    ],
+    "presets": [
+      "recommended"
+    ],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Search",
+      "valueName": "PreventIndexingOnBattery",
+      "expectedValue": 1,
+      "matchType": "Equals"
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Search",
+        "valueName": "PreventIndexingOnBattery",
+        "valueKind": "DWord",
+        "data": 1
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "operation": "DeleteValue",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Search",
+        "valueName": "PreventIndexingOnBattery"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-admx-search#search_preventindexingonbattery",
+    "verifiedOnBuild": "26100"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "performance.ntfs.disable-last-access",
+    "name": {
+      "en": "Disable NTFS Last Access Time Updates",
+      "ar": "تعطيل تحديث وقت آخر وصول لملفات NTFS"
+    },
+    "description": {
+      "en": "Stops updating file timestamp metadata every time a file is read, reducing unnecessary disk I/O operations.",
+      "ar": "إيقاف كتابة وتحديث وقت آخر وصول عند قراءة أي ملف، مما يقلل استهلاك القرص وعمليات الكتابة غير الضرورية."
+    },
+    "category": "performance",
+    "subcategory": "disk",
+    "risk": "Safe",
+    "impacts": [
+      "performance",
+      "storage"
+    ],
+    "tags": [
+      "ntfs",
+      "disk",
+      "io",
+      "performance"
+    ],
+    "presets": [
+      "recommended",
+      "gaming"
+    ],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SYSTEM\\CurrentControlSet\\Control\\FileSystem",
+      "valueName": "NtfsDisableLastAccessUpdate",
+      "expectedValue": 1,
+      "matchType": "Equals"
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKLM",
+        "key": "SYSTEM\\CurrentControlSet\\Control\\FileSystem",
+        "valueName": "NtfsDisableLastAccessUpdate",
+        "valueKind": "DWord",
+        "data": 1
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKLM",
+        "key": "SYSTEM\\CurrentControlSet\\Control\\FileSystem",
+        "valueName": "NtfsDisableLastAccessUpdate",
+        "valueKind": "DWord",
+        "data": 0
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/fsutil-behavior",
+    "verifiedOnBuild": "26100"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "performance.ntfs.disable-8dot3-names",
+    "name": {
+      "en": "Disable 8.3 Short File Name Creation",
+      "ar": "تعطيل إنشاء أسماء الملفات القصيرة 8.3 على أقراص NTFS"
+    },
+    "description": {
+      "en": "Disables legacy MS-DOS short file name generation to speed up directory enumeration and file creation.",
+      "ar": "تعطيل إنشاء أسماء ملفات DOS القديمة على أقراص NTFS لتسريع إنشاء الملفات وفهرسة المجلدات."
+    },
+    "category": "performance",
+    "subcategory": "disk",
+    "risk": "Safe",
+    "impacts": [
+      "performance",
+      "storage"
+    ],
+    "tags": [
+      "ntfs",
+      "8dot3",
+      "disk",
+      "speed"
+    ],
+    "presets": [
+      "recommended",
+      "gaming"
+    ],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SYSTEM\\CurrentControlSet\\Control\\FileSystem",
+      "valueName": "NtfsDisable8dot3NameCreation",
+      "expectedValue": 1,
+      "matchType": "Equals"
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKLM",
+        "key": "SYSTEM\\CurrentControlSet\\Control\\FileSystem",
+        "valueName": "NtfsDisable8dot3NameCreation",
+        "valueKind": "DWord",
+        "data": 1
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKLM",
+        "key": "SYSTEM\\CurrentControlSet\\Control\\FileSystem",
+        "valueName": "NtfsDisable8dot3NameCreation",
+        "valueKind": "DWord",
+        "data": 0
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/fsutil-8dot3name",
+    "verifiedOnBuild": "26100"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "performance.network.disable-remote-differential-compression",
+    "name": {
+      "en": "Disable Remote Differential Compression API",
+      "ar": "تعطيل ميزة الضغط التفاضلي عن بُعد (RDC)"
+    },
+    "description": {
+      "en": "Disables legacy RDC protocol overhead to speed up local network file transfers on modern gigabit LANs.",
+      "ar": "تعطيل بروتوكول RDC القديم لتحسين سرعة نقل الملفات عبر الشبكات المحلية الحديثة عالية السرعة."
+    },
+    "category": "performance",
+    "subcategory": "network",
+    "risk": "Safe",
+    "impacts": [
+      "performance",
+      "network"
+    ],
+    "tags": [
+      "rdc",
+      "network",
+      "speed"
+    ],
+    "presets": [
+      "recommended"
+    ],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RDC",
+      "valueName": "RdcEnabled",
+      "expectedValue": 0,
+      "matchType": "Equals"
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RDC",
+        "valueName": "RdcEnabled",
+        "valueKind": "DWord",
+        "data": 0
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "operation": "DeleteValue",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RDC",
+        "valueName": "RdcEnabled"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/rdc/about-remote-differential-compression",
+    "verifiedOnBuild": "26100"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "performance.system.clear-pagefile-shutdown",
+    "name": {
+      "en": "Ensure Pagefile is Not Overwritten on Every Shutdown",
+      "ar": "التأكد من عدم مسح ملف الترحيل (Pagefile) عند كل إيقاف تشغيل"
+    },
+    "description": {
+      "en": "Ensures ClearPageFileAtShutdown is disabled so Windows powers down rapidly without waiting for disk zeroing.",
+      "ar": "التأكد من إيقاف مسح ملف الترحيل عند إيقاف التشغيل لتسريع إغلاق الجهاز وتفادي بطء إيقاف التشغيل."
+    },
+    "category": "performance",
+    "subcategory": "system",
+    "risk": "Safe",
+    "impacts": [
+      "performance"
+    ],
+    "tags": [
+      "pagefile",
+      "shutdown",
+      "speed"
+    ],
+    "presets": [
+      "recommended",
+      "gaming"
+    ],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management",
+      "valueName": "ClearPageFileAtShutdown",
+      "expectedValue": 0,
+      "matchType": "Equals"
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKLM",
+        "key": "SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management",
+        "valueName": "ClearPageFileAtShutdown",
+        "valueKind": "DWord",
+        "data": 0
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKLM",
+        "key": "SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management",
+        "valueName": "ClearPageFileAtShutdown",
+        "valueKind": "DWord",
+        "data": 1
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/troubleshoot/windows-server/performance/clear-page-file-at-shutdown",
+    "verifiedOnBuild": "26100"
   }
 ]

@@ -13,9 +13,18 @@
     "category": "updates",
     "subcategory": "drivers",
     "risk": "Low",
-    "impacts": ["gaming", "performance"],
-    "tags": ["drivers", "windowsupdate"],
-    "presets": ["recommended", "gaming"],
+    "impacts": [
+      "gaming",
+      "performance"
+    ],
+    "tags": [
+      "drivers",
+      "windowsupdate"
+    ],
+    "presets": [
+      "recommended",
+      "gaming"
+    ],
     "windows": {
       "minBuild": 19041,
       "maxBuild": null
@@ -67,9 +76,16 @@
     "category": "updates",
     "subcategory": "reboot",
     "risk": "Safe",
-    "impacts": ["performance"],
-    "tags": ["reboot", "windowsupdate"],
-    "presets": ["recommended"],
+    "impacts": [
+      "performance"
+    ],
+    "tags": [
+      "reboot",
+      "windowsupdate"
+    ],
+    "presets": [
+      "recommended"
+    ],
     "windows": {
       "minBuild": 19041,
       "maxBuild": null
@@ -106,5 +122,255 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/deployment/update/waas-wu-settings#no-auto-reboot-with-logged-on-users-for-scheduled-automatic-updates-installations",
     "verifiedOnBuild": "22631.4317"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "updates.au.notify-download",
+    "name": {
+      "en": "Notify Before Downloading Windows Updates",
+      "ar": "تنبيه المستخدم قبل تنزيل تحديثات ويندوز"
+    },
+    "description": {
+      "en": "Configures Automatic Updates to AUOptions 2 (notify before downloading) to prevent unexpected bandwidth spikes.",
+      "ar": "ضبط تحديثات ويندوز التلقائية للتنبيه قبل بدء التنزيل لمنع استهلاك سرعة الإنترنت فجأة."
+    },
+    "category": "updates",
+    "subcategory": "schedule",
+    "risk": "Safe",
+    "impacts": [
+      "performance",
+      "network"
+    ],
+    "tags": [
+      "updates",
+      "bandwidth",
+      "notification"
+    ],
+    "presets": [
+      "recommended"
+    ],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\\AU",
+      "valueName": "AUOptions",
+      "expectedValue": 2,
+      "matchType": "Equals"
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\\AU",
+        "valueName": "AUOptions",
+        "valueKind": "DWord",
+        "data": 2
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "operation": "DeleteValue",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\\AU",
+        "valueName": "AUOptions"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/deployment/update/waas-wu-settings#configure-automatic-updates",
+    "verifiedOnBuild": "26100"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "updates.peering.metered-connections",
+    "name": {
+      "en": "Block Delivery Optimization on Metered Connections",
+      "ar": "حظر تحسين التوصيل P2P عبر الشبكات المحدودة"
+    },
+    "description": {
+      "en": "Prevents Windows Update from downloading or sharing update files when connected to metered networks or hotspots.",
+      "ar": "منع مشاركة أو تنزيل تحديثات ويندوز عبر اتصالات الشبكات ذات الباقات المحدودة ونقاط الاتصال الشخصية."
+    },
+    "category": "updates",
+    "subcategory": "bandwidth",
+    "risk": "Safe",
+    "impacts": [
+      "network",
+      "performance"
+    ],
+    "tags": [
+      "metered",
+      "updates",
+      "bandwidth"
+    ],
+    "presets": [
+      "recommended"
+    ],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\DeliveryOptimization",
+      "valueName": "AllowServerFiles",
+      "expectedValue": 0,
+      "matchType": "Equals"
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\DeliveryOptimization",
+        "valueName": "AllowServerFiles",
+        "valueKind": "DWord",
+        "data": 0
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "operation": "DeleteValue",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\DeliveryOptimization",
+        "valueName": "AllowServerFiles"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/deployment/do/waas-delivery-optimization-reference",
+    "verifiedOnBuild": "26100"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "updates.activehours.enable-policy",
+    "name": {
+      "en": "Enforce Active Hours Policy Against Mid-Day Restarts",
+      "ar": "فرض سياسة ساعات النشاط لمنع إعادة التشغيل أثناء العمل"
+    },
+    "description": {
+      "en": "Enforces smart active hours window (8 AM to 10 PM) so automatic restarts never interrupt daily activities.",
+      "ar": "تفعيل نافذة ساعات النشاط الذكية لمنع إعادة التشغيل العشوائي لتثبيت التحديثات في أوقات العمل."
+    },
+    "category": "updates",
+    "subcategory": "schedule",
+    "risk": "Safe",
+    "impacts": [
+      "performance"
+    ],
+    "tags": [
+      "activehours",
+      "reboot",
+      "updates"
+    ],
+    "presets": [
+      "recommended"
+    ],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate",
+      "valueName": "SetActiveHours",
+      "expectedValue": 1,
+      "matchType": "Equals"
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate",
+        "valueName": "SetActiveHours",
+        "valueKind": "DWord",
+        "data": 1
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "operation": "DeleteValue",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate",
+        "valueName": "SetActiveHours"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/deployment/update/waas-wu-settings#turn-off-auto-restart-for-updates-during-active-hours",
+    "verifiedOnBuild": "26100"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "updates.preview.disable-optional-content",
+    "name": {
+      "en": "Disable Optional Preview Updates & Beta Rollouts",
+      "ar": "تعطيل التحديثات التجريبية الاختيارية (Preview Updates)"
+    },
+    "description": {
+      "en": "Prevents installation of untested preview quality updates (C/D week optional releases).",
+      "ar": "منع تثبيت التحديثات التجريبية الاختيارية غير المستقرة لضمان استقرار وصلابة النظام."
+    },
+    "category": "updates",
+    "subcategory": "quality",
+    "risk": "Safe",
+    "impacts": [
+      "performance"
+    ],
+    "tags": [
+      "preview",
+      "updates",
+      "stability"
+    ],
+    "presets": [
+      "recommended"
+    ],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate",
+      "valueName": "AllowOptionalContent",
+      "expectedValue": 0,
+      "matchType": "Equals"
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate",
+        "valueName": "AllowOptionalContent",
+        "valueKind": "DWord",
+        "data": 0
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "operation": "DeleteValue",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate",
+        "valueName": "AllowOptionalContent"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/deployment/update/waas-wu-settings#enable-optional-updates",
+    "verifiedOnBuild": "26100"
   }
 ]

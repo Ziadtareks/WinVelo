@@ -17,13 +17,28 @@
     "category": "privacy",
     "subcategory": "telemetry",
     "risk": "Safe",
-    "impacts": ["privacy"],
-    "tags": ["telemetry", "privacy", "diagnostics"],
-    "presets": ["recommended", "privacy"],
+    "impacts": [
+      "privacy"
+    ],
+    "tags": [
+      "telemetry",
+      "privacy",
+      "diagnostics"
+    ],
+    "presets": [
+      "recommended",
+      "privacy"
+    ],
     "windows": {
       "minBuild": 19041,
       "maxBuild": null,
-      "editions": ["Home", "Pro", "Enterprise", "Education", "IoTEnterprise"]
+      "editions": [
+        "Home",
+        "Pro",
+        "Enterprise",
+        "Education",
+        "IoTEnterprise"
+      ]
     },
     "requiresReboot": false,
     "requiresExplorerRestart": false,
@@ -76,9 +91,17 @@
     "category": "privacy",
     "subcategory": "advertising",
     "risk": "Safe",
-    "impacts": ["privacy"],
-    "tags": ["ads", "tracking"],
-    "presets": ["recommended", "privacy"],
+    "impacts": [
+      "privacy"
+    ],
+    "tags": [
+      "ads",
+      "tracking"
+    ],
+    "presets": [
+      "recommended",
+      "privacy"
+    ],
     "windows": {
       "minBuild": 19041,
       "maxBuild": null
@@ -132,9 +155,17 @@
     "category": "privacy",
     "subcategory": "telemetry",
     "risk": "Safe",
-    "impacts": ["privacy"],
-    "tags": ["ads", "tips"],
-    "presets": ["recommended", "privacy"],
+    "impacts": [
+      "privacy"
+    ],
+    "tags": [
+      "ads",
+      "tips"
+    ],
+    "presets": [
+      "recommended",
+      "privacy"
+    ],
     "windows": {
       "minBuild": 19041,
       "maxBuild": null
@@ -188,9 +219,17 @@
     "category": "privacy",
     "subcategory": "activity",
     "risk": "Safe",
-    "impacts": ["privacy"],
-    "tags": ["timeline", "activity"],
-    "presets": ["recommended", "privacy"],
+    "impacts": [
+      "privacy"
+    ],
+    "tags": [
+      "timeline",
+      "activity"
+    ],
+    "presets": [
+      "recommended",
+      "privacy"
+    ],
     "windows": {
       "minBuild": 19041,
       "maxBuild": null
@@ -242,9 +281,16 @@
     "category": "privacy",
     "subcategory": "speech",
     "risk": "Safe",
-    "impacts": ["privacy"],
-    "tags": ["speech", "voice"],
-    "presets": ["privacy"],
+    "impacts": [
+      "privacy"
+    ],
+    "tags": [
+      "speech",
+      "voice"
+    ],
+    "presets": [
+      "privacy"
+    ],
     "windows": {
       "minBuild": 19041,
       "maxBuild": null
@@ -298,9 +344,17 @@
     "category": "privacy",
     "subcategory": "typing",
     "risk": "Safe",
-    "impacts": ["privacy"],
-    "tags": ["typing", "inking"],
-    "presets": ["recommended", "privacy"],
+    "impacts": [
+      "privacy"
+    ],
+    "tags": [
+      "typing",
+      "inking"
+    ],
+    "presets": [
+      "recommended",
+      "privacy"
+    ],
     "windows": {
       "minBuild": 19041,
       "maxBuild": null
@@ -368,9 +422,17 @@
     "category": "privacy",
     "subcategory": "tracking",
     "risk": "Safe",
-    "impacts": ["privacy"],
-    "tags": ["tracking", "startmenu"],
-    "presets": ["recommended", "privacy"],
+    "impacts": [
+      "privacy"
+    ],
+    "tags": [
+      "tracking",
+      "startmenu"
+    ],
+    "presets": [
+      "recommended",
+      "privacy"
+    ],
     "windows": {
       "minBuild": 19041,
       "maxBuild": null
@@ -424,9 +486,18 @@
     "category": "privacy",
     "subcategory": "feedback",
     "risk": "Safe",
-    "impacts": ["privacy", "ui"],
-    "tags": ["feedback", "popups"],
-    "presets": ["recommended", "privacy"],
+    "impacts": [
+      "privacy",
+      "ui"
+    ],
+    "tags": [
+      "feedback",
+      "popups"
+    ],
+    "presets": [
+      "recommended",
+      "privacy"
+    ],
     "windows": {
       "minBuild": 19041,
       "maxBuild": null
@@ -478,9 +549,17 @@
     "category": "privacy",
     "subcategory": "diagnostics",
     "risk": "Low",
-    "impacts": ["privacy", "network"],
-    "tags": ["wer", "crashes"],
-    "presets": ["privacy"],
+    "impacts": [
+      "privacy",
+      "network"
+    ],
+    "tags": [
+      "wer",
+      "crashes"
+    ],
+    "presets": [
+      "privacy"
+    ],
     "windows": {
       "minBuild": 19041,
       "maxBuild": null
@@ -532,9 +611,17 @@
     "category": "privacy",
     "subcategory": "telemetry",
     "risk": "Safe",
-    "impacts": ["privacy"],
-    "tags": ["ceip", "telemetry"],
-    "presets": ["recommended", "privacy"],
+    "impacts": [
+      "privacy"
+    ],
+    "tags": [
+      "ceip",
+      "telemetry"
+    ],
+    "presets": [
+      "recommended",
+      "privacy"
+    ],
     "windows": {
       "minBuild": 19041,
       "maxBuild": null
@@ -586,9 +673,17 @@
     "category": "privacy",
     "subcategory": "clipboard",
     "risk": "Safe",
-    "impacts": ["privacy", "network"],
-    "tags": ["clipboard", "cloud"],
-    "presets": ["privacy"],
+    "impacts": [
+      "privacy",
+      "network"
+    ],
+    "tags": [
+      "clipboard",
+      "cloud"
+    ],
+    "presets": [
+      "privacy"
+    ],
     "windows": {
       "minBuild": 19041,
       "maxBuild": null
@@ -640,9 +735,17 @@
     "category": "privacy",
     "subcategory": "search",
     "risk": "Safe",
-    "impacts": ["privacy"],
-    "tags": ["search", "history"],
-    "presets": ["recommended", "privacy"],
+    "impacts": [
+      "privacy"
+    ],
+    "tags": [
+      "search",
+      "history"
+    ],
+    "presets": [
+      "recommended",
+      "privacy"
+    ],
     "windows": {
       "minBuild": 19041,
       "maxBuild": null
@@ -696,9 +799,19 @@
     "category": "privacy",
     "subcategory": "spotlight",
     "risk": "Safe",
-    "impacts": ["privacy", "ui"],
-    "tags": ["lockscreen", "ads"],
-    "presets": ["recommended", "privacy", "minimal"],
+    "impacts": [
+      "privacy",
+      "ui"
+    ],
+    "tags": [
+      "lockscreen",
+      "ads"
+    ],
+    "presets": [
+      "recommended",
+      "privacy",
+      "minimal"
+    ],
     "windows": {
       "minBuild": 19041,
       "maxBuild": null
@@ -752,9 +865,19 @@
     "category": "privacy",
     "subcategory": "suggestions",
     "risk": "Safe",
-    "impacts": ["privacy", "ui"],
-    "tags": ["startmenu", "promotions"],
-    "presets": ["recommended", "privacy", "minimal"],
+    "impacts": [
+      "privacy",
+      "ui"
+    ],
+    "tags": [
+      "startmenu",
+      "promotions"
+    ],
+    "presets": [
+      "recommended",
+      "privacy",
+      "minimal"
+    ],
     "windows": {
       "minBuild": 19041,
       "maxBuild": null
@@ -793,5 +916,644 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/configuration/windows-spotlight",
     "verifiedOnBuild": "22631.4317"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "privacy.location.disable-sensor",
+    "name": {
+      "en": "Disable System Location Sensor",
+      "ar": "تعطيل مستشعر الموقع الجغرافي للنظام"
+    },
+    "description": {
+      "en": "Disables hardware and software geolocation sensor overrides to prevent physical tracking.",
+      "ar": "تعطيل مستشعر الموقع الجغرافي لمنع التتبع الفيزيائي للجهاز."
+    },
+    "category": "privacy",
+    "subcategory": "location",
+    "risk": "Safe",
+    "impacts": [
+      "privacy"
+    ],
+    "tags": [
+      "location",
+      "gps",
+      "privacy"
+    ],
+    "presets": [
+      "recommended",
+      "privacy"
+    ],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Sensor\\Overrides\\{BFA794E4-F964-4FDB-90F6-51056BFE4B44}",
+      "valueName": "SensorPermissionState",
+      "expectedValue": 0,
+      "matchType": "Equals"
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Sensor\\Overrides\\{BFA794E4-F964-4FDB-90F6-51056BFE4B44}",
+        "valueName": "SensorPermissionState",
+        "valueKind": "DWord",
+        "data": 0
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Sensor\\Overrides\\{BFA794E4-F964-4FDB-90F6-51056BFE4B44}",
+        "valueName": "SensorPermissionState",
+        "valueKind": "DWord",
+        "data": 1
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-system#system-allowlocation",
+    "verifiedOnBuild": "26100"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "privacy.consent.deny-location",
+    "name": {
+      "en": "Deny Apps Access to Location by Default",
+      "ar": "حظر وصول التطبيقات للموقع الجغرافي افتراضياً"
+    },
+    "description": {
+      "en": "Sets default capability store permission to deny apps access to user physical location.",
+      "ar": "ضبط صلاحيات النظام لمنع وصول تطبيقات متجر ويندوز للموقع الجغرافي تلقائياً."
+    },
+    "category": "privacy",
+    "subcategory": "permissions",
+    "risk": "Safe",
+    "impacts": [
+      "privacy"
+    ],
+    "tags": [
+      "location",
+      "permissions",
+      "privacy"
+    ],
+    "presets": [
+      "privacy"
+    ],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\location",
+      "valueName": "Value",
+      "expectedValue": "Deny",
+      "matchType": "Equals"
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\location",
+        "valueName": "Value",
+        "valueKind": "String",
+        "data": "Deny"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\location",
+        "valueName": "Value",
+        "valueKind": "String",
+        "data": "Allow"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/uwp/packaging/app-capability-declarations",
+    "verifiedOnBuild": "26100"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "privacy.consent.deny-microphone",
+    "name": {
+      "en": "Deny UWP Apps Access to Microphone by Default",
+      "ar": "حظر وصول تطبيقات UWP للميكروفون افتراضياً"
+    },
+    "description": {
+      "en": "Restricts UWP Store apps from silently listening to or accessing audio recording hardware.",
+      "ar": "منع تطبيقات المتجر من الوصول الصامت للمايكروفون أو تسجيل الصوت دون إذن."
+    },
+    "category": "privacy",
+    "subcategory": "permissions",
+    "risk": "Low",
+    "impacts": [
+      "privacy"
+    ],
+    "tags": [
+      "microphone",
+      "audio",
+      "privacy"
+    ],
+    "presets": [
+      "privacy"
+    ],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\microphone",
+      "valueName": "Value",
+      "expectedValue": "Deny",
+      "matchType": "Equals"
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\microphone",
+        "valueName": "Value",
+        "valueKind": "String",
+        "data": "Deny"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\microphone",
+        "valueName": "Value",
+        "valueKind": "String",
+        "data": "Allow"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/uwp/packaging/app-capability-declarations",
+    "verifiedOnBuild": "26100"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "privacy.consent.deny-webcam",
+    "name": {
+      "en": "Deny UWP Apps Access to Webcam by Default",
+      "ar": "حظر وصول تطبيقات UWP لكاميرا الويب افتراضياً"
+    },
+    "description": {
+      "en": "Blocks background UWP applications from capturing video frames through connected webcams.",
+      "ar": "منع تطبيقات المتجر بالخلفية من تشغيل كاميرات الويب والتقاط الصور."
+    },
+    "category": "privacy",
+    "subcategory": "permissions",
+    "risk": "Low",
+    "impacts": [
+      "privacy"
+    ],
+    "tags": [
+      "camera",
+      "webcam",
+      "privacy"
+    ],
+    "presets": [
+      "privacy"
+    ],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\webcam",
+      "valueName": "Value",
+      "expectedValue": "Deny",
+      "matchType": "Equals"
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\webcam",
+        "valueName": "Value",
+        "valueKind": "String",
+        "data": "Deny"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\webcam",
+        "valueName": "Value",
+        "valueKind": "String",
+        "data": "Allow"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/uwp/packaging/app-capability-declarations",
+    "verifiedOnBuild": "26100"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "privacy.consent.deny-notifications",
+    "name": {
+      "en": "Deny Apps Access to User Notifications",
+      "ar": "حظر قراءة إشعارات المستخدم من قِبل التطبيقات"
+    },
+    "description": {
+      "en": "Blocks applications from intercepting or reading private notification listener messages.",
+      "ar": "منع التطبيقات من قراءة أو اعتراض رسائل إشعارات النظام الخاصة بالمستخدم."
+    },
+    "category": "privacy",
+    "subcategory": "permissions",
+    "risk": "Safe",
+    "impacts": [
+      "privacy"
+    ],
+    "tags": [
+      "notifications",
+      "privacy"
+    ],
+    "presets": [
+      "privacy"
+    ],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\userNotificationListener",
+      "valueName": "Value",
+      "expectedValue": "Deny",
+      "matchType": "Equals"
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\userNotificationListener",
+        "valueName": "Value",
+        "valueKind": "String",
+        "data": "Deny"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\userNotificationListener",
+        "valueName": "Value",
+        "valueKind": "String",
+        "data": "Allow"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/uwp/packaging/app-capability-declarations",
+    "verifiedOnBuild": "26100"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "privacy.consent.deny-account-info",
+    "name": {
+      "en": "Deny Apps Access to Account Information",
+      "ar": "حظر وصول التطبيقات لبيانات حساب المستخدم"
+    },
+    "description": {
+      "en": "Prevents installed apps from accessing user display name, picture, and account identifier.",
+      "ar": "منع التطبيقات المثبتة من معرفة اسم المستخدم أو صورته أو بيانات حسابه الشخصي."
+    },
+    "category": "privacy",
+    "subcategory": "permissions",
+    "risk": "Safe",
+    "impacts": [
+      "privacy"
+    ],
+    "tags": [
+      "account",
+      "privacy"
+    ],
+    "presets": [
+      "privacy",
+      "recommended"
+    ],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\userAccountInformation",
+      "valueName": "Value",
+      "expectedValue": "Deny",
+      "matchType": "Equals"
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\userAccountInformation",
+        "valueName": "Value",
+        "valueKind": "String",
+        "data": "Deny"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\userAccountInformation",
+        "valueName": "Value",
+        "valueKind": "String",
+        "data": "Allow"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/uwp/packaging/app-capability-declarations",
+    "verifiedOnBuild": "26100"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "privacy.consent.deny-contacts",
+    "name": {
+      "en": "Deny Apps Access to Contacts List",
+      "ar": "حظر وصول التطبيقات لقائمة جهات الاتصال"
+    },
+    "description": {
+      "en": "Blocks store and system applications from scraping address book contacts.",
+      "ar": "حظر التطبيقات من قراءة أو استخراج جهات الاتصال ودفتر العناوين الخاص بالمستخدم."
+    },
+    "category": "privacy",
+    "subcategory": "permissions",
+    "risk": "Safe",
+    "impacts": [
+      "privacy"
+    ],
+    "tags": [
+      "contacts",
+      "privacy"
+    ],
+    "presets": [
+      "privacy",
+      "recommended"
+    ],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\contacts",
+      "valueName": "Value",
+      "expectedValue": "Deny",
+      "matchType": "Equals"
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\contacts",
+        "valueName": "Value",
+        "valueKind": "String",
+        "data": "Deny"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\contacts",
+        "valueName": "Value",
+        "valueKind": "String",
+        "data": "Allow"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/uwp/packaging/app-capability-declarations",
+    "verifiedOnBuild": "26100"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "privacy.consent.deny-calendar",
+    "name": {
+      "en": "Deny Apps Access to User Calendar & Appointments",
+      "ar": "حظر وصول التطبيقات للمواعيد والتقويم"
+    },
+    "description": {
+      "en": "Prevents third-party apps from harvesting schedule and appointment calendar entries.",
+      "ar": "حظر التطبيقات غير المعتمدة من قراءة جدول المواعيد والتقويم الشخصي."
+    },
+    "category": "privacy",
+    "subcategory": "permissions",
+    "risk": "Safe",
+    "impacts": [
+      "privacy"
+    ],
+    "tags": [
+      "calendar",
+      "privacy"
+    ],
+    "presets": [
+      "privacy"
+    ],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\appointments",
+      "valueName": "Value",
+      "expectedValue": "Deny",
+      "matchType": "Equals"
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\appointments",
+        "valueName": "Value",
+        "valueKind": "String",
+        "data": "Deny"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\appointments",
+        "valueName": "Value",
+        "valueKind": "String",
+        "data": "Allow"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/uwp/packaging/app-capability-declarations",
+    "verifiedOnBuild": "26100"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "privacy.consent.deny-diagnostics",
+    "name": {
+      "en": "Deny Apps Access to Other Apps Diagnostic Info",
+      "ar": "حظر وصول التطبيقات لمعلومات تشخيص التطبيقات الأخرى"
+    },
+    "description": {
+      "en": "Blocks third-party apps from querying memory and diagnostic stats of other running software.",
+      "ar": "منع التطبيقات من قراءة بيانات الذاكرة وتشخيص التطبيقات الأخرى المثبتة."
+    },
+    "category": "privacy",
+    "subcategory": "permissions",
+    "risk": "Safe",
+    "impacts": [
+      "privacy"
+    ],
+    "tags": [
+      "diagnostics",
+      "privacy"
+    ],
+    "presets": [
+      "privacy",
+      "recommended"
+    ],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\appDiagnostics",
+      "valueName": "Value",
+      "expectedValue": "Deny",
+      "matchType": "Equals"
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\appDiagnostics",
+        "valueName": "Value",
+        "valueKind": "String",
+        "data": "Deny"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\appDiagnostics",
+        "valueName": "Value",
+        "valueKind": "String",
+        "data": "Allow"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/uwp/packaging/app-capability-declarations",
+    "verifiedOnBuild": "26100"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "privacy.feedback.disable-frequency",
+    "name": {
+      "en": "Disable Windows Feedback Request Frequency",
+      "ar": "تعطيل تكرار استطلاعات رأي ويندوز"
+    },
+    "description": {
+      "en": "Configures Windows feedback prompt frequency to Never, suppressing feedback survey popups.",
+      "ar": "ضبط تكرار طلبات استطلاع الرأي والملاحظات في ويندوز إلى (أبداً) لمنع النوافذ المزعجة."
+    },
+    "category": "privacy",
+    "subcategory": "feedback",
+    "risk": "Safe",
+    "impacts": [
+      "privacy",
+      "ui"
+    ],
+    "tags": [
+      "feedback",
+      "telemetry"
+    ],
+    "presets": [
+      "privacy",
+      "recommended",
+      "minimal"
+    ],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Microsoft\\Siuf\\Rules",
+      "valueName": "NumberOfSIFInGracePeriod",
+      "expectedValue": 0,
+      "matchType": "Equals"
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Siuf\\Rules",
+        "valueName": "NumberOfSIFInGracePeriod",
+        "valueKind": "DWord",
+        "data": 0
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "operation": "DeleteValue",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Siuf\\Rules",
+        "valueName": "NumberOfSIFInGracePeriod"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services#7-feedback-and-diagnostics",
+    "verifiedOnBuild": "26100"
   }
 ]

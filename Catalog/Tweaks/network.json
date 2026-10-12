@@ -1,0 +1,332 @@
+[
+  {
+    "schemaVersion": "1.0.0",
+    "id": "network.wifi.disable-hotspot-reporting",
+    "name": {
+      "en": "Disable Wi-Fi Sense Hotspot Reporting",
+      "ar": "تعطيل مشاركة وإبلاغ شبكات Wi-Fi Sense"
+    },
+    "description": {
+      "en": "Prevents Windows from automatically sharing known Wi-Fi network information with Microsoft services.",
+      "ar": "منع ويندوز من مشاركة بيانات ومعلومات شبكات Wi-Fi المعروفة مع خوادم مايكروسوفت."
+    },
+    "category": "network",
+    "subcategory": "Wi-Fi",
+    "risk": "Safe",
+    "impacts": ["privacy", "network"],
+    "tags": ["wifi", "privacy", "network"],
+    "presets": ["recommended", "privacy"],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SOFTWARE\\Microsoft\\PolicyManager\\default\\WiFi\\AllowWiFiHotSpotReporting",
+      "valueName": "value",
+      "matchType": "Equals",
+      "expectedValue": 0
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\PolicyManager\\default\\WiFi\\AllowWiFiHotSpotReporting",
+        "valueName": "value",
+        "valueKind": "DWord",
+        "data": 0
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\PolicyManager\\default\\WiFi\\AllowWiFiHotSpotReporting",
+        "valueName": "value",
+        "valueKind": "DWord",
+        "data": 1
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-wifi#allowwifihotspotreporting",
+    "verifiedOnBuild": "26100"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "network.probing.disable-active-probing",
+    "name": {
+      "en": "Disable NCSI Active Internet Probing",
+      "ar": "تعطيل الفحص الدوري النشط للاتصال بالإنترنت (NCSI)"
+    },
+    "description": {
+      "en": "Prevents Windows from continuously pinging msftconnecttest.com to verify connectivity.",
+      "ar": "منع إرسال طلبات اتصال مستمرة إلى خوادم الفحص msftconnecttest.com لتوفير الاتصال وتقليل التتبع."
+    },
+    "category": "network",
+    "subcategory": "Telemetry",
+    "risk": "Safe",
+    "impacts": ["privacy", "network"],
+    "tags": ["ncsi", "probing", "privacy"],
+    "presets": ["privacy"],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SYSTEM\\CurrentControlSet\\Services\\NlaSvc\\Parameters\\Internet",
+      "valueName": "EnableActiveProbing",
+      "matchType": "Equals",
+      "expectedValue": 0
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKLM",
+        "key": "SYSTEM\\CurrentControlSet\\Services\\NlaSvc\\Parameters\\Internet",
+        "valueName": "EnableActiveProbing",
+        "valueKind": "DWord",
+        "data": 0
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKLM",
+        "key": "SYSTEM\\CurrentControlSet\\Services\\NlaSvc\\Parameters\\Internet",
+        "valueName": "EnableActiveProbing",
+        "valueKind": "DWord",
+        "data": 1
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/troubleshoot/windows-server/networking/network-connectivity-status-indicator-active-probing-behavior",
+    "verifiedOnBuild": "26100"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "network.wifi.disable-autoconnect-sense",
+    "name": {
+      "en": "Disable Auto-Connect to Suggested Open Wi-Fi",
+      "ar": "تعطيل الاتصال التلقائي بشبكات Wi-Fi المقترحة المفتوحة"
+    },
+    "description": {
+      "en": "Prevents Windows from connecting silently to unencrypted open public Wi-Fi hotspots.",
+      "ar": "منع ويندوز من الاتصال الصامت بشبكات الواي فاي العامة المفتوحة غير المشفرة لتفادي المخاطر."
+    },
+    "category": "network",
+    "subcategory": "Wi-Fi",
+    "risk": "Safe",
+    "impacts": ["security", "network"],
+    "tags": ["wifi", "hotspot", "security"],
+    "presets": ["recommended", "privacy"],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SOFTWARE\\Microsoft\\WcmSvc\\wifinetworkmanager\\config",
+      "valueName": "AutoConnectAllowedOEM",
+      "matchType": "Equals",
+      "expectedValue": 0
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\WcmSvc\\wifinetworkmanager\\config",
+        "valueName": "AutoConnectAllowedOEM",
+        "valueKind": "DWord",
+        "data": 0
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\WcmSvc\\wifinetworkmanager\\config",
+        "valueName": "AutoConnectAllowedOEM",
+        "valueKind": "DWord",
+        "data": 1
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-wifi",
+    "verifiedOnBuild": "26100"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "network.optimization.limit-peering-lan",
+    "name": {
+      "en": "Restrict Delivery Optimization to Local Network Only",
+      "ar": "قصر تحسين التوصيل على شبكة الاتصال المحلية فقط"
+    },
+    "description": {
+      "en": "Stops Windows Update from uploading update packages to random computers across the public Internet.",
+      "ar": "منع ويندوز من استهلاك سرعة رفع الإنترنت لمشاركة التحديثات مع حواسيب أخرى خارج الشبكة المحلية."
+    },
+    "category": "network",
+    "subcategory": "Bandwidth",
+    "risk": "Safe",
+    "impacts": ["network", "performance"],
+    "tags": ["delivery-optimization", "bandwidth", "updates"],
+    "presets": ["recommended", "gaming"],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\DeliveryOptimization",
+      "valueName": "DODownloadMode",
+      "matchType": "Equals",
+      "expectedValue": 1
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\DeliveryOptimization",
+        "valueName": "DODownloadMode",
+        "valueKind": "DWord",
+        "data": 1
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "operation": "DeleteValue",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\DeliveryOptimization",
+        "valueName": "DODownloadMode"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/deployment/do/waas-delivery-optimization-reference",
+    "verifiedOnBuild": "26100"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "network.dns.enable-doh",
+    "name": {
+      "en": "Enable DNS over HTTPS (DoH) System Fallback",
+      "ar": "تفعيل دعم استعلامات DNS عبر بروتوكول HTTPS المشفر"
+    },
+    "description": {
+      "en": "Configures Windows DNS client to prefer secure encrypted DNS over HTTPS queries when supported by resolver.",
+      "ar": "توجيه عميل DNS في ويندوز لتفضيل الاستعلامات المشفرة لمنع مراقبة مزودي الخدمة وتشفير البيانات."
+    },
+    "category": "network",
+    "subcategory": "Security",
+    "risk": "Safe",
+    "impacts": ["privacy", "security", "network"],
+    "tags": ["dns", "doh", "privacy", "security"],
+    "presets": ["recommended", "privacy"],
+    "windows": {
+      "minBuild": 22000,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SOFTWARE\\Policies\\Microsoft\\Windows NT\\DNSClient",
+      "valueName": "DnsOverHttps",
+      "matchType": "Equals",
+      "expectedValue": 2
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Windows NT\\DNSClient",
+        "valueName": "DnsOverHttps",
+        "valueKind": "DWord",
+        "data": 2
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "operation": "DeleteValue",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Windows NT\\DNSClient",
+        "valueName": "DnsOverHttps"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows-server/networking/dns/doh-client-support",
+    "verifiedOnBuild": "26100"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "network.teredo.disable-tunneling",
+    "name": {
+      "en": "Disable Teredo IPv6 Tunneling",
+      "ar": "تعطيل نفق Teredo لبروتوكول IPv6"
+    },
+    "description": {
+      "en": "Disables obsolete Teredo transition protocol tunneling to reduce attack surface and prevent IP leaks.",
+      "ar": "تعطيل نفق Teredo القديم لتقليل مساحة الهجمات ومنع تسريبات عناوين بروتوكول الإنترنت."
+    },
+    "category": "network",
+    "subcategory": "Security",
+    "risk": "Safe",
+    "impacts": ["security", "network"],
+    "tags": ["teredo", "ipv6", "security"],
+    "presets": ["recommended"],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SYSTEM\\CurrentControlSet\\Services\\TCPIP6\\Parameters",
+      "valueName": "DisabledComponents",
+      "matchType": "Equals",
+      "expectedValue": 8
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKLM",
+        "key": "SYSTEM\\CurrentControlSet\\Services\\TCPIP6\\Parameters",
+        "valueName": "DisabledComponents",
+        "valueKind": "DWord",
+        "data": 8
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "operation": "DeleteValue",
+        "hive": "HKLM",
+        "key": "SYSTEM\\CurrentControlSet\\Services\\TCPIP6\\Parameters",
+        "valueName": "DisabledComponents"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/troubleshoot/windows-server/networking/configure-ipv6-in-windows",
+    "verifiedOnBuild": "26100"
+  }
+]

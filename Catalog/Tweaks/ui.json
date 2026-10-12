@@ -13,9 +13,19 @@
     "category": "ui",
     "subcategory": "explorer",
     "risk": "Safe",
-    "impacts": ["ui", "performance"],
-    "tags": ["contextmenu", "explorer", "win11"],
-    "presets": ["recommended", "minimal"],
+    "impacts": [
+      "ui",
+      "performance"
+    ],
+    "tags": [
+      "contextmenu",
+      "explorer",
+      "win11"
+    ],
+    "presets": [
+      "recommended",
+      "minimal"
+    ],
     "windows": {
       "minBuild": 22000,
       "maxBuild": null
@@ -64,9 +74,18 @@
     "category": "ui",
     "subcategory": "explorer",
     "risk": "Safe",
-    "impacts": ["ui", "security"],
-    "tags": ["extensions", "explorer"],
-    "presets": ["recommended", "minimal"],
+    "impacts": [
+      "ui",
+      "security"
+    ],
+    "tags": [
+      "extensions",
+      "explorer"
+    ],
+    "presets": [
+      "recommended",
+      "minimal"
+    ],
     "windows": {
       "minBuild": 19041,
       "maxBuild": null
@@ -120,9 +139,16 @@
     "category": "ui",
     "subcategory": "explorer",
     "risk": "Safe",
-    "impacts": ["ui"],
-    "tags": ["hidden", "explorer"],
-    "presets": ["minimal"],
+    "impacts": [
+      "ui"
+    ],
+    "tags": [
+      "hidden",
+      "explorer"
+    ],
+    "presets": [
+      "minimal"
+    ],
     "windows": {
       "minBuild": 19041,
       "maxBuild": null
@@ -176,9 +202,17 @@
     "category": "ui",
     "subcategory": "explorer",
     "risk": "Safe",
-    "impacts": ["ui"],
-    "tags": ["thispc", "explorer"],
-    "presets": ["recommended", "minimal"],
+    "impacts": [
+      "ui"
+    ],
+    "tags": [
+      "thispc",
+      "explorer"
+    ],
+    "presets": [
+      "recommended",
+      "minimal"
+    ],
     "windows": {
       "minBuild": 19041,
       "maxBuild": null
@@ -232,9 +266,18 @@
     "category": "ui",
     "subcategory": "taskbar",
     "risk": "Safe",
-    "impacts": ["ui", "performance"],
-    "tags": ["taskbar", "endtask"],
-    "presets": ["recommended", "minimal"],
+    "impacts": [
+      "ui",
+      "performance"
+    ],
+    "tags": [
+      "taskbar",
+      "endtask"
+    ],
+    "presets": [
+      "recommended",
+      "minimal"
+    ],
     "windows": {
       "minBuild": 22621,
       "maxBuild": null
@@ -288,9 +331,16 @@
     "category": "ui",
     "subcategory": "taskbar",
     "risk": "Safe",
-    "impacts": ["ui"],
-    "tags": ["clock", "taskbar"],
-    "presets": ["minimal"],
+    "impacts": [
+      "ui"
+    ],
+    "tags": [
+      "clock",
+      "taskbar"
+    ],
+    "presets": [
+      "minimal"
+    ],
     "windows": {
       "minBuild": 22621,
       "maxBuild": null
@@ -344,9 +394,16 @@
     "category": "ui",
     "subcategory": "filesystem",
     "risk": "Safe",
-    "impacts": ["storage"],
-    "tags": ["filesystem", "paths"],
-    "presets": ["recommended"],
+    "impacts": [
+      "storage"
+    ],
+    "tags": [
+      "filesystem",
+      "paths"
+    ],
+    "presets": [
+      "recommended"
+    ],
     "windows": {
       "minBuild": 19041,
       "maxBuild": null
@@ -400,9 +457,16 @@
     "category": "ui",
     "subcategory": "taskbar",
     "risk": "Safe",
-    "impacts": ["ui"],
-    "tags": ["taskbar", "win11"],
-    "presets": ["minimal"],
+    "impacts": [
+      "ui"
+    ],
+    "tags": [
+      "taskbar",
+      "win11"
+    ],
+    "presets": [
+      "minimal"
+    ],
     "windows": {
       "minBuild": 22000,
       "maxBuild": null
@@ -456,9 +520,17 @@
     "category": "ui",
     "subcategory": "explorer",
     "risk": "Safe",
-    "impacts": ["ui"],
-    "tags": ["compact", "explorer"],
-    "presets": ["recommended", "minimal"],
+    "impacts": [
+      "ui"
+    ],
+    "tags": [
+      "compact",
+      "explorer"
+    ],
+    "presets": [
+      "recommended",
+      "minimal"
+    ],
     "windows": {
       "minBuild": 22000,
       "maxBuild": null
@@ -512,9 +584,16 @@
     "category": "ui",
     "subcategory": "windowing",
     "risk": "Safe",
-    "impacts": ["ui"],
-    "tags": ["snap", "multitasking"],
-    "presets": ["minimal"],
+    "impacts": [
+      "ui"
+    ],
+    "tags": [
+      "snap",
+      "multitasking"
+    ],
+    "presets": [
+      "minimal"
+    ],
     "windows": {
       "minBuild": 19041,
       "maxBuild": null
@@ -553,5 +632,658 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/client-management/client-tools/multitasking-configuration",
     "verifiedOnBuild": "22631.4317"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "ui.explorer.hide-gallery",
+    "name": {
+      "en": "Hide Gallery from File Explorer Navigation Pane",
+      "ar": "إخفاء معرض الصور Gallery من جزء التنقل في مستكشف الملفات"
+    },
+    "description": {
+      "en": "Removes the redundant 'Gallery' icon from the left navigation tree in Windows 11 File Explorer.",
+      "ar": "إزالة أيقونة معرض الصور Gallery من القائمة الجانبية لشجرة المجلدات في مستكشف الملفات."
+    },
+    "category": "ui",
+    "subcategory": "explorer",
+    "risk": "Safe",
+    "impacts": [
+      "ui"
+    ],
+    "tags": [
+      "explorer",
+      "gallery",
+      "ui"
+    ],
+    "presets": [
+      "recommended",
+      "minimal"
+    ],
+    "windows": {
+      "minBuild": 22621,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": true,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Classes\\CLSID\\{e88865ea-0e14-4e24-9277-49ec041659b0}",
+      "valueName": "System.IsPinnedToNameSpaceTree",
+      "expectedValue": 0,
+      "matchType": "Equals"
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKCU",
+        "key": "Software\\Classes\\CLSID\\{e88865ea-0e14-4e24-9277-49ec041659b0}",
+        "valueName": "System.IsPinnedToNameSpaceTree",
+        "valueKind": "DWord",
+        "data": 0
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "operation": "DeleteValue",
+        "hive": "HKCU",
+        "key": "Software\\Classes\\CLSID\\{e88865ea-0e14-4e24-9277-49ec041659b0}",
+        "valueName": "System.IsPinnedToNameSpaceTree"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/win32/shell/nse-works",
+    "verifiedOnBuild": "26100"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "ui.explorer.hide-recent-files",
+    "name": {
+      "en": "Hide Recent Files in File Explorer Home",
+      "ar": "إخفاء الملفات الأخيرة في الصفحة الرئيسية لمستكشف الملفات"
+    },
+    "description": {
+      "en": "Prevents recently opened files from cluttering the Quick Access and Home page.",
+      "ar": "منع إظهار الملفات المفتوحة مؤخراً في صفحة الوصول السريع والصفحة الرئيسية لمستكشف الملفات."
+    },
+    "category": "ui",
+    "subcategory": "explorer",
+    "risk": "Safe",
+    "impacts": [
+      "ui",
+      "privacy"
+    ],
+    "tags": [
+      "explorer",
+      "privacy",
+      "recent"
+    ],
+    "presets": [
+      "recommended",
+      "privacy",
+      "minimal"
+    ],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": true,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer",
+      "valueName": "ShowRecent",
+      "expectedValue": 0,
+      "matchType": "Equals"
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer",
+        "valueName": "ShowRecent",
+        "valueKind": "DWord",
+        "data": 0
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer",
+        "valueName": "ShowRecent",
+        "valueKind": "DWord",
+        "data": 1
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-admx-windowsexplorer#windowsexplorer_showrecent",
+    "verifiedOnBuild": "26100"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "ui.explorer.hide-frequent-folders",
+    "name": {
+      "en": "Hide Frequently Used Folders in Quick Access",
+      "ar": "إخفاء المجلدات شائعة الاستخدام في الوصول السريع"
+    },
+    "description": {
+      "en": "Stops Windows from automatically pinning frequently visited directories in File Explorer.",
+      "ar": "منع التثبيت التلقائي للمجلدات الأكثر زيارة واستخداماً داخل مستكشف الملفات."
+    },
+    "category": "ui",
+    "subcategory": "explorer",
+    "risk": "Safe",
+    "impacts": [
+      "ui",
+      "privacy"
+    ],
+    "tags": [
+      "explorer",
+      "frequent",
+      "ui"
+    ],
+    "presets": [
+      "recommended",
+      "privacy",
+      "minimal"
+    ],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": true,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer",
+      "valueName": "ShowFrequent",
+      "expectedValue": 0,
+      "matchType": "Equals"
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer",
+        "valueName": "ShowFrequent",
+        "valueKind": "DWord",
+        "data": 0
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer",
+        "valueName": "ShowFrequent",
+        "valueKind": "DWord",
+        "data": 1
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-admx-windowsexplorer",
+    "verifiedOnBuild": "26100"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "ui.explorer.show-full-path-title",
+    "name": {
+      "en": "Display Full Folder Path in File Explorer Title Bar",
+      "ar": "عرض مسار المجلد الكامل في شريط عنوان مستكشف الملفات"
+    },
+    "description": {
+      "en": "Shows the complete directory path in the Explorer title bar for precise file navigation.",
+      "ar": "إظهار المسار الكامل للمجلد الحالي في شريط العنوان لتسهيل التنقل ومعرفة موقع الملفات."
+    },
+    "category": "ui",
+    "subcategory": "explorer",
+    "risk": "Safe",
+    "impacts": [
+      "ui"
+    ],
+    "tags": [
+      "explorer",
+      "path",
+      "ui"
+    ],
+    "presets": [
+      "recommended"
+    ],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": true,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\CabinetState",
+      "valueName": "FullPath",
+      "expectedValue": 1,
+      "matchType": "Equals"
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\CabinetState",
+        "valueName": "FullPath",
+        "valueKind": "DWord",
+        "data": 1
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\CabinetState",
+        "valueName": "FullPath",
+        "valueKind": "DWord",
+        "data": 0
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows-hardware/customize/desktop/unattend/microsoft-windows-shell-setup-folderoptions-showfullpath",
+    "verifiedOnBuild": "26100"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "ui.search.disable-search-highlights",
+    "name": {
+      "en": "Disable Search Box Highlights & Illustrations",
+      "ar": "تعطيل صور ورسومات صندوق البحث الترويجية"
+    },
+    "description": {
+      "en": "Removes daily Bing illustrations and web trending topics from the taskbar search box.",
+      "ar": "إزالة الرسوم التوضيحية اليومية والتريندات من صندوق بحث شريط المهام لشكل أنظف وأسرع."
+    },
+    "category": "ui",
+    "subcategory": "taskbar",
+    "risk": "Safe",
+    "impacts": [
+      "ui",
+      "privacy"
+    ],
+    "tags": [
+      "search",
+      "taskbar",
+      "ui"
+    ],
+    "presets": [
+      "recommended",
+      "privacy",
+      "minimal"
+    ],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": true,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\SearchSettings",
+      "valueName": "IsShellSearchAddInSearchBoxEnabled",
+      "expectedValue": 0,
+      "matchType": "Equals"
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\SearchSettings",
+        "valueName": "IsShellSearchAddInSearchBoxEnabled",
+        "valueKind": "DWord",
+        "data": 0
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\SearchSettings",
+        "valueName": "IsShellSearchAddInSearchBoxEnabled",
+        "valueKind": "DWord",
+        "data": 1
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-admx-search#search_searchhighlights",
+    "verifiedOnBuild": "26100"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "ui.taskbar.disable-widgets-button",
+    "name": {
+      "en": "Hide Widgets Weather Icon from Taskbar",
+      "ar": "إخفاء أيقونة الطقس والأدوات Widgets من شريط المهام"
+    },
+    "description": {
+      "en": "Hides the weather forecast and MSN feed widget button on Windows 11 taskbar.",
+      "ar": "إخفاء أيقونة الطقس وأخبار MSN التلقائية من شريط مهام ويندوز 11 لتوفير المساحة والموارد."
+    },
+    "category": "ui",
+    "subcategory": "taskbar",
+    "risk": "Safe",
+    "impacts": [
+      "ui",
+      "performance"
+    ],
+    "tags": [
+      "widgets",
+      "taskbar",
+      "weather"
+    ],
+    "presets": [
+      "recommended",
+      "minimal"
+    ],
+    "windows": {
+      "minBuild": 22000,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": true,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+      "valueName": "TaskbarDa",
+      "expectedValue": 0,
+      "matchType": "Equals"
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "valueName": "TaskbarDa",
+        "valueKind": "DWord",
+        "data": 0
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "valueName": "TaskbarDa",
+        "valueKind": "DWord",
+        "data": 1
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-widgets",
+    "verifiedOnBuild": "26100"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "ui.taskbar.disable-chat-button",
+    "name": {
+      "en": "Hide Microsoft Teams Chat Icon on Taskbar",
+      "ar": "إخفاء أيقونة دردشة Microsoft Teams من شريط المهام"
+    },
+    "description": {
+      "en": "Removes the integrated personal Teams Chat icon from the Windows taskbar.",
+      "ar": "إزالة أيقونة الدردشة المدمجة لبرنامج تيمز من شريط المهام."
+    },
+    "category": "ui",
+    "subcategory": "taskbar",
+    "risk": "Safe",
+    "impacts": [
+      "ui"
+    ],
+    "tags": [
+      "chat",
+      "teams",
+      "taskbar"
+    ],
+    "presets": [
+      "recommended",
+      "minimal"
+    ],
+    "windows": {
+      "minBuild": 22000,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": true,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+      "valueName": "TaskbarMn",
+      "expectedValue": 0,
+      "matchType": "Equals"
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "valueName": "TaskbarMn",
+        "valueKind": "DWord",
+        "data": 0
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "valueName": "TaskbarMn",
+        "valueKind": "DWord",
+        "data": 1
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-experience#experience-configurechaticon",
+    "verifiedOnBuild": "26100"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "ui.taskbar.disable-task-view-button",
+    "name": {
+      "en": "Hide Task View Button from Taskbar",
+      "ar": "إخفاء زر عرض المهام (Task View) من شريط المهام"
+    },
+    "description": {
+      "en": "Removes the virtual desktop / Task View button from the Windows taskbar.",
+      "ar": "إزالة زر أسطح المكتب الافتراضية وعرض المهام من شريط المهام لتوفير مساحة للأيقونات."
+    },
+    "category": "ui",
+    "subcategory": "taskbar",
+    "risk": "Safe",
+    "impacts": [
+      "ui"
+    ],
+    "tags": [
+      "taskbar",
+      "taskview",
+      "ui"
+    ],
+    "presets": [
+      "minimal"
+    ],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": true,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+      "valueName": "ShowTaskViewButton",
+      "expectedValue": 0,
+      "matchType": "Equals"
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "valueName": "ShowTaskViewButton",
+        "valueKind": "DWord",
+        "data": 0
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "valueName": "ShowTaskViewButton",
+        "valueKind": "DWord",
+        "data": 1
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows-hardware/customize/desktop/unattend/microsoft-windows-shell-setup-taskbarlinks",
+    "verifiedOnBuild": "26100"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "ui.system.disable-welcome-experience",
+    "name": {
+      "en": "Disable Windows Welcome Experience After Updates",
+      "ar": "تعطيل شاشة الترحيب ومستجدات ويندوز بعد التحديثات"
+    },
+    "description": {
+      "en": "Stops Windows from presenting full-screen 'What's new' setup and promo screens after feature updates.",
+      "ar": "منع ظهور شاشات الترحيب والإعداد الكاملة المزعجة التي تظهر بعد تثبيت تحديثات ويندوز الكبيرة."
+    },
+    "category": "ui",
+    "subcategory": "system",
+    "risk": "Safe",
+    "impacts": [
+      "ui"
+    ],
+    "tags": [
+      "welcome",
+      "oobe",
+      "ui"
+    ],
+    "presets": [
+      "recommended",
+      "minimal"
+    ],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+      "valueName": "SubscribedContent-310093Enabled",
+      "expectedValue": 0,
+      "matchType": "Equals"
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+        "valueName": "SubscribedContent-310093Enabled",
+        "valueKind": "DWord",
+        "data": 0
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+        "valueName": "SubscribedContent-310093Enabled",
+        "valueKind": "DWord",
+        "data": 1
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/configuration/windows-spotlight",
+    "verifiedOnBuild": "26100"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "ui.system.disable-tips-suggestions",
+    "name": {
+      "en": "Disable Tips, Tricks, and Suggestions About Windows",
+      "ar": "تعطيل النصائح والإرشادات والاقتراحات حول ويندوز"
+    },
+    "description": {
+      "en": "Prevents Windows from generating informational popups and suggestions during normal desktop usage.",
+      "ar": "منع ويندوز من عرض إشعارات تلميحات الاستخدام والنصائح الدعائية أثناء العمل اليومي."
+    },
+    "category": "ui",
+    "subcategory": "system",
+    "risk": "Safe",
+    "impacts": [
+      "ui"
+    ],
+    "tags": [
+      "tips",
+      "suggestions",
+      "ui"
+    ],
+    "presets": [
+      "recommended",
+      "minimal"
+    ],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+      "valueName": "SubscribedContent-338389Enabled",
+      "expectedValue": 0,
+      "matchType": "Equals"
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+        "valueName": "SubscribedContent-338389Enabled",
+        "valueKind": "DWord",
+        "data": 0
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+        "valueName": "SubscribedContent-338389Enabled",
+        "valueKind": "DWord",
+        "data": 1
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/configuration/windows-spotlight",
+    "verifiedOnBuild": "26100"
   }
 ]
