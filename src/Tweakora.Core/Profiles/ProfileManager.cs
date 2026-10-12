@@ -59,7 +59,6 @@ public sealed class ProfileManager
                     "privacy.consent.deny-location",
                     "privacy.consent.deny-diagnostics",
                     "system.security.disable-llmnr",
-                    "system.security.disable-wsh",
                     "network.wifi.disable-hotspot-reporting",
                     "network.dns.enable-doh"
                 }

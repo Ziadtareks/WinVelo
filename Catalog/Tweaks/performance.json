@@ -235,8 +235,8 @@
   {
     "schemaVersion": "1.0.0",
     "id": "performance.network.delivery-optimization-simple",
-    "name": "Restrict Delivery Optimization to Local Network",
-    "description": "Stops Windows Update from uploading update files to external internet peers (Mode 0: HTTP only / No P2P).",
+    "name": "Disable Delivery Optimization Peer-to-Peer (HTTP Only)",
+    "description": "Disables peer-to-peer distribution of Windows updates, downloading updates directly from Microsoft servers only.",
     "category": "performance",
     "subcategory": "network",
     "risk": "Safe",

@@ -124,7 +124,8 @@
     "description": "Blocks execution of standalone .vbs and .js scripts, preventing common malware vectors.",
     "category": "system",
     "subcategory": "Security",
-    "risk": "Low",
+    "risk": "Medium",
+    "warnings": "Can break software installers and administrative scripts relying on VBScript or JScript.",
     "impacts": [
       "security"
     ],
@@ -134,9 +135,7 @@
       "scripts",
       "security"
     ],
-    "presets": [
-      "recommended"
-    ],
+    "presets": [],
     "windows": {
       "minBuild": 19041,
       "maxBuild": null
@@ -178,9 +177,10 @@
   },
   {
     "schemaVersion": "1.0.0",
-    "id": "system.security.enable-smartscreen-edge",
-    "name": "Enforce Windows Defender SmartScreen",
-    "description": "Enforces SmartScreen checks against malicious sites, downloads, and unverified executables.",
+    "id": "system.security.enforce-smartscreen",
+    "name": "Enforce Windows SmartScreen via Policy",
+    "description": "Enforces Windows Defender SmartScreen protection across the operating system via policy.",
+    "warnings": "This setting is enforced by policy and locks the SmartScreen toggle in Windows Security settings.",
     "category": "system",
     "subcategory": "Security",
     "risk": "Safe",
@@ -292,8 +292,9 @@
   {
     "schemaVersion": "1.0.0",
     "id": "system.security.disable-rdp-auto-enable",
-    "name": "Ensure Remote Desktop Inbound Access is Disabled",
-    "description": "Prevents unauthorized inbound RDP connections on port 3389.",
+    "name": "Disable Remote Desktop Inbound Connections",
+    "description": "Disables incoming Remote Desktop connections on port 3389.",
+    "warnings": "Remote Desktop to this PC will stop working.",
     "category": "system",
     "subcategory": "Security",
     "risk": "Safe",
@@ -404,63 +405,6 @@
       }
     ],
     "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-personalization#nolockscreencamera",
-    "verifiedOnBuild": "26100"
-  },
-  {
-    "schemaVersion": "1.0.0",
-    "id": "system.security.hide-fast-user-switching",
-    "name": "Disable Fast User Switching",
-    "description": "Prevents multiple concurrent active interactive user sessions in background to save RAM and harden system access.",
-    "category": "system",
-    "subcategory": "Security",
-    "risk": "Low",
-    "impacts": [
-      "security",
-      "performance"
-    ],
-    "tags": [
-      "users",
-      "security",
-      "sessions"
-    ],
-    "presets": [
-      "recommended"
-    ],
-    "windows": {
-      "minBuild": 19041,
-      "maxBuild": null
-    },
-    "requiresReboot": false,
-    "requiresExplorerRestart": false,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKLM",
-      "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System",
-      "valueName": "HideFastUserSwitching",
-      "matchType": "Equals",
-      "expectedValue": 1
-    },
-    "apply": [
-      {
-        "type": "Registry",
-        "operation": "Set",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System",
-        "valueName": "HideFastUserSwitching",
-        "valueKind": "DWord",
-        "data": 1
-      }
-    ],
-    "undo": [
-      {
-        "type": "Registry",
-        "operation": "DeleteValue",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System",
-        "valueName": "HideFastUserSwitching"
-      }
-    ],
-    "source": "https://learn.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/interactive-logon-hide-fast-user-switching",
     "verifiedOnBuild": "26100"
   }
 ]

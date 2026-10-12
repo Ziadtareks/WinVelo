@@ -1165,5 +1165,62 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/configuration/windows-spotlight",
     "verifiedOnBuild": "26100"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "ui.logon.hide-fast-user-switching",
+    "name": "Hide Fast User Switching Option",
+    "description": "Hides the Fast User Switching button from the Start menu and logon screen to avoid leaving background sessions open.",
+    "category": "ui",
+    "subcategory": "Logon",
+    "risk": "Safe",
+    "impacts": [
+      "ui"
+    ],
+    "tags": [
+      "users",
+      "logon",
+      "sessions",
+      "ui"
+    ],
+    "presets": [
+      "recommended"
+    ],
+    "windows": {
+      "minBuild": 19041,
+      "maxBuild": null
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System",
+      "valueName": "HideFastUserSwitching",
+      "matchType": "Equals",
+      "expectedValue": 1
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System",
+        "valueName": "HideFastUserSwitching",
+        "valueKind": "DWord",
+        "data": 1
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "operation": "DeleteValue",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System",
+        "valueName": "HideFastUserSwitching"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/interactive-logon-hide-fast-user-switching",
+    "verifiedOnBuild": "26100"
   }
 ]
