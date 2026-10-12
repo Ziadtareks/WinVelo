@@ -1,30 +1,68 @@
 # Tweakora Safety System
 
-Quality, safety, and system stability come before speed and features.
+System safety, predictability, and reversibility are the non-negotiable core principles of Tweakora. Every feature is engineered so that modifications can be previewed before application, recorded reliably during execution, and restored cleanly at any point.
+
+---
 
 ## 1. Safety Pillars
 
-1. **System Restore Point Verification**
-   - Query system restore points before creation.
-   - Request creation via `SRSetRestorePoint`.
-   - Query restore points again to confirm a new restore point actually exists.
-   - If Windows blocks creation (e.g. 24-hour limit or disabled), **never proceed silently**. Display a dialog asking the user whether to continue with Registry backup only or cancel.
+```mermaid
+flowchart TD
+    Start([User selects Tweaks / Profile]) --> DryRun[1. Dry-Run Diff Preview]
+    DryRun --> RestorePrompt{2. System Restore Available?}
+    RestorePrompt -- Yes --> CreateRP[Create & Verify New Restore Point]
+    RestorePrompt -- No / Limit --> AskUser[Prompt User: Proceed with Registry Backup or Cancel?]
+    AskUser -- Cancel --> Abort([Execution Aborted])
+    AskUser -- Continue --> RegBackup[3. Export Pre-State .reg Backup]
+    CreateRP --> RegBackup
+    RegBackup --> JournalWAL[4. Write-Ahead Journal to Disk & Flush]
+    JournalWAL --> ApplyAction[5. Execute Win32 Modification]
+    ApplyAction --> NextAction{More Actions?}
+    NextAction -- Yes --> JournalWAL
+    NextAction -- No --> Done([Complete & Verified])
+```
 
-2. **Registry Backup (.reg)**
-   - Before modifying any key, export the target key to `Backups/registry-[timestamp].reg`.
+---
 
-3. **Write-Ahead Rollback Journal**
-   - The Rollback Journal records the *real* current system state before any action is executed.
-   - **Write-ahead logging**: The journal entry is written to disk and flushed before executing the action.
-   - **Baseline preservation**: If a tweak is applied again, the initial baseline value is preserved. It is never overwritten by a tweaked value.
-   - If a value did not exist originally, `existedBefore: false` is recorded. Rollback deletes the created key/value.
-   - The `undo` array in the tweak catalog is only a static fallback if the journal file is missing.
+## 2. Safety Architecture Details
 
-4. **Crash / Unfinished Session Recovery**
-   - On application startup, Tweakora inspects the journal directory.
-   - If an unfinished session is detected, a recovery dialog is displayed giving the user the option to rollback or resume.
+### 1. Verification of System Restore Points
+- Windows restricts restore point creation if one has been created within the past 24 hours (or if System Protection is disabled on the system drive).
+- Tweakora queries existing restore points before initiating creation.
+- After calling the Win32 `SRSetRestorePointW` API, Tweakora re-queries the system to verify that a **new** restore point was actually created.
+- If creation failed or was skipped by Windows, Tweakora displays a confirmation dialog asking the user whether to proceed using the `.reg` backup only or cancel. It never continues silently.
 
-5. **Safe Development Rules**
-   - During development on the host PC, **no tweak or system modification may be run**.
-   - Unit tests must use mock/fake registry and service layers (`FakeRegistry`, `FakeServiceManager`).
-   - Real-system verification only takes place in dedicated test virtual machines.
+### 2. Write-Ahead Rollback Journal (WAL)
+- All actions are logged to disk under `%APPDATA%\Tweakora\Journal\session-[timestamp].json`.
+- **Pre-execution flush**: The journal entry (including the true original system state) is written and flushed to disk *before* any registry key or service state is modified.
+- **Baseline Preservation**: If a tweak is toggled or applied multiple times, Tweakora maintains the **original baseline value** from before the first application. The initial value is never overwritten by a modified value.
+- **Non-existent keys**: If a registry value or key did not exist before the tweak was applied, `existedBefore: false` is recorded. Rollback performs a deletion rather than leaving arbitrary data behind.
+
+### 3. Registry Backup Files (`.reg`)
+- For every registry modification, Tweakora generates an independent `.reg` file containing the previous state.
+- Even if Tweakora is uninstalled or unable to run, the user can double-click the exported `.reg` file to restore settings using the standard Windows Registry Editor.
+
+### 4. Smart Cleaner Whitelist Safety
+- The Smart Cleaner module strictly enforces a non-destructive directory whitelist:
+  - `%TEMP%` (Current User Temp)
+  - `%SYSTEMROOT%\Temp` (Windows System Temp)
+  - `%SYSTEMROOT%\Prefetch` (Prefetch cache)
+  - `%LOCALAPPDATA%\CrashDumps` (Application crash dumps)
+- It provides size previews before any file deletion occurs.
+- System files, user documents, browser histories, and arbitrary directories are physically impossible to select or delete.
+
+### 5. Crash and Unfinished Session Recovery
+- On application launch, Tweakora inspects the journal storage folder.
+- If an incomplete session marker is found (indicating an unexpected power loss or process termination during modification), Tweakora prompts the user immediately with an automatic rollback option.
+
+---
+
+## 3. Host Development & Testing Protocol
+
+To protect the host development workstation:
+1. **Host PC Protection**:
+   - During local development, all engine tests and UI demo modes use in-memory mock services (`Tweakora.Core.Fakes`).
+   - The host PC's registry, services, and filesystem are never modified by the test suite or dev runs.
+2. **Virtual Machine Testing**:
+   - Verification of real Windows changes takes place in dedicated Hyper-V, VMware, or VirtualBox virtual machines.
+   - Always take a VM snapshot before running live test scripts.

@@ -15,32 +15,31 @@ Repository Location: `C:\Dev\Tweakora`
 | **Phase 5** | App Installer (WinGet), Uninstaller, Fixes Center, Network Tools | **DONE** | Build: 0 errors / Tests: 18 passed / Process alive 10s (PID 8348, Handle: 2164814) |
 | **Phase 6** | Expand Catalog to 80+ Verified Tweaks | **DONE** | 84 Verified Tweaks Validated (0 errors) / Tests: 18 passed / Process alive 10s (PID 4352, Handle: 1247348) |
 | **Phase 7** | Change History, Profiles, Command Palette (Ctrl+K), Settings & First-Run | **DONE** | Build: 0 errors / Tests: 23 passed / Process alive 10s (PID 18888, Handle: 34539548) |
-| **Phase 8** | Release Polish, Docs, Single-File Release Build + Checksum | **IN PROGRESS** | Ready for final release packaging |
+| **Phase 8** | Release Polish, Docs, Single-File Release Build + Checksum | **DONE** | Single-file portable exe published & verified alive 10s (PID 13268, Handle: 1968186) |
 
 ---
 
-## Phase 7 Verification Evidence (Real Outputs)
+## Phase 8 Verification Evidence (Real Outputs)
 
-- **Profiles & Serialization**:
-  - Built-in profiles: `Recommended Baseline`, `Privacy & Security Shield`, `Gaming & Low-Latency`, `Minimalist Clean Desktop`.
-  - Export capabilities: JSON profile format, standard `.reg` Windows registry script, unattended PowerShell `.ps1` script.
-- **Change History**:
-  - Rollback Journal viewer embedded in `PresetsPage.xaml` showing past session baselines and restore options.
-- **Command Palette (Ctrl+K)**:
-  - Accessible via global key binding `Ctrl+K` with quick action and page search filter.
-- **Settings & First-Run Wizard**:
-  - Experience mode switch (Beginner/Advanced), restore point preference, journal path indicator, and welcome card dismiss.
-- **Catalog Validation**:
-  `Summary: 84 tweak(s) validated. 0 error(s).`
-- **Build Output**:
-  `Build succeeded. 0 Warning(s) 0 Error(s).`
-- **Unit Tests**:
-  `Passed! - Failed: 0, Passed: 23, Skipped: 0, Total: 23, Duration: 1 s - Tweakora.Tests.dll (net10.0)`
-- **UI Process Health Verification**:
-  `APP_RUNNING_OK: PID=18888, MainWindowHandle=34539548`
-  `SUCCESS: App launched and ran for 10s with valid window handle.`
+- **Distribution Artifacts (`dist/`)**:
+  - `dist\Tweakora.exe`: Single-file, self-contained Windows x64 portable executable (148 MB).
+  - `dist\tweakora-cli.exe`: Headless command-line runner for unattended setup.
+  - `dist\Catalog\`: Bundled strict JSON catalog files.
+  - `installer\tweakora.iss`: Complete Inno Setup configuration for optional installer compilation.
+- **SHA-256 Checksums (`dist/SHA256SUMS.txt`)**:
+  - `Tweakora.exe` / `Tweakora.App.exe`: `FBFDA082BA74CF4D896179AE186A13D192F881A29F76CD8B595B3A0EB20A3F3B`
+  - `tweakora-cli.exe`: `62CE3D59B11761C24F7716708C346380D7CA494AC52473555F7DEF01503DA835`
+- **Headless CLI Execution (`dist\tweakora-cli.exe --list`)**:
+  - Successfully parsed and enumerated all 84 catalog tweaks headlessly across 8 categories.
+- **Single-File Release Executable Verification**:
+  - `DIST_APP_RUNNING_OK: PID=13268, MainWindowHandle=1968186`
+  - App launched directly from `dist\Tweakora.exe`, loaded Mica/Fluent chrome, initialized views, stayed alive for 10 seconds, and terminated cleanly.
+- **Full Solution Automated Test Suite**:
+  - `dotnet test Tweakora.sln` -> 23 Passed, 0 Failed, 0 Skipped.
+- **Catalog Schema Validator**:
+  - `dotnet run --project tools/CatalogValidator/CatalogValidator.csproj -- Catalog/` -> 84 tweaks validated, 0 errors.
 
 ---
 
 ## Questions for Ziad
-*(None currently. All tasks are proceeding autonomously per specifications.)*
+*(None. All 8 phases are complete and verified according to specifications.)*

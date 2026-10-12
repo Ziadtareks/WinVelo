@@ -25,4 +25,8 @@
     <ProjectReference Include="..\Tweakora.Modules\Tweakora.Modules.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="..\..\Catalog\**\*" Link="Catalog\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>

@@ -28,18 +28,37 @@ public sealed class WinGetManager
 
     public List<WinGetApp> LoadAppsCatalog()
     {
-        if (!File.Exists(_catalogPath))
+        string path = _catalogPath;
+        if (!File.Exists(path))
         {
-            // Fallback path check if running from binary subfolder
-            string relative = Path.Combine(Directory.GetCurrentDirectory(), "Catalog", "Apps", "apps.winget.json");
-            if (File.Exists(relative))
+            string rootDir = AppDomain.CurrentDomain.BaseDirectory;
+            string candidate = Path.Combine(rootDir, "Catalog", "Apps", "apps.winget.json");
+            if (File.Exists(candidate))
             {
-                return ParseJson(relative);
+                path = candidate;
             }
-            return new List<WinGetApp>();
+            else
+            {
+                string? parent = Directory.GetParent(rootDir)?.FullName;
+                while (parent != null)
+                {
+                    candidate = Path.Combine(parent, "Catalog", "Apps", "apps.winget.json");
+                    if (File.Exists(candidate))
+                    {
+                        path = candidate;
+                        break;
+                    }
+                    parent = Directory.GetParent(parent)?.FullName;
+                }
+            }
         }
 
-        return ParseJson(_catalogPath);
+        if (File.Exists(path))
+        {
+            return ParseJson(path);
+        }
+
+        return new List<WinGetApp>();
     }
 
     private static List<WinGetApp> ParseJson(string path)
