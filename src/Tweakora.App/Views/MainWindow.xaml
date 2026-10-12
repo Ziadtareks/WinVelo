@@ -9,7 +9,7 @@
                  Height="780" Width="1180"
                  MinHeight="600" MinWidth="900"
                  WindowStartupLocation="CenterScreen"
-                 WindowBackdropType="Mica"
+                 ExtendsContentIntoTitleBar="True"
                  FlowDirection="{Binding Localization.CurrentFlowDirection}">
 
     <Window.Resources>
@@ -41,24 +41,33 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <!-- Titlebar -->
-        <Grid Grid.Row="0">
-            <ui:TitleBar Title="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[AppTitle]}" />
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,140,0">
-                <ui:Button Icon="{ui:SymbolIcon LocalLanguage24}"
-                           ToolTip="Toggle Language (English / العربية)"
-                           Command="{Binding ToggleLanguageCommand}"
-                           Appearance="Transparent" Margin="0,0,4,0" />
-                <ui:Button Icon="{ui:SymbolIcon DarkTheme24}"
-                           ToolTip="Toggle Dark / Light Theme"
-                           Command="{Binding ToggleThemeCommand}"
-                           Appearance="Transparent" Margin="0,0,4,0" />
-                <ui:Button Icon="{ui:SymbolIcon DocumentBulletList24}"
-                           ToolTip="Toggle Activity Log"
-                           Command="{Binding ToggleLogPanelCommand}"
-                           Appearance="Transparent" />
-            </StackPanel>
-        </Grid>
+        <!-- Fluent Titlebar with Icon, Title, and Action Buttons -->
+        <ui:TitleBar Grid.Row="0"
+                     x:Name="AppTitleBar"
+                     Title="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[AppTitle]}"
+                     ShowMaximize="True"
+                     ShowMinimize="True"
+                     ShowClose="True">
+            <ui:TitleBar.Icon>
+                <ui:SymbolIcon Symbol="Shield24" />
+            </ui:TitleBar.Icon>
+            <ui:TitleBar.TrailingContent>
+                <StackPanel Orientation="Horizontal" Margin="0,0,8,0">
+                    <ui:Button Icon="{ui:SymbolIcon LocalLanguage24}"
+                               ToolTip="Toggle Language (English / العربية)"
+                               Command="{Binding ToggleLanguageCommand}"
+                               Appearance="Transparent" Margin="0,0,4,0" />
+                    <ui:Button Icon="{ui:SymbolIcon DarkTheme24}"
+                               ToolTip="Toggle Dark / Light Theme"
+                               Command="{Binding ToggleThemeCommand}"
+                               Appearance="Transparent" Margin="0,0,4,0" />
+                    <ui:Button Icon="{ui:SymbolIcon DocumentBulletList24}"
+                               ToolTip="Toggle Activity Log"
+                               Command="{Binding ToggleLogPanelCommand}"
+                               Appearance="Transparent" />
+                </StackPanel>
+            </ui:TitleBar.TrailingContent>
+        </ui:TitleBar>
 
         <!-- Main Workspace: Left Nav + Content -->
         <Grid Grid.Row="1">
