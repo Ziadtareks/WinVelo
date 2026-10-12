@@ -1,0 +1,149 @@
+<ui:FluentWindow x:Class="Tweakora.App.Views.MainWindow"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+                 xmlns:vm="clr-namespace:Tweakora.App.ViewModels"
+                 xmlns:views="clr-namespace:Tweakora.App.Views"
+                 xmlns:loc="clr-namespace:Tweakora.App.Localization"
+                 Title="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[AppTitle]}"
+                 Height="780" Width="1180"
+                 MinHeight="600" MinWidth="900"
+                 WindowStartupLocation="CenterScreen"
+                 WindowBackdropType="Mica"
+                 FlowDirection="{Binding Localization.CurrentFlowDirection}">
+
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisConverter" />
+        <DataTemplate DataType="{x:Type vm:DashboardViewModel}">
+            <views:DashboardPage />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:TweaksViewModel}">
+            <views:TweaksPage />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ToolboxViewModel}">
+            <views:ToolboxPage />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:AppsViewModel}">
+            <views:AppsPage />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:PresetsViewModel}">
+            <views:PresetsPage />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
+            <views:SettingsPage />
+        </DataTemplate>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Titlebar -->
+        <Grid Grid.Row="0">
+            <ui:TitleBar Title="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[AppTitle]}" />
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,140,0">
+                <ui:Button Icon="{ui:SymbolIcon LocalLanguage24}"
+                           ToolTip="Toggle Language (English / العربية)"
+                           Command="{Binding ToggleLanguageCommand}"
+                           Appearance="Transparent" Margin="0,0,4,0" />
+                <ui:Button Icon="{ui:SymbolIcon DarkTheme24}"
+                           ToolTip="Toggle Dark / Light Theme"
+                           Command="{Binding ToggleThemeCommand}"
+                           Appearance="Transparent" Margin="0,0,4,0" />
+                <ui:Button Icon="{ui:SymbolIcon DocumentBulletList24}"
+                           ToolTip="Toggle Activity Log"
+                           Command="{Binding ToggleLogPanelCommand}"
+                           Appearance="Transparent" />
+            </StackPanel>
+        </Grid>
+
+        <!-- Main Workspace: Left Nav + Content -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="220" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Navigation Rail -->
+            <Border Grid.Column="0" BorderThickness="0,0,1,0"
+                    BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                    Background="{DynamicResource SolidBackgroundFillColorSecondaryBrush}">
+                <DockPanel LastChildFill="False">
+                    <StackPanel DockPanel.Dock="Top" Margin="8,16,8,8">
+                        <!-- Brand Header -->
+                        <TextBlock Text="Tweakora" FontSize="18" FontWeight="Bold" Margin="12,0,0,16"
+                                   Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}" />
+
+                        <!-- Nav Buttons -->
+                        <ui:Button Content="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[NavHome]}"
+                                   Icon="{ui:SymbolIcon Home24}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
+                                   Appearance="Transparent" Margin="0,0,0,4"
+                                   Command="{Binding NavigateCommand}" CommandParameter="Dashboard" />
+
+                        <ui:Button Content="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[NavTweaks]}"
+                                   Icon="{ui:SymbolIcon Wrench24}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
+                                   Appearance="Transparent" Margin="0,0,0,4"
+                                   Command="{Binding NavigateCommand}" CommandParameter="Tweaks" />
+
+                        <ui:Button Content="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[NavTools]}"
+                                   Icon="{ui:SymbolIcon Toolbox24}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
+                                   Appearance="Transparent" Margin="0,0,0,4"
+                                   Command="{Binding NavigateCommand}" CommandParameter="Toolbox" />
+
+                        <ui:Button Content="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[NavApps]}"
+                                   Icon="{ui:SymbolIcon Apps24}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
+                                   Appearance="Transparent" Margin="0,0,0,4"
+                                   Command="{Binding NavigateCommand}" CommandParameter="Apps" />
+
+                        <ui:Button Content="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[NavPresets]}"
+                                   Icon="{ui:SymbolIcon Collections24}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
+                                   Appearance="Transparent" Margin="0,0,0,4"
+                                   Command="{Binding NavigateCommand}" CommandParameter="Presets" />
+                    </StackPanel>
+
+                    <!-- Settings at Bottom -->
+                    <StackPanel DockPanel.Dock="Bottom" Margin="8,0,8,16">
+                        <ui:Button Content="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[NavSettings]}"
+                                   Icon="{ui:SymbolIcon Settings24}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
+                                   Appearance="Transparent"
+                                   Command="{Binding NavigateCommand}" CommandParameter="Settings" />
+                    </StackPanel>
+                </DockPanel>
+            </Border>
+
+            <!-- Page Content Host -->
+            <ContentControl Grid.Column="1" Content="{Binding CurrentPage}" />
+        </Grid>
+
+        <!-- Collapsible Bottom Log Panel -->
+        <Border Grid.Row="2" Height="140"
+                Visibility="{Binding IsLogPanelOpen, Converter={StaticResource BoolToVisConverter}}"
+                BorderThickness="0,1,0,0"
+                BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                Background="{DynamicResource SolidBackgroundFillColorSecondaryBrush}">
+            <Grid Margin="12,8">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <DockPanel Grid.Row="0" Margin="0,0,0,4">
+                    <TextBlock Text="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[LogTitle]}"
+                               FontWeight="SemiBold" FontSize="13" />
+                    <ui:Button DockPanel.Dock="Right" Icon="{ui:SymbolIcon Dismiss16}" Appearance="Transparent"
+                               Command="{Binding ToggleLogPanelCommand}" HorizontalAlignment="Right" Padding="4" />
+                </DockPanel>
+                <ListBox Grid.Row="1" ItemsSource="{Binding LogSink.Messages}"
+                         Background="Transparent" BorderThickness="0" FontFamily="Consolas, Cascadia Code, Courier New">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Message}" FontSize="12" />
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Grid>
+        </Border>
+    </Grid>
+</ui:FluentWindow>

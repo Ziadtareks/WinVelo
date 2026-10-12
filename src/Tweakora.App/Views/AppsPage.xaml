@@ -1,0 +1,25 @@
+<UserControl x:Class="Tweakora.App.Views.AppsPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:loc="clr-namespace:Tweakora.App.Localization">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="32" MaxWidth="1000" HorizontalAlignment="Stretch">
+            <TextBlock Text="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[AppsTitle]}"
+                       FontSize="26" FontWeight="SemiBold" Margin="0,0,0,8" />
+            <TextBlock Text="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[AppsSubtitle]}"
+                       FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,24" />
+
+            <ui:TextBox PlaceholderText="Search 300+ curated WinGet software packages..."
+                        Icon="{ui:SymbolIcon Apps24}" Margin="0,0,0,16" />
+
+            <ui:Card>
+                <StackPanel Margin="8">
+                    <TextBlock Text="Categories" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,8" />
+                    <TextBlock Text="Browsers, Developer Tools, Utilities, Media, Gaming, and Runtimes."
+                               Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="13" />
+                </StackPanel>
+            </ui:Card>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

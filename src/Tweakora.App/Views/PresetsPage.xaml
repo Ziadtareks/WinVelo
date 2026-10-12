@@ -1,0 +1,45 @@
+<UserControl x:Class="Tweakora.App.Views.PresetsPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:loc="clr-namespace:Tweakora.App.Localization">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="32" MaxWidth="1000" HorizontalAlignment="Stretch">
+            <TextBlock Text="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[PresetsTitle]}"
+                       FontSize="26" FontWeight="SemiBold" Margin="0,0,0,8" />
+            <TextBlock Text="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[PresetsSubtitle]}"
+                       FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,24" />
+
+            <!-- Preset Cards -->
+            <ui:Card Margin="0,0,0,12">
+                <Grid Margin="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="Recommended Preset" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,4" />
+                        <TextBlock Text="Safe baseline settings that balance privacy, system responsiveness, and clean UI without breaking any features."
+                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="13" TextWrapping="Wrap" />
+                    </StackPanel>
+                    <ui:Button Grid.Column="1" Content="Preview &amp; Apply" Appearance="Primary" VerticalAlignment="Center" />
+                </Grid>
+            </ui:Card>
+
+            <ui:Card Margin="0,0,0,12">
+                <Grid Margin="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="Gaming Preset" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,4" />
+                        <TextBlock Text="Disables background Xbox Game Bar recording overlays, Game DVR, and enables Windows Game Mode."
+                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="13" TextWrapping="Wrap" />
+                    </StackPanel>
+                    <ui:Button Grid.Column="1" Content="Preview &amp; Apply" Appearance="Secondary" VerticalAlignment="Center" />
+                </Grid>
+            </ui:Card>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

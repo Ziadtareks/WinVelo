@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="AppTitle" xml:space="preserve">
+    <value>Tweakora - Windows Control Center</value>
+  </data>
+  <data name="NavHome" xml:space="preserve">
+    <value>Dashboard</value>
+  </data>
+  <data name="NavTweaks" xml:space="preserve">
+    <value>Tweaks</value>
+  </data>
+  <data name="NavTools" xml:space="preserve">
+    <value>Toolbox</value>
+  </data>
+  <data name="NavApps" xml:space="preserve">
+    <value>App Installer</value>
+  </data>
+  <data name="NavPresets" xml:space="preserve">
+    <value>Presets</value>
+  </data>
+  <data name="NavSettings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+</root>

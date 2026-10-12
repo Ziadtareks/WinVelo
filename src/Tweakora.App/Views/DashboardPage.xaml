@@ -1,0 +1,40 @@
+<UserControl x:Class="Tweakora.App.Views.DashboardPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:loc="clr-namespace:Tweakora.App.Localization">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="32" MaxWidth="1000" HorizontalAlignment="Stretch">
+            <TextBlock Text="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[DashboardWelcome]}"
+                       FontSize="26" FontWeight="SemiBold" Margin="0,0,0,8" />
+            <TextBlock Text="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[DashboardSubtitle]}"
+                       FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,24" />
+
+            <!-- System Info Card -->
+            <ui:Card Margin="0,0,0,16">
+                <StackPanel Margin="8">
+                    <TextBlock Text="System Overview" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,12" />
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Windows Version" Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12" />
+                            <TextBlock Text="Windows 11 / 10" FontSize="14" FontWeight="Medium" Margin="0,4,0,0" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="Safety Engine" Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12" />
+                            <TextBlock Text="Rollback Journal Ready" Foreground="#107C41" FontSize="14" FontWeight="Medium" Margin="0,4,0,0" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Catalog Status" Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12" />
+                            <TextBlock Text="Verified Safe" Foreground="#0078D4" FontSize="14" FontWeight="Medium" Margin="0,4,0,0" />
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </ui:Card>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>
