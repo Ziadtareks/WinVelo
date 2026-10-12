@@ -3,46 +3,192 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              xmlns:loc="clr-namespace:Tweakora.App.Localization">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisConverter" />
+    </UserControl.Resources>
+
     <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <StackPanel Margin="32" MaxWidth="1000" HorizontalAlignment="Stretch">
+        <StackPanel Margin="32" MaxWidth="1100" HorizontalAlignment="Stretch">
+            <!-- Header -->
             <TextBlock Text="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[ToolsTitle]}"
-                       FontSize="26" FontWeight="SemiBold" Margin="0,0,0,8" />
+                       FontSize="26" FontWeight="SemiBold" Margin="0,0,0,6" />
             <TextBlock Text="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[ToolsSubtitle]}"
-                       FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,24" />
+                       FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,20" />
 
-            <WrapPanel>
-                <ui:CardAction Margin="0,0,16,16" Width="280">
-                    <StackPanel Margin="8">
-                        <TextBlock Text="Smart Cleaner" FontSize="16" FontWeight="SemiBold" />
-                        <TextBlock Text="Clean temporary files, caches, and update logs safely."
-                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12" Margin="0,4,0,0" TextWrapping="Wrap" />
-                    </StackPanel>
-                </ui:CardAction>
+            <!-- Tool Selection Buttons -->
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                <ui:Button Content="Smart Cleaner" Icon="{ui:SymbolIcon Broom24}" Margin="0,0,8,0"
+                           Command="{Binding SelectToolCommand}" CommandParameter="Cleaner" />
+                <ui:Button Content="Startup Apps" Icon="{ui:SymbolIcon Apps24}" Margin="0,0,8,0"
+                           Command="{Binding SelectToolCommand}" CommandParameter="Startup" />
+                <ui:Button Content="Services Manager" Icon="{ui:SymbolIcon Settings24}" Margin="0,0,8,0"
+                           Command="{Binding SelectToolCommand}" CommandParameter="Services" />
+            </StackPanel>
 
-                <ui:CardAction Margin="0,0,16,16" Width="280">
-                    <StackPanel Margin="8">
-                        <TextBlock Text="Startup Manager" FontSize="16" FontWeight="SemiBold" />
-                        <TextBlock Text="Manage background startup applications and scheduled tasks."
-                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12" Margin="0,4,0,0" TextWrapping="Wrap" />
-                    </StackPanel>
-                </ui:CardAction>
+            <!-- ==================== SECTION 1: SMART CLEANER ==================== -->
+            <Border>
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ActiveTool}" Value="Cleaner">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <StackPanel>
+                    <ui:Card Margin="0,0,0,16" Padding="16">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Safe Cache &amp; Junk Cleaner" FontSize="18" FontWeight="SemiBold" />
+                                <TextBlock Text="Whitelisted locations only (%TEMP%, %WINDIR%\Temp, Update Download Cache). Preview size first before cleaning."
+                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12" Margin="0,4,0,8" />
+                                <TextBlock Text="{Binding CleanerStatusText}" FontWeight="Medium" Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}" FontSize="13" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                <ui:Button Content="Scan Now" Icon="{ui:SymbolIcon Search24}" Margin="0,0,8,0"
+                                           Command="{Binding ScanCleanerCommand}" />
+                                <ui:Button Content="Clean Selected" Icon="{ui:SymbolIcon Delete24}" Appearance="Primary"
+                                           Command="{Binding CleanNowCommand}" />
+                            </StackPanel>
+                        </Grid>
+                    </ui:Card>
 
-                <ui:CardAction Margin="0,0,16,16" Width="280">
-                    <StackPanel Margin="8">
-                        <TextBlock Text="Services Manager" FontSize="16" FontWeight="SemiBold" />
-                        <TextBlock Text="Search, inspect, and configure Windows services startup state."
-                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12" Margin="0,4,0,0" TextWrapping="Wrap" />
-                    </StackPanel>
-                </ui:CardAction>
+                    <!-- Cleaner Categories List -->
+                    <ItemsControl ItemsSource="{Binding CleanerCategories}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <ui:Card Margin="0,0,0,8" Padding="14">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <CheckBox Grid.Column="0" IsChecked="{Binding IsSelected}" VerticalAlignment="Center" Margin="0,0,12,0" />
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Name}" FontSize="15" FontWeight="SemiBold" />
+                                            <TextBlock Text="{Binding PathDescription}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12" />
+                                        </StackPanel>
+                                        <Border Grid.Column="2" Background="{DynamicResource ControlFillColorSecondaryBrush}" CornerRadius="4" Padding="8,4" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding FormattedSize}" FontWeight="SemiBold" FontSize="13" />
+                                        </Border>
+                                    </Grid>
+                                </ui:Card>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
 
-                <ui:CardAction Margin="0,0,16,16" Width="280">
-                    <StackPanel Margin="8">
-                        <TextBlock Text="Fixes Center" FontSize="16" FontWeight="SemiBold" />
-                        <TextBlock Text="One-click repairs for Windows Update, Store, and Network."
-                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12" Margin="0,4,0,0" TextWrapping="Wrap" />
-                    </StackPanel>
-                </ui:CardAction>
-            </WrapPanel>
+            <!-- ==================== SECTION 2: STARTUP MANAGER ==================== -->
+            <Border>
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ActiveTool}" Value="Startup">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <StackPanel>
+                    <ui:Card Margin="0,0,0,16" Padding="16">
+                        <StackPanel>
+                            <TextBlock Text="Startup Applications" FontSize="18" FontWeight="SemiBold" />
+                            <TextBlock Text="Control which applications start automatically when you sign in to Windows. Disabling unnecessary apps speeds up boot time."
+                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12" Margin="0,4,0,0" />
+                        </StackPanel>
+                    </ui:Card>
+
+                    <ItemsControl ItemsSource="{Binding StartupItems}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <ui:Card Margin="0,0,0,8" Padding="14">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="16" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Name}" FontSize="15" FontWeight="SemiBold" />
+                                            <TextBlock Text="{Binding Command}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12" TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Text="{Binding Location, StringFormat='Registry: {0}'}" Foreground="{DynamicResource TextFillColorTertiaryBrush}" FontSize="11" Margin="0,2,0,0" />
+                                        </StackPanel>
+                                        <Border Grid.Column="1" CornerRadius="4" Padding="6,2" VerticalAlignment="Center"
+                                                Background="{DynamicResource ControlFillColorSecondaryBrush}">
+                                            <TextBlock Text="{Binding Impact, StringFormat='Impact: {0}'}" FontSize="11" FontWeight="Medium" />
+                                        </Border>
+                                        <ui:ToggleSwitch Grid.Column="3" IsChecked="{Binding IsEnabled}"
+                                                         Command="{Binding DataContext.ToggleStartupItemCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                         CommandParameter="{Binding}" VerticalAlignment="Center" />
+                                    </Grid>
+                                </ui:Card>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
+            <!-- ==================== SECTION 3: SERVICES MANAGER ==================== -->
+            <Border>
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ActiveTool}" Value="Services">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <StackPanel>
+                    <ui:Card Margin="0,0,0,16" Padding="16">
+                        <StackPanel>
+                            <TextBlock Text="Windows Services Inspector" FontSize="18" FontWeight="SemiBold" />
+                            <TextBlock Text="Inspect and review Windows system services. Safe modification with rollback journal protection."
+                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12" Margin="0,4,0,0" />
+                        </StackPanel>
+                    </ui:Card>
+
+                    <ItemsControl ItemsSource="{Binding ServicesList}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <ui:Card Margin="0,0,0,8" Padding="14">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="12" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding DisplayName}" FontSize="15" FontWeight="SemiBold" />
+                                            <TextBlock Text="{Binding ServiceName, StringFormat='Service ID: {0}'}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12" />
+                                        </StackPanel>
+                                        <Border Grid.Column="1" CornerRadius="4" Padding="8,3" VerticalAlignment="Center"
+                                                Background="{DynamicResource ControlFillColorSecondaryBrush}">
+                                            <TextBlock Text="{Binding Status}" FontSize="12" FontWeight="SemiBold" />
+                                        </Border>
+                                        <Border Grid.Column="3" CornerRadius="4" Padding="8,3" VerticalAlignment="Center"
+                                                Background="{DynamicResource ControlFillColorTertiaryBrush}">
+                                            <TextBlock Text="{Binding StartupType, StringFormat='Startup: {0}'}" FontSize="12" FontWeight="Medium" />
+                                        </Border>
+                                    </Grid>
+                                </ui:Card>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
         </StackPanel>
     </ScrollViewer>
 </UserControl>

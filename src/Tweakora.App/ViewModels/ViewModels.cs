@@ -14,13 +14,112 @@ public sealed partial class DashboardViewModel : ViewModelBase
 {
     [ObservableProperty]
     private string _status = "System Ready";
+
+    public Tweakora.Modules.Dashboard.SystemInfoSummary SystemSummary { get; }
+
+    public DashboardViewModel()
+    {
+        SystemSummary = Tweakora.Modules.Dashboard.SystemInfoProvider.GetSystemSummary();
+    }
 }
 
 
 public sealed partial class ToolboxViewModel : ViewModelBase
 {
+    private readonly Tweakora.Modules.Cleaner.SmartCleaner _cleaner = new(isSimulationMode: true);
+    private readonly Tweakora.Modules.Startup.StartupManager _startupManager;
+    private readonly Tweakora.Modules.Services.ServicesManager _servicesManager;
+
     [ObservableProperty]
     private string _status = "Tools Available";
+
+    [ObservableProperty]
+    private string _activeTool = "Cleaner"; // "Cleaner", "Startup", "Services"
+
+    [ObservableProperty]
+    private bool _isScanningCleaner;
+
+    [ObservableProperty]
+    private string _cleanerStatusText = "Ready to scan temporary caches.";
+
+    public System.Collections.ObjectModel.ObservableCollection<Tweakora.Modules.Cleaner.CleanerCategoryScan> CleanerCategories { get; } = new();
+    public System.Collections.ObjectModel.ObservableCollection<Tweakora.Modules.Startup.StartupEntry> StartupItems { get; } = new();
+    public System.Collections.ObjectModel.ObservableCollection<Tweakora.Modules.Services.ServiceItem> ServicesList { get; } = new();
+
+    public ToolboxViewModel()
+    {
+        Tweakora.Core.Fakes.FakeRegistryService fakeReg = new();
+        Tweakora.Core.Fakes.FakeServicesService fakeSvc = new();
+
+        _startupManager = new Tweakora.Modules.Startup.StartupManager(fakeReg);
+        _servicesManager = new Tweakora.Modules.Services.ServicesManager(fakeSvc);
+
+        LoadToolsData();
+    }
+
+    [RelayCommand]
+    private void SelectTool(string toolName)
+    {
+        ActiveTool = toolName;
+    }
+
+    [RelayCommand]
+    private async Task ScanCleanerAsync()
+    {
+        IsScanningCleaner = true;
+        CleanerStatusText = "Scanning whitelisted system temporary directories...";
+        try
+        {
+            var results = await _cleaner.ScanCategoriesAsync();
+            CleanerCategories.Clear();
+            long totalBytes = 0;
+            foreach (var r in results)
+            {
+                CleanerCategories.Add(r);
+                totalBytes += r.TotalBytes;
+            }
+            CleanerStatusText = $"Scan complete. {CleanerCategories.Sum(c => c.FileCount)} junk files found ({totalBytes / (1024.0 * 1024):F1} MB).";
+        }
+        finally
+        {
+            IsScanningCleaner = false;
+        }
+    }
+
+    [RelayCommand]
+    private async Task CleanNowAsync()
+    {
+        var selected = CleanerCategories.Where(c => c.IsSelected).Select(c => c.Id).ToList();
+        if (selected.Count == 0) return;
+
+        CleanerStatusText = "Cleaning selected safe cache locations...";
+        long freed = await _cleaner.CleanCategoriesAsync(selected);
+        CleanerStatusText = $"Cleanup completed safely! Freed {freed / (1024.0 * 1024):F1} MB of space.";
+        await ScanCleanerAsync();
+    }
+
+    [RelayCommand]
+    private void ToggleStartupItem(Tweakora.Modules.Startup.StartupEntry item)
+    {
+        _startupManager.SetEntryState(item, !item.IsEnabled);
+    }
+
+    private void LoadToolsData()
+    {
+        // Populate startup items
+        StartupItems.Clear();
+        foreach (var item in _startupManager.GetStartupEntries())
+        {
+            StartupItems.Add(item);
+        }
+
+        // Populate services
+        ServicesList.Clear();
+        foreach (var svc in _servicesManager.GetServices())
+        {
+            ServicesList.Add(svc);
+        }
+    }
 }
 
 public sealed partial class AppsViewModel : ViewModelBase
