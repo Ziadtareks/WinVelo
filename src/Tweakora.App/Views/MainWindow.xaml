@@ -9,8 +9,7 @@
                   Height="780" Width="1180"
                   MinHeight="600" MinWidth="900"
                   WindowStartupLocation="CenterScreen"
-                  ExtendsContentIntoTitleBar="True"
-                  FlowDirection="{Binding Localization.CurrentFlowDirection}">
+                  ExtendsContentIntoTitleBar="True">
 
     <Window.InputBindings>
         <KeyBinding Modifiers="Control" Key="K" Command="{Binding ToggleCommandPaletteCommand}" />
@@ -60,10 +59,6 @@
                     <ui:Button Icon="{ui:SymbolIcon Search24}"
                                ToolTip="Command Palette &amp; Search (Ctrl+K)"
                                Command="{Binding ToggleCommandPaletteCommand}"
-                               Appearance="Transparent" Margin="0,0,4,0" />
-                    <ui:Button Icon="{ui:SymbolIcon LocalLanguage24}"
-                               ToolTip="Toggle Language (English / العربية)"
-                               Command="{Binding ToggleLanguageCommand}"
                                Appearance="Transparent" Margin="0,0,4,0" />
                     <ui:Button Icon="{ui:SymbolIcon DarkTheme24}"
                                ToolTip="Toggle Dark / Light Theme"

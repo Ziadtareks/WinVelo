@@ -2,14 +2,8 @@
   {
     "schemaVersion": "1.0.0",
     "id": "performance.visual.disable-transparency",
-    "name": {
-      "en": "Disable Transparency Effects",
-      "ar": "تعطيل تأثيرات الشفافية"
-    },
-    "description": {
-      "en": "Turns off transparency on taskbar, Start menu, and windows to reduce GPU overhead.",
-      "ar": "إيقاف شفافية النوافذ وشريط المهام لتقليل الحمل على كارت الشاشة وتحسين الاستجابة."
-    },
+    "name": "Disable Transparency Effects",
+    "description": "Turns off transparency on taskbar, Start menu, and windows to reduce GPU overhead.",
     "category": "performance",
     "subcategory": "visual",
     "risk": "Safe",
@@ -68,14 +62,8 @@
   {
     "schemaVersion": "1.0.0",
     "id": "performance.visual.disable-animations",
-    "name": {
-      "en": "Disable Window Minimize/Maximize Animations",
-      "ar": "تعطيل حركات تصغير وتكبير النوافذ"
-    },
-    "description": {
-      "en": "Speeds up desktop responsiveness by eliminating window transition animations.",
-      "ar": "تسريع التنقل عبر النوافذ بإلغاء الرسوم المتحركة عند التصغير والتكبير."
-    },
+    "name": "Disable Window Minimize/Maximize Animations",
+    "description": "Speeds up desktop responsiveness by eliminating window transition animations.",
     "category": "performance",
     "subcategory": "visual",
     "risk": "Safe",
@@ -133,14 +121,8 @@
   {
     "schemaVersion": "1.0.0",
     "id": "performance.system.disable-startup-delay",
-    "name": {
-      "en": "Disable Windows Startup App Delay",
-      "ar": "إلغاء مهلة تأخير تشغيل تطبيقات الإقلاع"
-    },
-    "description": {
-      "en": "Eliminates the built-in 10-second startup delay Windows imposes on autostart apps.",
-      "ar": "إلغاء فترة التأخير التلقائية التي يفرضها ويندوز عند تشغيل البرامج مع إقلاع النظام."
-    },
+    "name": "Disable Windows Startup App Delay",
+    "description": "Eliminates the built-in 10-second startup delay Windows imposes on autostart apps.",
     "category": "performance",
     "subcategory": "startup",
     "risk": "Safe",
@@ -195,14 +177,8 @@
   {
     "schemaVersion": "1.0.0",
     "id": "performance.system.storage-sense",
-    "name": {
-      "en": "Enable Storage Sense Auto-Cleanup",
-      "ar": "تفعيل مستشعر مساحة التخزين التلقائي"
-    },
-    "description": {
-      "en": "Automatically frees up disk space by deleting old temp files and recycled items.",
-      "ar": "تنظيف القرص تلقائياً بحذف الملفات المؤقتة والمهملات عند انخفاض مساحة التخزين."
-    },
+    "name": "Enable Storage Sense Auto-Cleanup",
+    "description": "Automatically frees up disk space by deleting old temp files and recycled items.",
     "category": "performance",
     "subcategory": "storage",
     "risk": "Safe",
@@ -259,14 +235,8 @@
   {
     "schemaVersion": "1.0.0",
     "id": "performance.network.delivery-optimization-simple",
-    "name": {
-      "en": "Restrict Delivery Optimization to Local Network",
-      "ar": "تقييد تحسين التسليم على الشبكة المحلية فقط"
-    },
-    "description": {
-      "en": "Stops Windows Update from uploading update files to external internet peers (Mode 0: HTTP only / No P2P).",
-      "ar": "منع ويندوز من استخدام سرعة الإنترنت لديك لرفع التحديثات لأجهزة أخرى عبر الإنترنت."
-    },
+    "name": "Restrict Delivery Optimization to Local Network",
+    "description": "Stops Windows Update from uploading update files to external internet peers (Mode 0: HTTP only / No P2P).",
     "category": "performance",
     "subcategory": "network",
     "risk": "Safe",
@@ -322,14 +292,8 @@
   {
     "schemaVersion": "1.0.0",
     "id": "performance.memory.svchost-split-threshold",
-    "name": {
-      "en": "Tune SvcHost Split Threshold",
-      "ar": "تحسين عتبة تجزئة عمليات الخدمات (SvcHost)"
-    },
-    "description": {
-      "en": "Groups system services into fewer svchost processes on systems with moderate RAM to reduce memory overhead.",
-      "ar": "تجميع خدمات النظام في عدد أقل من عمليات svchost لتوفير استهلاك الذاكرة العشوائية (RAM)."
-    },
+    "name": "Tune SvcHost Split Threshold",
+    "description": "Groups system services into fewer svchost processes on systems with moderate RAM to reduce memory overhead.",
     "category": "performance",
     "subcategory": "memory",
     "risk": "Low",
@@ -383,14 +347,8 @@
   {
     "schemaVersion": "1.0.0",
     "id": "performance.system.disable-maintenance-wake",
-    "name": {
-      "en": "Disable Automatic Maintenance Wake-Up Timers",
-      "ar": "تعطيل مؤقتات إيقاظ الجهاز للصيانة التلقائية"
-    },
-    "description": {
-      "en": "Prevents Windows Automatic Maintenance from waking the PC from sleep during the night.",
-      "ar": "منع مهام الصيانة التلقائية في ويندوز من إيقاظ الحاسوب ليلاً أثناء وضع السكون أو النوم."
-    },
+    "name": "Disable Automatic Maintenance Wake-Up Timers",
+    "description": "Prevents Windows Automatic Maintenance from waking the PC from sleep during the night.",
     "category": "performance",
     "subcategory": "power",
     "risk": "Safe",
@@ -448,14 +406,8 @@
   {
     "schemaVersion": "1.0.0",
     "id": "performance.search.prevent-indexing-on-battery",
-    "name": {
-      "en": "Prevent Search Indexing While on Battery Power",
-      "ar": "إيقاف فهرسة البحث التلقائية عند تشغيل البطارية"
-    },
-    "description": {
-      "en": "Pauses Windows Search background indexing while running on laptop battery to prolong battery life.",
-      "ar": "إيقاف فهرسة وبناء قاعدة بيانات البحث تلقائياً عند العمل على طاقة البطارية للحفاظ على شحن الحاسوب المحمول."
-    },
+    "name": "Prevent Search Indexing While on Battery Power",
+    "description": "Pauses Windows Search background indexing while running on laptop battery to prolong battery life.",
     "category": "performance",
     "subcategory": "battery",
     "risk": "Safe",
@@ -511,14 +463,8 @@
   {
     "schemaVersion": "1.0.0",
     "id": "performance.ntfs.disable-last-access",
-    "name": {
-      "en": "Disable NTFS Last Access Time Updates",
-      "ar": "تعطيل تحديث وقت آخر وصول لملفات NTFS"
-    },
-    "description": {
-      "en": "Stops updating file timestamp metadata every time a file is read, reducing unnecessary disk I/O operations.",
-      "ar": "إيقاف كتابة وتحديث وقت آخر وصول عند قراءة أي ملف، مما يقلل استهلاك القرص وعمليات الكتابة غير الضرورية."
-    },
+    "name": "Disable NTFS Last Access Time Updates",
+    "description": "Stops updating file timestamp metadata every time a file is read, reducing unnecessary disk I/O operations.",
     "category": "performance",
     "subcategory": "disk",
     "risk": "Safe",
@@ -578,14 +524,8 @@
   {
     "schemaVersion": "1.0.0",
     "id": "performance.ntfs.disable-8dot3-names",
-    "name": {
-      "en": "Disable 8.3 Short File Name Creation",
-      "ar": "تعطيل إنشاء أسماء الملفات القصيرة 8.3 على أقراص NTFS"
-    },
-    "description": {
-      "en": "Disables legacy MS-DOS short file name generation to speed up directory enumeration and file creation.",
-      "ar": "تعطيل إنشاء أسماء ملفات DOS القديمة على أقراص NTFS لتسريع إنشاء الملفات وفهرسة المجلدات."
-    },
+    "name": "Disable 8.3 Short File Name Creation",
+    "description": "Disables legacy MS-DOS short file name generation to speed up directory enumeration and file creation.",
     "category": "performance",
     "subcategory": "disk",
     "risk": "Safe",
@@ -645,14 +585,8 @@
   {
     "schemaVersion": "1.0.0",
     "id": "performance.network.disable-remote-differential-compression",
-    "name": {
-      "en": "Disable Remote Differential Compression API",
-      "ar": "تعطيل ميزة الضغط التفاضلي عن بُعد (RDC)"
-    },
-    "description": {
-      "en": "Disables legacy RDC protocol overhead to speed up local network file transfers on modern gigabit LANs.",
-      "ar": "تعطيل بروتوكول RDC القديم لتحسين سرعة نقل الملفات عبر الشبكات المحلية الحديثة عالية السرعة."
-    },
+    "name": "Disable Remote Differential Compression API",
+    "description": "Disables legacy RDC protocol overhead to speed up local network file transfers on modern gigabit LANs.",
     "category": "performance",
     "subcategory": "network",
     "risk": "Safe",
@@ -708,14 +642,8 @@
   {
     "schemaVersion": "1.0.0",
     "id": "performance.system.clear-pagefile-shutdown",
-    "name": {
-      "en": "Ensure Pagefile is Not Overwritten on Every Shutdown",
-      "ar": "التأكد من عدم مسح ملف الترحيل (Pagefile) عند كل إيقاف تشغيل"
-    },
-    "description": {
-      "en": "Ensures ClearPageFileAtShutdown is disabled so Windows powers down rapidly without waiting for disk zeroing.",
-      "ar": "التأكد من إيقاف مسح ملف الترحيل عند إيقاف التشغيل لتسريع إغلاق الجهاز وتفادي بطء إيقاف التشغيل."
-    },
+    "name": "Ensure Pagefile is Not Overwritten on Every Shutdown",
+    "description": "Ensures ClearPageFileAtShutdown is disabled so Windows powers down rapidly without waiting for disk zeroing.",
     "category": "performance",
     "subcategory": "system",
     "risk": "Safe",

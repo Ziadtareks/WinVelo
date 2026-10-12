@@ -2,18 +2,9 @@
   {
     "schemaVersion": "1.0.0",
     "id": "privacy.telemetry.diagnostic-data",
-    "name": {
-      "en": "Diagnostic Data Level",
-      "ar": "مستوى البيانات التشخيصية"
-    },
-    "description": {
-      "en": "Reduces diagnostic data sent to Microsoft to the lowest allowed level.",
-      "ar": "تقليل البيانات التشخيصية المرسلة إلى مايكروسوفت إلى أدنى حد مسموح به."
-    },
-    "effectNote": {
-      "en": "On Windows Enterprise and Education, this sets data collection to 0 (Security). On Windows Home and Pro, Windows treats 0 as 1 (Required diagnostic data).",
-      "ar": "على نسختي Enterprise و Education، يضبط القيمة إلى 0 (أمني). أما على Home و Pro، فيعتبر ويندوز القيمة 0 بمثابة 1 (البيانات المطلوبة فقط)."
-    },
+    "name": "Diagnostic Data Level",
+    "description": "Reduces diagnostic data sent to Microsoft to the lowest allowed level.",
+    "effectNote": "On Windows Enterprise and Education, this sets data collection to 0 (Security). On Windows Home and Pro, Windows treats 0 as 1 (Required diagnostic data).",
     "category": "privacy",
     "subcategory": "telemetry",
     "risk": "Safe",
@@ -72,22 +63,13 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/privacy/configure-windows-diagnostic-data-in-your-organization",
     "verifiedOnBuild": "22631.4317",
-    "warnings": {
-      "en": "Windows Settings will display 'Some settings are managed by your organization'. This is normal when Group Policy registry keys are set.",
-      "ar": "ستظهر رسالة 'تتم إدارة بعض الإعدادات بواسطة مؤسستك' داخل إعدادات ويندوز. هذا أمر طبيعي عند تفعيل مفاتيح سياسات النظام."
-    }
+    "warnings": "Windows Settings will display \u0027Some settings are managed by your organization\u0027. This is normal when Group Policy registry keys are set."
   },
   {
     "schemaVersion": "1.0.0",
     "id": "privacy.advertising.advertising-id",
-    "name": {
-      "en": "Disable Advertising ID",
-      "ar": "تعطيل معرّف الإعلانات"
-    },
-    "description": {
-      "en": "Prevents apps from using the advertising ID for relevant ads across experiences.",
-      "ar": "منع التطبيقات من استخدام معرّف الإعلانات لتقديم إعلانات موجهة."
-    },
+    "name": "Disable Advertising ID",
+    "description": "Prevents apps from using the advertising ID for relevant ads across experiences.",
     "category": "privacy",
     "subcategory": "advertising",
     "risk": "Safe",
@@ -144,14 +126,8 @@
   {
     "schemaVersion": "1.0.0",
     "id": "privacy.experiences.tailored-experiences",
-    "name": {
-      "en": "Disable Tailored Experiences",
-      "ar": "تعطيل التجارب المخصصة"
-    },
-    "description": {
-      "en": "Stops Windows from offering personalized tips, ads, and recommendations based on diagnostic data.",
-      "ar": "منع ويندوز من تقديم نصائح وتوصيات وإعلانات مخصصة بناءً على البيانات التشخيصية."
-    },
+    "name": "Disable Tailored Experiences",
+    "description": "Stops Windows from offering personalized tips, ads, and recommendations based on diagnostic data.",
     "category": "privacy",
     "subcategory": "telemetry",
     "risk": "Safe",
@@ -208,14 +184,8 @@
   {
     "schemaVersion": "1.0.0",
     "id": "privacy.activity.activity-history",
-    "name": {
-      "en": "Disable Activity History Publishing",
-      "ar": "تعطيل نشر سجل الأنشطة"
-    },
-    "description": {
-      "en": "Prevents publishing and syncing of user activity history across devices.",
-      "ar": "منع نشر ومزامنة سجل أنشطة المستخدم عبر الأجهزة."
-    },
+    "name": "Disable Activity History Publishing",
+    "description": "Prevents publishing and syncing of user activity history across devices.",
     "category": "privacy",
     "subcategory": "activity",
     "risk": "Safe",
@@ -270,14 +240,8 @@
   {
     "schemaVersion": "1.0.0",
     "id": "privacy.speech.online-speech-recognition",
-    "name": {
-      "en": "Disable Online Speech Recognition",
-      "ar": "تعطيل التعرف على الصوت عبر الإنترنت"
-    },
-    "description": {
-      "en": "Disables cloud-based speech services, keeping dictation and speech processing offline.",
-      "ar": "تعطيل خدمات الصوت السحابية والاعتماد على المعالجة المحلية بدون إرسال الصوت عبر الإنترنت."
-    },
+    "name": "Disable Online Speech Recognition",
+    "description": "Disables cloud-based speech services, keeping dictation and speech processing offline.",
     "category": "privacy",
     "subcategory": "speech",
     "risk": "Safe",
@@ -333,14 +297,8 @@
   {
     "schemaVersion": "1.0.0",
     "id": "privacy.typing.inking-typing-personalization",
-    "name": {
-      "en": "Disable Inking & Typing Data Collection",
-      "ar": "تعطيل جمع بيانات الكتابة بالقلم والمفاتيح"
-    },
-    "description": {
-      "en": "Stops sending typing and handwriting sample data to Microsoft for dictionary improvements.",
-      "ar": "إيقاف إرسال عينات الكتابة بخط اليد والمفاتيح إلى مايكروسوفت لتحسين القاموس."
-    },
+    "name": "Disable Inking \u0026 Typing Data Collection",
+    "description": "Stops sending typing and handwriting sample data to Microsoft for dictionary improvements.",
     "category": "privacy",
     "subcategory": "typing",
     "risk": "Safe",
@@ -411,14 +369,8 @@
   {
     "schemaVersion": "1.0.0",
     "id": "privacy.tracking.app-launch-tracking",
-    "name": {
-      "en": "Disable App Launch Tracking",
-      "ar": "تعطيل تتبع تشغيل التطبيقات"
-    },
-    "description": {
-      "en": "Prevents Windows from tracking app launches to improve Start menu and search results.",
-      "ar": "منع ويندوز من تتبع التطبيقات التي تقوم بتشغيلها لتعديل قائمة ابدأ."
-    },
+    "name": "Disable App Launch Tracking",
+    "description": "Prevents Windows from tracking app launches to improve Start menu and search results.",
     "category": "privacy",
     "subcategory": "tracking",
     "risk": "Safe",
@@ -475,14 +427,8 @@
   {
     "schemaVersion": "1.0.0",
     "id": "privacy.feedback.feedback-prompts",
-    "name": {
-      "en": "Disable Feedback Frequency Prompts",
-      "ar": "تعطيل مطالبات الملاحظات التلقائية"
-    },
-    "description": {
-      "en": "Disables periodic popups asking for user feedback about Windows features.",
-      "ar": "تعطيل النوافذ المنبثقة الدورية التي تسألك عن رأيك في ميزات ويندوز."
-    },
+    "name": "Disable Feedback Frequency Prompts",
+    "description": "Disables periodic popups asking for user feedback about Windows features.",
     "category": "privacy",
     "subcategory": "feedback",
     "risk": "Safe",
@@ -538,14 +484,8 @@
   {
     "schemaVersion": "1.0.0",
     "id": "privacy.reporting.windows-error-reporting",
-    "name": {
-      "en": "Disable Windows Error Reporting",
-      "ar": "تعطيل تقارير أخطاء ويندوز"
-    },
-    "description": {
-      "en": "Disables automatic sending of crash dumps and error logs to Microsoft.",
-      "ar": "تعطيل الإرسال التلقائي لتقارير انهيار البرامج وملفات الذاكرة إلى مايكروسوفت."
-    },
+    "name": "Disable Windows Error Reporting",
+    "description": "Disables automatic sending of crash dumps and error logs to Microsoft.",
     "category": "privacy",
     "subcategory": "diagnostics",
     "risk": "Low",
@@ -600,14 +540,8 @@
   {
     "schemaVersion": "1.0.0",
     "id": "privacy.ceip.customer-experience-improvement",
-    "name": {
-      "en": "Disable Customer Experience Program (CEIP)",
-      "ar": "تعطيل برنامج تحسين تجربة المستخدم (CEIP)"
-    },
-    "description": {
-      "en": "Disables participation in the Windows Customer Experience Improvement telemetry program.",
-      "ar": "تعطيل المشاركة في برنامج مايكروسوفت لتحسين تجربة المستخدم والقياس عن بعد."
-    },
+    "name": "Disable Customer Experience Program (CEIP)",
+    "description": "Disables participation in the Windows Customer Experience Improvement telemetry program.",
     "category": "privacy",
     "subcategory": "telemetry",
     "risk": "Safe",
@@ -662,14 +596,8 @@
   {
     "schemaVersion": "1.0.0",
     "id": "privacy.clipboard.cloud-clipboard-sync",
-    "name": {
-      "en": "Disable Cloud Clipboard Sync",
-      "ar": "تعطيل مزامنة الحافظة السحابية"
-    },
-    "description": {
-      "en": "Stops clipboard content from synchronizing across multiple Windows devices.",
-      "ar": "منع مزامنة النصوص المنسوخة في الحافظة سحابياً عبر الأجهزة المختلفة."
-    },
+    "name": "Disable Cloud Clipboard Sync",
+    "description": "Stops clipboard content from synchronizing across multiple Windows devices.",
     "category": "privacy",
     "subcategory": "clipboard",
     "risk": "Safe",
@@ -724,14 +652,8 @@
   {
     "schemaVersion": "1.0.0",
     "id": "privacy.search.device-search-history",
-    "name": {
-      "en": "Disable Device Search History",
-      "ar": "تعطيل سجل البحث على الجهاز"
-    },
-    "description": {
-      "en": "Prevents Windows Search from saving local device search history.",
-      "ar": "منع بحث ويندوز من حفظ سجل عمليات البحث التي تجريها على جهازك محلياً."
-    },
+    "name": "Disable Device Search History",
+    "description": "Prevents Windows Search from saving local device search history.",
     "category": "privacy",
     "subcategory": "search",
     "risk": "Safe",
@@ -788,14 +710,8 @@
   {
     "schemaVersion": "1.0.0",
     "id": "privacy.spotlight.lockscreen-ads",
-    "name": {
-      "en": "Disable Lock Screen Tips & Spotlight Ads",
-      "ar": "تعطيل النصائح والإعلانات على شاشة القفل"
-    },
-    "description": {
-      "en": "Removes suggestions, tips, and promotional overlays from the Windows lock screen.",
-      "ar": "إزالة التلميحات والنصائح والإعلانات الترويجية من شاشة القفل."
-    },
+    "name": "Disable Lock Screen Tips \u0026 Spotlight Ads",
+    "description": "Removes suggestions, tips, and promotional overlays from the Windows lock screen.",
     "category": "privacy",
     "subcategory": "spotlight",
     "risk": "Safe",
@@ -854,14 +770,8 @@
   {
     "schemaVersion": "1.0.0",
     "id": "privacy.suggestions.start-menu-promotions",
-    "name": {
-      "en": "Disable Start Menu Suggested App Ads",
-      "ar": "تعطيل التطبيقات المقترحة والإعلانية في ابدأ"
-    },
-    "description": {
-      "en": "Prevents Windows from displaying recommended app store suggestions in the Start menu.",
-      "ar": "منع ويندوز من اقتراح وتثبيت تطبيقات المتجر الترويجية داخل قائمة ابدأ."
-    },
+    "name": "Disable Start Menu Suggested App Ads",
+    "description": "Prevents Windows from displaying recommended app store suggestions in the Start menu.",
     "category": "privacy",
     "subcategory": "suggestions",
     "risk": "Safe",
@@ -920,14 +830,8 @@
   {
     "schemaVersion": "1.0.0",
     "id": "privacy.location.disable-sensor",
-    "name": {
-      "en": "Disable System Location Sensor",
-      "ar": "تعطيل مستشعر الموقع الجغرافي للنظام"
-    },
-    "description": {
-      "en": "Disables hardware and software geolocation sensor overrides to prevent physical tracking.",
-      "ar": "تعطيل مستشعر الموقع الجغرافي لمنع التتبع الفيزيائي للجهاز."
-    },
+    "name": "Disable System Location Sensor",
+    "description": "Disables hardware and software geolocation sensor overrides to prevent physical tracking.",
     "category": "privacy",
     "subcategory": "location",
     "risk": "Safe",
@@ -985,14 +889,8 @@
   {
     "schemaVersion": "1.0.0",
     "id": "privacy.consent.deny-location",
-    "name": {
-      "en": "Deny Apps Access to Location by Default",
-      "ar": "حظر وصول التطبيقات للموقع الجغرافي افتراضياً"
-    },
-    "description": {
-      "en": "Sets default capability store permission to deny apps access to user physical location.",
-      "ar": "ضبط صلاحيات النظام لمنع وصول تطبيقات متجر ويندوز للموقع الجغرافي تلقائياً."
-    },
+    "name": "Deny Apps Access to Location by Default",
+    "description": "Sets default capability store permission to deny apps access to user physical location.",
     "category": "privacy",
     "subcategory": "permissions",
     "risk": "Safe",
@@ -1049,14 +947,8 @@
   {
     "schemaVersion": "1.0.0",
     "id": "privacy.consent.deny-microphone",
-    "name": {
-      "en": "Deny UWP Apps Access to Microphone by Default",
-      "ar": "حظر وصول تطبيقات UWP للميكروفون افتراضياً"
-    },
-    "description": {
-      "en": "Restricts UWP Store apps from silently listening to or accessing audio recording hardware.",
-      "ar": "منع تطبيقات المتجر من الوصول الصامت للمايكروفون أو تسجيل الصوت دون إذن."
-    },
+    "name": "Deny UWP Apps Access to Microphone by Default",
+    "description": "Restricts UWP Store apps from silently listening to or accessing audio recording hardware.",
     "category": "privacy",
     "subcategory": "permissions",
     "risk": "Low",
@@ -1113,14 +1005,8 @@
   {
     "schemaVersion": "1.0.0",
     "id": "privacy.consent.deny-webcam",
-    "name": {
-      "en": "Deny UWP Apps Access to Webcam by Default",
-      "ar": "حظر وصول تطبيقات UWP لكاميرا الويب افتراضياً"
-    },
-    "description": {
-      "en": "Blocks background UWP applications from capturing video frames through connected webcams.",
-      "ar": "منع تطبيقات المتجر بالخلفية من تشغيل كاميرات الويب والتقاط الصور."
-    },
+    "name": "Deny UWP Apps Access to Webcam by Default",
+    "description": "Blocks background UWP applications from capturing video frames through connected webcams.",
     "category": "privacy",
     "subcategory": "permissions",
     "risk": "Low",
@@ -1177,14 +1063,8 @@
   {
     "schemaVersion": "1.0.0",
     "id": "privacy.consent.deny-notifications",
-    "name": {
-      "en": "Deny Apps Access to User Notifications",
-      "ar": "حظر قراءة إشعارات المستخدم من قِبل التطبيقات"
-    },
-    "description": {
-      "en": "Blocks applications from intercepting or reading private notification listener messages.",
-      "ar": "منع التطبيقات من قراءة أو اعتراض رسائل إشعارات النظام الخاصة بالمستخدم."
-    },
+    "name": "Deny Apps Access to User Notifications",
+    "description": "Blocks applications from intercepting or reading private notification listener messages.",
     "category": "privacy",
     "subcategory": "permissions",
     "risk": "Safe",
@@ -1240,14 +1120,8 @@
   {
     "schemaVersion": "1.0.0",
     "id": "privacy.consent.deny-account-info",
-    "name": {
-      "en": "Deny Apps Access to Account Information",
-      "ar": "حظر وصول التطبيقات لبيانات حساب المستخدم"
-    },
-    "description": {
-      "en": "Prevents installed apps from accessing user display name, picture, and account identifier.",
-      "ar": "منع التطبيقات المثبتة من معرفة اسم المستخدم أو صورته أو بيانات حسابه الشخصي."
-    },
+    "name": "Deny Apps Access to Account Information",
+    "description": "Prevents installed apps from accessing user display name, picture, and account identifier.",
     "category": "privacy",
     "subcategory": "permissions",
     "risk": "Safe",
@@ -1304,14 +1178,8 @@
   {
     "schemaVersion": "1.0.0",
     "id": "privacy.consent.deny-contacts",
-    "name": {
-      "en": "Deny Apps Access to Contacts List",
-      "ar": "حظر وصول التطبيقات لقائمة جهات الاتصال"
-    },
-    "description": {
-      "en": "Blocks store and system applications from scraping address book contacts.",
-      "ar": "حظر التطبيقات من قراءة أو استخراج جهات الاتصال ودفتر العناوين الخاص بالمستخدم."
-    },
+    "name": "Deny Apps Access to Contacts List",
+    "description": "Blocks store and system applications from scraping address book contacts.",
     "category": "privacy",
     "subcategory": "permissions",
     "risk": "Safe",
@@ -1368,14 +1236,8 @@
   {
     "schemaVersion": "1.0.0",
     "id": "privacy.consent.deny-calendar",
-    "name": {
-      "en": "Deny Apps Access to User Calendar & Appointments",
-      "ar": "حظر وصول التطبيقات للمواعيد والتقويم"
-    },
-    "description": {
-      "en": "Prevents third-party apps from harvesting schedule and appointment calendar entries.",
-      "ar": "حظر التطبيقات غير المعتمدة من قراءة جدول المواعيد والتقويم الشخصي."
-    },
+    "name": "Deny Apps Access to User Calendar \u0026 Appointments",
+    "description": "Prevents third-party apps from harvesting schedule and appointment calendar entries.",
     "category": "privacy",
     "subcategory": "permissions",
     "risk": "Safe",
@@ -1431,14 +1293,8 @@
   {
     "schemaVersion": "1.0.0",
     "id": "privacy.consent.deny-diagnostics",
-    "name": {
-      "en": "Deny Apps Access to Other Apps Diagnostic Info",
-      "ar": "حظر وصول التطبيقات لمعلومات تشخيص التطبيقات الأخرى"
-    },
-    "description": {
-      "en": "Blocks third-party apps from querying memory and diagnostic stats of other running software.",
-      "ar": "منع التطبيقات من قراءة بيانات الذاكرة وتشخيص التطبيقات الأخرى المثبتة."
-    },
+    "name": "Deny Apps Access to Other Apps Diagnostic Info",
+    "description": "Blocks third-party apps from querying memory and diagnostic stats of other running software.",
     "category": "privacy",
     "subcategory": "permissions",
     "risk": "Safe",
@@ -1495,14 +1351,8 @@
   {
     "schemaVersion": "1.0.0",
     "id": "privacy.feedback.disable-frequency",
-    "name": {
-      "en": "Disable Windows Feedback Request Frequency",
-      "ar": "تعطيل تكرار استطلاعات رأي ويندوز"
-    },
-    "description": {
-      "en": "Configures Windows feedback prompt frequency to Never, suppressing feedback survey popups.",
-      "ar": "ضبط تكرار طلبات استطلاع الرأي والملاحظات في ويندوز إلى (أبداً) لمنع النوافذ المزعجة."
-    },
+    "name": "Disable Windows Feedback Request Frequency",
+    "description": "Configures Windows feedback prompt frequency to Never, suppressing feedback survey popups.",
     "category": "privacy",
     "subcategory": "feedback",
     "risk": "Safe",

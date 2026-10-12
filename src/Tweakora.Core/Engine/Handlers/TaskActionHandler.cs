@@ -5,7 +5,8 @@ namespace Tweakora.Core.Engine.Handlers;
 public sealed class TaskActionHandler : IActionHandler
 {
     public bool CanHandle(string actionType) =>
-        actionType.Equals("ScheduledTask", StringComparison.OrdinalIgnoreCase);
+        actionType.Equals("ScheduledTask", StringComparison.OrdinalIgnoreCase) ||
+        actionType.Equals("Task", StringComparison.OrdinalIgnoreCase);
 
     public Task<ActionResult> ExecuteAsync(ActionItem action, string tweakId, int actionIndex, ExecutionContext context)
     {

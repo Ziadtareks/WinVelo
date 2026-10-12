@@ -141,8 +141,8 @@ public sealed class TweakRunnerTests : IDisposable
         TweakDefinition tweak = new()
         {
             Id = "test.transaction.fail",
-            Name = new LocalizedString { En = "Tx Fail", Ar = "فشل" },
-            Description = new LocalizedString { En = "Transaction test", Ar = "اختبار" },
+            Name = "Tx Fail",
+            Description = "Transaction test",
             Category = "system",
             Risk = "Safe",
             Impacts = new List<string> { "system" },
@@ -207,8 +207,8 @@ public sealed class TweakRunnerTests : IDisposable
         return new TweakDefinition
         {
             Id = id,
-            Name = new LocalizedString { En = "Sample", Ar = "عينة" },
-            Description = new LocalizedString { En = "Sample description", Ar = "وصف" },
+            Name = "Sample",
+            Description = "Sample description",
             Category = "privacy",
             Risk = "Safe",
             Impacts = new List<string> { "privacy" },

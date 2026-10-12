@@ -161,6 +161,7 @@ public sealed class RollbackJournalManager
 
     private void FlushSessionUnsafe(RollbackJournalSession session)
     {
+        Directory.CreateDirectory(_journalDirectory);
         string filePath = Path.Combine(_journalDirectory, $"session-{session.SessionId}.json");
         string tempPath = filePath + ".tmp";
 

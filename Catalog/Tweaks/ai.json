@@ -2,20 +2,24 @@
   {
     "schemaVersion": "1.0.0",
     "id": "ai.copilot.disable-taskbar-button",
-    "name": {
-      "en": "Hide Copilot Taskbar Button",
-      "ar": "إخفاء زر كوبايلوت من شريط المهام"
-    },
-    "description": {
-      "en": "Hides the Copilot button from the Windows 11 taskbar.",
-      "ar": "إخفاء أيقونة مساعد كوبايلوت من شريط مهام ويندوز 11."
-    },
+    "name": "Hide Copilot Taskbar Button",
+    "description": "Hides the Copilot button from the Windows 11 taskbar.",
     "category": "ai",
     "subcategory": "copilot",
     "risk": "Safe",
-    "impacts": ["ui"],
-    "tags": ["copilot", "taskbar", "ai"],
-    "presets": ["recommended", "privacy", "minimal"],
+    "impacts": [
+      "ui"
+    ],
+    "tags": [
+      "copilot",
+      "taskbar",
+      "ai"
+    ],
+    "presets": [
+      "recommended",
+      "privacy",
+      "minimal"
+    ],
     "windows": {
       "minBuild": 22621,
       "maxBuild": null
@@ -58,24 +62,32 @@
   {
     "schemaVersion": "1.0.0",
     "id": "ai.copilot.disable-policy",
-    "name": {
-      "en": "Disable Windows Copilot Globally",
-      "ar": "تعطيل ويندوز كوبايلوت كلياً"
-    },
-    "description": {
-      "en": "Turns off the Windows Copilot assistant system-wide using policy.",
-      "ar": "تعطيل مساعد ويندوز كوبايلوت على كامل النظام باستخدام سياسة النظام."
-    },
+    "name": "Disable Windows Copilot Globally",
+    "description": "Turns off the Windows Copilot assistant system-wide using policy.",
     "category": "ai",
     "subcategory": "copilot",
     "risk": "Low",
-    "impacts": ["privacy", "ui"],
-    "tags": ["copilot", "ai", "policy"],
-    "presets": ["privacy"],
+    "impacts": [
+      "privacy",
+      "ui"
+    ],
+    "tags": [
+      "copilot",
+      "ai",
+      "policy"
+    ],
+    "presets": [
+      "privacy"
+    ],
     "windows": {
       "minBuild": 22621,
       "maxBuild": null,
-      "editions": ["Pro", "Enterprise", "Education", "IoTEnterprise"]
+      "editions": [
+        "Pro",
+        "Enterprise",
+        "Education",
+        "IoTEnterprise"
+      ]
     },
     "requiresReboot": false,
     "requiresExplorerRestart": true,
@@ -113,20 +125,25 @@
   {
     "schemaVersion": "1.0.0",
     "id": "ai.recall.disable-snapshots",
-    "name": {
-      "en": "Disable Windows Recall Snapshots",
-      "ar": "تعطيل التقاط لقطات ميزة الاسترجاع (Recall)"
-    },
-    "description": {
-      "en": "Prevents Windows from saving photographic snapshots of screen activities for Recall.",
-      "ar": "منع ويندوز من التقاط وحفظ لقطات شاشة دورية لأنشطتك لميزة الاسترجاع."
-    },
+    "name": "Disable Windows Recall Snapshots",
+    "description": "Prevents Windows from saving photographic snapshots of screen activities for Recall.",
     "category": "ai",
     "subcategory": "recall",
     "risk": "Safe",
-    "impacts": ["privacy", "storage", "performance"],
-    "tags": ["recall", "snapshots", "ai"],
-    "presets": ["recommended", "privacy"],
+    "impacts": [
+      "privacy",
+      "storage",
+      "performance"
+    ],
+    "tags": [
+      "recall",
+      "snapshots",
+      "ai"
+    ],
+    "presets": [
+      "recommended",
+      "privacy"
+    ],
     "windows": {
       "minBuild": 26100,
       "maxBuild": null
@@ -167,20 +184,26 @@
   {
     "schemaVersion": "1.0.0",
     "id": "ai.search.disable-bing-web-search",
-    "name": {
-      "en": "Disable Bing Web Search in Start Menu",
-      "ar": "تعطيل بحث بينغ السحابي في قائمة ابدأ"
-    },
-    "description": {
-      "en": "Restricts Start menu search to local files, settings, and apps without querying Bing.",
-      "ar": "قصر البحث في قائمة ابدأ على الملفات والتطبيقات المحلية فقط بدون البحث في بينغ عبر الويب."
-    },
+    "name": "Disable Bing Web Search in Start Menu",
+    "description": "Restricts Start menu search to local files, settings, and apps without querying Bing.",
     "category": "ai",
     "subcategory": "search",
     "risk": "Safe",
-    "impacts": ["privacy", "performance", "ui"],
-    "tags": ["bing", "search", "websearch"],
-    "presets": ["recommended", "privacy", "minimal"],
+    "impacts": [
+      "privacy",
+      "performance",
+      "ui"
+    ],
+    "tags": [
+      "bing",
+      "search",
+      "websearch"
+    ],
+    "presets": [
+      "recommended",
+      "privacy",
+      "minimal"
+    ],
     "windows": {
       "minBuild": 19041,
       "maxBuild": null

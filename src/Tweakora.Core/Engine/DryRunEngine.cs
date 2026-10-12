@@ -30,7 +30,7 @@ public sealed class DryRunEngine
             TweakPreview preview = new()
             {
                 TweakId = tweak.Id,
-                Name = tweak.Name.En,
+                Name = tweak.Name,
                 Risk = tweak.Risk
             };
 

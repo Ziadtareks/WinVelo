@@ -29,14 +29,8 @@ Every tweak in Tweakora is data-driven, defined as a JSON document in the `Catal
   {
     "schemaVersion": "1.0.0",
     "id": "ui.explorer.classic-context-menu",
-    "name": {
-      "en": "Enable Windows 10 Classic Context Menu",
-      "ar": "تفعيل قائمة الزر الأيمن الكلاسيكية"
-    },
-    "description": {
-      "en": "Restores the classic right-click context menu in Windows 11 File Explorer without requiring 'Show more options'.",
-      "ar": "استعادة قائمة الزر الأيمن الكاملة في مستكشف ملفات ويندوز 11 دون الحاجة للضغط على خيارات إضافية."
-    },
+    "name": "Enable Windows 10 Classic Context Menu",
+    "description": "Restores the classic right-click context menu in Windows 11 File Explorer without requiring 'Show more options'.",
     "category": "UI",
     "subcategory": "Explorer",
     "risk": "Safe",

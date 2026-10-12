@@ -2,14 +2,8 @@
   {
     "schemaVersion": "1.0.0",
     "id": "updates.drivers.exclude-from-updates",
-    "name": {
-      "en": "Exclude Hardware Drivers from Windows Update",
-      "ar": "استبعاد تعريفات العتاد من تحديثات ويندوز"
-    },
-    "description": {
-      "en": "Prevents Windows Update from automatically replacing your dedicated GPU or chipset drivers.",
-      "ar": "منع تحديثات ويندوز من استبدال تعريفات كارت الشاشة أو اللوحة الأم بتعريفات افتراضية."
-    },
+    "name": "Exclude Hardware Drivers from Windows Update",
+    "description": "Prevents Windows Update from automatically replacing your dedicated GPU or chipset drivers.",
     "category": "updates",
     "subcategory": "drivers",
     "risk": "Low",
@@ -65,14 +59,8 @@
   {
     "schemaVersion": "1.0.0",
     "id": "updates.reboot.disable-auto-reboot-logged-on",
-    "name": {
-      "en": "Prevent Forced Auto-Reboot While Logged On",
-      "ar": "منع إعادة التشغيل الإجباري أثناء استخدام الجهاز"
-    },
-    "description": {
-      "en": "Stops Windows Update from forcibly restarting your PC when updates install while you are logged in.",
-      "ar": "منع ويندوز من إعادة التشغيل المفاجئ لتثبيت التحديثات أثناء وجودك وتسجيل دخولك على الجهاز."
-    },
+    "name": "Prevent Forced Auto-Reboot While Logged On",
+    "description": "Stops Windows Update from forcibly restarting your PC when updates install while you are logged in.",
     "category": "updates",
     "subcategory": "reboot",
     "risk": "Safe",
@@ -126,14 +114,8 @@
   {
     "schemaVersion": "1.0.0",
     "id": "updates.au.notify-download",
-    "name": {
-      "en": "Notify Before Downloading Windows Updates",
-      "ar": "تنبيه المستخدم قبل تنزيل تحديثات ويندوز"
-    },
-    "description": {
-      "en": "Configures Automatic Updates to AUOptions 2 (notify before downloading) to prevent unexpected bandwidth spikes.",
-      "ar": "ضبط تحديثات ويندوز التلقائية للتنبيه قبل بدء التنزيل لمنع استهلاك سرعة الإنترنت فجأة."
-    },
+    "name": "Notify Before Downloading Windows Updates",
+    "description": "Configures Automatic Updates to AUOptions 2 (notify before downloading) to prevent unexpected bandwidth spikes.",
     "category": "updates",
     "subcategory": "schedule",
     "risk": "Safe",
@@ -189,14 +171,8 @@
   {
     "schemaVersion": "1.0.0",
     "id": "updates.peering.metered-connections",
-    "name": {
-      "en": "Block Delivery Optimization on Metered Connections",
-      "ar": "حظر تحسين التوصيل P2P عبر الشبكات المحدودة"
-    },
-    "description": {
-      "en": "Prevents Windows Update from downloading or sharing update files when connected to metered networks or hotspots.",
-      "ar": "منع مشاركة أو تنزيل تحديثات ويندوز عبر اتصالات الشبكات ذات الباقات المحدودة ونقاط الاتصال الشخصية."
-    },
+    "name": "Block Delivery Optimization on Metered Connections",
+    "description": "Prevents Windows Update from downloading or sharing update files when connected to metered networks or hotspots.",
     "category": "updates",
     "subcategory": "bandwidth",
     "risk": "Safe",
@@ -252,14 +228,8 @@
   {
     "schemaVersion": "1.0.0",
     "id": "updates.activehours.enable-policy",
-    "name": {
-      "en": "Enforce Active Hours Policy Against Mid-Day Restarts",
-      "ar": "فرض سياسة ساعات النشاط لمنع إعادة التشغيل أثناء العمل"
-    },
-    "description": {
-      "en": "Enforces smart active hours window (8 AM to 10 PM) so automatic restarts never interrupt daily activities.",
-      "ar": "تفعيل نافذة ساعات النشاط الذكية لمنع إعادة التشغيل العشوائي لتثبيت التحديثات في أوقات العمل."
-    },
+    "name": "Enforce Active Hours Policy Against Mid-Day Restarts",
+    "description": "Enforces smart active hours window (8 AM to 10 PM) so automatic restarts never interrupt daily activities.",
     "category": "updates",
     "subcategory": "schedule",
     "risk": "Safe",
@@ -314,14 +284,8 @@
   {
     "schemaVersion": "1.0.0",
     "id": "updates.preview.disable-optional-content",
-    "name": {
-      "en": "Disable Optional Preview Updates & Beta Rollouts",
-      "ar": "تعطيل التحديثات التجريبية الاختيارية (Preview Updates)"
-    },
-    "description": {
-      "en": "Prevents installation of untested preview quality updates (C/D week optional releases).",
-      "ar": "منع تثبيت التحديثات التجريبية الاختيارية غير المستقرة لضمان استقرار وصلابة النظام."
-    },
+    "name": "Disable Optional Preview Updates \u0026 Beta Rollouts",
+    "description": "Prevents installation of untested preview quality updates (C/D week optional releases).",
     "category": "updates",
     "subcategory": "quality",
     "risk": "Safe",

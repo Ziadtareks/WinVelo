@@ -49,7 +49,7 @@ public static class Program
             Console.WriteLine("\nAvailable Tweaks in Catalog:");
             foreach (var t in catalog)
             {
-                Console.WriteLine($"  - [{t.Risk,-6}] {t.Id}: {t.Name.En} (Category: {t.Category})");
+                Console.WriteLine($"  - [{t.Risk,-6}] {t.Id}: {t.Name} (Category: {t.Category})");
             }
             return 0;
         }

@@ -91,13 +91,13 @@ public sealed class TweakDefinition
     public string Id { get; set; } = string.Empty;
 
     [JsonPropertyName("name")]
-    public LocalizedString Name { get; set; } = new();
+    public string Name { get; set; } = string.Empty;
 
     [JsonPropertyName("description")]
-    public LocalizedString Description { get; set; } = new();
+    public string Description { get; set; } = string.Empty;
 
     [JsonPropertyName("effectNote")]
-    public LocalizedString? EffectNote { get; set; }
+    public string? EffectNote { get; set; }
 
     [JsonPropertyName("category")]
     public string Category { get; set; } = string.Empty;
@@ -148,5 +148,5 @@ public sealed class TweakDefinition
     public string VerifiedOnBuild { get; set; } = string.Empty;
 
     [JsonPropertyName("warnings")]
-    public LocalizedString? Warnings { get; set; }
+    public string? Warnings { get; set; }
 }

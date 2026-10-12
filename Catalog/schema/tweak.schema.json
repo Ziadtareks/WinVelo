@@ -28,31 +28,15 @@
       "pattern": "^[a-z0-9]+(\\.[a-z0-9-]+)+$"
     },
     "name": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["en", "ar"],
-      "properties": {
-        "en": { "type": "string", "minLength": 3 },
-        "ar": { "type": "string", "minLength": 3 }
-      }
+      "type": "string",
+      "minLength": 3
     },
     "description": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["en", "ar"],
-      "properties": {
-        "en": { "type": "string", "minLength": 10 },
-        "ar": { "type": "string", "minLength": 10 }
-      }
+      "type": "string",
+      "minLength": 10
     },
     "effectNote": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["en", "ar"],
-      "properties": {
-        "en": { "type": "string" },
-        "ar": { "type": "string" }
-      }
+      "type": "string"
     },
     "category": {
       "type": "string",
@@ -129,12 +113,7 @@
     },
     "verifiedOnBuild": { "type": "string" },
     "warnings": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "en": { "type": "string" },
-        "ar": { "type": "string" }
-      }
+      "type": "string"
     }
   },
   "definitions": {

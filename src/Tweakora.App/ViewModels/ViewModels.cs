@@ -568,7 +568,6 @@ public sealed partial class MainViewModel : ViewModelBase
         _allPaletteItems.Add(new PaletteItem { Title = "Presets & Profiles", Subtitle = "Apply Recommended, Privacy, or Gaming profiles", Category = "Page", IconSymbol = "Bookmark24", ActionToExecute = () => Navigate("Presets") });
         _allPaletteItems.Add(new PaletteItem { Title = "Settings", Subtitle = "Configure language, theme, and safety options", Category = "Page", IconSymbol = "Settings24", ActionToExecute = () => Navigate("Settings") });
         _allPaletteItems.Add(new PaletteItem { Title = "Toggle Dark/Light Theme", Subtitle = "Switch application appearance theme", Category = "Action", IconSymbol = "DarkTheme24", ActionToExecute = ToggleTheme });
-        _allPaletteItems.Add(new PaletteItem { Title = "Toggle Language (العربية / English)", Subtitle = "Switch UI language and RTL layout", Category = "Action", IconSymbol = "LocalLanguage24", ActionToExecute = ToggleLanguage });
         _allPaletteItems.Add(new PaletteItem { Title = "Toggle Activity Log", Subtitle = "Show or hide live debug log sink drawer", Category = "Action", IconSymbol = "DocumentBulletList24", ActionToExecute = ToggleLogPanel });
 
         FilterPalette();
@@ -634,14 +633,6 @@ public sealed partial class MainViewModel : ViewModelBase
     private void ToggleLogPanel()
     {
         IsLogPanelOpen = !IsLogPanelOpen;
-    }
-
-    [RelayCommand]
-    private void ToggleLanguage()
-    {
-        string newLang = Localization.CurrentLanguage == "en" ? "ar" : "en";
-        Localization.SetLanguage(newLang);
-        Serilog.Log.Information("Toggled language to: {Language}", newLang);
     }
 
     [RelayCommand]

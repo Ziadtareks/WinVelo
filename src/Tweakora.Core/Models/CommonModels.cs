@@ -2,20 +2,6 @@ using System.Text.Json.Serialization;
 
 namespace Tweakora.Core.Models;
 
-public sealed class LocalizedString
-{
-    [JsonPropertyName("en")]
-    public string En { get; set; } = string.Empty;
-
-    [JsonPropertyName("ar")]
-    public string Ar { get; set; } = string.Empty;
-
-    public string Get(string languageCode) =>
-        languageCode.StartsWith("ar", StringComparison.OrdinalIgnoreCase) ? Ar : En;
-
-    public override string ToString() => En;
-}
-
 public sealed class WindowsRequirements
 {
     [JsonPropertyName("minBuild")]

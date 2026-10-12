@@ -11,18 +11,6 @@
 
 ---
 
-## 🌍 Arabic Overview | نبذة باللغة العربية
-
-**تويكورا (Tweakora)** هو تطبيق مجاني ومفتوح المصدر لإدارة وتحسين نظام ويندوز 10 و 11. تم تصميمه بمعايير أمان صارمة تضمن استرجاع أي تعديل بسهولة.
-
-- **84 تعديل موثق وآمن**: جميع التعديلات مستندة إلى توثيقات مايكروسوفت الرسمية.
-- **سجل تراجع فوري (Rollback Journal)**: حفظ الحالة الأصلية للنظام قبل إجراء أي تعديل للرجوع إليها في أي وقت.
-- **واجهة عصرية بتصميم مايكروسوفت Fluent**: تدعم المظهر الداكن والفاتح، واللغتين العربية والإنجليزية مع دعم كامل لاتجاه الشاشات من اليمين لليسار (RTL).
-- **أدوات صيانة متكاملة**: إدارة برامج بدء التشغيل، إدارة الخدمات، تنظيف الملفات المؤقتة، متجر تطبيقات WinGet، إصلاح المشاكل الشائعة، وتسريع خوادم DNS.
-- **آمن بنسبة 100%**: لا يحتوي على أي برمجيات تتبع أو إعلانات، ويعمل بدون اتصال بالإنترنت.
-
----
-
 ## 🌟 Key Features
 
 ### 1. Reversible by Design
@@ -61,7 +49,7 @@ Every tweak in Tweakora has a documented source (Microsoft Learn / official docs
 
 ### 5. Modern Fluent UI
 - Built with **WPF UI** (`lepoco/wpfui`) featuring Windows 11 Mica material and dark/light modes.
-- Dual English & Arabic localization with runtime layout mirroring (RTL).
+- Dark and Light themes with dynamic switching and extensible localization support.
 - **Command Palette (`Ctrl+K`)**: Rapid keyboard-first navigation across all tweaks and tools.
 
 ---

@@ -1,7 +1,6 @@
 using System.ComponentModel;
 using System.Globalization;
 using System.Runtime.CompilerServices;
-using System.Windows;
 
 namespace Tweakora.App.Localization;
 
@@ -11,9 +10,8 @@ public sealed class LocalizationManager : INotifyPropertyChanged
     public static LocalizationManager Instance => _instance.Value;
 
     private string _currentLanguage = "en";
-    private FlowDirection _currentFlowDirection = FlowDirection.LeftToRight;
 
-    private readonly Dictionary<string, string> _enStrings = new(StringComparer.OrdinalIgnoreCase)
+    private readonly Dictionary<string, string> _strings = new(StringComparer.OrdinalIgnoreCase)
     {
         ["AppTitle"] = "Tweakora - Windows Control Center",
         ["NavHome"] = "Dashboard",
@@ -27,7 +25,6 @@ public sealed class LocalizationManager : INotifyPropertyChanged
         ["ThemeDark"] = "Dark",
         ["Language"] = "Language",
         ["LanguageEn"] = "English",
-        ["LanguageAr"] = "العربية",
         ["StatusReady"] = "Ready",
         ["LogTitle"] = "Activity Log",
         ["SearchPlaceholder"] = "Search tweaks, tools, and settings...",
@@ -42,39 +39,7 @@ public sealed class LocalizationManager : INotifyPropertyChanged
         ["PresetsTitle"] = "System Presets",
         ["PresetsSubtitle"] = "Apply tested configurations tailored for Recommended, Gaming, or Privacy.",
         ["SettingsTitle"] = "Preferences & Backup Settings",
-        ["SettingsSubtitle"] = "Configure language, theme, and safety defaults."
-    };
-
-    private readonly Dictionary<string, string> _arStrings = new(StringComparer.OrdinalIgnoreCase)
-    {
-        ["AppTitle"] = "تويكورا - مركز التحكم في ويندوز",
-        ["NavHome"] = "لوحة التحكم",
-        ["NavTweaks"] = "التعديلات",
-        ["NavTools"] = "صندوق الأدوات",
-        ["NavApps"] = "مثبت البرامج",
-        ["NavPresets"] = "الإعدادات المسبقة",
-        ["NavSettings"] = "الإعدادات",
-        ["Theme"] = "المظهر",
-        ["ThemeLight"] = "فاتح",
-        ["ThemeDark"] = "داكن",
-        ["Language"] = "اللغة",
-        ["LanguageEn"] = "English",
-        ["LanguageAr"] = "العربية",
-        ["StatusReady"] = "جاهز",
-        ["LogTitle"] = "سجل النشاط",
-        ["SearchPlaceholder"] = "ابحث عن التعديلات والأدوات والإعدادات...",
-        ["DashboardWelcome"] = "مرحبًا بك في تويكورا",
-        ["DashboardSubtitle"] = "مركز آمن وقابل للاسترجاع لتحسين والتحكم في ويندوز 10 و 11.",
-        ["TweaksTitle"] = "تعديلات ويندوز",
-        ["TweaksSubtitle"] = "كل تعديل قابل للتراجع ومحفوظ في سجل الاسترجاع المسبق.",
-        ["ToolsTitle"] = "صندوق الأدوات المدمج",
-        ["ToolsSubtitle"] = "أدوات النظام: المنظف الذكي، بدء التشغيل، الخدمات، إلغاء التثبيت، والشبكة.",
-        ["AppsTitle"] = "مثبت البرامج (WinGet)",
-        ["AppsSubtitle"] = "تثبيت وتحديث البرامج بأمان عبر مدير حزم ويندوز الرسمي.",
-        ["PresetsTitle"] = "الإعدادات المسبقة",
-        ["PresetsSubtitle"] = "تطبيق إعدادات مخصصة ومختبرة للموصى به، الألعاب، أو الخصوصية.",
-        ["SettingsTitle"] = "التفضيلات وإعدادات النسخ الاحتياطي",
-        ["SettingsSubtitle"] = "تخصيص اللغة، المظهر، وخيارات الأمان الافتراضية."
+        ["SettingsSubtitle"] = "Configure appearance, experience mode, and safety defaults."
     };
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -88,21 +53,7 @@ public sealed class LocalizationManager : INotifyPropertyChanged
             {
                 _currentLanguage = value;
                 OnPropertyChanged();
-                OnPropertyChanged(nameof(CurrentFlowDirection));
                 OnPropertyChanged("Item[]");
-            }
-        }
-    }
-
-    public FlowDirection CurrentFlowDirection
-    {
-        get => _currentFlowDirection;
-        private set
-        {
-            if (_currentFlowDirection != value)
-            {
-                _currentFlowDirection = value;
-                OnPropertyChanged();
             }
         }
     }
@@ -111,14 +62,8 @@ public sealed class LocalizationManager : INotifyPropertyChanged
     {
         get
         {
-            if (_currentLanguage.Equals("ar", StringComparison.OrdinalIgnoreCase))
-            {
-                if (_arStrings.TryGetValue(key, out string? arVal))
-                    return arVal;
-            }
-
-            if (_enStrings.TryGetValue(key, out string? enVal))
-                return enVal;
+            if (_strings.TryGetValue(key, out string? val))
+                return val;
 
             return key;
         }
@@ -126,11 +71,8 @@ public sealed class LocalizationManager : INotifyPropertyChanged
 
     public void SetLanguage(string languageCode)
     {
-        string normalized = languageCode.StartsWith("ar", StringComparison.OrdinalIgnoreCase) ? "ar" : "en";
-        CurrentLanguage = normalized;
-        CurrentFlowDirection = normalized == "ar" ? FlowDirection.RightToLeft : FlowDirection.LeftToRight;
-
-        CultureInfo culture = new(normalized == "ar" ? "ar-SA" : "en-US");
+        CurrentLanguage = languageCode;
+        CultureInfo culture = new(languageCode.Equals("en", StringComparison.OrdinalIgnoreCase) ? "en-US" : languageCode);
         Thread.CurrentThread.CurrentCulture = culture;
         Thread.CurrentThread.CurrentUICulture = culture;
     }

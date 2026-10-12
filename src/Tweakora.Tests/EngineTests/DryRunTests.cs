@@ -44,8 +44,8 @@ public sealed class DryRunTests
         TweakDefinition tweak = new()
         {
             Id = "privacy.telemetry.preview",
-            Name = new LocalizedString { En = "Telemetry", Ar = "البيانات" },
-            Description = new LocalizedString { En = "Reduce data", Ar = "تقليل" },
+            Name = "Telemetry",
+            Description = "Reduce data",
             Category = "privacy",
             Risk = "Safe",
             Impacts = new List<string> { "privacy" },

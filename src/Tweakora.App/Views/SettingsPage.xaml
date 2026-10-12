@@ -64,15 +64,12 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <StackPanel Grid.Column="0">
-                        <TextBlock Text="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[Language]}" FontSize="16" FontWeight="SemiBold" />
-                        <TextBlock Text="Select your preferred application language / اختر لغة الواجهة"
+                        <TextBlock Text="Application Language" FontSize="16" FontWeight="SemiBold" />
+                        <TextBlock Text="Tweakora interface language."
                                    Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12" Margin="0,4,0,0" />
                     </StackPanel>
                     <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                        <ui:Button Content="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[LanguageEn]}"
-                                   Command="{Binding SwitchLanguageCommand}" CommandParameter="en" Margin="0,0,8,0" />
-                        <ui:Button Content="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[LanguageAr]}"
-                                   Command="{Binding SwitchLanguageCommand}" CommandParameter="ar" />
+                        <ui:Button Content="English (en-US)" IsEnabled="False" />
                     </StackPanel>
                 </Grid>
             </ui:Card>

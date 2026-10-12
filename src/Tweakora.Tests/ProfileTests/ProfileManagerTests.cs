@@ -67,8 +67,8 @@ public class ProfileManagerTests
             new()
             {
                 Id = "test.tweak1",
-                Name = new LocalizedString { En = "Test Tweak 1", Ar = "اختبار 1" },
-                Description = new LocalizedString { En = "Desc 1", Ar = "وصف 1" },
+                Name = "Test Tweak 1",
+                Description = "Desc 1",
                 Apply = new List<ActionItem>
                 {
                     new()
@@ -86,8 +86,8 @@ public class ProfileManagerTests
             new()
             {
                 Id = "test.tweak2",
-                Name = new LocalizedString { En = "Test Tweak 2", Ar = "اختبار 2" },
-                Description = new LocalizedString { En = "Desc 2", Ar = "وصف 2" },
+                Name = "Test Tweak 2",
+                Description = "Desc 2",
                 Apply = new List<ActionItem>
                 {
                     new()
@@ -126,8 +126,8 @@ public class ProfileManagerTests
             new()
             {
                 Id = "test.tweak1",
-                Name = new LocalizedString { En = "Test Tweak 1", Ar = "اختبار 1" },
-                Description = new LocalizedString { En = "Desc 1", Ar = "وصف 1" },
+                Name = "Test Tweak 1",
+                Description = "Desc 1",
                 Category = "Privacy",
                 Apply = new List<ActionItem>
                 {

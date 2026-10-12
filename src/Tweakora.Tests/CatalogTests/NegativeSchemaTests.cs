@@ -76,8 +76,8 @@ public sealed class NegativeSchemaTests
         {
             ["schemaVersion"] = "1.0.0",
             ["id"] = "test.sample.rule",
-            ["name"] = new JsonObject { ["en"] = "Test Rule", ["ar"] = "قاعدة تجريبية" },
-            ["description"] = new JsonObject { ["en"] = "A valid test rule for schema checks.", ["ar"] = "قاعدة تجريبية صالحة للتحقق." },
+            ["name"] = "Test Rule",
+            ["description"] = "A valid test rule for schema checks.",
             ["category"] = "privacy",
             ["risk"] = "Safe",
             ["impacts"] = new JsonArray { "privacy" },

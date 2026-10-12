@@ -28,17 +28,10 @@ public sealed partial class TweakCardModel : ObservableObject
     public bool RequiresExplorerRestart => Tweak.RequiresExplorerRestart;
     public string SourceUrl => Tweak.Source.ValueKind == JsonValueKind.String ? Tweak.Source.GetString() ?? "" : "";
 
-    public string LocalizedName =>
-        Tweak.Name.Get(LocalizationManager.Instance.CurrentLanguage);
-
-    public string LocalizedDescription =>
-        Tweak.Description.Get(LocalizationManager.Instance.CurrentLanguage);
-
-    public string? LocalizedEffectNote =>
-        Tweak.EffectNote?.Get(LocalizationManager.Instance.CurrentLanguage);
-
-    public string? LocalizedWarning =>
-        Tweak.Warnings?.Get(LocalizationManager.Instance.CurrentLanguage);
+    public string LocalizedName => Tweak.Name;
+    public string LocalizedDescription => Tweak.Description;
+    public string? LocalizedEffectNote => Tweak.EffectNote;
+    public string? LocalizedWarning => Tweak.Warnings;
 
     public string RiskBadgeBackground => Risk switch
     {

@@ -2,20 +2,23 @@
   {
     "schemaVersion": "1.0.0",
     "id": "system.security.disable-remote-assistance",
-    "name": {
-      "en": "Disable Remote Assistance",
-      "ar": "تعطيل المساعدة عن بعد"
-    },
-    "description": {
-      "en": "Disables Windows Remote Assistance (Easy Connect and invitation files) to close unsolicited remote help access.",
-      "ar": "تعطيل المساعدة عن بعد في ويندوز لمنع جلسات الدعم والمساعدة غير المصرح بها."
-    },
+    "name": "Disable Remote Assistance",
+    "description": "Disables Windows Remote Assistance (Easy Connect and invitation files) to close unsolicited remote help access.",
     "category": "system",
     "subcategory": "Security",
     "risk": "Safe",
-    "impacts": ["security"],
-    "tags": ["remote", "security", "assistance"],
-    "presets": ["recommended", "minimal"],
+    "impacts": [
+      "security"
+    ],
+    "tags": [
+      "remote",
+      "security",
+      "assistance"
+    ],
+    "presets": [
+      "recommended",
+      "minimal"
+    ],
     "windows": {
       "minBuild": 19041,
       "maxBuild": null
@@ -58,20 +61,23 @@
   {
     "schemaVersion": "1.0.0",
     "id": "system.security.disable-autorun",
-    "name": {
-      "en": "Disable AutoRun & AutoPlay on All Drives",
-      "ar": "تعطيل التشغيل التلقائي لكافة محركات الأقراص"
-    },
-    "description": {
-      "en": "Prevents malicious executables on USB drives and external media from executing automatically.",
-      "ar": "منع تشغيل البرامج التلقائية من محركات أقراص USB والوسائط الخارجية لحماية النظام."
-    },
+    "name": "Disable AutoRun \u0026 AutoPlay on All Drives",
+    "description": "Prevents malicious executables on USB drives and external media from executing automatically.",
     "category": "system",
     "subcategory": "Security",
     "risk": "Safe",
-    "impacts": ["security"],
-    "tags": ["autoplay", "autorun", "usb", "security"],
-    "presets": ["recommended"],
+    "impacts": [
+      "security"
+    ],
+    "tags": [
+      "autoplay",
+      "autorun",
+      "usb",
+      "security"
+    ],
+    "presets": [
+      "recommended"
+    ],
     "windows": {
       "minBuild": 19041,
       "maxBuild": null
@@ -114,20 +120,23 @@
   {
     "schemaVersion": "1.0.0",
     "id": "system.security.disable-wsh",
-    "name": {
-      "en": "Disable Windows Script Host (VBS/JS Scripts)",
-      "ar": "تعطيل محرك Windows Script Host للبرامج النصية"
-    },
-    "description": {
-      "en": "Blocks execution of standalone .vbs and .js scripts, preventing common malware vectors.",
-      "ar": "حظر تشغيل ملفات البرمجة النصية .vbs و .js لمنع هجمات البرمجيات الضارة."
-    },
+    "name": "Disable Windows Script Host (VBS/JS Scripts)",
+    "description": "Blocks execution of standalone .vbs and .js scripts, preventing common malware vectors.",
     "category": "system",
     "subcategory": "Security",
     "risk": "Low",
-    "impacts": ["security"],
-    "tags": ["wsh", "vbs", "scripts", "security"],
-    "presets": ["recommended"],
+    "impacts": [
+      "security"
+    ],
+    "tags": [
+      "wsh",
+      "vbs",
+      "scripts",
+      "security"
+    ],
+    "presets": [
+      "recommended"
+    ],
     "windows": {
       "minBuild": 19041,
       "maxBuild": null
@@ -170,20 +179,22 @@
   {
     "schemaVersion": "1.0.0",
     "id": "system.security.enable-smartscreen-edge",
-    "name": {
-      "en": "Enforce Windows Defender SmartScreen",
-      "ar": "تفعيل حماية Windows Defender SmartScreen"
-    },
-    "description": {
-      "en": "Enforces SmartScreen checks against malicious sites, downloads, and unverified executables.",
-      "ar": "فرض فحص SmartScreen للحماية من المواقع الخبيثة والملفات التنفيذية غير الموثوقة."
-    },
+    "name": "Enforce Windows Defender SmartScreen",
+    "description": "Enforces SmartScreen checks against malicious sites, downloads, and unverified executables.",
     "category": "system",
     "subcategory": "Security",
     "risk": "Safe",
-    "impacts": ["security"],
-    "tags": ["smartscreen", "security", "defender"],
-    "presets": ["recommended"],
+    "impacts": [
+      "security"
+    ],
+    "tags": [
+      "smartscreen",
+      "security",
+      "defender"
+    ],
+    "presets": [
+      "recommended"
+    ],
     "windows": {
       "minBuild": 19041,
       "maxBuild": null
@@ -224,20 +235,23 @@
   {
     "schemaVersion": "1.0.0",
     "id": "system.security.disable-llmnr",
-    "name": {
-      "en": "Disable Link-Local Multicast Name Resolution (LLMNR)",
-      "ar": "تعطيل بروتوكول استبانة الأسماء المحلي (LLMNR)"
-    },
-    "description": {
-      "en": "Disables LLMNR on local networks to eliminate hash-stealing and man-in-the-middle poison attacks.",
-      "ar": "تعطيل LLMNR لمنع هجمات التسميم وسرقة بيانات اعتماد NTLM عبر الشبكة المحلية."
-    },
+    "name": "Disable Link-Local Multicast Name Resolution (LLMNR)",
+    "description": "Disables LLMNR on local networks to eliminate hash-stealing and man-in-the-middle poison attacks.",
     "category": "system",
     "subcategory": "Security",
     "risk": "Safe",
-    "impacts": ["security"],
-    "tags": ["llmnr", "dns", "security", "network"],
-    "presets": ["recommended"],
+    "impacts": [
+      "security"
+    ],
+    "tags": [
+      "llmnr",
+      "dns",
+      "security",
+      "network"
+    ],
+    "presets": [
+      "recommended"
+    ],
     "windows": {
       "minBuild": 19041,
       "maxBuild": null
@@ -278,20 +292,22 @@
   {
     "schemaVersion": "1.0.0",
     "id": "system.security.disable-rdp-auto-enable",
-    "name": {
-      "en": "Ensure Remote Desktop Inbound Access is Disabled",
-      "ar": "التأكد من تعطيل اتصالات سطح المكتب البعيد الواردة"
-    },
-    "description": {
-      "en": "Prevents unauthorized inbound RDP connections on port 3389.",
-      "ar": "منع اتصالات سطح المكتب البعيد RDP الواردة غير المصرح بها لحماية المنفذ 3389."
-    },
+    "name": "Ensure Remote Desktop Inbound Access is Disabled",
+    "description": "Prevents unauthorized inbound RDP connections on port 3389.",
     "category": "system",
     "subcategory": "Security",
     "risk": "Safe",
-    "impacts": ["security"],
-    "tags": ["rdp", "remote-desktop", "security"],
-    "presets": ["recommended"],
+    "impacts": [
+      "security"
+    ],
+    "tags": [
+      "rdp",
+      "remote-desktop",
+      "security"
+    ],
+    "presets": [
+      "recommended"
+    ],
     "windows": {
       "minBuild": 19041,
       "maxBuild": null
@@ -334,20 +350,25 @@
   {
     "schemaVersion": "1.0.0",
     "id": "system.security.disable-lockscreen-camera",
-    "name": {
-      "en": "Disable Camera Access on Lock Screen",
-      "ar": "تعطيل استخدام الكاميرا من شاشة القفل"
-    },
-    "description": {
-      "en": "Prevents anyone from launching or accessing the webcam when the computer is locked.",
-      "ar": "منع تشغيل كاميرا الويب أو استخدامها أثناء قفل شاشة الحاسوب."
-    },
+    "name": "Disable Camera Access on Lock Screen",
+    "description": "Prevents anyone from launching or accessing the webcam when the computer is locked.",
     "category": "system",
     "subcategory": "Security",
     "risk": "Safe",
-    "impacts": ["security", "privacy"],
-    "tags": ["camera", "lockscreen", "privacy", "security"],
-    "presets": ["recommended", "privacy"],
+    "impacts": [
+      "security",
+      "privacy"
+    ],
+    "tags": [
+      "camera",
+      "lockscreen",
+      "privacy",
+      "security"
+    ],
+    "presets": [
+      "recommended",
+      "privacy"
+    ],
     "windows": {
       "minBuild": 19041,
       "maxBuild": null
@@ -388,20 +409,23 @@
   {
     "schemaVersion": "1.0.0",
     "id": "system.security.hide-fast-user-switching",
-    "name": {
-      "en": "Disable Fast User Switching",
-      "ar": "تعطيل التبديل السريع بين المستخدمين"
-    },
-    "description": {
-      "en": "Prevents multiple concurrent active interactive user sessions in background to save RAM and harden system access.",
-      "ar": "منع فتح جلسات تفاعلية متعددة للمستخدمين بالخلفية لتوفير الذاكرة وتعزيز أمان النظام."
-    },
+    "name": "Disable Fast User Switching",
+    "description": "Prevents multiple concurrent active interactive user sessions in background to save RAM and harden system access.",
     "category": "system",
     "subcategory": "Security",
     "risk": "Low",
-    "impacts": ["security", "performance"],
-    "tags": ["users", "security", "sessions"],
-    "presets": ["recommended"],
+    "impacts": [
+      "security",
+      "performance"
+    ],
+    "tags": [
+      "users",
+      "security",
+      "sessions"
+    ],
+    "presets": [
+      "recommended"
+    ],
     "windows": {
       "minBuild": 19041,
       "maxBuild": null

@@ -131,7 +131,7 @@ public sealed class ProfileManager
         {
             if (!tweakLookup.TryGetValue(tweakId, out var tweak)) continue;
 
-            sb.AppendLine($"; Tweak: {tweak.Name.En}");
+            sb.AppendLine($"; Tweak: {tweak.Name}");
             foreach (var action in tweak.Apply)
             {
                 if (string.Equals(action.Type, "Registry", StringComparison.OrdinalIgnoreCase) ||
@@ -181,7 +181,7 @@ public sealed class ProfileManager
         {
             if (!tweakLookup.TryGetValue(tweakId, out var tweak)) continue;
 
-            sb.AppendLine($"# [{tweak.Category.ToUpperInvariant()}] {tweak.Name.En}");
+            sb.AppendLine($"# [{tweak.Category.ToUpperInvariant()}] {tweak.Name}");
             foreach (var action in tweak.Apply)
             {
                 if (string.Equals(action.Type, "Registry", StringComparison.OrdinalIgnoreCase) ||
