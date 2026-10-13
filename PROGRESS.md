@@ -17,6 +17,11 @@ Repository Location: `C:\Dev\Tweakora`
 | **Phase 7** | Change History, Profiles, Command Palette (Ctrl+K), Settings & First-Run | **DONE** | Build: 0 errors / Tests: 23 passed / Process alive 10s |
 | **Phase 8** | Release Polish, English-Only, Size Optimization, Packaging | **DONE** | Build: 0 errors / Tests: 34 passed / Releases Packaged |
 | **Audit Phase** | Quality & Safety Audit, Staging Architecture, FlaUI Test Suite | **DONE** | 35 Unit Tests passed / FlaUI UI Suite passed / 79 Tweaks 100% verified |
+| **Phase A (Truth Inventory)** | Line-by-line audit of all buttons, commands, stubs, and Task.Delay | **DONE** | Created FEATURE_MATRIX.md. 89 actions audited: 47 REAL, 29 FAKE/BROKEN, 7 STUB/MISSING, 6 DEAD. |
+| **Phase B (Re-Architecture)** | DI injection, MVVM AsyncRelayCommand, OperationRunner, Admin check | **IN PROGRESS** | Ready to begin |
+| **Phase C (Sandbox / VM Tests)**| Real integration test runner inside isolated sandbox/VM | **QUEUED** | |
+| **Phase D (Fix Every Feature)** | Make every row in FEATURE_MATRIX.md real and verified | **QUEUED** | |
+| **Phase E (UI Quality)** | Visual polish, button progress, 1280x720 + 1920x1080 screenshots | **QUEUED** | |
 
 ---
 
