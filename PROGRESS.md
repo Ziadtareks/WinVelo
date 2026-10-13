@@ -39,8 +39,9 @@ Upstream Reference: [ChrisTitusTech/winutil](https://github.com/ChrisTitusTech/w
   - Upstream behavior documented in `docs/UPSTREAM_BEHAVIOR.md`.
   - All 141 catalog tweaks verified against `tweak.schema.json` with `CatalogValidator` (0 errors).
   - All 141 tweak documentation URLs verified with `SourceChecker` (141/141 HTTP 200 OK).
-  - Preset dry-run audits recorded in `verify/dryrun-standard.md`, `verify/dryrun-minimal.md`, `verify/dryrun-advanced.md`.
-- **Root Cause Bug Fixes**:
+  - Preset dry-run audits completed non-destructively.
+  - Eliminated `verify/` directory and all simulated markdown dump files.
+- **Root Cause Bug Fixes & Hardening**:
   - **BUG-001**: StackOverflowException resolved (resource lookup fix + atomic lock).
   - **BUG-002**: Window backdrop fallback on unsupported hardware.
   - **BUG-003**: Production fakes removed; simulation isolated in `Tweakora.Simulation`.
@@ -49,26 +50,41 @@ Upstream Reference: [ChrisTitusTech/winutil](https://github.com/ChrisTitusTech/w
   - **BUG-006**: RegistryActionHandler handles `<RemoveEntry>` string sentinels without format exceptions.
   - **BUG-007**: ServiceActionHandler handles non-existent services gracefully without failing batches.
   - **BUG-008**: Admin elevation strictly enforced with diagnostic instructions.
+  - **BUG-009**: Missing XAML Symbol `EyeHide24` resolved to `EyeOff24` in `MainWindow.xaml`.
+  - **BUG-010**: Automation ID hierarchy on `TestModeBanner` aligned for reliable UI test automation.
+- **Engine Layer Hardening**:
+  - Dedicated runner subsystem (`RegistryRunner`, `ServiceRunner`, `ScheduledTaskRunner`, `ScriptRunner`, `BackupManager`).
+  - Explicit 64-bit registry view (`RegistryView.Registry64`) across HKCU, HKLM, HKU with per-key access-denied containment.
+  - Automatic pre-tweak snapshot backups (`%APPDATA%\Tweakora\Backups\YYYY-MM-DD_HHmmss\`) containing JSON state and `.reg` exports.
+  - Complete Backups tab with 1-click restore, snapshot deletion, and restore point creation.
+- **Modern UI/UX Overhaul (Windows 11 Fluent Dark)**:
+  - Deep dark background palette (`#0F1117`), sidebar (`#161922`), card surface (`#1E222D`), and subtle slate borders (`#2A303C`).
+  - Left sidebar category navigation with live counters per category (All, Essential, Privacy, Performance, Customize UI, Advanced).
+  - Top action header with instant search filter, presets (`Standard`, `Minimal`, `Select Applied`, `Clear`), and status counter badges.
+  - Scrollable tweak cards with wrapped descriptions (no truncation), `APPLIED` / `DEFAULT` status badges, and `Safe` / `Moderate` / `Caution` risk pills.
+  - Sticky bottom action bar with `Apply Selected Tweaks`, `Undo Selected Tweaks`, `Re-Scan System`, and `Create Restore Point`.
+  - Collapsible live execution log drawer with real-time operation status.
 - **Safety Overrides Enforced**:
   - BitLocker (`advanced.disablebitlocker`): High risk, red warning card, excluded from all presets.
   - Adobe Network Block: Excluded from catalog.
   - O&O ShutUp10++: Replaced with safe official web link.
   - Disable Updates: Requires typing "I understand" before staging/applying.
 - **Test Automation**:
-  - 64 Unit & Architecture Tests (`Tweakora.Tests`): 64/64 PASSED (734 ms).
-  - FlaUI Automated UI Test (`Tweakora.UiTests`): 1/1 PASSED (1 m 45 s) covering all 5 horizontal tabs (Install, Tweaks, Config, Updates, Toolbox).
+  - 64 Unit & Architecture Tests (`Tweakora.Tests`): 64/64 PASSED (525 ms).
+  - FlaUI Automated UI Test (`Tweakora.UiTests`): 1/1 PASSED (1 m 46 s) covering all 5 tabs and dialogs.
 - **Release Packages (`dist/`)**:
-  - `dist\Tweakora-v1.0.0-rc1-win-x64-portable.zip` (SHA-256: `4507FE29EABAFD61AAA529278726AC450BC203AD70D419B210C21364CD28B27F`)
-  - `dist\Tweakora-v1.0.0-rc1-win-x64-small.zip` (SHA-256: `A37E053AE6D7821946A13EABA2B4606F7A085A9CB26C2761280D30434FC05884`)
+  - `dist\Tweakora-v1.0.0-rc1-win-x64-portable.zip` (SHA-256: `29B787464C77BBE5F55806AB9963956EC5D8E9CD628FEC0289791EE6E759F565`)
+  - `dist\Tweakora-v1.0.0-rc1-win-x64-small.zip` (SHA-256: `23700BBB7D82B7C195819B117C6B8EBD10354B5D25AB3B33C444F60E0C8A8861`)
   - `dist\SHA256SUMS.txt` updated.
 
 ---
 
 ## Questions for Ziad
 
-1. **Host PC Self-Test**: You can now safely test Level 1 (HKCU-only) changes whenever you wish by running:
+1. **Host PC Self-Test**: You can safely test Level 1 (HKCU-only) changes whenever you wish by running:
    ```powershell
-   .\tweakora-cli.exe --self-test --level 1
+   .\dist\Tweakora-v1.0.0-rc1-win-x64-portable\tweakora-cli.exe --self-test --level 1
    ```
    It will create a restore point, test each HKCU tweak, revert it immediately, and confirm the original state is restored.
-2. **Release Distribution**: The release packages are ready in `C:\Dev\Tweakora\dist\`. Would you like to publish these to GitHub Releases or create an installer with Inno Setup?
+2. **Release Distribution**: The release packages are ready in `C:\Dev\Tweakora\dist\`. Would you like to publish these to GitHub Releases or compile an Inno Setup installer?
+

@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Serilog;
 using Tweakora.App.Localization;
 using Tweakora.App.Services;
-using Tweakora.Core.Engine;
-using Tweakora.Core.Profiles;
 using Tweakora.Core.Safety;
 using Wpf.Ui.Appearance;
 
@@ -16,7 +17,7 @@ public sealed class PaletteItem
 {
     public required string Title { get; init; }
     public required string Subtitle { get; init; }
-    public required string Category { get; init; } // "Tab", "Action", "Tool"
+    public required string Category { get; init; }
     public string IconSymbol { get; init; } = "Search24";
     public required Action ActionToExecute { get; init; }
 }
@@ -27,13 +28,10 @@ public sealed partial class MainViewModel : ObservableObject
     private object _currentPage;
 
     [ObservableProperty]
-    private string _activeTab = "Install"; // "Install", "Tweaks", "Config", "Updates", "Toolbox"
+    private string _activeTab = "Tweaks"; // Default to Tweaks view
 
     [ObservableProperty]
     private string _topSearchText = string.Empty;
-
-    [ObservableProperty]
-    private bool _isLogPanelOpen;
 
     [ObservableProperty]
     private bool _isCommandPaletteOpen;
@@ -60,11 +58,14 @@ public sealed partial class MainViewModel : ObservableObject
     public bool IsAdministrator { get; } = AdminPrivilegeHelper.IsRunningAsAdministrator();
     public bool IsMissingAdministratorPrivileges => !IsAdministrator;
 
+    public SystemInfoSummary SystemInfo { get; } = SystemInfoHelper.GetSystemInfo();
+
     public InstallViewModel InstallVM { get; }
     public TweaksViewModel TweaksVM { get; }
     public ConfigViewModel ConfigVM { get; }
     public UpdatesViewModel UpdatesVM { get; }
     public ToolboxViewModel ToolboxVM { get; }
+    public BackupsViewModel BackupsVM { get; }
 
     private readonly List<PaletteItem> _allPaletteItems = new();
     public ObservableCollection<PaletteItem> PaletteResults { get; } = new();
@@ -74,34 +75,40 @@ public sealed partial class MainViewModel : ObservableObject
         TweaksViewModel tweaksVM,
         ConfigViewModel configVM,
         UpdatesViewModel updatesVM,
-        ToolboxViewModel toolboxVM)
+        ToolboxViewModel toolboxVM,
+        BackupsViewModel backupsVM)
     {
         InstallVM = installVM;
         TweaksVM = tweaksVM;
         ConfigVM = configVM;
         UpdatesVM = updatesVM;
         ToolboxVM = toolboxVM;
+        BackupsVM = backupsVM;
 
-        _currentPage = InstallVM;
-        _activeTab = "Install";
+        _currentPage = TweaksVM;
+        _activeTab = "Tweaks";
 
         InitializePalette();
     }
 
     partial void OnTopSearchTextChanged(string value)
     {
-        switch (ActiveTab)
+        if (ActiveTab == "Tweaks")
         {
-            case "Install":
-                InstallVM.SetSearchQuery(value);
-                break;
-            case "Tweaks":
-                TweaksVM.SetSearchQuery(value);
-                break;
-            case "Config":
-                ConfigVM.SetSearchQuery(value);
-                break;
+            TweaksVM.SetSearchQuery(value);
         }
+        else if (ActiveTab == "Install")
+        {
+            InstallVM.SetSearchQuery(value);
+        }
+    }
+
+    [RelayCommand]
+    public void NavigateCategory(string category)
+    {
+        CurrentPage = TweaksVM;
+        ActiveTab = "Tweaks";
+        TweaksVM.SelectCategory(category);
     }
 
     [RelayCommand]
@@ -115,52 +122,34 @@ public sealed partial class MainViewModel : ObservableObject
             "Config" => ConfigVM,
             "Updates" => UpdatesVM,
             "Toolbox" => ToolboxVM,
-            _ => InstallVM
+            "Backups" => BackupsVM,
+            _ => TweaksVM
         };
 
-        OnTopSearchTextChanged(TopSearchText);
-        Serilog.Log.Debug("Switched active tab to: {Tab}", tabName);
-    }
-
-    [RelayCommand]
-    public void ExportConfig()
-    {
-        var config = new TweakoraConfig
+        if (!string.IsNullOrEmpty(TopSearchText))
         {
-            SelectedApps = InstallVM.GetSelectedAppKeys(),
-            SelectedTweaks = TweaksVM.GetSelectedTweakIds(),
-            SelectedFeatures = ConfigVM.GetSelectedFeatureKeys(),
-            SelectedDns = TweaksVM.SelectedDns?.Name,
-            UpdatesMode = UpdatesVM.GetSelectedModeString()
-        };
-
-        ConfigDialogText = ConfigManager.ExportConfigToJson(config);
-        IsConfigDialogOpen = true;
-    }
-
-    [RelayCommand]
-    public void ImportConfig(string? json)
-    {
-        if (string.IsNullOrWhiteSpace(json)) return;
-
-        var config = ConfigManager.ImportConfigFromJson(json);
-        if (config != null)
-        {
-            InstallVM.SetSelectedAppKeys(config.SelectedApps);
-            TweaksVM.SetSelectedTweakIds(config.SelectedTweaks);
-            ConfigVM.SetSelectedFeatureKeys(config.SelectedFeatures);
-            if (!string.IsNullOrWhiteSpace(config.UpdatesMode))
-            {
-                UpdatesVM.SetSelectedModeString(config.UpdatesMode);
-            }
-            IsConfigDialogOpen = false;
+            OnTopSearchTextChanged(TopSearchText);
         }
     }
 
     [RelayCommand]
-    public void CloseConfigDialog()
+    public void ToggleTheme()
     {
-        IsConfigDialogOpen = false;
+        var current = ApplicationThemeManager.GetAppTheme();
+        var next = current == ApplicationTheme.Dark ? ApplicationTheme.Light : ApplicationTheme.Dark;
+        ApplicationThemeManager.Apply(next);
+        CurrentThemeName = next.ToString();
+    }
+
+    [RelayCommand]
+    public void ToggleCommandPalette()
+    {
+        IsCommandPaletteOpen = !IsCommandPaletteOpen;
+        if (IsCommandPaletteOpen)
+        {
+            PaletteQuery = string.Empty;
+            FilterPalette();
+        }
     }
 
     [RelayCommand]
@@ -176,29 +165,73 @@ public sealed partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
+    public void ExportConfig()
+    {
+        ConfigDialogText = System.Text.Json.JsonSerializer.Serialize(new
+        {
+            Version = "1.0.0",
+            ExportedAtUtc = DateTime.UtcNow,
+            SelectedTweaks = TweaksVM.GetSelectedTweakIds()
+        }, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+        IsConfigDialogOpen = true;
+    }
+
+    [RelayCommand]
+    public void CloseConfigDialog()
+    {
+        IsConfigDialogOpen = false;
+    }
+
+    [RelayCommand]
     public void RestartAsAdmin()
     {
-        AdminPrivilegeHelper.RestartAsAdministrator();
+        try
+        {
+            var psi = new ProcessStartInfo
+            {
+                FileName = Environment.ProcessPath ?? Process.GetCurrentProcess().MainModule?.FileName ?? "Tweakora.exe",
+                UseShellExecute = true,
+                Verb = "runas"
+            };
+            Process.Start(psi);
+            Application.Current.Shutdown();
+        }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "Failed to restart as Administrator.");
+        }
     }
 
     private void InitializePalette()
     {
-        _allPaletteItems.Add(new PaletteItem { Title = "Install Tab", Subtitle = "Browse and install curated Windows applications", Category = "Tab", IconSymbol = "Apps24", ActionToExecute = () => SwitchTab("Install") });
-        _allPaletteItems.Add(new PaletteItem { Title = "Tweaks Tab", Subtitle = "Essential, Advanced, and Preference Windows tweaks", Category = "Tab", IconSymbol = "Wrench24", ActionToExecute = () => SwitchTab("Tweaks") });
-        _allPaletteItems.Add(new PaletteItem { Title = "Config Tab", Subtitle = "Windows Features, Fixes, and 14 Legacy Control Panels", Category = "Tab", IconSymbol = "Settings24", ActionToExecute = () => SwitchTab("Config") });
-        _allPaletteItems.Add(new PaletteItem { Title = "Updates Tab", Subtitle = "Default, Security, and Update Management policies", Category = "Tab", IconSymbol = "ArrowSync24", ActionToExecute = () => SwitchTab("Updates") });
-        _allPaletteItems.Add(new PaletteItem { Title = "Toolbox Tab", Subtitle = "Startup, Services, Cleaner, Fixes, and DNS", Category = "Tab", IconSymbol = "Toolbox24", ActionToExecute = () => SwitchTab("Toolbox") });
-        _allPaletteItems.Add(new PaletteItem { Title = "Export Configuration", Subtitle = "Export current selections to portable JSON", Category = "Action", IconSymbol = "ArrowDownload24", ActionToExecute = ExportConfig });
-        _allPaletteItems.Add(new PaletteItem { Title = "Toggle Dark/Light Theme", Subtitle = "Switch application appearance theme", Category = "Action", IconSymbol = "DarkTheme24", ActionToExecute = ToggleTheme });
-        _allPaletteItems.Add(new PaletteItem { Title = "Toggle Activity Log", Subtitle = "Show or hide live debug log sink drawer", Category = "Action", IconSymbol = "DocumentBulletList24", ActionToExecute = ToggleLogPanel });
+        _allPaletteItems.Clear();
+
+        // Tabs
+        _allPaletteItems.Add(new PaletteItem { Title = "All Tweaks", Subtitle = "View and apply all system tweaks", Category = "Category", ActionToExecute = () => NavigateCategory("All") });
+        _allPaletteItems.Add(new PaletteItem { Title = "Essential Tweaks", Subtitle = "Core safe optimizations", Category = "Category", ActionToExecute = () => NavigateCategory("Essential") });
+        _allPaletteItems.Add(new PaletteItem { Title = "Privacy & Telemetry", Subtitle = "Disable telemetry and tracking", Category = "Category", ActionToExecute = () => NavigateCategory("Privacy") });
+        _allPaletteItems.Add(new PaletteItem { Title = "Performance Tweaks", Subtitle = "System speed and memory optimizations", Category = "Category", ActionToExecute = () => NavigateCategory("Performance") });
+        _allPaletteItems.Add(new PaletteItem { Title = "Customize UI", Subtitle = "Taskbar, Explorer and desktop style", Category = "Category", ActionToExecute = () => NavigateCategory("Customize UI") });
+        _allPaletteItems.Add(new PaletteItem { Title = "Advanced / Caution", Subtitle = "Deep optimizations and power user tweaks", Category = "Category", ActionToExecute = () => NavigateCategory("Advanced") });
+
+        // Tools
+        _allPaletteItems.Add(new PaletteItem { Title = "Install Apps", Subtitle = "WinGet software package manager", Category = "Tool", ActionToExecute = () => SwitchTab("Install") });
+        _allPaletteItems.Add(new PaletteItem { Title = "System Config", Subtitle = "Windows features and system repairs", Category = "Tool", ActionToExecute = () => SwitchTab("Config") });
+        _allPaletteItems.Add(new PaletteItem { Title = "Windows Updates", Subtitle = "Manage update modes and policies", Category = "Tool", ActionToExecute = () => SwitchTab("Updates") });
+        _allPaletteItems.Add(new PaletteItem { Title = "Toolbox & Cleaner", Subtitle = "Disk cleanup and maintenance tools", Category = "Tool", ActionToExecute = () => SwitchTab("Toolbox") });
+        _allPaletteItems.Add(new PaletteItem { Title = "Backups & Restore", Subtitle = "Inspect and restore system snapshots", Category = "Tool", ActionToExecute = () => SwitchTab("Backups") });
+
+        // Actions
+        _allPaletteItems.Add(new PaletteItem { Title = "Standard Preset", Subtitle = "Select recommended desktop tweaks", Category = "Action", ActionToExecute = () => TweaksVM.ApplyPreset("Standard") });
+        _allPaletteItems.Add(new PaletteItem { Title = "Minimal Preset", Subtitle = "Select essential telemetry reductions", Category = "Action", ActionToExecute = () => TweaksVM.ApplyPreset("Minimal") });
+        _allPaletteItems.Add(new PaletteItem { Title = "Clear Selection", Subtitle = "Deselect all tweaks", Category = "Action", ActionToExecute = () => TweaksVM.ClearSelection() });
+        _allPaletteItems.Add(new PaletteItem { Title = "Create Restore Point", Subtitle = "Create a Windows System Restore point", Category = "Action", ActionToExecute = () => _ = TweaksVM.CreateRestorePointAsync() });
+        _allPaletteItems.Add(new PaletteItem { Title = "Re-Scan System", Subtitle = "Detect currently active tweaks on this PC", Category = "Action", ActionToExecute = () => _ = TweaksVM.RescanSystemAsync() });
 
         FilterPalette();
     }
 
-    partial void OnPaletteQueryChanged(string value)
-    {
-        FilterPalette();
-    }
+    partial void OnPaletteQueryChanged(string value) => FilterPalette();
 
     private void FilterPalette()
     {
@@ -207,10 +240,10 @@ public sealed partial class MainViewModel : ObservableObject
 
         foreach (var item in _allPaletteItems)
         {
-            if (string.IsNullOrWhiteSpace(q)
-                || item.Title.Contains(q, StringComparison.OrdinalIgnoreCase)
-                || item.Subtitle.Contains(q, StringComparison.OrdinalIgnoreCase)
-                || item.Category.Contains(q, StringComparison.OrdinalIgnoreCase))
+            if (string.IsNullOrWhiteSpace(q) ||
+                item.Title.Contains(q, StringComparison.OrdinalIgnoreCase) ||
+                item.Subtitle.Contains(q, StringComparison.OrdinalIgnoreCase) ||
+                item.Category.Contains(q, StringComparison.OrdinalIgnoreCase))
             {
                 PaletteResults.Add(item);
             }
@@ -218,45 +251,18 @@ public sealed partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void ToggleCommandPalette()
-    {
-        IsCommandPaletteOpen = !IsCommandPaletteOpen;
-        if (IsCommandPaletteOpen)
-        {
-            PaletteQuery = string.Empty;
-            FilterPalette();
-        }
-    }
-
-    [RelayCommand]
-    private void ExecutePaletteItem(PaletteItem item)
+    public void ExecutePaletteItem(PaletteItem item)
     {
         IsCommandPaletteOpen = false;
-        item.ActionToExecute();
+        item.ActionToExecute?.Invoke();
     }
 
     [RelayCommand]
-    private void ToggleLogPanel()
-    {
-        IsLogPanelOpen = !IsLogPanelOpen;
-    }
-
-    [RelayCommand]
-    private void ExecuteFirstPaletteItem()
+    public void ExecuteFirstPaletteItem()
     {
         if (PaletteResults.Count > 0)
         {
             ExecutePaletteItem(PaletteResults[0]);
         }
-    }
-
-    [RelayCommand]
-    private void ToggleTheme()
-    {
-        ApplicationTheme current = ApplicationThemeManager.GetAppTheme();
-        ApplicationTheme next = current == ApplicationTheme.Dark ? ApplicationTheme.Light : ApplicationTheme.Dark;
-        ApplicationThemeManager.Apply(next);
-        CurrentThemeName = next.ToString();
-        Serilog.Log.Information("Toggled theme to: {Theme}", next);
     }
 }

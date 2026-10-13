@@ -4,113 +4,156 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Tweakora.App.Services;
+using Tweakora.Core.Engine.Runners;
 using Tweakora.Core.Models;
 using Tweakora.Core.Operations;
+using Tweakora.Core.Safety;
 using Tweakora.Modules.Tweaks;
 
 namespace Tweakora.App.ViewModels;
+
+public sealed partial class LogEntryItem : ObservableObject
+{
+    public required string Timestamp { get; init; }
+    public required string Level { get; init; } // "OK", "SKIP", "WARN", "ERR", "INFO"
+    public required string Message { get; init; }
+
+    public string BadgeBg => Level switch
+    {
+        "OK" => "#065F46",
+        "SKIP" => "#1E3A8A",
+        "WARN" => "#78350F",
+        "ERR" => "#7F1D1D",
+        _ => "#374151"
+    };
+
+    public string BadgeFg => Level switch
+    {
+        "OK" => "#34D399",
+        "SKIP" => "#60A5FA",
+        "WARN" => "#FBBF24",
+        "ERR" => "#F87171",
+        _ => "#D1D5DB"
+    };
+}
 
 public sealed partial class TweakCardModel : ObservableObject
 {
     public TweakDefinition Tweak { get; }
 
     [ObservableProperty]
+    private bool _isSelected;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(StatusBadgeText))]
+    [NotifyPropertyChangedFor(nameof(StatusBadgeBackground))]
+    [NotifyPropertyChangedFor(nameof(StatusBadgeForeground))]
+    [NotifyPropertyChangedFor(nameof(StatusBadgeBorder))]
     private bool _isActive;
-
-    [ObservableProperty]
-    private bool _isStaged;
-
-    [ObservableProperty]
-    private bool _stagedTargetState;
 
     [ObservableProperty]
     private bool _isBusy;
 
-    public bool IsCheckedInUi
-    {
-        get => IsStaged ? StagedTargetState : IsActive;
-        set
-        {
-            if (value == IsActive)
-            {
-                IsStaged = false;
-            }
-            else
-            {
-                IsStaged = true;
-                StagedTargetState = value;
-            }
-            OnPropertyChanged();
-            OnPropertyChanged(nameof(IsStaged));
-        }
-    }
-
-    public void DiscardStaged()
-    {
-        IsStaged = false;
-        OnPropertyChanged(nameof(IsCheckedInUi));
-    }
-
-    public void MarkApplied(bool active)
-    {
-        IsActive = active;
-        IsStaged = false;
-        OnPropertyChanged(nameof(IsCheckedInUi));
-    }
-
     public string Id => Tweak.Id;
     public string? Origin => Tweak.Origin;
+    public string Title => Tweak.Name;
+    public string Description => Tweak.Description;
     public string Category => Tweak.Category;
     public string? Subcategory => Tweak.Subcategory;
     public string Risk => Tweak.Risk;
     public bool RequiresReboot => Tweak.RequiresReboot;
     public bool RequiresExplorerRestart => Tweak.RequiresExplorerRestart;
-    public string SourceUrl => Tweak.Source.ValueKind == JsonValueKind.String ? Tweak.Source.GetString() ?? "" : "";
-
-    public string LocalizedName => Tweak.Name;
-    public string LocalizedDescription => Tweak.Description;
-    public string? LocalizedEffectNote => Tweak.EffectNote;
-    public string? LocalizedWarning => Tweak.Warnings;
-
-    public bool HasEffectNote => !string.IsNullOrWhiteSpace(LocalizedEffectNote);
-    public bool HasWarning => !string.IsNullOrWhiteSpace(LocalizedWarning);
-    public bool IsHighRisk => string.Equals(Risk, "High", StringComparison.OrdinalIgnoreCase);
+    public string? Warnings => Tweak.Warnings;
+    public string? EffectNote => Tweak.EffectNote;
+    public bool HasWarning => !string.IsNullOrWhiteSpace(Warnings);
+    public bool HasEffectNote => !string.IsNullOrWhiteSpace(EffectNote);
     public bool IsBitLocker => Id.Contains("bitlocker", StringComparison.OrdinalIgnoreCase) ||
                                (Origin?.Contains("bitlocker", StringComparison.OrdinalIgnoreCase) ?? false);
 
+    // Compatibility aliases for existing UI bindings
+    public string LocalizedName => Title;
+    public string LocalizedDescription => Description;
+    public string? LocalizedWarning => Warnings;
+    public string? LocalizedEffectNote => EffectNote;
+    public bool IsHighRisk => string.Equals(Risk, "High", StringComparison.OrdinalIgnoreCase) ||
+                              string.Equals(Risk, "Caution", StringComparison.OrdinalIgnoreCase);
+
+    public string CategoryGroup { get; }
+
+    public string StatusBadgeText => IsActive ? "APPLIED" : "DEFAULT";
+    public string StatusBadgeBackground => IsActive ? "#064E3B" : "#1F2937";
+    public string StatusBadgeForeground => IsActive ? "#34D399" : "#9CA3AF";
+    public string StatusBadgeBorder => IsActive ? "#059669" : "#374151";
+
     public string RiskBadgeBackground => Risk switch
     {
-        "Safe" => "#E6F4EA",
-        "Low" => "#E8F0FE",
-        "Medium" => "#FEF7E0",
-        "High" => "#FCE8E6",
-        _ => "#F1F3F4"
+        "Safe" => "#064E3B",
+        "Low" or "Moderate" or "Medium" => "#78350F",
+        "Caution" or "High" => "#7F1D1D",
+        _ => "#1F2937"
     };
 
     public string RiskBadgeForeground => Risk switch
     {
-        "Safe" => "#137333",
-        "Low" => "#1A73E8",
-        "Medium" => "#B06000",
-        "High" => "#C5221F",
-        _ => "#5F6368"
+        "Safe" => "#34D399",
+        "Low" or "Moderate" or "Medium" => "#FBBF24",
+        "Caution" or "High" => "#F87171",
+        _ => "#9CA3AF"
+    };
+
+    public string RiskBadgeBorder => Risk switch
+    {
+        "Safe" => "#059669",
+        "Low" or "Moderate" or "Medium" => "#D97706",
+        "Caution" or "High" => "#DC2626",
+        _ => "#374151"
     };
 
     public TweakCardModel(TweakDefinition tweak)
     {
         Tweak = tweak;
+        CategoryGroup = ClassifyCategory(tweak);
     }
-}
 
-public sealed class DnsOptionItem
-{
-    public required string Name { get; init; }
-    public required string PrimaryDns { get; init; }
-    public required string SecondaryDns { get; init; }
-    public string DisplayText => $"{Name} ({PrimaryDns})";
+    private static string ClassifyCategory(TweakDefinition tweak)
+    {
+        string sub = tweak.Subcategory ?? "";
+        string id = tweak.Id.ToLowerInvariant();
+        string cat = tweak.Category.ToLowerInvariant();
+        string risk = tweak.Risk.ToLowerInvariant();
+
+        if (risk == "high" || risk == "caution" || sub.Contains("Advanced", StringComparison.OrdinalIgnoreCase) || id.StartsWith("advanced."))
+        {
+            return "Advanced";
+        }
+        if (sub.Contains("Essential", StringComparison.OrdinalIgnoreCase) || id.StartsWith("essential."))
+        {
+            return "Essential";
+        }
+        if (cat.Contains("privacy") || tweak.Impacts.Any(i => i.Contains("privacy", StringComparison.OrdinalIgnoreCase)) ||
+            id.Contains("telemetry") || id.Contains("tracking") || id.Contains("cortana") || id.Contains("diagnostic") || id.Contains("activity"))
+        {
+            return "Privacy";
+        }
+        if (cat.Contains("performance") || cat.Contains("system") || tweak.Impacts.Any(i => i.Contains("performance", StringComparison.OrdinalIgnoreCase)) ||
+            id.Contains("hiber") || id.Contains("memory") || id.Contains("cache") || id.Contains("speed") || id.Contains("network"))
+        {
+            return "Performance";
+        }
+        if (cat.Contains("ui") || cat.Contains("preferences") || id.StartsWith("pref.") || sub.Contains("Customize", StringComparison.OrdinalIgnoreCase) ||
+            id.Contains("darkmode") || id.Contains("taskbar") || id.Contains("start") || id.Contains("snap") || id.Contains("ribbon"))
+        {
+            return "Customize UI";
+        }
+
+        return "Performance";
+    }
 }
 
 public sealed partial class TweaksViewModel : ObservableObject
@@ -120,23 +163,74 @@ public sealed partial class TweaksViewModel : ObservableObject
     private readonly List<TweakCardModel> _allTweaks = new();
     private readonly Dictionary<string, List<string>> _presets = new(StringComparer.OrdinalIgnoreCase);
 
-    // 4 Display Collections
+    // Primary modern display collection
+    public ObservableCollection<TweakCardModel> FilteredTweaks { get; } = new();
+
+    // Legacy multi-column collections maintained for compatibility
     public ObservableCollection<TweakCardModel> EssentialTweaks { get; } = new();
     public ObservableCollection<TweakCardModel> AdvancedTweaks { get; } = new();
     public ObservableCollection<TweakCardModel> PreferenceToggles { get; } = new();
     public ObservableCollection<TweakCardModel> ExtraTweaks { get; } = new();
 
-    public ObservableCollection<DnsOptionItem> DnsOptions { get; } = new();
-    public ObservableCollection<string> PerformancePlans { get; } = new();
+    // Live Execution Log Drawer items
+    public ObservableCollection<LogEntryItem> LogEntries { get; } = new();
 
     [ObservableProperty]
     private string _searchQuery = string.Empty;
 
     [ObservableProperty]
-    private DnsOptionItem? _selectedDns;
+    private string _selectedCategory = "All";
 
     [ObservableProperty]
-    private string _selectedPerformancePlan = "Balanced (Recommended)";
+    private int _selectedCount;
+
+    [ObservableProperty]
+    private int _appliedCount;
+
+    [ObservableProperty]
+    private int _totalCount;
+
+    [ObservableProperty]
+    private int _allCount;
+
+    [ObservableProperty]
+    private int _essentialCount;
+
+    [ObservableProperty]
+    private int _privacyCount;
+
+    [ObservableProperty]
+    private int _performanceCount;
+
+    [ObservableProperty]
+    private int _customizeUiCount;
+
+    [ObservableProperty]
+    private int _advancedCount;
+
+    [ObservableProperty]
+    private bool _isScanning;
+
+    [ObservableProperty]
+    private int _scanProgress;
+
+    [ObservableProperty]
+    private string _scanStatusText = "Ready";
+
+    [ObservableProperty]
+    private bool _isBusy;
+
+    [ObservableProperty]
+    private bool _isDryRun;
+
+    [ObservableProperty]
+    private bool _isLogDrawerOpen;
+
+    [ObservableProperty]
+    private double _executionProgress;
+
+    [ObservableProperty]
+    private string _statusMessage = "Select tweaks or choose a preset to begin.";
 
     [ObservableProperty]
     private bool _isPreviewDialogOpen;
@@ -144,44 +238,18 @@ public sealed partial class TweaksViewModel : ObservableObject
     [ObservableProperty]
     private string _previewReportText = string.Empty;
 
-    [ObservableProperty]
-    private int _stagedCount;
-
-    [ObservableProperty]
-    private bool _hasStagedChanges;
-
-    [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(RunTweaksCommand))]
-    [NotifyCanExecuteChangedFor(nameof(UndoSelectedTweaksCommand))]
-    private bool _isBusy;
-
-    [ObservableProperty]
-    private string _statusMessage = "Select tweaks or choose a preset to stage changes.";
+    public bool IsAdmin => AdminPrivilegeHelper.IsRunningAsAdministrator();
 
     public TweaksViewModel(ITweakService tweakService, IOperationRunner runner)
     {
         _tweakService = tweakService;
         _runner = runner;
 
-        InitializeDnsAndPlans();
         LoadPresets();
-        LoadCatalogTweaks();
-    }
+        LoadCatalogTweaksFast();
 
-    private void InitializeDnsAndPlans()
-    {
-        PerformancePlans.Add("Balanced (Recommended)");
-        PerformancePlans.Add("High Performance");
-        PerformancePlans.Add("Ultimate Performance");
-
-        DnsOptions.Add(new DnsOptionItem { Name = "Default (DHCP)", PrimaryDns = "Automatic", SecondaryDns = "" });
-        DnsOptions.Add(new DnsOptionItem { Name = "Cloudflare", PrimaryDns = "1.1.1.1", SecondaryDns = "1.0.0.1" });
-        DnsOptions.Add(new DnsOptionItem { Name = "Quad9", PrimaryDns = "9.9.9.9", SecondaryDns = "149.112.112.112" });
-        DnsOptions.Add(new DnsOptionItem { Name = "Google", PrimaryDns = "8.8.8.8", SecondaryDns = "8.8.4.4" });
-        DnsOptions.Add(new DnsOptionItem { Name = "AdGuard", PrimaryDns = "94.140.14.14", SecondaryDns = "94.140.15.15" });
-        DnsOptions.Add(new DnsOptionItem { Name = "OpenDNS", PrimaryDns = "208.67.222.222", SecondaryDns = "208.67.220.220" });
-
-        SelectedDns = DnsOptions[0];
+        // Start non-blocking real-time detection scan in background
+        _ = Task.Run(() => ScanSystemStateAsync());
     }
 
     private void LoadPresets()
@@ -223,12 +291,12 @@ public sealed partial class TweaksViewModel : ObservableObject
             }
             catch (Exception ex)
             {
-                Serilog.Log.Warning(ex, "Failed to load presets from preset.json");
+                System.Diagnostics.Debug.WriteLine($"Failed to load presets: {ex.Message}");
             }
         }
     }
 
-    private void LoadCatalogTweaks()
+    private void LoadCatalogTweaksFast()
     {
         _allTweaks.Clear();
         var catalog = _tweakService.LoadCatalog();
@@ -236,18 +304,72 @@ public sealed partial class TweaksViewModel : ObservableObject
         foreach (var tweak in catalog)
         {
             var card = new TweakCardModel(tweak);
-            card.IsActive = _tweakService.DetectState(tweak);
             card.PropertyChanged += (s, e) =>
             {
-                if (e.PropertyName == nameof(TweakCardModel.IsStaged))
+                if (e.PropertyName == nameof(TweakCardModel.IsSelected))
                 {
-                    UpdateStagedState();
+                    UpdateCounts();
                 }
             };
             _allTweaks.Add(card);
         }
 
+        TotalCount = _allTweaks.Count;
+        AllCount = TotalCount;
+        EssentialCount = _allTweaks.Count(t => t.CategoryGroup == "Essential");
+        PrivacyCount = _allTweaks.Count(t => t.CategoryGroup == "Privacy");
+        PerformanceCount = _allTweaks.Count(t => t.CategoryGroup == "Performance");
+        CustomizeUiCount = _allTweaks.Count(t => t.CategoryGroup == "Customize UI");
+        AdvancedCount = _allTweaks.Count(t => t.CategoryGroup == "Advanced");
+
         ApplyFilter();
+    }
+
+    public async Task ScanSystemStateAsync(CancellationToken cancellationToken = default)
+    {
+        IsScanning = true;
+        ScanProgress = 0;
+        ScanStatusText = "Scanning system tweaks...";
+
+        int count = _allTweaks.Count;
+        int detectedApplied = 0;
+
+        for (int i = 0; i < count; i++)
+        {
+            if (cancellationToken.IsCancellationRequested) break;
+
+            var card = _allTweaks[i];
+            try
+            {
+                bool active = await _tweakService.DetectStateAsync(card.Tweak, cancellationToken);
+                if (active) detectedApplied++;
+
+                Application.Current?.Dispatcher?.InvokeAsync(() =>
+                {
+                    card.IsActive = active;
+                    AppliedCount = _allTweaks.Count(t => t.IsActive);
+                });
+            }
+            catch { }
+
+            int currentIdx = i + 1;
+            int pct = (int)((currentIdx / (double)count) * 100);
+
+            Application.Current?.Dispatcher?.InvokeAsync(() =>
+            {
+                ScanProgress = pct;
+                ScanStatusText = $"Scanning ({currentIdx}/{count}): {card.Title}";
+            });
+        }
+
+        Application.Current?.Dispatcher?.InvokeAsync(() =>
+        {
+            IsScanning = false;
+            ScanProgress = 100;
+            AppliedCount = _allTweaks.Count(t => t.IsActive);
+            ScanStatusText = $"Scan complete. {AppliedCount} applied on system.";
+            AddLog("OK", $"System state detection finished. Currently applied: {AppliedCount}/{count} tweaks.");
+        });
     }
 
     public void SetSearchQuery(string query)
@@ -256,69 +378,96 @@ public sealed partial class TweaksViewModel : ObservableObject
     }
 
     partial void OnSearchQueryChanged(string value) => ApplyFilter();
+    partial void OnSelectedCategoryChanged(string value) => ApplyFilter();
+
+    [RelayCommand]
+    public void SelectCategory(string category)
+    {
+        SelectedCategory = category;
+    }
 
     public void ApplyFilter()
     {
+        FilteredTweaks.Clear();
         EssentialTweaks.Clear();
         AdvancedTweaks.Clear();
         PreferenceToggles.Clear();
         ExtraTweaks.Clear();
 
         string q = SearchQuery?.Trim() ?? string.Empty;
+        string cat = SelectedCategory ?? "All";
 
         foreach (var card in _allTweaks)
         {
+            // Category filter
+            if (!string.Equals(cat, "All", StringComparison.OrdinalIgnoreCase))
+            {
+                if (!string.Equals(card.CategoryGroup, cat, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+            }
+
+            // Search query filter
             if (!string.IsNullOrWhiteSpace(q))
             {
-                bool matches = card.LocalizedName.Contains(q, StringComparison.OrdinalIgnoreCase) ||
-                               card.LocalizedDescription.Contains(q, StringComparison.OrdinalIgnoreCase) ||
+                bool matches = card.Title.Contains(q, StringComparison.OrdinalIgnoreCase) ||
+                               card.Description.Contains(q, StringComparison.OrdinalIgnoreCase) ||
                                card.Id.Contains(q, StringComparison.OrdinalIgnoreCase) ||
                                (card.Origin?.Contains(q, StringComparison.OrdinalIgnoreCase) ?? false);
                 if (!matches) continue;
             }
 
-            string sub = card.Subcategory ?? "";
-            string id = card.Id.ToLowerInvariant();
+            FilteredTweaks.Add(card);
 
-            if (sub.Contains("Essential", StringComparison.OrdinalIgnoreCase) || id.StartsWith("essential."))
-            {
-                EssentialTweaks.Add(card);
-            }
-            else if (sub.Contains("Advanced", StringComparison.OrdinalIgnoreCase) || id.StartsWith("advanced."))
-            {
-                AdvancedTweaks.Add(card);
-            }
-            else if (sub.Contains("Customize", StringComparison.OrdinalIgnoreCase) || id.StartsWith("pref."))
-            {
-                PreferenceToggles.Add(card);
-            }
-            else
-            {
-                ExtraTweaks.Add(card);
-            }
+            // Legacy collections for multi-column compatibility
+            if (card.CategoryGroup == "Essential") EssentialTweaks.Add(card);
+            else if (card.CategoryGroup == "Advanced") AdvancedTweaks.Add(card);
+            else if (card.CategoryGroup == "Customize UI") PreferenceToggles.Add(card);
+            else ExtraTweaks.Add(card);
         }
     }
 
-    private void UpdateStagedState()
+    private void UpdateCounts()
     {
-        StagedCount = _allTweaks.Count(t => t.IsStaged);
-        HasStagedChanges = StagedCount > 0;
+        SelectedCount = _allTweaks.Count(t => t.IsSelected);
+        AppliedCount = _allTweaks.Count(t => t.IsActive);
     }
 
     [RelayCommand]
     public void ApplyPreset(string presetName)
     {
-        ClearSelection();
-
         if (string.Equals(presetName, "Clear", StringComparison.OrdinalIgnoreCase))
         {
-            StatusMessage = "Cleared all selections.";
+            ClearSelection();
             return;
         }
 
-        if (!_presets.TryGetValue(presetName, out var presetKeys))
+        if (string.Equals(presetName, "SelectApplied", StringComparison.OrdinalIgnoreCase))
         {
-            StatusMessage = $"Preset {presetName} not found in presets config.";
+            foreach (var card in _allTweaks)
+            {
+                card.IsSelected = card.IsActive;
+            }
+            UpdateCounts();
+            StatusMessage = $"Selected {SelectedCount} currently applied tweaks.";
+            AddLog("INFO", $"Selected all currently applied tweaks ({SelectedCount} total).");
+            return;
+        }
+
+        // Map preset names: "Standard" -> "recommended", "Minimal" -> "minimal"
+        string mappedKey = presetName.ToLowerInvariant() switch
+        {
+            "standard" => "recommended",
+            "minimal" => "minimal",
+            "advanced" => "advanced",
+            _ => presetName
+        };
+
+        if (!_presets.TryGetValue(mappedKey, out var presetKeys) &&
+            !_presets.TryGetValue(presetName, out presetKeys))
+        {
+            StatusMessage = $"Preset '{presetName}' not found.";
             return;
         }
 
@@ -327,22 +476,22 @@ public sealed partial class TweaksViewModel : ObservableObject
 
         foreach (var card in _allTweaks)
         {
-            if (card.IsBitLocker) continue;
+            if (card.IsBitLocker)
+            {
+                card.IsSelected = false;
+                continue;
+            }
 
             bool matches = (card.Origin != null && keySet.Contains(card.Origin)) ||
                            keySet.Contains(card.Id);
 
-            if (matches)
-            {
-                card.IsStaged = true;
-                card.StagedTargetState = true;
-                card.IsCheckedInUi = true;
-                matched++;
-            }
+            card.IsSelected = matches;
+            if (matches) matched++;
         }
 
-        UpdateStagedState();
-        StatusMessage = $"Applied preset '{presetName}' ({matched} tweaks staged).";
+        UpdateCounts();
+        StatusMessage = $"Preset '{presetName}' loaded ({matched} tweaks selected).";
+        AddLog("INFO", $"Applied preset '{presetName}' ({matched} tweaks selected).");
     }
 
     [RelayCommand]
@@ -350,24 +499,224 @@ public sealed partial class TweaksViewModel : ObservableObject
     {
         foreach (var card in _allTweaks)
         {
-            card.DiscardStaged();
+            card.IsSelected = false;
         }
-        UpdateStagedState();
-        StatusMessage = "All staged changes cleared.";
+        UpdateCounts();
+        StatusMessage = "Selection cleared.";
+        AddLog("INFO", "Cleared all selected tweaks.");
+    }
+
+    [RelayCommand]
+    public async Task ApplySelectedTweaksAsync()
+    {
+        var selected = _allTweaks.Where(t => t.IsSelected).ToList();
+        if (selected.Count == 0)
+        {
+            StatusMessage = "No tweaks selected. Select tweaks or choose a preset first.";
+            AddLog("WARN", "Apply requested but no tweaks were selected.");
+            return;
+        }
+
+        if (!IsDryRun && !AppAdminGuard.EnsureAdmin("apply system tweaks"))
+        {
+            StatusMessage = "Administrator privileges required to apply tweaks.";
+            AddLog("ERR", "Cannot apply tweaks: Administrator privileges are required.");
+            return;
+        }
+
+        IsLogDrawerOpen = true;
+        IsBusy = true;
+        ExecutionProgress = 0;
+
+        try
+        {
+            if (IsDryRun)
+            {
+                AddLog("INFO", $"--- DRY-RUN MODE: Simulating apply for {selected.Count} tweak(s) ---");
+                for (int i = 0; i < selected.Count; i++)
+                {
+                    var tweak = selected[i];
+                    AddLog("SKIP", $"[DRY-RUN] Would apply: {tweak.Title} ({tweak.Id})");
+                    ExecutionProgress = ((i + 1) / (double)selected.Count) * 100;
+                }
+                StatusMessage = $"Dry-run completed for {selected.Count} tweak(s). No changes made.";
+                AddLog("OK", "Dry-run simulation completed successfully.");
+                return;
+            }
+
+            AddLog("INFO", $"Starting application of {selected.Count} tweak(s)...");
+            AddLog("INFO", "Creating automatic pre-tweak backup snapshot...");
+
+            var report = await _tweakService.ApplyTweaksAsync(selected.Select(c => c.Tweak).ToList(), _runner);
+
+            foreach (var item in report.Results)
+            {
+                string level = item.Status switch
+                {
+                    OperationItemStatus.Succeeded => "OK",
+                    OperationItemStatus.Skipped => "SKIP",
+                    _ => "ERR"
+                };
+                AddLog(level, $"{item.Name}: {item.Reason}");
+            }
+
+            // Update state
+            foreach (var card in selected)
+            {
+                card.IsActive = true;
+            }
+
+            UpdateCounts();
+            StatusMessage = $"Applied {report.SucceededCount} tweak(s), {report.SkippedCount} skipped, {report.FailedCount} failed.";
+            AddLog("OK", $"Execution completed: {StatusMessage}");
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Error during execution: {ex.Message}";
+            AddLog("ERR", $"Unhandled execution failure: {ex.Message}");
+        }
+        finally
+        {
+            IsBusy = false;
+            ExecutionProgress = 100;
+        }
+    }
+
+    [RelayCommand]
+    public async Task UndoSelectedTweaksAsync()
+    {
+        var selected = _allTweaks.Where(t => t.IsSelected).ToList();
+        if (selected.Count == 0)
+        {
+            StatusMessage = "No tweaks selected to undo.";
+            AddLog("WARN", "Undo requested but no tweaks were selected.");
+            return;
+        }
+
+        if (!IsDryRun && !AppAdminGuard.EnsureAdmin("undo system tweaks"))
+        {
+            StatusMessage = "Administrator privileges required to undo tweaks.";
+            AddLog("ERR", "Cannot undo tweaks: Administrator privileges are required.");
+            return;
+        }
+
+        IsLogDrawerOpen = true;
+        IsBusy = true;
+        ExecutionProgress = 0;
+
+        try
+        {
+            if (IsDryRun)
+            {
+                AddLog("INFO", $"--- DRY-RUN MODE: Simulating undo for {selected.Count} tweak(s) ---");
+                for (int i = 0; i < selected.Count; i++)
+                {
+                    var tweak = selected[i];
+                    AddLog("SKIP", $"[DRY-RUN] Would revert: {tweak.Title} ({tweak.Id})");
+                    ExecutionProgress = ((i + 1) / (double)selected.Count) * 100;
+                }
+                StatusMessage = $"Dry-run undo completed for {selected.Count} tweak(s).";
+                AddLog("OK", "Dry-run undo simulation completed successfully.");
+                return;
+            }
+
+            AddLog("INFO", $"Reverting {selected.Count} tweak(s)...");
+
+            var report = await _tweakService.UndoTweaksAsync(selected.Select(c => c.Tweak).ToList(), _runner);
+
+            foreach (var item in report.Results)
+            {
+                string level = item.Status == OperationItemStatus.Succeeded ? "OK" : "ERR";
+                AddLog(level, $"Revert {item.Name}: {item.Reason}");
+            }
+
+            foreach (var card in selected)
+            {
+                card.IsActive = false;
+            }
+
+            UpdateCounts();
+            StatusMessage = $"Reverted {report.SucceededCount} tweak(s), {report.FailedCount} failed.";
+            AddLog("OK", $"Undo completed: {StatusMessage}");
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Error during revert: {ex.Message}";
+            AddLog("ERR", $"Unhandled undo failure: {ex.Message}");
+        }
+        finally
+        {
+            IsBusy = false;
+            ExecutionProgress = 100;
+        }
+    }
+
+    [RelayCommand]
+    public async Task RescanSystemAsync()
+    {
+        AddLog("INFO", "Initiating manual system re-scan...");
+        await Task.Run(() => ScanSystemStateAsync());
+    }
+
+    [RelayCommand]
+    public async Task CreateRestorePointAsync()
+    {
+        if (!AppAdminGuard.EnsureAdmin("create a system restore point"))
+        {
+            StatusMessage = "Administrator privileges required to create a System Restore point.";
+            AddLog("ERR", "Cannot create restore point: Administrator privileges required.");
+            return;
+        }
+
+        IsLogDrawerOpen = true;
+        AddLog("INFO", "Requesting Windows System Restore Point creation...");
+
+        try
+        {
+            var res = await _tweakService.BackupManager.CreateSystemRestorePointAsync($"Tweakora Manual Restore Point {DateTime.Now:yyyy-MM-dd HH:mm}");
+            if (res.Success)
+            {
+                AddLog("OK", "System Restore Point created successfully.");
+                StatusMessage = "System Restore Point created successfully.";
+            }
+            else
+            {
+                string msg = res.WasThrottledOrSkipped
+                    ? "Windows restricted creation (24-hour rate limit). Registry backup snapshot was preserved."
+                    : (res.ErrorMessage ?? "Could not create restore point (check if System Protection is enabled).");
+                AddLog("WARN", msg);
+                StatusMessage = msg;
+            }
+        }
+        catch (Exception ex)
+        {
+            AddLog("ERR", $"Restore point error: {ex.Message}");
+        }
+    }
+
+    [RelayCommand]
+    public void ToggleLogDrawer()
+    {
+        IsLogDrawerOpen = !IsLogDrawerOpen;
+    }
+
+    [RelayCommand]
+    public void ClearLogs()
+    {
+        LogEntries.Clear();
     }
 
     [RelayCommand]
     public async Task OpenDiffPreviewAsync()
     {
-        var staged = _allTweaks.Where(t => t.IsStaged).ToList();
-        if (staged.Count == 0)
+        var selected = _allTweaks.Where(t => t.IsSelected).ToList();
+        if (selected.Count == 0)
         {
-            StatusMessage = "No tweaks currently staged to preview.";
+            StatusMessage = "No tweaks currently selected to preview.";
             return;
         }
 
-        List<TweakDefinition> tweaksToPreview = staged.Select(c => c.Tweak).ToList();
-        PreviewReportText = await _tweakService.GenerateDryRunDiffAsync(tweaksToPreview);
+        PreviewReportText = await _tweakService.GenerateDryRunDiffAsync(selected.Select(c => c.Tweak));
         IsPreviewDialogOpen = true;
     }
 
@@ -377,121 +726,34 @@ public sealed partial class TweaksViewModel : ObservableObject
         IsPreviewDialogOpen = false;
     }
 
-    private bool CanRunTweaks() => !IsBusy;
-
-    [RelayCommand(CanExecute = nameof(CanRunTweaks))]
-    public async Task RunTweaksAsync()
+    private void AddLog(string level, string message)
     {
-        if (!Tweakora.App.Services.AppAdminGuard.EnsureAdmin("apply system tweaks"))
+        Application.Current?.Dispatcher?.InvokeAsync(() =>
         {
-            StatusMessage = "Administrator privileges required to apply tweaks.";
-            return;
-        }
-
-        var staged = _allTweaks.Where(t => t.IsStaged).ToList();
-        if (staged.Count == 0)
-        {
-            StatusMessage = "No tweaks staged to run.";
-            return;
-        }
-
-        IsPreviewDialogOpen = false;
-        IsBusy = true;
-        try
-        {
-            StatusMessage = $"Applying {staged.Count} tweak(s)...";
-
-            var report = await _tweakService.ApplyTweaksAsync(staged.Select(c => c.Tweak).ToList(), _runner);
-
-            foreach (var card in staged)
+            LogEntries.Insert(0, new LogEntryItem
             {
-                card.MarkApplied(card.StagedTargetState);
-            }
+                Timestamp = DateTime.Now.ToString("HH:mm:ss"),
+                Level = level,
+                Message = message
+            });
 
-            // Apply selected performance plan if customized
-            if (!string.IsNullOrWhiteSpace(SelectedPerformancePlan))
+            while (LogEntries.Count > 250)
             {
-                await _tweakService.SetPerformancePlanAsync(SelectedPerformancePlan);
+                LogEntries.RemoveAt(LogEntries.Count - 1);
             }
-
-            // Apply selected DNS if not default
-            if (SelectedDns != null && SelectedDns.PrimaryDns != "Automatic")
-            {
-                await _tweakService.SetDnsAsync(SelectedDns.PrimaryDns, SelectedDns.SecondaryDns);
-            }
-
-            UpdateStagedState();
-            StatusMessage = $"Execution completed: {report.Summary}. All protected by journal.";
-        }
-        catch (Exception ex)
-        {
-            StatusMessage = $"Execution error: {ex.Message}";
-        }
-        finally
-        {
-            IsBusy = false;
-        }
+        });
     }
 
-    [RelayCommand(CanExecute = nameof(CanRunTweaks))]
-    public async Task UndoSelectedTweaksAsync()
-    {
-        if (!Tweakora.App.Services.AppAdminGuard.EnsureAdmin("undo system tweaks"))
-        {
-            StatusMessage = "Administrator privileges required to undo tweaks.";
-            return;
-        }
-
-        var active = _allTweaks.Where(t => t.IsCheckedInUi).ToList();
-        if (active.Count == 0)
-        {
-            StatusMessage = "No tweaks selected to undo.";
-            return;
-        }
-
-        IsBusy = true;
-        try
-        {
-            StatusMessage = $"Reverting {active.Count} tweak(s)...";
-
-            var report = await _tweakService.UndoTweaksAsync(active.Select(c => c.Tweak).ToList(), _runner);
-
-            foreach (var card in active)
-            {
-                card.MarkApplied(false);
-            }
-
-            UpdateStagedState();
-            StatusMessage = $"Revert completed: {report.Summary}.";
-        }
-        catch (Exception ex)
-        {
-            StatusMessage = $"Revert error: {ex.Message}";
-        }
-        finally
-        {
-            IsBusy = false;
-        }
-    }
-
-    public List<string> GetSelectedTweakIds() => _allTweaks.Where(t => t.IsCheckedInUi).Select(t => t.Id).ToList();
+    // Methods for test or external callers
+    public List<string> GetSelectedTweakIds() => _allTweaks.Where(t => t.IsSelected).Select(t => t.Id).ToList();
 
     public void SetSelectedTweakIds(IEnumerable<string> ids)
     {
         var idSet = new HashSet<string>(ids, StringComparer.OrdinalIgnoreCase);
         foreach (var card in _allTweaks)
         {
-            if (idSet.Contains(card.Id) || (card.Origin != null && idSet.Contains(card.Origin)))
-            {
-                card.IsStaged = true;
-                card.StagedTargetState = true;
-                card.IsCheckedInUi = true;
-            }
-            else
-            {
-                card.DiscardStaged();
-            }
+            card.IsSelected = idSet.Contains(card.Id) || (card.Origin != null && idSet.Contains(card.Origin));
         }
-        UpdateStagedState();
+        UpdateCounts();
     }
 }

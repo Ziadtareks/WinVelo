@@ -19,6 +19,11 @@ public sealed class TaskActionHandler : IActionHandler
         bool exists = context.Tasks.TaskExists(path, action.TaskName);
         if (!exists)
         {
+            if (string.Equals(action.Operation, "Disable", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(action.Operation, "Delete", StringComparison.OrdinalIgnoreCase))
+            {
+                return Task.FromResult(new ActionResult { Success = true, Message = $"Task '{path}\\{action.TaskName}' not present (already inactive, skipped)." });
+            }
             return Task.FromResult(new ActionResult { Success = false, Message = $"Task '{path}\\{action.TaskName}' not found." });
         }
 
@@ -45,19 +50,26 @@ public sealed class TaskActionHandler : IActionHandler
         {
             context.Journal.RecordActionWriteAhead(journalRecord);
 
-            switch (action.Operation)
+            try
             {
-                case "Enable":
-                    context.Tasks.EnableTask(path, action.TaskName);
-                    break;
-                case "Disable":
-                    context.Tasks.DisableTask(path, action.TaskName);
-                    break;
-                case "Delete":
-                    context.Tasks.DeleteTask(path, action.TaskName);
-                    break;
-                default:
-                    return Task.FromResult(new ActionResult { Success = false, Message = $"Unknown task operation: {action.Operation}" });
+                switch (action.Operation)
+                {
+                    case "Enable":
+                        context.Tasks.EnableTask(path, action.TaskName);
+                        break;
+                    case "Disable":
+                        context.Tasks.DisableTask(path, action.TaskName);
+                        break;
+                    case "Delete":
+                        context.Tasks.DeleteTask(path, action.TaskName);
+                        break;
+                    default:
+                        return Task.FromResult(new ActionResult { Success = false, Message = $"Unknown task operation: {action.Operation}" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult(new ActionResult { Success = false, Message = $"Task '{path}\\{action.TaskName}' operation failed: {ex.Message}" });
             }
         }
 

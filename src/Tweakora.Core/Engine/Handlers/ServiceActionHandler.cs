@@ -43,25 +43,32 @@ public sealed class ServiceActionHandler : IActionHandler
         {
             context.Journal.RecordActionWriteAhead(journalRecord);
 
-            switch (action.Operation)
+            try
             {
-                case "SetStartup":
-                    if (!string.IsNullOrEmpty(action.StartupType))
-                    {
-                        context.Services.SetStartupType(action.ServiceName, action.StartupType);
-                    }
-                    break;
+                switch (action.Operation)
+                {
+                    case "SetStartup":
+                        if (!string.IsNullOrEmpty(action.StartupType))
+                        {
+                            context.Services.SetStartupType(action.ServiceName, action.StartupType);
+                        }
+                        break;
 
-                case "Start":
-                    context.Services.StartService(action.ServiceName);
-                    break;
+                    case "Start":
+                        context.Services.StartService(action.ServiceName);
+                        break;
 
-                case "Stop":
-                    context.Services.StopService(action.ServiceName);
-                    break;
+                    case "Stop":
+                        context.Services.StopService(action.ServiceName);
+                        break;
 
-                default:
-                    return Task.FromResult(new ActionResult { Success = false, Message = $"Unknown service operation: {action.Operation}" });
+                    default:
+                        return Task.FromResult(new ActionResult { Success = false, Message = $"Unknown service operation: {action.Operation}" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult(new ActionResult { Success = false, Message = $"Service '{action.ServiceName}' operation '{action.Operation}' failed: {ex.Message}" });
             }
         }
 

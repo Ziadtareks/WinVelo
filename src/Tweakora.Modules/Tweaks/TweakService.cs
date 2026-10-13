@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Tweakora.Core.Engine;
 using Tweakora.Core.Engine.Handlers;
+using Tweakora.Core.Engine.Runners;
 using Tweakora.Core.Interfaces;
 using Tweakora.Core.Models;
 using Tweakora.Core.Operations;
@@ -28,6 +29,8 @@ public interface ITweakService
         CancellationToken cancellationToken = default);
     Task<bool> SetPerformancePlanAsync(string planName);
     Task<bool> SetDnsAsync(string primary, string secondary);
+    Task<bool> DetectStateAsync(TweakDefinition tweak, CancellationToken cancellationToken = default);
+    BackupManager BackupManager { get; }
 }
 
 public sealed class TweakService : ITweakService
@@ -43,6 +46,9 @@ public sealed class TweakService : ITweakService
     private readonly StateDetector _detector;
     private readonly TweakRunner _runner;
     private readonly DryRunEngine _dryRun;
+    private readonly BackupManager _backupManager;
+
+    public BackupManager BackupManager => _backupManager;
 
     public TweakService(
         IRegistryService registry,
@@ -58,6 +64,8 @@ public sealed class TweakService : ITweakService
         _restore = restore;
         _shell = shell;
         _journal = journal;
+
+        _backupManager = new BackupManager(_registry, _services, _restore);
 
         _handlers = new List<IActionHandler>
         {
@@ -130,6 +138,11 @@ public sealed class TweakService : ITweakService
         return _detector.IsTweakActiveAsync(tweak, useCache: false).GetAwaiter().GetResult();
     }
 
+    public Task<bool> DetectStateAsync(TweakDefinition tweak, CancellationToken cancellationToken = default)
+    {
+        return _detector.IsTweakActiveAsync(tweak, useCache: false);
+    }
+
     public Task<string> GenerateDryRunDiffAsync(IEnumerable<TweakDefinition> tweaks)
     {
         var list = tweaks.ToList();
@@ -159,6 +172,15 @@ public sealed class TweakService : ITweakService
         IOperationRunner runner,
         CancellationToken cancellationToken = default)
     {
+        try
+        {
+            await _backupManager.CreateSnapshotAsync(tweaks, "Automatic pre-tweak snapshot");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[WARN] Could not create automatic backup snapshot before tweak application: {ex.Message}");
+        }
+
         return await runner.RunAsync(
             "Apply Tweaks",
             tweaks,

@@ -61,40 +61,51 @@ public sealed class RegistryActionHandler : IActionHandler
             }
 
             // Perform actual change
-            switch (action.Operation)
+            try
             {
-                case "Set":
-                    object dataToSet = ParseData(action.Data, action.ValueKind ?? "DWord");
-                    if (dataToSet is string s && s == "<RemoveEntry>")
-                    {
+                switch (action.Operation)
+                {
+                    case "Set":
+                        object dataToSet = ParseData(action.Data, action.ValueKind ?? "DWord");
+                        if (dataToSet is string s && s == "<RemoveEntry>")
+                        {
+                            if (keyExisted && valueExisted && !string.IsNullOrEmpty(action.ValueName))
+                            {
+                                context.Registry.DeleteValue(action.Hive, action.Key, action.ValueName);
+                            }
+                        }
+                        else
+                        {
+                            if (!keyExisted) context.Registry.CreateKey(action.Hive, action.Key);
+                            context.Registry.SetValue(action.Hive, action.Key, action.ValueName ?? string.Empty, dataToSet, action.ValueKind ?? "DWord");
+                        }
+                        break;
+
+                    case "DeleteValue":
                         if (keyExisted && valueExisted && !string.IsNullOrEmpty(action.ValueName))
                         {
                             context.Registry.DeleteValue(action.Hive, action.Key, action.ValueName);
                         }
-                    }
-                    else
-                    {
-                        if (!keyExisted) context.Registry.CreateKey(action.Hive, action.Key);
-                        context.Registry.SetValue(action.Hive, action.Key, action.ValueName ?? string.Empty, dataToSet, action.ValueKind ?? "DWord");
-                    }
-                    break;
+                        break;
 
-                case "DeleteValue":
-                    if (keyExisted && valueExisted && !string.IsNullOrEmpty(action.ValueName))
-                    {
-                        context.Registry.DeleteValue(action.Hive, action.Key, action.ValueName);
-                    }
-                    break;
+                    case "DeleteKey":
+                        if (keyExisted)
+                        {
+                            context.Registry.DeleteKey(action.Hive, action.Key);
+                        }
+                        break;
 
-                case "DeleteKey":
-                    if (keyExisted)
-                    {
-                        context.Registry.DeleteKey(action.Hive, action.Key);
-                    }
-                    break;
-
-                default:
-                    return Task.FromResult(new ActionResult { Success = false, Message = $"Unknown registry operation: {action.Operation}" });
+                    default:
+                        return Task.FromResult(new ActionResult { Success = false, Message = $"Unknown registry operation: {action.Operation}" });
+                }
+            }
+            catch (Exception ex) when (ex is UnauthorizedAccessException or System.Security.SecurityException)
+            {
+                return Task.FromResult(new ActionResult
+                {
+                    Success = false,
+                    Message = $"Access denied for {action.Hive}\\{action.Key} (protected by system or TrustedInstaller): {ex.Message}"
+                });
             }
         }
 

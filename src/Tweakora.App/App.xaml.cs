@@ -106,6 +106,7 @@ public partial class App : Application
                 services.AddSingleton<ConfigViewModel>();
                 services.AddSingleton<UpdatesViewModel>();
                 services.AddSingleton<ToolboxViewModel>();
+                services.AddSingleton<BackupsViewModel>();
                 services.AddSingleton<MainViewModel>();
 
                 // Views
