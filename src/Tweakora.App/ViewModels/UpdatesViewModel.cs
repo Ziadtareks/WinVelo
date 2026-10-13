@@ -103,6 +103,12 @@ public sealed partial class UpdatesViewModel : ObservableObject
     {
         if (!IsApplyEnabled) return;
 
+        if (!Tweakora.App.Services.AppAdminGuard.EnsureAdmin("modify Windows Update policies"))
+        {
+            StatusMessage = "Administrator privileges required to modify update policies.";
+            return;
+        }
+
         IsBusy = true;
         try
         {

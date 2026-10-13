@@ -116,6 +116,12 @@ public sealed partial class ConfigViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(CanExecuteAction))]
     private async Task InstallSelectedFeaturesAsync()
     {
+        if (!Tweakora.App.Services.AppAdminGuard.EnsureAdmin("enable Windows features"))
+        {
+            StatusMessage = "Administrator privileges required to enable features.";
+            return;
+        }
+
         var selected = _allFeatures.Where(f => f.IsSelected).ToList();
         if (selected.Count == 0)
         {
@@ -143,6 +149,12 @@ public sealed partial class ConfigViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(CanExecuteAction))]
     private async Task UninstallSelectedFeaturesAsync()
     {
+        if (!Tweakora.App.Services.AppAdminGuard.EnsureAdmin("disable Windows features"))
+        {
+            StatusMessage = "Administrator privileges required to disable features.";
+            return;
+        }
+
         var selected = _allFeatures.Where(f => f.IsSelected).ToList();
         if (selected.Count == 0)
         {
@@ -174,6 +186,12 @@ public sealed partial class ConfigViewModel : ObservableObject
         {
             _fixService.OpenUrl("https://learn.microsoft.com/en-us/sysinternals/downloads/autologon");
             StatusMessage = "Opened Sysinternals AutoLogon page in browser.";
+            return;
+        }
+
+        if (!Tweakora.App.Services.AppAdminGuard.EnsureAdmin("run system maintenance fixes"))
+        {
+            StatusMessage = "Administrator privileges required to run fixes.";
             return;
         }
 

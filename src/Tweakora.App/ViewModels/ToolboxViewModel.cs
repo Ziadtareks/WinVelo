@@ -103,6 +103,12 @@ public sealed partial class ToolboxViewModel : ObservableObject
     [RelayCommand]
     private async Task CleanNowAsync()
     {
+        if (!Tweakora.App.Services.AppAdminGuard.EnsureAdmin("clean system temporary files"))
+        {
+            CleanerStatusText = "Administrator privileges required to clean temporary files.";
+            return;
+        }
+
         var selected = CleanerCategories.Where(c => c.IsSelected).Select(c => c.Id).ToList();
         if (selected.Count == 0)
         {
@@ -131,6 +137,12 @@ public sealed partial class ToolboxViewModel : ObservableObject
     [RelayCommand]
     private async Task ToggleStartupItemAsync(StartupProgramItem item)
     {
+        if (!Tweakora.App.Services.AppAdminGuard.EnsureAdmin("modify startup programs"))
+        {
+            item.IsEnabled = !item.IsEnabled;
+            return;
+        }
+
         bool targetState = item.IsEnabled;
         bool ok = await _startupService.SetEntryStateAsync(item, targetState);
         if (!ok)
@@ -143,6 +155,12 @@ public sealed partial class ToolboxViewModel : ObservableObject
     [RelayCommand]
     private async Task RunFixAsync(SystemFixDefinition fix)
     {
+        if (!Tweakora.App.Services.AppAdminGuard.EnsureAdmin("run system maintenance fixes"))
+        {
+            FixStatusText = "Administrator privileges required to run fixes.";
+            return;
+        }
+
         FixStatusText = $"Running repair: {fix.Title}...";
         var report = await _fixService.RunFixAsync(fix.Id, _runner);
         FixStatusText = report.FailedCount == 0
@@ -153,6 +171,12 @@ public sealed partial class ToolboxViewModel : ObservableObject
     [RelayCommand]
     private async Task ApplyDnsAsync(DnsProviderDefinition provider)
     {
+        if (!Tweakora.App.Services.AppAdminGuard.EnsureAdmin("change DNS settings"))
+        {
+            DnsStatusText = "Administrator privileges required to change DNS settings.";
+            return;
+        }
+
         DnsStatusText = $"Applying {provider.Name} ({provider.PrimaryDns})...";
         bool ok = await _dnsService.ApplyDnsAsync(provider);
         if (ok)

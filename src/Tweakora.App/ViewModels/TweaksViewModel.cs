@@ -382,6 +382,12 @@ public sealed partial class TweaksViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(CanRunTweaks))]
     public async Task RunTweaksAsync()
     {
+        if (!Tweakora.App.Services.AppAdminGuard.EnsureAdmin("apply system tweaks"))
+        {
+            StatusMessage = "Administrator privileges required to apply tweaks.";
+            return;
+        }
+
         var staged = _allTweaks.Where(t => t.IsStaged).ToList();
         if (staged.Count == 0)
         {
@@ -430,6 +436,12 @@ public sealed partial class TweaksViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(CanRunTweaks))]
     public async Task UndoSelectedTweaksAsync()
     {
+        if (!Tweakora.App.Services.AppAdminGuard.EnsureAdmin("undo system tweaks"))
+        {
+            StatusMessage = "Administrator privileges required to undo tweaks.";
+            return;
+        }
+
         var active = _allTweaks.Where(t => t.IsCheckedInUi).ToList();
         if (active.Count == 0)
         {

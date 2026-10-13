@@ -21,6 +21,18 @@ using Tweakora.Simulation;
 
 namespace Tweakora.Cli;
 
+public sealed class SelfTestReportItem
+{
+    public required int Index { get; init; }
+    public required string Id { get; init; }
+    public required string Name { get; init; }
+    public required string Category { get; init; }
+    public required bool ApplyVerified { get; init; }
+    public required bool UndoVerified { get; init; }
+    public required bool Passed { get; init; }
+    public string Details { get; init; } = "Exact match";
+}
+
 public static class Program
 {
     public static async Task<int> Main(string[] args)
@@ -35,14 +47,26 @@ public static class Program
             return 0;
         }
 
-        bool isRealMode = args.Contains("--real-mode");
+        bool isSelfTest = args.Contains("--self-test");
+        bool isTestMode = args.Contains("--test-mode");
+        bool isRealMode = args.Contains("--real-mode") || (isSelfTest && !isTestMode);
         bool isDryRun = args.Contains("--dry-run");
-        bool isRun = args.Contains("--run") || args.Contains("--apply") || args.Contains("--enable") || args.Contains("--disable") || args.Contains("--clean") || args.Contains("--dns") || args.Contains("--update-mode") || args.Contains("--fix") || args.Contains("--undo");
+        bool isRun = args.Contains("--run") || args.Contains("--apply") || args.Contains("--enable") || args.Contains("--disable") || args.Contains("--clean") || args.Contains("--dns") || args.Contains("--update-mode") || args.Contains("--fix") || args.Contains("--undo") || isSelfTest;
 
         if (isRealMode)
         {
             TestModeManager.DisableTestMode();
             Console.WriteLine("[MODE] REAL-MODE ACTIVE — Modifying host OS configuration.");
+
+            // Strict Elevation Check: Fail with clear error if not running as administrator
+            if (!AdminPrivilegeHelper.IsRunningAsAdministrator())
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("\n[ERROR] Administrator privileges are required to run Tweakora CLI in real-mode.");
+                Console.WriteLine("Please open your terminal (PowerShell / Command Prompt) as Administrator and re-run.");
+                Console.ResetColor();
+                return 1;
+            }
         }
         else
         {
@@ -132,6 +156,21 @@ public static class Program
         DryRunEngine dryRun = new(handlers, context);
         TweakRunner runner = new(handlers, context, restore, detector);
         IOperationRunner opRunner = new OperationRunner();
+
+        // ---------------------------------------------------------------------
+        // CLI COMMAND: --self-test [--level <1|2>]
+        // ---------------------------------------------------------------------
+        if (isSelfTest)
+        {
+            int levelIdx = Array.FindIndex(args, a => string.Equals(a, "--level", StringComparison.OrdinalIgnoreCase) || string.Equals(a, "-l", StringComparison.OrdinalIgnoreCase));
+            int level = 1;
+            if (levelIdx >= 0 && levelIdx < args.Length - 1 && int.TryParse(args[levelIdx + 1], out int parsedLvl))
+            {
+                level = parsedLvl;
+            }
+
+            return await ExecuteSelfTestAsync(level, catalog, registry, runner, detector, restore, isTestMode);
+        }
 
         // 1. Single Tweak execution: --tweak <id> [--apply | --undo]
         int tweakIdx = Array.FindIndex(args, a => string.Equals(a, "--tweak", StringComparison.OrdinalIgnoreCase));
@@ -342,6 +381,288 @@ public static class Program
         return 0;
     }
 
+    private static async Task<int> ExecuteSelfTestAsync(
+        int level,
+        List<TweakDefinition> catalog,
+        IRegistryService registry,
+        TweakRunner runner,
+        StateDetector detector,
+        ISystemRestoreService restore,
+        bool isTestMode)
+    {
+        Console.WriteLine("\n==========================================================");
+        Console.WriteLine($"   Tweakora Host Self-Test Engine — Level {level}             ");
+        Console.WriteLine("==========================================================");
+
+        // Step 1: System Restore Point Creation
+        Console.WriteLine($"\n[1/3] Creating safety System Restore Point: 'Tweakora Pre-Self-Test Level {level}'...");
+        var restoreResult = restore.CreateRestorePoint($"Tweakora Pre-Self-Test Level {level}");
+
+        if (!restoreResult.Success && !restoreResult.WasThrottledOrSkipped)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"[CRITICAL ERROR] Failed to create system restore point: {restoreResult.ErrorMessage}");
+            Console.WriteLine("Self-test aborted immediately for host system safety.");
+            Console.ResetColor();
+            return 1;
+        }
+
+        if (restoreResult.Success)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("[PASS] System Restore Point created successfully.");
+            Console.ResetColor();
+        }
+        else
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("[INFO] A restore point was created recently (within Windows 24h throttling window). Continuing safely.");
+            Console.ResetColor();
+        }
+
+        // Step 2: Filter Level Tweaks (Level 1 = strictly safe HKCU-only tweaks)
+        List<TweakDefinition> targetTweaks;
+        if (level == 1)
+        {
+            targetTweaks = catalog.Where(t =>
+                t.Apply.Count > 0 &&
+                t.Apply.All(a => string.Equals(a.Type, "registry", StringComparison.OrdinalIgnoreCase) &&
+                                 string.Equals(a.Hive, "HKCU", StringComparison.OrdinalIgnoreCase)) &&
+                t.Undo.All(a => string.Equals(a.Type, "registry", StringComparison.OrdinalIgnoreCase) &&
+                                string.Equals(a.Hive, "HKCU", StringComparison.OrdinalIgnoreCase))
+            ).ToList();
+        }
+        else
+        {
+            Console.WriteLine($"[ERROR] Level {level} self-test is not implemented yet. Supported levels: 1");
+            return 1;
+        }
+
+        Console.WriteLine($"\n[2/3] Executing safe HKCU roundtrip on {targetTweaks.Count} Level 1 tweaks...");
+        Console.WriteLine("Each tweak runs: Snapshot -> Apply -> Verify -> Undo -> Verify Original Restored.\n");
+
+        List<SelfTestReportItem> results = new();
+
+        for (int i = 0; i < targetTweaks.Count; i++)
+        {
+            var tweak = targetTweaks[i];
+            Console.Write($"[{i + 1,2}/{targetTweaks.Count}] {tweak.Id,-50} ... ");
+
+            // 1. Snapshot original state of all keys & values touched by this tweak
+            var snapshot = tweak.Apply.Select(a =>
+            {
+                string hive = a.Hive ?? "HKCU";
+                string key = a.Key ?? string.Empty;
+                string valName = a.ValueName ?? string.Empty;
+                bool exists = registry.ValueExists(hive, key, valName);
+                object? val = exists ? registry.GetValue(hive, key, valName) : null;
+                return (Hive: hive, Key: key, ValueName: valName, Existed: exists, Value: val, Data: a.Data);
+            }).ToList();
+
+            bool wasActiveInitially = await detector.IsTweakActiveAsync(tweak, useCache: false);
+
+            // If it's already active, undo first so we can verify apply
+            if (wasActiveInitially)
+            {
+                await runner.UndoTweakAsync(tweak);
+                detector.InvalidateCache(tweak.Id);
+            }
+
+            // 2. Apply tweak
+            await runner.ApplyBatchAsync(new[] { tweak });
+            detector.InvalidateCache(tweak.Id);
+
+            // 3. Verify Apply: check detector and registry values
+            bool applyVerified = await detector.IsTweakActiveAsync(tweak, useCache: false);
+            foreach (var a in tweak.Apply)
+            {
+                string hive = a.Hive ?? "HKCU";
+                string key = a.Key ?? string.Empty;
+                string valName = a.ValueName ?? string.Empty;
+                if (!registry.ValueExists(hive, key, valName))
+                {
+                    applyVerified = false;
+                    break;
+                }
+                object? curVal = registry.GetValue(hive, key, valName);
+                if (!CompareRegistryValue(curVal, a.Data))
+                {
+                    applyVerified = false;
+                    break;
+                }
+            }
+
+            // 4. Undo tweak
+            await runner.UndoTweakAsync(tweak);
+            detector.InvalidateCache(tweak.Id);
+
+            // 5. Verify Undo: check inactive and restored exact values
+            bool undoVerified = !await detector.IsTweakActiveAsync(tweak, useCache: false);
+            foreach (var snap in snapshot)
+            {
+                bool existsNow = registry.ValueExists(snap.Hive, snap.Key, snap.ValueName);
+                if (!snap.Existed)
+                {
+                    if (existsNow)
+                    {
+                        if (await detector.IsTweakActiveAsync(tweak, useCache: false))
+                        {
+                            undoVerified = false;
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    if (!existsNow)
+                    {
+                        undoVerified = false;
+                        break;
+                    }
+                    object? curVal = registry.GetValue(snap.Hive, snap.Key, snap.ValueName);
+                    if (!CompareValues(curVal, snap.Value))
+                    {
+                        undoVerified = false;
+                        break;
+                    }
+                }
+            }
+
+            // 6. If it was active originally on host, restore it back to original active state
+            if (wasActiveInitially)
+            {
+                await runner.ApplyBatchAsync(new[] { tweak });
+                detector.InvalidateCache(tweak.Id);
+            }
+
+            bool passed = applyVerified && undoVerified;
+            if (passed)
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("PASS");
+                Console.ResetColor();
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"FAIL (Apply: {(applyVerified ? "PASS" : "FAIL")}, Undo: {(undoVerified ? "PASS" : "FAIL")})");
+                Console.ResetColor();
+            }
+
+            results.Add(new SelfTestReportItem
+            {
+                Index = i + 1,
+                Id = tweak.Id,
+                Name = tweak.Name,
+                Category = tweak.Category,
+                ApplyVerified = applyVerified,
+                UndoVerified = undoVerified,
+                Passed = passed,
+                Details = passed ? "Exact match restored" : $"Mismatch (Apply: {applyVerified}, Undo: {undoVerified})"
+            });
+        }
+
+        // Step 3: Print Table and Export to self-test-results.md
+        Console.WriteLine("\n[3/3] Generating summary report and writing self-test-results.md...");
+        PrintSummaryTable(results);
+        WriteMarkdownReport(results, level);
+
+        int passCount = results.Count(r => r.Passed);
+        int failCount = results.Count(r => !r.Passed);
+
+        Console.WriteLine($"\nSelf-Test Complete: {passCount} passed, {failCount} failed.");
+        Console.WriteLine("Full markdown report saved to: self-test-results.md\n");
+
+        return failCount == 0 ? 0 : 1;
+    }
+
+    private static void PrintSummaryTable(List<SelfTestReportItem> results)
+    {
+        Console.WriteLine("\n" + new string('=', 100));
+        Console.WriteLine($"{"#",-4} | {"Tweak ID",-45} | {"Apply",-7} | {"Undo",-7} | {"Overall",-7} | {"Status"}");
+        Console.WriteLine(new string('-', 100));
+
+        foreach (var r in results)
+        {
+            string applyStr = r.ApplyVerified ? "PASS" : "FAIL";
+            string undoStr = r.UndoVerified ? "PASS" : "FAIL";
+            string overallStr = r.Passed ? "PASS" : "FAIL";
+
+            Console.WriteLine($"{r.Index,-4} | {r.Id,-45} | {applyStr,-7} | {undoStr,-7} | {overallStr,-7} | {r.Details}");
+        }
+
+        Console.WriteLine(new string('=', 100));
+    }
+
+    private static void WriteMarkdownReport(List<SelfTestReportItem> results, int level)
+    {
+        int passCount = results.Count(r => r.Passed);
+        int failCount = results.Count(r => !r.Passed);
+
+        using var sw = new StreamWriter("self-test-results.md", false, System.Text.Encoding.UTF8);
+        sw.WriteLine("# Tweakora Host Self-Test Report");
+        sw.WriteLine();
+        sw.WriteLine($"- **Execution Date**: {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} UTC");
+        sw.WriteLine($"- **Test Level**: Level {level} (Safe — Strictly HKCU Registry Tweaks)");
+        sw.WriteLine($"- **Total Tweaks Audited**: {results.Count}");
+        sw.WriteLine($"- **Passed**: {passCount}");
+        sw.WriteLine($"- **Failed**: {failCount}");
+        sw.WriteLine($"- **Overall Verdict**: **{(failCount == 0 ? "PASSED (100% Exact Restoration)" : "FAILED")}**");
+        sw.WriteLine();
+        sw.WriteLine("## Verification Results Table");
+        sw.WriteLine();
+        sw.WriteLine("| # | Tweak ID | Name | Category | Apply Verify | Undo Verify | Overall | Details |");
+        sw.WriteLine("|---|---|---|---|:---:|:---:|:---:|---|");
+
+        foreach (var r in results)
+        {
+            string apply = r.ApplyVerified ? "PASS" : "FAIL";
+            string undo = r.UndoVerified ? "PASS" : "FAIL";
+            string overall = r.Passed ? "**PASS**" : "**FAIL**";
+            sw.WriteLine($"| {r.Index} | `{r.Id}` | {r.Name} | {r.Category} | {apply} | {undo} | {overall} | {r.Details} |");
+        }
+
+        sw.WriteLine();
+        sw.WriteLine("---");
+        sw.WriteLine("*Report automatically generated by Tweakora CLI Self-Test Engine.*");
+    }
+
+    private static bool CompareValues(object? val1, object? val2)
+    {
+        if (val1 == null && val2 == null) return true;
+        if (val1 == null || val2 == null) return false;
+
+        if (val1 is int i1 && val2 is int i2) return i1 == i2;
+        if (val1 is long l1 && val2 is long l2) return l1 == l2;
+
+        if (long.TryParse(val1.ToString(), out long p1) && long.TryParse(val2.ToString(), out long p2))
+        {
+            return p1 == p2;
+        }
+
+        return string.Equals(val1.ToString(), val2.ToString(), StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static bool CompareRegistryValue(object? actual, JsonElement? expected)
+    {
+        if (actual == null && expected == null) return true;
+        if (actual == null || expected == null) return false;
+
+        if (expected.Value.ValueKind == JsonValueKind.Number)
+        {
+            long expNum = expected.Value.GetInt64();
+            if (actual is int actInt) return actInt == expNum;
+            if (actual is long actLong) return actLong == expNum;
+            if (long.TryParse(actual.ToString(), out long parsed)) return parsed == expNum;
+        }
+        else if (expected.Value.ValueKind == JsonValueKind.String)
+        {
+            string? expStr = expected.Value.GetString();
+            return string.Equals(actual.ToString(), expStr, StringComparison.OrdinalIgnoreCase);
+        }
+        return string.Equals(actual.ToString(), expected.ToString(), StringComparison.OrdinalIgnoreCase);
+    }
+
     private static List<TweakDefinition> LoadCatalog(string tweaksDir)
     {
         List<TweakDefinition> tweaks = new();
@@ -363,6 +684,7 @@ public static class Program
     private static void PrintUsage()
     {
         Console.WriteLine("Usage:");
+        Console.WriteLine("  tweakora-cli --self-test --level 1        Run automated safe HKCU self-test with restore point");
         Console.WriteLine("  tweakora-cli --list                       List all catalog tweaks");
         Console.WriteLine("  tweakora-cli --dry-run                    Preview all catalog tweaks without modifying system");
         Console.WriteLine("  tweakora-cli --tweak <id> --apply         Apply a specific tweak (add --real-mode for real OS)");

@@ -21,7 +21,7 @@ Repository Location: `C:\Dev\Tweakora`
 | **Phase B (Re-Architecture)** | DI injection, MVVM AsyncRelayCommand, OperationRunner, Admin check | **DONE** | Fakes segregated to `Tweakora.Simulation`. 9 clean domain services implemented in `Tweakora.Modules`. 4 architecture integrity gates pass. |
 | **Phase D (Fix Every Feature)** | Make every row in FEATURE_MATRIX.md real and verified | **DONE** | All 83 active actions wired to real platform APIs (WinGet, DISM, SFC, Registry, SCM, netsh). 0 fakes in production code. |
 | **Phase E (UI Quality)** | Visual polish, button progress, 1280x720 + 1920x1080 screenshots | **DONE** | FlaUI UI automation passes across all 5 tabs and dialogs. Generated high-res screenshots in `docs/screenshots/`. |
-| **Phase C (Sandbox / VM Tests)**| Real integration test runner inside isolated VirtualBox VM | **PREPARED** | `docs/VM_SETUP.md`, `tests/vm/run-vm-tests.ps1`, `tests/vm/run-integration.ps1` ready. Waiting for user VM. |
+| **Host Verification Phase**    | User-driven real host verification (3 safety levels) | **ACTIVE** | `TEST_PLAN_HOST.md` created. `tweakora-cli --self-test --level 1` implemented with restore point and roundtrip verification. VM scripts preserved in `tests/vm/` for future optional use. |
 
 ---
 

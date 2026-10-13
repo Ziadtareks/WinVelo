@@ -160,6 +160,12 @@ public sealed partial class InstallViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(CanExecuteAction))]
     private async Task InstallSelectedAsync()
     {
+        if (!Tweakora.App.Services.AppAdminGuard.EnsureAdmin("install applications"))
+        {
+            StatusMessage = "Administrator privileges required to install applications.";
+            return;
+        }
+
         var selected = _allApps.Where(a => a.IsSelected).ToList();
         if (selected.Count == 0)
         {
@@ -187,6 +193,12 @@ public sealed partial class InstallViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(CanExecuteAction))]
     private async Task UninstallSelectedAsync()
     {
+        if (!Tweakora.App.Services.AppAdminGuard.EnsureAdmin("uninstall applications"))
+        {
+            StatusMessage = "Administrator privileges required to uninstall applications.";
+            return;
+        }
+
         var selected = _allApps.Where(a => a.IsSelected).ToList();
         if (selected.Count == 0)
         {
@@ -214,6 +226,12 @@ public sealed partial class InstallViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(CanExecuteAction))]
     private async Task UpgradeAllAsync()
     {
+        if (!Tweakora.App.Services.AppAdminGuard.EnsureAdmin("upgrade applications"))
+        {
+            StatusMessage = "Administrator privileges required to upgrade applications.";
+            return;
+        }
+
         IsBusy = true;
         try
         {
