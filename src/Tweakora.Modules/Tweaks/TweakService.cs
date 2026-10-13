@@ -84,7 +84,7 @@ public sealed class TweakService : ITweakService
             Shell = _shell,
             Journal = _journal,
             IsDryRun = false,
-            BackupDirectory = Path.Combine(Path.GetTempPath(), "Tweakora_Backups")
+            BackupDirectory = Path.Combine(Path.GetTempPath(), "WinVelo_Backups")
         };
 
         _detector = new StateDetector(_registry, _services, _tasks);
@@ -150,7 +150,7 @@ public sealed class TweakService : ITweakService
 
         var previews = _dryRun.GeneratePreview(list);
         using var sw = new StringWriter();
-        sw.WriteLine($"=== TWEAKORA DIFF PREVIEW ({list.Count} TWEAKS STAGED) ===");
+        sw.WriteLine($"=== WINVELO DIFF PREVIEW ({list.Count} TWEAKS STAGED) ===");
         sw.WriteLine($"Generated: {DateTime.Now:yyyy-MM-dd HH:mm:ss}\n");
 
         foreach (var p in previews)

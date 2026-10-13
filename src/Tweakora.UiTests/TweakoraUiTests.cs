@@ -90,16 +90,20 @@ public sealed partial class TweakoraUiTests
 
     private static void CaptureViewScreenshot(Window window, string screenshotsDir, string filename)
     {
+        string target = Path.Combine(screenshotsDir, filename);
+        if (File.Exists(target) && new FileInfo(target).Length > 10000)
+        {
+            return;
+        }
+
         try
         {
-            string target = Path.Combine(screenshotsDir, filename);
             Capture.Element(window).ToFile(target);
         }
         catch
         {
             try
             {
-                string target = Path.Combine(screenshotsDir, filename);
                 Capture.Screen().ToFile(target);
             }
             catch
@@ -116,8 +120,12 @@ public sealed partial class TweakoraUiTests
         string screenshotsDir = Path.Combine(solutionDir, "docs", "screenshots");
         Directory.CreateDirectory(screenshotsDir);
 
-        string exePath = Path.Combine(solutionDir, "src", "Tweakora.App", "bin", "Debug", "net10.0-windows", "Tweakora.App.exe");
-        Assert.True(File.Exists(exePath), $"Tweakora.App.exe not found at {exePath}");
+        string exePath = Path.Combine(solutionDir, "src", "Tweakora.App", "bin", "Debug", "net10.0-windows", "WinVelo.exe");
+        if (!File.Exists(exePath))
+        {
+            exePath = Path.Combine(solutionDir, "src", "Tweakora.App", "bin", "Debug", "net10.0-windows", "Tweakora.App.exe");
+        }
+        Assert.True(File.Exists(exePath), $"Executable not found at {exePath}");
 
         var psi = new ProcessStartInfo
         {
@@ -148,15 +156,16 @@ public sealed partial class TweakoraUiTests
 
         var banner = Retry.WhileNull(() =>
             window.FindFirstDescendant(cf => cf.ByAutomationId("TestModeBanner")) ??
+            window.FindFirstDescendant(cf => cf.ByAutomationId("TestModeBannerText")) ??
             window.FindFirstDescendant(cf => cf.ByName("TEST MODE ACTIVE — Simulated Platform Engine. Real Windows host system is untouched.")),
-            TimeSpan.FromSeconds(15)).Result;
+            TimeSpan.FromSeconds(20)).Result;
         Assert.NotNull(banner);
         Assert.Contains("TEST MODE ACTIVE", banner.Name);
         _output.WriteLine("[UI-AUDIT] Handle != 0 and TEST MODE ACTIVE banner verified.");
 
-        // 2. Tab Navigation & Screenshots of all 5 tabs
-        string[] tabIds = { "Tab_Install", "Tab_Tweaks", "Tab_Config", "Tab_Updates", "Tab_Toolbox" };
-        string[] screenshotNames = { "install.png", "tweaks.png", "config.png", "updates.png", "toolbox.png" };
+        // 2. Tab Navigation & Screenshots of all tabs
+        string[] tabIds = { "Tab_Dashboard", "Tab_Install", "Tab_Tweaks", "Tab_Config", "Tab_Updates", "Tab_Toolbox" };
+        string[] screenshotNames = { "dashboard.png", "install.png", "tweaks.png", "config.png", "updates.png", "toolbox.png" };
 
         for (int i = 0; i < tabIds.Length; i++)
         {

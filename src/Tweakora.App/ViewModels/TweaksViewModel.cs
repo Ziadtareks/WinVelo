@@ -372,6 +372,9 @@ public sealed partial class TweaksViewModel : ObservableObject
         });
     }
 
+    [ObservableProperty]
+    private bool _isBeginnerMode = false;
+
     public void SetSearchQuery(string query)
     {
         SearchQuery = query;
@@ -379,6 +382,13 @@ public sealed partial class TweaksViewModel : ObservableObject
 
     partial void OnSearchQueryChanged(string value) => ApplyFilter();
     partial void OnSelectedCategoryChanged(string value) => ApplyFilter();
+    partial void OnIsBeginnerModeChanged(bool value) => ApplyFilter();
+
+    [RelayCommand]
+    public void SetMode(string mode)
+    {
+        IsBeginnerMode = string.Equals(mode, "Beginner", StringComparison.OrdinalIgnoreCase);
+    }
 
     [RelayCommand]
     public void SelectCategory(string category)
@@ -399,6 +409,15 @@ public sealed partial class TweaksViewModel : ObservableObject
 
         foreach (var card in _allTweaks)
         {
+            // Beginner mode filter: hide caution / high-risk tweaks
+            if (IsBeginnerMode)
+            {
+                if (card.IsHighRisk || string.Equals(card.Risk, "Caution", StringComparison.OrdinalIgnoreCase) || card.CategoryGroup == "Advanced")
+                {
+                    continue;
+                }
+            }
+
             // Category filter
             if (!string.Equals(cat, "All", StringComparison.OrdinalIgnoreCase))
             {
@@ -425,6 +444,55 @@ public sealed partial class TweaksViewModel : ObservableObject
             else if (card.CategoryGroup == "Advanced") AdvancedTweaks.Add(card);
             else if (card.CategoryGroup == "Customize UI") PreferenceToggles.Add(card);
             else ExtraTweaks.Add(card);
+        }
+    }
+
+    [RelayCommand]
+    public async Task ToggleTweakAsync(TweakCardModel card)
+    {
+        if (card == null || card.IsBusy) return;
+        card.IsBusy = true;
+        try
+        {
+            if (!card.IsActive)
+            {
+                AddLog("INFO", $"Applying tweak: {card.Title}...");
+                var report = await _tweakService.ApplyTweaksAsync(new[] { card.Tweak }, _runner);
+                var res = report.Results.FirstOrDefault();
+                if (res != null && res.Status == OperationItemStatus.Succeeded)
+                {
+                    card.IsActive = true;
+                    AddLog("OK", $"Successfully applied: {card.Title}");
+                }
+                else
+                {
+                    AddLog("ERR", $"Failed to apply {card.Title}: {res?.Reason ?? "Operation incomplete"}");
+                }
+            }
+            else
+            {
+                AddLog("INFO", $"Reverting tweak: {card.Title}...");
+                var report = await _tweakService.UndoTweaksAsync(new[] { card.Tweak }, _runner);
+                var res = report.Results.FirstOrDefault();
+                if (res != null && res.Status == OperationItemStatus.Succeeded)
+                {
+                    card.IsActive = false;
+                    AddLog("OK", $"Successfully reverted: {card.Title}");
+                }
+                else
+                {
+                    AddLog("ERR", $"Failed to revert {card.Title}: {res?.Reason ?? "Operation incomplete"}");
+                }
+            }
+            UpdateCounts();
+        }
+        catch (Exception ex)
+        {
+            AddLog("ERR", $"Error toggling {card.Title}: {ex.Message}");
+        }
+        finally
+        {
+            card.IsBusy = false;
         }
     }
 
@@ -673,7 +741,7 @@ public sealed partial class TweaksViewModel : ObservableObject
 
         try
         {
-            var res = await _tweakService.BackupManager.CreateSystemRestorePointAsync($"Tweakora Manual Restore Point {DateTime.Now:yyyy-MM-dd HH:mm}");
+            var res = await _tweakService.BackupManager.CreateSystemRestorePointAsync($"WinVelo Manual Restore Point {DateTime.Now:yyyy-MM-dd HH:mm}");
             if (res.Success)
             {
                 AddLog("OK", "System Restore Point created successfully.");

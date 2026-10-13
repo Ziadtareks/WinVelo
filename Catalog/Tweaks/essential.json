@@ -179,7 +179,7 @@
     "detect": {
       "type": "Registry",
       "hive": "HKLM",
-      "key": "SOFTWARE\\Tweakora\\Simulated",
+      "key": "SOFTWARE\\WinVelo\\State",
       "valueName": "WPFTweaksWidget",
       "matchType": "Equals",
       "expectedValue": 1
@@ -194,7 +194,7 @@
       {
         "type": "Registry",
         "hive": "HKLM",
-        "key": "SOFTWARE\\Tweakora\\Simulated",
+        "key": "SOFTWARE\\WinVelo\\State",
         "operation": "Set",
         "valueName": "WPFTweaksWidget",
         "valueKind": "DWord",
@@ -211,7 +211,7 @@
       {
         "type": "Registry",
         "hive": "HKLM",
-        "key": "SOFTWARE\\Tweakora\\Simulated",
+        "key": "SOFTWARE\\WinVelo\\State",
         "operation": "DeleteValue",
         "valueName": "WPFTweaksWidget"
       }
@@ -287,7 +287,7 @@
     "detect": {
       "type": "Registry",
       "hive": "HKLM",
-      "key": "SOFTWARE\\Tweakora\\Simulated",
+      "key": "SOFTWARE\\WinVelo\\State",
       "valueName": "WPFTweaksDisableStoreSearch",
       "matchType": "Equals",
       "expectedValue": 1
@@ -302,7 +302,7 @@
       {
         "type": "Registry",
         "hive": "HKLM",
-        "key": "SOFTWARE\\Tweakora\\Simulated",
+        "key": "SOFTWARE\\WinVelo\\State",
         "operation": "Set",
         "valueName": "WPFTweaksDisableStoreSearch",
         "valueKind": "DWord",
@@ -319,7 +319,7 @@
       {
         "type": "Registry",
         "hive": "HKLM",
-        "key": "SOFTWARE\\Tweakora\\Simulated",
+        "key": "SOFTWARE\\WinVelo\\State",
         "operation": "DeleteValue",
         "valueName": "WPFTweaksDisableStoreSearch"
       }
@@ -1072,7 +1072,7 @@
     "detect": {
       "type": "Registry",
       "hive": "HKLM",
-      "key": "SOFTWARE\\Tweakora\\Simulated",
+      "key": "SOFTWARE\\WinVelo\\State",
       "valueName": "WPFTweaksDiskCleanup",
       "matchType": "Equals",
       "expectedValue": 1
@@ -1087,7 +1087,7 @@
       {
         "type": "Registry",
         "hive": "HKLM",
-        "key": "SOFTWARE\\Tweakora\\Simulated",
+        "key": "SOFTWARE\\WinVelo\\State",
         "operation": "Set",
         "valueName": "WPFTweaksDiskCleanup",
         "valueKind": "DWord",
@@ -1104,7 +1104,7 @@
       {
         "type": "Registry",
         "hive": "HKLM",
-        "key": "SOFTWARE\\Tweakora\\Simulated",
+        "key": "SOFTWARE\\WinVelo\\State",
         "operation": "DeleteValue",
         "valueName": "WPFTweaksDiskCleanup"
       }
@@ -1132,7 +1132,7 @@
     "detect": {
       "type": "Registry",
       "hive": "HKLM",
-      "key": "SOFTWARE\\Tweakora\\Simulated",
+      "key": "SOFTWARE\\WinVelo\\State",
       "valueName": "WPFTweaksDeleteTempFiles",
       "matchType": "Equals",
       "expectedValue": 1
@@ -1147,7 +1147,7 @@
       {
         "type": "Registry",
         "hive": "HKLM",
-        "key": "SOFTWARE\\Tweakora\\Simulated",
+        "key": "SOFTWARE\\WinVelo\\State",
         "operation": "Set",
         "valueName": "WPFTweaksDeleteTempFiles",
         "valueKind": "DWord",
@@ -1164,7 +1164,7 @@
       {
         "type": "Registry",
         "hive": "HKLM",
-        "key": "SOFTWARE\\Tweakora\\Simulated",
+        "key": "SOFTWARE\\WinVelo\\State",
         "operation": "DeleteValue",
         "valueName": "WPFTweaksDeleteTempFiles"
       }
@@ -1192,7 +1192,7 @@
     "detect": {
       "type": "Registry",
       "hive": "HKLM",
-      "key": "SOFTWARE\\Tweakora\\Simulated",
+      "key": "SOFTWARE\\WinVelo\\State",
       "valueName": "WPFTweaksDisableExplorerAutoDiscovery",
       "matchType": "Equals",
       "expectedValue": 1
@@ -1207,7 +1207,7 @@
       {
         "type": "Registry",
         "hive": "HKLM",
-        "key": "SOFTWARE\\Tweakora\\Simulated",
+        "key": "SOFTWARE\\WinVelo\\State",
         "operation": "Set",
         "valueName": "WPFTweaksDisableExplorerAutoDiscovery",
         "valueKind": "DWord",
@@ -1224,7 +1224,7 @@
       {
         "type": "Registry",
         "hive": "HKLM",
-        "key": "SOFTWARE\\Tweakora\\Simulated",
+        "key": "SOFTWARE\\WinVelo\\State",
         "operation": "DeleteValue",
         "valueName": "WPFTweaksDisableExplorerAutoDiscovery"
       }

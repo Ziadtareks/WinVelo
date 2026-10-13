@@ -5,11 +5,11 @@
     <LangVersion>latest</LangVersion>
     <AnalysisLevel>latest</AnalysisLevel>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-    <Company>Tweakora Team</Company>
-    <Product>Tweakora</Product>
-    <Version>1.0.0-rc1</Version>
-    <Authors>Tweakora Contributors</Authors>
-    <RepositoryUrl>https://github.com/tweakora/tweakora</RepositoryUrl>
+    <Company>WinVelo Team</Company>
+    <Product>WinVelo</Product>
+    <Version>1.0.0</Version>
+    <Authors>WinVelo Contributors</Authors>
+    <RepositoryUrl>https://github.com/winvelo/winvelo</RepositoryUrl>
     <NeutralLanguage>en</NeutralLanguage>
   </PropertyGroup>
 </Project>

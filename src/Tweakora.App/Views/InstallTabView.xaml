@@ -9,7 +9,7 @@
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
     </UserControl.Resources>
 
-    <Grid Margin="16,12,16,12">
+    <Grid Margin="20,16,20,16">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" /> <!-- Top Action Bar -->
             <RowDefinition Height="Auto" /> <!-- Category Filter Bar -->
@@ -18,14 +18,14 @@
         </Grid.RowDefinitions>
 
         <!-- Top Action Bar -->
-        <Border Grid.Row="0" Background="{DynamicResource ControlFillColorDefaultBrush}"
+        <Border Grid.Row="0" Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
                 BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
-                BorderThickness="1" CornerRadius="6" Padding="12,8" Margin="0,0,0,10">
+                BorderThickness="1" CornerRadius="8" Padding="14,10" Margin="0,0,0,12">
             <DockPanel LastChildFill="False">
-                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" VerticalAlignment="Center">
                     <!-- Package Manager Selector -->
-                    <TextBlock Text="Package Manager:" VerticalAlignment="Center" Margin="0,0,8,0" FontWeight="SemiBold" />
-                    <ComboBox SelectedValue="{Binding PackageManager, Mode=TwoWay}" Width="120" Margin="0,0,16,0" VerticalAlignment="Center">
+                    <TextBlock Text="Package Manager:" VerticalAlignment="Center" Margin="0,0,8,0" FontWeight="SemiBold" FontSize="13" Foreground="{DynamicResource TextPrimaryBrush}" />
+                    <ComboBox SelectedValue="{Binding PackageManager, Mode=TwoWay}" Width="130" Margin="0,0,16,0" VerticalAlignment="Center">
                         <ComboBoxItem Content="WinGet" IsSelected="True" />
                         <ComboBoxItem Content="Chocolatey" />
                     </ComboBox>
@@ -34,26 +34,27 @@
                     <ui:Button AutomationProperties.AutomationId="InstallSelectedButton"
                                Appearance="Primary" Icon="{ui:SymbolIcon ArrowDownload24}"
                                Content="Install Selected" Command="{Binding InstallSelectedCommand}"
-                               IsEnabled="{Binding IsBusy, Converter={x:Null}}" Margin="0,0,8,0" />
+                               Margin="0,0,8,0" Padding="14,6" FontWeight="SemiBold" />
 
                     <ui:Button AutomationProperties.AutomationId="UninstallSelectedButton"
                                Appearance="Secondary" Icon="{ui:SymbolIcon Delete24}"
                                Content="Uninstall Selected" Command="{Binding UninstallSelectedCommand}"
-                               IsEnabled="{Binding IsBusy, Converter={x:Null}}" Margin="0,0,8,0" />
+                               Margin="0,0,8,0" Padding="14,6" />
 
                     <ui:Button AutomationProperties.AutomationId="UpgradeAllButton"
                                Appearance="Transparent" Icon="{ui:SymbolIcon ArrowSync24}"
                                Content="Upgrade All" Command="{Binding UpgradeAllCommand}"
-                               Margin="0,0,8,0" />
+                               Margin="0,0,8,0" Padding="12,6" />
 
                     <ui:Button AutomationProperties.AutomationId="ClearAppSelectionButton"
                                Appearance="Transparent" Icon="{ui:SymbolIcon Dismiss24}"
-                               Content="Clear Selection" Command="{Binding ClearSelectionCommand}" />
+                               Content="Clear Selection" Command="{Binding ClearSelectionCommand}"
+                               Padding="10,6" />
                 </StackPanel>
 
                 <!-- Selected Counter Badge -->
-                <Border DockPanel.Dock="Right" Background="{DynamicResource AccentFillColorDefaultBrush}"
-                        CornerRadius="12" Padding="10,4" VerticalAlignment="Center">
+                <Border DockPanel.Dock="Right" Background="{DynamicResource AccentPrimaryBrush}"
+                        CornerRadius="12" Padding="12,4" VerticalAlignment="Center">
                     <TextBlock Text="{Binding SelectedCount, StringFormat='{}Selected: {0}'}"
                                Foreground="White" FontWeight="Bold" FontSize="12" />
                 </Border>
@@ -61,7 +62,7 @@
         </Border>
 
         <!-- Category Filter Chips / Bar -->
-        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" Margin="0,0,0,10">
+        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" Margin="0,0,0,12">
             <ItemsControl ItemsSource="{Binding Categories}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -70,7 +71,7 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <ui:Button Content="{Binding}" Margin="0,0,6,0" Padding="12,5"
+                        <ui:Button Content="{Binding}" Margin="0,0,8,0" Padding="14,6"
                                    Command="{Binding DataContext.SelectCategoryCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                    CommandParameter="{Binding}" />
                     </DataTemplate>
@@ -78,48 +79,69 @@
             </ItemsControl>
         </ScrollViewer>
 
-        <!-- Apps List (Dense Multi-Column Grid) -->
-        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" Margin="0,0,0,8">
+        <!-- Apps List (Clean Multi-Column Grid of 36 Famous Software Cards) -->
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="0,0,0,10">
             <ItemsControl ItemsSource="{Binding FilteredApps}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <WrapPanel Orientation="Horizontal" ItemWidth="280" />
+                        <WrapPanel Orientation="Horizontal" ItemWidth="300" />
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <Border Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
                                 BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
-                                BorderThickness="1" CornerRadius="6" Margin="4" Padding="10,8"
+                                BorderThickness="1" CornerRadius="10" Margin="5" Padding="12,10"
                                 ToolTip="{Binding Description}">
                             <Grid>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" /> <!-- Checkbox -->
+                                    <ColumnDefinition Width="Auto" /> <!-- Colorful Icon Tile -->
+                                    <ColumnDefinition Width="*" />    <!-- Name, Category, Badges -->
+                                    <ColumnDefinition Width="Auto" /> <!-- Action / Link -->
                                 </Grid.ColumnDefinitions>
 
                                 <!-- App Checkbox -->
                                 <CheckBox Grid.Column="0" IsChecked="{Binding IsSelected, Mode=TwoWay}"
                                           AutomationProperties.AutomationId="{Binding Key, StringFormat='AppCheck_{0}'}"
-                                          VerticalAlignment="Center" Margin="0,0,8,0" />
+                                          VerticalAlignment="Center" Margin="0,0,10,0" />
 
-                                <!-- App Name & Category -->
-                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="13" TextTrimming="CharacterEllipsis" />
-                                        <Border Visibility="{Binding IsFoss, Converter={StaticResource BoolToVis}}"
+                                <!-- Colorful Branded 42x42 Icon Tile -->
+                                <Border Grid.Column="1" Background="{Binding BrandColor}"
+                                        CornerRadius="10" Width="42" Height="42" Margin="0,0,12,0"
+                                        VerticalAlignment="Center">
+                                    <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <!-- Vector Symbol Icon -->
+                                        <ui:SymbolIcon Symbol="{Binding IconSymbol}" Foreground="White" FontSize="20"
+                                                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    </Grid>
+                                </Border>
+
+                                <!-- App Name, Category & Status Badge -->
+                                <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                                    <DockPanel LastChildFill="False">
+                                        <TextBlock DockPanel.Dock="Left" Text="{Binding Name}" FontWeight="Bold" FontSize="13"
+                                                   Foreground="{DynamicResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis" MaxWidth="150" />
+
+                                        <!-- Installed Badge -->
+                                        <Border DockPanel.Dock="Right" Visibility="{Binding IsInstalled, Converter={StaticResource BoolToVis}}"
                                                 Background="#064E3B" BorderBrush="#059669" BorderThickness="1"
-                                                CornerRadius="3" Padding="4,1" Margin="6,0,0,0" VerticalAlignment="Center">
-                                            <TextBlock Text="FOSS" FontSize="9" FontWeight="Bold" Foreground="#10B981" />
+                                                CornerRadius="8" Padding="6,1" Margin="6,0,0,0" VerticalAlignment="Center">
+                                            <TextBlock Text="INSTALLED" FontSize="9" FontWeight="ExtraBold" Foreground="#10B981" />
                                         </Border>
-                                    </StackPanel>
-                                    <TextBlock Text="{Binding Category}" FontSize="11" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                                    </DockPanel>
+
+                                    <DockPanel LastChildFill="False" Margin="0,3,0,0">
+                                        <TextBlock DockPanel.Dock="Left" Text="{Binding Category}" FontSize="11"
+                                                   Foreground="{DynamicResource TextSecondaryBrush}" />
+                                        <TextBlock DockPanel.Dock="Right" Text="{Binding StatusText}" FontSize="10"
+                                                   Foreground="{DynamicResource TextMutedBrush}" />
+                                    </DockPanel>
                                 </StackPanel>
 
                                 <!-- Website / Info Link Button -->
-                                <ui:Button Grid.Column="2" Appearance="Transparent" Padding="4"
-                                           Icon="{ui:SymbolIcon Globe20}" ToolTip="Open official project website"
+                                <ui:Button Grid.Column="3" Appearance="Transparent" Padding="5" Margin="4,0,0,0"
+                                           Icon="{ui:SymbolIcon Globe20}" ToolTip="Visit official website"
                                            Command="{Binding DataContext.OpenAppWebsiteCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                            CommandParameter="{Binding}" VerticalAlignment="Center" />
                             </Grid>
@@ -132,11 +154,12 @@
         <!-- Progress and Output Log Bar -->
         <Border Grid.Row="3" Background="{DynamicResource ControlFillColorSecondaryBrush}"
                 BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
-                BorderThickness="1" CornerRadius="6" Padding="10,6">
+                BorderThickness="1" CornerRadius="8" Padding="12,8">
             <StackPanel>
                 <Grid Margin="0,0,0,4">
-                    <TextBlock Text="{Binding StatusMessage}" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center" />
-                    <ProgressBar HorizontalAlignment="Right" Width="150" Height="10"
+                    <TextBlock Text="{Binding StatusMessage}" FontSize="12" FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" />
+                    <ProgressBar HorizontalAlignment="Right" Width="180" Height="8"
                                  Value="{Binding ProgressPercent}" Maximum="100" />
                 </Grid>
             </StackPanel>

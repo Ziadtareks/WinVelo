@@ -97,6 +97,8 @@ public sealed partial class InstallViewModel : ObservableObject
 
         ApplyFilter();
         UpdateSelectedCount();
+
+        _ = Task.Run(() => _installService.DetectInstalledStatusAsync(_allApps));
     }
 
     public void SetSearchQuery(string query)

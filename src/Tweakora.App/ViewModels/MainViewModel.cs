@@ -60,6 +60,7 @@ public sealed partial class MainViewModel : ObservableObject
 
     public SystemInfoSummary SystemInfo { get; } = SystemInfoHelper.GetSystemInfo();
 
+    public DashboardViewModel DashboardVM { get; }
     public InstallViewModel InstallVM { get; }
     public TweaksViewModel TweaksVM { get; }
     public ConfigViewModel ConfigVM { get; }
@@ -71,6 +72,7 @@ public sealed partial class MainViewModel : ObservableObject
     public ObservableCollection<PaletteItem> PaletteResults { get; } = new();
 
     public MainViewModel(
+        DashboardViewModel dashboardVM,
         InstallViewModel installVM,
         TweaksViewModel tweaksVM,
         ConfigViewModel configVM,
@@ -78,6 +80,7 @@ public sealed partial class MainViewModel : ObservableObject
         ToolboxViewModel toolboxVM,
         BackupsViewModel backupsVM)
     {
+        DashboardVM = dashboardVM;
         InstallVM = installVM;
         TweaksVM = tweaksVM;
         ConfigVM = configVM;
@@ -85,8 +88,8 @@ public sealed partial class MainViewModel : ObservableObject
         ToolboxVM = toolboxVM;
         BackupsVM = backupsVM;
 
-        _currentPage = TweaksVM;
-        _activeTab = "Tweaks";
+        _currentPage = DashboardVM;
+        _activeTab = "Dashboard";
 
         InitializePalette();
     }
@@ -117,13 +120,14 @@ public sealed partial class MainViewModel : ObservableObject
         ActiveTab = tabName;
         CurrentPage = tabName switch
         {
+            "Dashboard" or "Home" => DashboardVM,
             "Install" => InstallVM,
             "Tweaks" => TweaksVM,
             "Config" => ConfigVM,
             "Updates" => UpdatesVM,
             "Toolbox" => ToolboxVM,
             "Backups" => BackupsVM,
-            _ => TweaksVM
+            _ => DashboardVM
         };
 
         if (!string.IsNullOrEmpty(TopSearchText))
@@ -189,7 +193,7 @@ public sealed partial class MainViewModel : ObservableObject
         {
             var psi = new ProcessStartInfo
             {
-                FileName = Environment.ProcessPath ?? Process.GetCurrentProcess().MainModule?.FileName ?? "Tweakora.exe",
+                FileName = Environment.ProcessPath ?? Process.GetCurrentProcess().MainModule?.FileName ?? "WinVelo.exe",
                 UseShellExecute = true,
                 Verb = "runas"
             };

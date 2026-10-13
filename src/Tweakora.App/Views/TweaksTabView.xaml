@@ -27,6 +27,20 @@
                         <TextBlock Text="{Binding FilteredTweaks.Count, StringFormat='{}{0} available'}"
                                    FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" FontWeight="SemiBold" />
                     </Border>
+
+                    <!-- Beginner vs Pro Mode Switch -->
+                    <Border Background="#1E293B" CornerRadius="6" Padding="2" Margin="14,0,0,0" VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal">
+                            <ui:Button AutomationProperties.AutomationId="ModeBeginnerButton"
+                                       Content="Beginner Mode"
+                                       Command="{Binding SetModeCommand}" CommandParameter="Beginner"
+                                       Padding="10,3" FontSize="11" Margin="0,0,2,0" />
+                            <ui:Button AutomationProperties.AutomationId="ModeProButton"
+                                       Content="Pro Mode (All)"
+                                       Command="{Binding SetModeCommand}" CommandParameter="Pro"
+                                       Padding="10,3" FontSize="11" />
+                        </StackPanel>
+                    </Border>
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center">
@@ -83,8 +97,15 @@
                                                    Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" />
                                     </StackPanel>
 
-                                    <!-- Right Badges -->
+                                    <!-- Right Badges & Direct 1-Click Toggle -->
                                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center">
+                                        <!-- Direct 1-Click Toggle Switch -->
+                                        <ui:ToggleSwitch AutomationProperties.AutomationId="{Binding Id, StringFormat='TweakToggle_{0}'}"
+                                                         IsChecked="{Binding IsActive, Mode=OneWay}"
+                                                         Command="{Binding DataContext.ToggleTweakCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                         CommandParameter="{Binding}"
+                                                         Margin="0,0,10,0" VerticalAlignment="Center" />
+
                                         <!-- Real System State Status Badge -->
                                         <Border Background="{Binding StatusBadgeBackground}"
                                                 BorderBrush="{Binding StatusBadgeBorder}"

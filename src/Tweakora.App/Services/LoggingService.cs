@@ -60,7 +60,7 @@ public static class LoggingConfiguration
     {
         string logDir = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "Tweakora",
+            "WinVelo",
             "Logs"
         );
         Directory.CreateDirectory(logDir);
@@ -68,7 +68,7 @@ public static class LoggingConfiguration
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Debug()
             .WriteTo.File(
-                Path.Combine(logDir, "tweakora-.log"),
+                Path.Combine(logDir, "winvelo-.log"),
                 rollingInterval: RollingInterval.Day,
                 retainedFileCountLimit: 7,
                 outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:u3}] {Message:lj}{NewLine}{Exception}"
@@ -76,6 +76,6 @@ public static class LoggingConfiguration
             .WriteTo.Sink(UiLogSink.Instance)
             .CreateLogger();
 
-        Log.Information("Tweakora logger initialized. Log directory: {LogDir}", logDir);
+        Log.Information("WinVelo logger initialized. Log directory: {LogDir}", logDir);
     }
 }

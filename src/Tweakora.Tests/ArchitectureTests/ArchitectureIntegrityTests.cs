@@ -193,6 +193,7 @@ public sealed class ArchitectureIntegrityTests
         services.AddSingleton<IStartupService, StartupService>();
         services.AddSingleton<IServicesManagerService, ServicesManagerService>();
 
+        services.AddSingleton<DashboardViewModel>();
         services.AddSingleton<InstallViewModel>();
         services.AddSingleton<TweaksViewModel>();
         services.AddSingleton<ConfigViewModel>();
@@ -205,6 +206,7 @@ public sealed class ArchitectureIntegrityTests
 
         var viewModelTypes = new[]
         {
+            typeof(DashboardViewModel),
             typeof(InstallViewModel),
             typeof(TweaksViewModel),
             typeof(ConfigViewModel),

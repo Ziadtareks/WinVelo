@@ -612,7 +612,7 @@
     "detect": {
       "type": "Registry",
       "hive": "HKLM",
-      "key": "SOFTWARE\\Tweakora\\Simulated",
+      "key": "SOFTWARE\\WinVelo\\State",
       "valueName": "WPFTweaksRemoveEdge",
       "matchType": "Equals",
       "expectedValue": 1
@@ -627,7 +627,7 @@
       {
         "type": "Registry",
         "hive": "HKLM",
-        "key": "SOFTWARE\\Tweakora\\Simulated",
+        "key": "SOFTWARE\\WinVelo\\State",
         "operation": "Set",
         "valueName": "WPFTweaksRemoveEdge",
         "valueKind": "DWord",
@@ -644,7 +644,7 @@
       {
         "type": "Registry",
         "hive": "HKLM",
-        "key": "SOFTWARE\\Tweakora\\Simulated",
+        "key": "SOFTWARE\\WinVelo\\State",
         "operation": "DeleteValue",
         "valueName": "WPFTweaksRemoveEdge"
       }
@@ -673,7 +673,7 @@
     "detect": {
       "type": "Registry",
       "hive": "HKLM",
-      "key": "SOFTWARE\\Tweakora\\Simulated",
+      "key": "SOFTWARE\\WinVelo\\State",
       "valueName": "WPFTweaksDisableBitLocker",
       "matchType": "Equals",
       "expectedValue": 1
@@ -688,7 +688,7 @@
       {
         "type": "Registry",
         "hive": "HKLM",
-        "key": "SOFTWARE\\Tweakora\\Simulated",
+        "key": "SOFTWARE\\WinVelo\\State",
         "operation": "Set",
         "valueName": "WPFTweaksDisableBitLocker",
         "valueKind": "DWord",
@@ -705,7 +705,7 @@
       {
         "type": "Registry",
         "hive": "HKLM",
-        "key": "SOFTWARE\\Tweakora\\Simulated",
+        "key": "SOFTWARE\\WinVelo\\State",
         "operation": "DeleteValue",
         "valueName": "WPFTweaksDisableBitLocker"
       }
@@ -785,7 +785,7 @@
     "detect": {
       "type": "Registry",
       "hive": "HKLM",
-      "key": "SOFTWARE\\Tweakora\\Simulated",
+      "key": "SOFTWARE\\WinVelo\\State",
       "valueName": "WPFTweaksRemoveOneDrive",
       "matchType": "Equals",
       "expectedValue": 1
@@ -800,7 +800,7 @@
       {
         "type": "Registry",
         "hive": "HKLM",
-        "key": "SOFTWARE\\Tweakora\\Simulated",
+        "key": "SOFTWARE\\WinVelo\\State",
         "operation": "Set",
         "valueName": "WPFTweaksRemoveOneDrive",
         "valueKind": "DWord",
@@ -817,7 +817,7 @@
       {
         "type": "Registry",
         "hive": "HKLM",
-        "key": "SOFTWARE\\Tweakora\\Simulated",
+        "key": "SOFTWARE\\WinVelo\\State",
         "operation": "DeleteValue",
         "valueName": "WPFTweaksRemoveOneDrive"
       }
@@ -1186,7 +1186,7 @@
     "detect": {
       "type": "Registry",
       "hive": "HKLM",
-      "key": "SOFTWARE\\Tweakora\\Simulated",
+      "key": "SOFTWARE\\WinVelo\\State",
       "valueName": "WPFTweaksReservedStorage",
       "matchType": "Equals",
       "expectedValue": 1
@@ -1201,7 +1201,7 @@
       {
         "type": "Registry",
         "hive": "HKLM",
-        "key": "SOFTWARE\\Tweakora\\Simulated",
+        "key": "SOFTWARE\\WinVelo\\State",
         "operation": "Set",
         "valueName": "WPFTweaksReservedStorage",
         "valueKind": "DWord",
@@ -1218,7 +1218,7 @@
       {
         "type": "Registry",
         "hive": "HKLM",
-        "key": "SOFTWARE\\Tweakora\\Simulated",
+        "key": "SOFTWARE\\WinVelo\\State",
         "operation": "DeleteValue",
         "valueName": "WPFTweaksReservedStorage"
       }
@@ -1448,7 +1448,7 @@
     "detect": {
       "type": "Registry",
       "hive": "HKLM",
-      "key": "SOFTWARE\\Tweakora\\Simulated",
+      "key": "SOFTWARE\\WinVelo\\State",
       "valueName": "WPFTweaksLogiBlock",
       "matchType": "Equals",
       "expectedValue": 1
@@ -1463,7 +1463,7 @@
       {
         "type": "Registry",
         "hive": "HKLM",
-        "key": "SOFTWARE\\Tweakora\\Simulated",
+        "key": "SOFTWARE\\WinVelo\\State",
         "operation": "Set",
         "valueName": "WPFTweaksLogiBlock",
         "valueKind": "DWord",
@@ -1480,7 +1480,7 @@
       {
         "type": "Registry",
         "hive": "HKLM",
-        "key": "SOFTWARE\\Tweakora\\Simulated",
+        "key": "SOFTWARE\\WinVelo\\State",
         "operation": "DeleteValue",
         "valueName": "WPFTweaksLogiBlock"
       }
@@ -1574,7 +1574,7 @@
     "detect": {
       "type": "Registry",
       "hive": "HKLM",
-      "key": "SOFTWARE\\Tweakora\\Simulated",
+      "key": "SOFTWARE\\WinVelo\\State",
       "valueName": "WPFTweaksRightClickMenu",
       "matchType": "Equals",
       "expectedValue": 1
@@ -1589,7 +1589,7 @@
       {
         "type": "Registry",
         "hive": "HKLM",
-        "key": "SOFTWARE\\Tweakora\\Simulated",
+        "key": "SOFTWARE\\WinVelo\\State",
         "operation": "Set",
         "valueName": "WPFTweaksRightClickMenu",
         "valueKind": "DWord",
@@ -1606,7 +1606,7 @@
       {
         "type": "Registry",
         "hive": "HKLM",
-        "key": "SOFTWARE\\Tweakora\\Simulated",
+        "key": "SOFTWARE\\WinVelo\\State",
         "operation": "DeleteValue",
         "valueName": "WPFTweaksRightClickMenu"
       }

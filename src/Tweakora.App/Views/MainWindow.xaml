@@ -5,7 +5,7 @@
                    xmlns:vm="clr-namespace:Tweakora.App.ViewModels"
                    xmlns:views="clr-namespace:Tweakora.App.Views"
                    xmlns:loc="clr-namespace:Tweakora.App.Localization"
-                   Title="Tweakora — Windows 10/11 Performance &amp; Privacy Utility"
+                   Title="WinVelo — Windows Velocity &amp; Performance Utility"
                    Height="860" Width="1360"
                    MinHeight="700" MinWidth="1080"
                    WindowStartupLocation="CenterScreen"
@@ -19,6 +19,9 @@
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisConverter" />
 
+        <DataTemplate DataType="{x:Type vm:DashboardViewModel}">
+            <views:DashboardTabView />
+        </DataTemplate>
         <DataTemplate DataType="{x:Type vm:TweaksViewModel}">
             <views:TweaksTabView />
         </DataTemplate>
@@ -50,7 +53,7 @@
         <!-- TITLEBAR -->
         <ui:TitleBar Grid.Row="0"
                      x:Name="AppTitleBar"
-                     Title="Tweakora"
+                     Title="WinVelo"
                      ShowMaximize="True"
                      ShowMinimize="True"
                      ShowClose="True">
@@ -82,7 +85,7 @@
                             <ContextMenu>
                                 <MenuItem Header="Export Config JSON..." Command="{Binding ExportConfigCommand}" />
                                 <Separator />
-                                <MenuItem Header="About Tweakora" Command="{Binding OpenAboutDialogCommand}" />
+                                <MenuItem Header="About WinVelo" Command="{Binding OpenAboutDialogCommand}" />
                             </ContextMenu>
                         </ui:Button.ContextMenu>
                     </ui:Button>
@@ -113,7 +116,7 @@
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" VerticalAlignment="Center">
                     <ui:SymbolIcon Symbol="ShieldError24" Foreground="#F87171" FontSize="18" Margin="0,0,10,0" VerticalAlignment="Center" />
                     <TextBlock AutomationProperties.AutomationId="AdminWarningBanner"
-                               Text="LIMITED ACCESS — Tweakora is running as a Standard User. Applying system tweaks and services requires Administrator privileges."
+                               Text="LIMITED ACCESS — WinVelo is running as a Standard User. Applying system tweaks and services requires Administrator privileges."
                                FontWeight="Bold" Foreground="#F87171" FontSize="12" VerticalAlignment="Center" />
                 </StackPanel>
                 <Button DockPanel.Dock="Right" Content="Restart as Administrator"
@@ -146,7 +149,7 @@
                             <Border Background="{DynamicResource AccentPrimaryBrush}" CornerRadius="6" Width="28" Height="28" Margin="0,0,8,0">
                                 <ui:SymbolIcon Symbol="Shield24" Foreground="White" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center" />
                             </Border>
-                            <TextBlock Text="TWEAKORA" FontSize="16" FontWeight="ExtraBold"
+                            <TextBlock Text="WINVELO" FontSize="16" FontWeight="ExtraBold"
                                        Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" />
                         </StackPanel>
                         <Border DockPanel.Dock="Right" Background="{DynamicResource StatusDefaultBgBrush}" CornerRadius="4" Padding="6,2" VerticalAlignment="Center">
@@ -157,6 +160,25 @@
                     <!-- Scrollable Navigation Items -->
                     <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
                         <StackPanel>
+                            <!-- OVERVIEW / QUICK START -->
+                            <TextBlock Text="OVERVIEW" FontSize="11" FontWeight="Bold"
+                                       Foreground="{DynamicResource TextMutedBrush}" Margin="8,4,0,6" />
+
+                            <!-- Home (Easy Boost) -->
+                            <Button AutomationProperties.AutomationId="Tab_Dashboard"
+                                    Style="{DynamicResource SidebarNavBtn}"
+                                    Command="{Binding SwitchTabCommand}" CommandParameter="Dashboard" Margin="0,0,0,8">
+                                <DockPanel LastChildFill="False">
+                                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                                        <ui:SymbolIcon Symbol="Home24" FontSize="16" Margin="0,0,8,0" Foreground="{DynamicResource AccentPrimaryBrush}" VerticalAlignment="Center" />
+                                        <TextBlock Text="Home (Easy Boost)" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <Border DockPanel.Dock="Right" Background="{DynamicResource AccentPrimaryBrush}" CornerRadius="6" Padding="6,1" VerticalAlignment="Center">
+                                        <TextBlock Text="HOME" FontSize="9" FontWeight="Bold" Foreground="White" />
+                                    </Border>
+                                </DockPanel>
+                            </Button>
+
                             <!-- CATEGORIES SECTION -->
                             <TextBlock Text="CATEGORIES" FontSize="11" FontWeight="Bold"
                                        Foreground="{DynamicResource TextMutedBrush}" Margin="8,4,0,6" />

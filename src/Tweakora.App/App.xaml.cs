@@ -50,16 +50,17 @@ public partial class App : Application
         // 3. Detect Test Mode from command line arguments or environment variable
         string[] args = Environment.GetCommandLineArgs();
         bool isTestMode = args.Any(a => string.Equals(a, "--test-mode", StringComparison.OrdinalIgnoreCase)) ||
+                          string.Equals(Environment.GetEnvironmentVariable("WINVELO_TEST_MODE"), "1", StringComparison.OrdinalIgnoreCase) ||
                           string.Equals(Environment.GetEnvironmentVariable("TWEAKORA_TEST_MODE"), "1", StringComparison.OrdinalIgnoreCase);
 
         if (isTestMode)
         {
             TestModeManager.EnableTestMode();
-            Log.Warning("⚠️ Tweakora launched in TEST MODE. All system operations are simulated with in-memory fakes.");
+            Log.Warning("⚠️ WinVelo launched in TEST MODE. All system operations are simulated with in-memory fakes.");
         }
         else
         {
-            Log.Information("Tweakora launched in NORMAL PRODUCTION MODE. Using real Windows platform drivers.");
+            Log.Information("WinVelo launched in NORMAL PRODUCTION MODE. Using real Windows platform drivers.");
         }
 
         // 4. Setup Dependency Injection host
@@ -87,7 +88,7 @@ public partial class App : Application
                 // Core Engine and Operation Infrastructure
                 string journalDir = Path.Combine(
                     Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                    "Tweakora", "Journal");
+                    "WinVelo", "Journal");
                 services.AddSingleton(new RollbackJournalManager(journalDir));
                 services.AddSingleton<IOperationRunner, OperationRunner>();
 
@@ -103,6 +104,7 @@ public partial class App : Application
                 services.AddSingleton<IServicesManagerService, ServicesManagerService>();
 
                 // ViewModels
+                services.AddSingleton<DashboardViewModel>();
                 services.AddSingleton<InstallViewModel>();
                 services.AddSingleton<TweaksViewModel>();
                 services.AddSingleton<ConfigViewModel>();
@@ -123,20 +125,24 @@ public partial class App : Application
 
         try
         {
-            Log.Information("Starting Tweakora application host (TestMode={IsTestMode})...", TestModeManager.IsTestMode);
+            Log.Information("Starting WinVelo application host (TestMode={IsTestMode})...", TestModeManager.IsTestMode);
             await _host.StartAsync();
 
             MainWindow window = _host.Services.GetRequiredService<MainWindow>();
             MainWindow = window;
             window.Show();
 
-            Log.Information("Tweakora main window shown successfully.");
+            Log.Information("WinVelo main window shown successfully.");
 
             if (e.Args.Any(a => string.Equals(a, "--capture-screenshots", StringComparison.OrdinalIgnoreCase)))
             {
                 int idx = Array.FindIndex(e.Args, a => string.Equals(a, "--capture-screenshots", StringComparison.OrdinalIgnoreCase));
                 string targetDir = (idx >= 0 && idx + 1 < e.Args.Length && !e.Args[idx + 1].StartsWith("--")) ? e.Args[idx + 1] : "docs/screenshots";
-                window.Loaded += (_, _) => CaptureAllScreenshots(window, targetDir);
+                
+                Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, new Action(() =>
+                {
+                    CaptureAllScreenshots(window, targetDir);
+                }));
                 return;
             }
         }
@@ -144,8 +150,8 @@ public partial class App : Application
         {
             Log.Fatal(ex, "Critical failure during application startup");
             MessageBox.Show(
-                $"Tweakora failed to start:\n\n{ex.Message}\n\nStack Trace:\n{ex.StackTrace}\n\nPlease check the logs in %LOCALAPPDATA%\\Tweakora\\Logs for details.",
-                "Tweakora Startup Error",
+                $"WinVelo failed to start:\n\n{ex.Message}\n\nStack Trace:\n{ex.StackTrace}\n\nPlease check the logs in %LOCALAPPDATA%\\WinVelo\\Logs for details.",
+                "WinVelo Startup Error",
                 MessageBoxButton.OK,
                 MessageBoxImage.Error
             );
@@ -158,6 +164,7 @@ public partial class App : Application
     {
         try
         {
+            Log.Information("Starting automated UI screenshot capture to {TargetDir}...", targetDir);
             Directory.CreateDirectory(targetDir);
             window.Width = 1440;
             window.Height = 900;
@@ -165,35 +172,47 @@ public partial class App : Application
 
             var vm = (MainViewModel)window.DataContext;
 
+            // 0. Dashboard Tab (Home / Easy Boost)
+            vm.SwitchTabCommand.Execute("Dashboard");
+            FlushUi(window);
+            SaveVisualToPng((Visual)window.Content ?? window, 1440, 900, Path.Combine(targetDir, "dashboard.png"));
+            Log.Information("Captured dashboard.png");
+
             // 1. Tweaks Tab
             vm.SwitchTabCommand.Execute("Tweaks");
             FlushUi(window);
-            SaveVisualToPng(window, 1440, 900, Path.Combine(targetDir, "tweaks.png"));
+            SaveVisualToPng((Visual)window.Content ?? window, 1440, 900, Path.Combine(targetDir, "tweaks.png"));
+            Log.Information("Captured tweaks.png");
 
             // 2. Install Tab
             vm.SwitchTabCommand.Execute("Install");
             FlushUi(window);
-            SaveVisualToPng(window, 1440, 900, Path.Combine(targetDir, "install.png"));
+            SaveVisualToPng((Visual)window.Content ?? window, 1440, 900, Path.Combine(targetDir, "install.png"));
+            Log.Information("Captured install.png");
 
             // 3. Config Tab
             vm.SwitchTabCommand.Execute("Config");
             FlushUi(window);
-            SaveVisualToPng(window, 1440, 900, Path.Combine(targetDir, "config.png"));
+            SaveVisualToPng((Visual)window.Content ?? window, 1440, 900, Path.Combine(targetDir, "config.png"));
+            Log.Information("Captured config.png");
 
             // 4. Updates Tab
             vm.SwitchTabCommand.Execute("Updates");
             FlushUi(window);
-            SaveVisualToPng(window, 1440, 900, Path.Combine(targetDir, "updates.png"));
+            SaveVisualToPng((Visual)window.Content ?? window, 1440, 900, Path.Combine(targetDir, "updates.png"));
+            Log.Information("Captured updates.png");
 
             // 5. Toolbox Tab
             vm.SwitchTabCommand.Execute("Toolbox");
             FlushUi(window);
-            SaveVisualToPng(window, 1440, 900, Path.Combine(targetDir, "toolbox.png"));
+            SaveVisualToPng((Visual)window.Content ?? window, 1440, 900, Path.Combine(targetDir, "toolbox.png"));
+            Log.Information("Captured toolbox.png");
 
             // 6. Backups Tab
             vm.SwitchTabCommand.Execute("Backups");
             FlushUi(window);
-            SaveVisualToPng(window, 1440, 900, Path.Combine(targetDir, "backups.png"));
+            SaveVisualToPng((Visual)window.Content ?? window, 1440, 900, Path.Combine(targetDir, "backups.png"));
+            Log.Information("Captured backups.png");
 
             // 7. Diff Preview Overlay
             vm.SwitchTabCommand.Execute("Tweaks");
@@ -201,7 +220,8 @@ public partial class App : Application
             FlushUi(window);
             vm.TweaksVM.OpenDiffPreviewCommand.Execute(null);
             FlushUi(window);
-            SaveVisualToPng(window, 1440, 900, Path.Combine(targetDir, "diff-preview.png"));
+            SaveVisualToPng((Visual)window.Content ?? window, 1440, 900, Path.Combine(targetDir, "diff-preview.png"));
+            Log.Information("Captured diff-preview.png");
             vm.TweaksVM.CloseDiffPreviewCommand.Execute(null);
             vm.TweaksVM.ClearSelectionCommand.Execute(null);
             FlushUi(window);
@@ -209,7 +229,8 @@ public partial class App : Application
             // 8. Command Palette Overlay
             vm.ToggleCommandPaletteCommand.Execute(null);
             FlushUi(window);
-            SaveVisualToPng(window, 1440, 900, Path.Combine(targetDir, "command-palette.png"));
+            SaveVisualToPng((Visual)window.Content ?? window, 1440, 900, Path.Combine(targetDir, "command-palette.png"));
+            Log.Information("Captured command-palette.png");
             vm.ToggleCommandPaletteCommand.Execute(null);
 
             Log.Information("All UI screenshots successfully captured to {TargetDir}", targetDir);
@@ -239,8 +260,15 @@ public partial class App : Application
 
     private static void SaveVisualToPng(Visual visual, int width, int height, string filePath)
     {
+        var dv = new DrawingVisual();
+        using (var dc = dv.RenderOpen())
+        {
+            dc.DrawRectangle(new SolidColorBrush(Color.FromRgb(0x0F, 0x11, 0x17)), null, new Rect(0, 0, width, height));
+            dc.DrawRectangle(new VisualBrush(visual) { Stretch = Stretch.UniformToFill }, null, new Rect(0, 0, width, height));
+        }
+
         var rtb = new RenderTargetBitmap(width, height, 96, 96, PixelFormats.Pbgra32);
-        rtb.Render(visual);
+        rtb.Render(dv);
         var encoder = new PngBitmapEncoder();
         encoder.Frames.Add(BitmapFrame.Create(rtb));
         using var stream = File.Create(filePath);

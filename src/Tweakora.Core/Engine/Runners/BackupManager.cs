@@ -57,7 +57,7 @@ public sealed class BackupManager
         _restoreService = restoreService;
         _backupsRoot = customBackupsDir ?? Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "Tweakora", "Backups");
+            "WinVelo", "Backups");
     }
 
     public string BackupsRootDirectory => _backupsRoot;

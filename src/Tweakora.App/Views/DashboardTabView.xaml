@@ -1,0 +1,249 @@
+<UserControl x:Class="Tweakora.App.Views.DashboardTabView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:vm="clr-namespace:Tweakora.App.ViewModels"
+             AutomationProperties.AutomationId="DashboardTabView">
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisConverter" />
+    </UserControl.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Margin="24,20,24,24">
+
+            <!-- ==================== SYSTEM HEALTH BANNER ==================== -->
+            <Border Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                    BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                    BorderThickness="1" CornerRadius="10" Padding="20,16" Margin="0,0,0,24">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <!-- Top Row: Welcome & Admin Badge & Restore Point -->
+                    <DockPanel Grid.Row="0" LastChildFill="False" Margin="0,0,0,16">
+                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" VerticalAlignment="Center">
+                            <Border Background="{DynamicResource AccentPrimaryBrush}" CornerRadius="8" Width="36" Height="36" Margin="0,0,12,0">
+                                <ui:SymbolIcon Symbol="ShieldCheckmark24" Foreground="White" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="System Health &amp; Velocity Dashboard" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" />
+                                <TextBlock Text="Real-time hardware status and 1-click optimization center" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- Admin Status Pill & Restore Point Button -->
+                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center">
+                            <!-- Admin Badge -->
+                            <Border Background="{Binding AdminBadgeBg}" CornerRadius="12" Padding="10,4" Margin="0,0,10,0" VerticalAlignment="Center">
+                                <StackPanel Orientation="Horizontal">
+                                    <ui:SymbolIcon Symbol="Shield20" Foreground="{Binding AdminBadgeFg}" FontSize="14" Margin="0,0,6,0" VerticalAlignment="Center" />
+                                    <TextBlock Text="{Binding AdminStatusText}" FontWeight="Bold" FontSize="11" Foreground="{Binding AdminBadgeFg}" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Create Restore Point Button -->
+                            <ui:Button AutomationProperties.AutomationId="CreateRestorePointButton"
+                                       Appearance="Primary"
+                                       Icon="{ui:SymbolIcon History24}"
+                                       Content="Create Restore Point"
+                                       Command="{Binding CreateRestorePointCommand}"
+                                       Padding="12,6" />
+                        </StackPanel>
+                    </DockPanel>
+
+                    <!-- Bottom Row: 3 Hardware Cards (OS, CPU, RAM) -->
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <!-- OS & Device Card -->
+                        <Border Grid.Column="0" Background="{DynamicResource ControlFillColorDefaultBrush}"
+                                BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                                BorderThickness="1" CornerRadius="8" Padding="14,12" Margin="0,0,8,0">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                    <ui:SymbolIcon Symbol="Desktop24" Foreground="{DynamicResource AccentPrimaryBrush}" FontSize="16" Margin="0,0,8,0" VerticalAlignment="Center" />
+                                    <TextBlock Text="OPERATING SYSTEM" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" />
+                                </StackPanel>
+                                <TextBlock Text="{Binding SystemInfo.OsName}" FontSize="14" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis" />
+                                <TextBlock Text="{Binding SystemInfo.BuildNumber, StringFormat='{}Host: {0}'}" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- CPU Card -->
+                        <Border Grid.Column="1" Background="{DynamicResource ControlFillColorDefaultBrush}"
+                                BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                                BorderThickness="1" CornerRadius="8" Padding="14,12" Margin="4,0,4,0">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                    <ui:SymbolIcon Symbol="DeveloperBoard24" Foreground="#38BDF8" FontSize="16" Margin="0,0,8,0" VerticalAlignment="Center" />
+                                    <TextBlock Text="PROCESSOR" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" />
+                                </StackPanel>
+                                <TextBlock Text="{Binding SystemInfo.ProcessorName}" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis" />
+                                <TextBlock Text="{Binding SystemInfo.Architecture}" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- RAM Card with Progress Bar -->
+                        <Border Grid.Column="2" Background="{DynamicResource ControlFillColorDefaultBrush}"
+                                BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                                BorderThickness="1" CornerRadius="8" Padding="14,12" Margin="8,0,0,0">
+                            <StackPanel>
+                                <DockPanel LastChildFill="False" Margin="0,0,0,6">
+                                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                                        <ui:SymbolIcon Symbol="Memory16" Foreground="#34D399" FontSize="16" Margin="0,0,8,0" VerticalAlignment="Center" />
+                                        <TextBlock Text="MEMORY (RAM)" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <TextBlock DockPanel.Dock="Right" Text="{Binding SystemInfo.MemoryLoadPercent, StringFormat='{}{0}%'}" FontSize="11" FontWeight="Bold" Foreground="#34D399" />
+                                </DockPanel>
+                                <TextBlock Text="{Binding SystemInfo.MemoryDisplay}" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" />
+                                <ProgressBar Value="{Binding SystemInfo.MemoryLoadPercent}" Maximum="100" Height="6" Margin="0,6,0,0" Foreground="{DynamicResource AccentPrimaryBrush}" Background="#1E293B" BorderThickness="0" />
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <!-- Global Status Bar Message (if any) -->
+            <Border Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="6" Padding="14,8" Margin="0,0,0,24">
+                <DockPanel LastChildFill="False">
+                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" VerticalAlignment="Center">
+                        <ui:SymbolIcon Symbol="Info24" Foreground="{DynamicResource AccentPrimaryBrush}" FontSize="16" Margin="0,0,8,0" VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding GlobalStatusMessage}" FontSize="12" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" />
+                    </StackPanel>
+                    <TextBlock DockPanel.Dock="Right" Text="{Binding RestorePointStatus}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" />
+                </DockPanel>
+            </Border>
+
+            <!-- ==================== 1-CLICK PROFILES SECTION ==================== -->
+            <TextBlock Text="1-CLICK SMART OPTIMIZATION PROFILES" FontSize="14" FontWeight="ExtraBold"
+                       Foreground="{DynamicResource TextPrimaryBrush}" Margin="2,0,0,12" />
+
+            <ItemsControl ItemsSource="{Binding Profiles}" Margin="0,0,0,28">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <UniformGrid Columns="2" Rows="2" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                                BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                                BorderThickness="1" CornerRadius="10" Padding="18,16" Margin="6">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" /> <!-- Header: Icon, Title, Badge -->
+                                    <RowDefinition Height="*" />    <!-- Description -->
+                                    <RowDefinition Height="Auto" /> <!-- Impact / Tweak Count -->
+                                    <RowDefinition Height="Auto" /> <!-- Action Button & Status -->
+                                </Grid.RowDefinitions>
+
+                                <!-- Card Header -->
+                                <DockPanel Grid.Row="0" LastChildFill="False" Margin="0,0,0,10">
+                                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" VerticalAlignment="Center">
+                                        <Border Background="{DynamicResource ControlFillColorSecondaryBrush}" CornerRadius="8" Width="36" Height="36" Margin="0,0,10,0">
+                                            <ui:SymbolIcon Symbol="{Binding IconSymbol}" Foreground="{DynamicResource AccentPrimaryBrush}" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Border>
+                                        <StackPanel VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Title}" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" />
+                                            <TextBlock Text="{Binding TweakCountText}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" />
+                                        </StackPanel>
+                                    </StackPanel>
+
+                                    <Border DockPanel.Dock="Right" Background="{Binding BadgeBg}" CornerRadius="10" Padding="8,3" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding BadgeText}" FontSize="10" FontWeight="Bold" Foreground="{Binding BadgeFg}" />
+                                    </Border>
+                                </DockPanel>
+
+                                <!-- Description -->
+                                <TextBlock Grid.Row="1" Text="{Binding Description}" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}"
+                                           TextWrapping="Wrap" Margin="0,0,0,12" LineHeight="18" />
+
+                                <!-- Impact Badge -->
+                                <DockPanel Grid.Row="2" Margin="0,0,0,14" LastChildFill="False">
+                                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                                        <ui:SymbolIcon Symbol="Sparkle20" Foreground="#FBBF24" FontSize="14" Margin="0,0,6,0" VerticalAlignment="Center" />
+                                        <TextBlock Text="{Binding ImpactText}" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </DockPanel>
+
+                                <!-- Button & Status Message -->
+                                <DockPanel Grid.Row="3" LastChildFill="False">
+                                    <ui:Button DockPanel.Dock="Left"
+                                               Appearance="Primary"
+                                               AutomationProperties.AutomationId="{Binding Id, StringFormat='ProfileBtn_{0}'}"
+                                               Content="{Binding ButtonText}"
+                                               Command="{Binding ApplyCommand}"
+                                               Padding="16,7" FontWeight="SemiBold" />
+
+                                    <TextBlock DockPanel.Dock="Right" Text="{Binding StatusMessage}" FontSize="11"
+                                               Foreground="#34D399" FontWeight="SemiBold" VerticalAlignment="Center" Margin="10,0,0,0" />
+                                </DockPanel>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <!-- ==================== TOP 8 INSTANT QUICK-TOGGLES ==================== -->
+            <DockPanel LastChildFill="False" Margin="2,0,0,12">
+                <TextBlock DockPanel.Dock="Left" Text="INSTANT QUICK-TOGGLES" FontSize="14" FontWeight="ExtraBold"
+                           Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" />
+                <TextBlock DockPanel.Dock="Right" Text="1-click instant system toggles" FontSize="11"
+                           Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" />
+            </DockPanel>
+
+            <ItemsControl ItemsSource="{Binding QuickToggles}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <UniformGrid Columns="4" Rows="2" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                                BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                                BorderThickness="1" CornerRadius="8" Padding="14,12" Margin="5">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+
+                                <!-- Top Row: Icon + Toggle Switch -->
+                                <DockPanel Grid.Row="0" LastChildFill="False" Margin="0,0,0,8">
+                                    <Border DockPanel.Dock="Left" Background="{DynamicResource ControlFillColorSecondaryBrush}" CornerRadius="6" Width="30" Height="30">
+                                        <ui:SymbolIcon Symbol="{Binding IconSymbol}" Foreground="{DynamicResource AccentPrimaryBrush}" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    </Border>
+
+                                    <!-- Switch Button -->
+                                    <ui:ToggleSwitch DockPanel.Dock="Right"
+                                                     AutomationProperties.AutomationId="{Binding Id, StringFormat='Toggle_{0}'}"
+                                                     IsChecked="{Binding IsActive, Mode=OneWay}"
+                                                     Command="{Binding ToggleCommand}"
+                                                     VerticalAlignment="Center" />
+                                </DockPanel>
+
+                                <!-- Title -->
+                                <TextBlock Grid.Row="1" Text="{Binding Title}" FontSize="13" FontWeight="Bold"
+                                           Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,4" TextTrimming="CharacterEllipsis" />
+
+                                <!-- Description -->
+                                <TextBlock Grid.Row="2" Text="{Binding Description}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"
+                                           TextWrapping="Wrap" MaxHeight="40" TextTrimming="CharacterEllipsis" LineHeight="15" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

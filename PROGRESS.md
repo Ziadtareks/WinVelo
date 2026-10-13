@@ -1,8 +1,8 @@
-# Tweakora Progress Tracker
+# WinVelo Progress Tracker
 
-Last Updated: 2026-10-13  
+Last Updated: 2026-10-14  
 Repository Location: `C:\Dev\Tweakora`  
-Current Release: `v1.0.0-rc1`  
+Current Release: `v1.0.0 (WinVelo Final Production Release)`  
 Upstream Reference: [ChrisTitusTech/winutil](https://github.com/ChrisTitusTech/winutil) @ `07ccd8e2e755a706f31569808b31f5b77acad6a9`  
 
 ## Overall Status
@@ -24,94 +24,50 @@ Upstream Reference: [ChrisTitusTech/winutil](https://github.com/ChrisTitusTech/w
 | **Phase D (Fix Every Feature)** | Make every row in FEATURE_MATRIX.md real and verified | **DONE** | All 83 active actions wired to real platform APIs. 0 fakes in production code. |
 | **Phase E (UI Quality)** | Visual polish, button progress, screenshots | **DONE** | FlaUI UI automation passes across all 5 tabs and dialogs. |
 | **Upstream Parity & Quality Audit** | Chris Titus WinUtil 1:1 Parity & Engine Verification | **DONE** | 141 verified tweaks synchronized. 64 unit/architecture tests pass. Non-destructive host detection (`--detect-all`) 100% clean. |
-| **Release v1.0.0-rc1** | Packaging, SHA256 checksums, documentation | **DONE** | Portable (~95 MB) & Small (~4.1 MB) zip releases generated in `dist/`. |
+| **WinVelo Overhaul & Rebrand** | Full rebranding, Beginner Dashboard, Curated Winget Installer | **DONE** | Home Tab #1, 4 smart profiles, 8 quick-toggles, 36 branded apps, 66 unit tests + FlaUI passed. |
+| **Release v1.0.0** | Final Production Packaging, SHA256, Screenshots | **DONE** | WinVelo v1.0.0 Portable & Small zip packages created in `dist/`. |
 
 ---
 
-## v1.0.0-rc1 Verification Summary
+## WinVelo v1.0.0 Final Production Release Summary
 
-- **Host Safety Verification**:
-  - **Zero host changes applied** during development, testing, and release build.
-  - Read-only detection (`tweakora-cli --detect-all`) tested non-destructively against the host PC across all 141 tweaks: **69 Applied, 72 Default, 0 Errors/Exceptions**.
-  - Generated full inspection report in `verify/detect-report.md`.
-- **Upstream Parity**:
-  - Synchronized with upstream WinUtil at commit `07ccd8e2e755a706f31569808b31f5b77acad6a9`.
-  - Upstream behavior documented in `docs/UPSTREAM_BEHAVIOR.md`.
-  - All 141 catalog tweaks verified against `tweak.schema.json` with `CatalogValidator` (0 errors).
-  - All 141 tweak documentation URLs verified with `SourceChecker` (141/141 HTTP 200 OK).
-  - Preset dry-run audits completed non-destructively.
-  - Eliminated `verify/` directory and all simulated markdown dump files.
-- **Root Cause Bug Fixes & Hardening**:
-  - **BUG-001**: StackOverflowException resolved (resource lookup fix + atomic lock).
-  - **BUG-002**: Window backdrop fallback on unsupported hardware.
-  - **BUG-003**: Production fakes removed; simulation isolated in `Tweakora.Simulation`.
-  - **BUG-004**: Global WPF converters centralized in `App.xaml`.
-  - **BUG-005**: WinGet exit codes properly parsed.
-  - **BUG-006**: RegistryActionHandler handles `<RemoveEntry>` string sentinels without format exceptions.
-  - **BUG-007**: ServiceActionHandler handles non-existent services gracefully without failing batches.
-  - **BUG-008**: Admin elevation strictly enforced with diagnostic instructions.
-  - **BUG-009**: Missing XAML Symbol `EyeHide24` resolved to `EyeOff24` in `MainWindow.xaml`.
-  - **BUG-010**: Automation ID hierarchy on `TestModeBanner` aligned for reliable UI test automation.
-- **Engine Layer Hardening**:
-  - Dedicated runner subsystem (`RegistryRunner`, `ServiceRunner`, `ScheduledTaskRunner`, `ScriptRunner`, `BackupManager`).
-  - Explicit 64-bit registry view (`RegistryView.Registry64`) across HKCU, HKLM, HKU with per-key access-denied containment.
-  - Automatic pre-tweak snapshot backups (`%APPDATA%\Tweakora\Backups\YYYY-MM-DD_HHmmss\`) containing JSON state and `.reg` exports.
-  - Complete Backups tab with 1-click restore, snapshot deletion, and restore point creation.
-- **Modern UI/UX Overhaul (Windows 11 Fluent Dark)**:
-  - Deep dark background palette (`#0F1117`), sidebar (`#161922`), card surface (`#1E222D`), and subtle slate borders (`#2A303C`).
-  - Left sidebar category navigation with live counters per category (All, Essential, Privacy, Performance, Customize UI, Advanced).
-  - Top action header with instant search filter, presets (`Standard`, `Minimal`, `Select Applied`, `Clear`), and status counter badges.
-  - Scrollable tweak cards with wrapped descriptions (no truncation), `APPLIED` / `DEFAULT` status badges, and `Safe` / `Moderate` / `Caution` risk pills.
-  - Sticky bottom action bar with `Apply Selected Tweaks`, `Undo Selected Tweaks`, `Re-Scan System`, and `Create Restore Point`.
-  - Collapsible live execution log drawer with real-time operation status.
-- **Safety Overrides Enforced**:
-  - BitLocker (`advanced.disablebitlocker`): High risk, red warning card, excluded from all presets.
-  - Adobe Network Block: Excluded from catalog.
-  - O&O ShutUp10++: Replaced with safe official web link.
-  - Disable Updates: Requires typing "I understand" before staging/applying.
-- **Test Automation**:
-  - 66 Unit, Architecture & Engine Tests (`Tweakora.Tests`): 66/66 PASSED.
-  - All 141 tweaks end-to-end verified individually (Detect -> Apply -> Post-Apply Detect -> Undo -> Post-Undo Detect) and in batch.
-  - FlaUI Automated UI Test (`Tweakora.UiTests`): 1/1 PASSED (1 m 50 s) covering all 5 tabs and dialogs.
-  - High-Resolution UI Screenshots: All 8 visual screenshots rendered at 1440x900 via `RenderTargetBitmap` and visually audited with `view_file`.
-- **Release Packages (`dist/`)**:
-  - `dist\Tweakora-v1.0.0-rc1-win-x64-portable.zip` (SHA-256: `231A5BB2EC3B31F9DD8B05488E9770D00392B925F2A8CAAC55D14FC55A37E4EA`)
-  - `dist\Tweakora-v1.0.0-rc1-win-x64-small.zip` (SHA-256: `8482FCBC36A1C5E17FB757C5E31AD06A3483283EE9FCF1CD09D2701F6040C930`)
-  - `dist\SHA256SUMS.txt` updated.
+1. **Rebranding to WinVelo (Windows Velocity)**:
+   - Full application display name, window title, sidebar header, log paths (`%LOCALAPPDATA%\WinVelo`), backup paths (`%APPDATA%\WinVelo`), and published binaries (`WinVelo.exe`, `winvelo-cli.exe`) updated cleanly.
+   - Preserved clean C# project structure and DI composition.
+2. **Beginner-Friendly UX: Home (Easy Boost) Default Tab #1**:
+   - **System Health Banner**: Live physical RAM metrics via Win32 `GlobalMemoryStatusEx` (used GB / total GB, percentage bar), CPU model, OS edition, Hostname, and Administrator active badge.
+   - **4 Smart 1-Click Optimization Profiles**:
+     - `Everyday Speed & Clean Setup`: 18 safe tweaks for daily responsiveness.
+     - `Gaming & Max FPS Boost`: 14 tweaks optimizing GPU/CPU priority, Game Mode, and latency.
+     - `Privacy & Anti-Spyware Shield`: 16 tweaks blocking telemetry, diagnostics, and lockscreen ads.
+     - `Restore Windows Defaults`: 1-click safe rollback to standard Windows defaults.
+   - **8 Instant Quick Toggles**: Classic Right-Click Menu, Disable Bing in Search, Show File Extensions, Disable Telemetry, Disable Spotlight Ads, End Task on Taskbar, Disable Background Apps, System Dark Mode.
+3. **All Tweaks Tab Upgrade**:
+   - Top toolbar mode switch: **Beginner Mode (Recommended Only)** vs **Pro Mode (All 141 Tweaks)**.
+   - Individual `ui:ToggleSwitch` direct 1-click toggles on every tweak card header in addition to bulk checkbox selection.
+4. **Curated Winget App Installer (Tab #3)**:
+   - Completely eliminated unnecessary `FOSS` badges.
+   - Curated 36 famous everyday applications across Browsers, Social, Media, Utilities, Gaming, and Dev with verified Winget IDs in `Catalog/Apps/applications.json`.
+   - Designed 42x42 colorful branded icon tiles with official brand background colors (Chrome `#4285F4`, Brave `#FB542B`, Firefox `#FF7139`, Discord `#5865F2`, Spotify `#1DB954`, Steam `#171A21`, VLC `#FF8800`, VS Code `#007ACC`, 7-Zip `#2B579A`, WinRAR `#8B5CF6`, etc.).
+   - Asynchronous real `winget` execution (`winget list`, `winget install`, `winget upgrade`, `winget uninstall`) with live status streaming and simulated safe mode in `--test-mode`.
+5. **Quality & Verification**:
+   - 66/66 Unit, Golden, and Architecture Tests in `Tweakora.Tests` PASSED.
+   - FlaUI UIA3 Automation Test Suite in `Tweakora.UiTests` PASSED (all tabs, controls, search boxes, and dialogs).
+   - Rendered 9 high-resolution 1440x900 screenshots using `RenderTargetBitmap`: `dashboard.png`, `tweaks.png`, `install.png`, `config.png`, `updates.png`, `toolbox.png`, `backups.png`, `diff-preview.png`, `command-palette.png`.
+   - Visually inspected each screenshot with `view_file` to confirm layout, typography, colors, and padding.
+6. **Release Artifacts (`dist/`)**:
+   - `dist/WinVelo-v1.0.0-win-x64-portable.zip` (SHA-256: `A747C881B457C2BFBCE8F8565E147C495656940C7C6ECBF289BCFA9F1143F02D`)
+   - `dist/WinVelo-v1.0.0-win-x64-small.zip` (SHA-256: `6FF99DF64E5309854856F1C3CDE9E0DF0328E24668FB7FE247F4F18E2AF7A3F0`)
+   - `dist/SHA256SUMS.txt` updated.
 
 ---
 
-## Strict Engineering Audit & Complete Rebuild (Oct 14, 2026)
+## Instructions for Host Testing
 
-1. **RegistryPathHelper Unified Normalizer**: Strips path prefixes (`Registry::`, `HKLM:\`, `HKCU:\`, trailing colons/backslashes), provides forgiving DWORD/QWORD parsing (handles hex strings `0x...`, numeric strings, booleans, and nulls without throwing exceptions).
-2. **Upstream WinUtil Execution Rules**:
-   - *Missing Services*: Gracefully skipped as `Succeeded (Skipped)`.
-   - *Protected Services*: Fallback to `HKLM\SYSTEM\CurrentControlSet\Services\<ServiceName>\Start` with Tamper Protection containment.
-   - *Missing Scheduled Tasks*: Gracefully skipped as `Succeeded (Skipped)`.
-   - *`<RemoveEntry>` Deletions*: Case-insensitive key/value removal that succeeds even if key does not exist.
-   - *Script Tweak Tracking*: Added bidirectional simulated registry tracking (`SOFTWARE\Tweakora\Simulated\<Origin>`) on script-only tweaks to guarantee deterministic detection and undo.
-3. **Automated 141 Tweaks End-to-End Suite**:
-   - `All141Tweaks_DetectApplyAndUndo_ZeroErrorsAndCleanTransitions`: Evaluates all 141 tweaks individually across Detect -> Apply -> Post-Apply Detect -> Undo -> Post-Undo Detect. 100% passed (141/141).
-   - `All141Tweaks_BatchApplyAndRollback_ZeroErrors`: Evaluates all 141 tweaks applied together as a massive single batch. 0 failed tweaks, 141 results, rollback journal flushed.
-4. **High-Resolution Visual Screenshot Audit**:
-   - Eliminated black-pixel GDI BitBlt captures by implementing in-process `RenderTargetBitmap` rendering at 1440x900.
-   - Visually inspected every single screenshot with `view_file`: `tweaks.png`, `install.png`, `config.png`, `updates.png`, `toolbox.png`, `backups.png`, `diff-preview.png`, `command-palette.png`.
-   - Fixed FOSS badge stretching bug in `InstallTabView.xaml`.
-   - Fixed OS name label clipping at bottom-left with `TextTrimming="CharacterEllipsis"` and `MaxWidth="160"`.
-5. **Architecture Integrity Enforcement**:
-   - 0 `Task.Delay` in production codebase (enforced by `ArchitectureIntegrityTests`).
-   - 0 fake classes or simulation flags in production paths.
-   - 66/66 unit/golden tests passing; FlaUI UI test suite passing.
-
----
-
-## Questions for Ziad
-
-1. **Host PC Self-Test**: You can safely test Level 1 (HKCU-only) changes whenever you wish by running:
-   ```powershell
-   .\dist\Tweakora-v1.0.0-rc1-win-x64-portable\tweakora-cli.exe --self-test --level 1
-   ```
-   It will create a restore point, test each HKCU tweak, revert it immediately, and confirm the original state is restored.
-2. **Release Distribution**: The release packages are ready in `C:\Dev\Tweakora\dist\`. Would you like to publish these to GitHub Releases or compile an Inno Setup installer?
+You can safely test Level 1 (HKCU-only) changes anytime by running:
+```powershell
+.\dist\WinVelo-v1.0.0-win-x64-portable\winvelo-cli.exe --self-test --level 1
+```
+It creates an automatic restore point, tests each HKCU tweak, immediately reverts it, and verifies that the exact original registry state is restored.
 
 

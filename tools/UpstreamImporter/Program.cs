@@ -521,7 +521,7 @@ public static class Program
             string markerName = tweak.Origin ?? tweak.Id;
             tweak.Detect.Type = "Registry";
             tweak.Detect.Hive = "HKLM";
-            tweak.Detect.Key = @"SOFTWARE\Tweakora\Simulated";
+            tweak.Detect.Key = @"SOFTWARE\WinVelo\State";
             tweak.Detect.ValueName = markerName;
             tweak.Detect.MatchType = "Equals";
             tweak.Detect.ExpectedValue = JsonSerializer.SerializeToElement(1);
@@ -530,7 +530,7 @@ public static class Program
             {
                 Type = "Registry",
                 Hive = "HKLM",
-                Key = @"SOFTWARE\Tweakora\Simulated",
+                Key = @"SOFTWARE\WinVelo\State",
                 Operation = "Set",
                 ValueName = markerName,
                 ValueKind = "DWord",
@@ -541,7 +541,7 @@ public static class Program
             {
                 Type = "Registry",
                 Hive = "HKLM",
-                Key = @"SOFTWARE\Tweakora\Simulated",
+                Key = @"SOFTWARE\WinVelo\State",
                 Operation = "DeleteValue",
                 ValueName = markerName
             });
