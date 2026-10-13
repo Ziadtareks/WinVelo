@@ -164,7 +164,26 @@ public sealed class FakeShellService : IShellService
 {
     public bool ExplorerRestarted { get; private set; }
     public bool EnvironmentRefreshed { get; private set; }
+    public List<string> ExecutedScripts { get; } = new();
+    public List<string> OpenedUrls { get; } = new();
+    public List<string> LaunchedApplets { get; } = new();
 
     public void RestartExplorer() => ExplorerRestarted = true;
     public void RefreshShellEnvironment() => EnvironmentRefreshed = true;
+
+    public Task<string> ExecutePowerShellAsync(string script, int timeoutSeconds = 60)
+    {
+        ExecutedScripts.Add(script);
+        return Task.FromResult($"Simulated execution of script ({script.Length} chars)");
+    }
+
+    public void OpenUrl(string url)
+    {
+        OpenedUrls.Add(url);
+    }
+
+    public void LaunchApplet(string appletCommand)
+    {
+        LaunchedApplets.Add(appletCommand);
+    }
 }

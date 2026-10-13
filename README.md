@@ -3,54 +3,47 @@
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)]()
 [![.NET Version](https://img.shields.io/badge/.NET-10.0%20LTS-purple.svg)](https://dotnet.microsoft.com/)
 [![Windows Target](https://img.shields.io/badge/Windows-10%20%7C%2011-blue.svg)]()
-[![Verified Tweaks](https://img.shields.io/badge/verified%20tweaks-84-success.svg)]()
+[![Verified Tweaks](https://img.shields.io/badge/verified%20tweaks-141-success.svg)]()
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Safety](https://img.shields.io/badge/safety-reversible%20by%20design-blueviolet.svg)](docs/SAFETY.md)
 
-**Tweakora** is a professional, open-source Windows 10/11 system configuration center and toolbox utility. Built for speed, safety, and modern aesthetics, it gives you full control over your PC with guaranteed reversibility.
+**Tweakora** is a professional, open-source Windows 10/11 system configuration center and toolbox utility. Built with C# and .NET 10 LTS, it pairs the full feature set and layout of Chris Titus Tech's WinUtil with Tweakora's safety architecture (write-ahead rollback journal, dry-run diff preview, and 100% reversible tweaks).
+
+> **Credits**: Based on ideas and tweak data from [ChrisTitusTech/winutil](https://github.com/ChrisTitusTech/winutil) (MIT License).
 
 ---
 
-## 🌟 Key Features
+## 🌟 Top-Level Navigation & Layout
 
-### 1. Reversible by Design
+Tweakora features 5 top horizontal tabs with real-time live search filtering:
+
+1. **`INSTALL`**: Dense multi-column catalog of 236 curated applications across 10 categories (Browsers, Dev, Documents, Games, Multimedia, Utilities, Tools, Social, Security, System) with WinGet & Chocolatey support.
+2. **`TWEAKS`**: 3-column layout matching WinUtil:
+   - **Column 1 — Essential Tweaks**: Restore Point, Disable Telemetry, Diagnostic Data, Activity History, Bing Search in Start, Location Tracking, etc.
+   - **Column 2 — Advanced Tweaks (CAUTION)**: BitLocker disable with prominent red safety card, Edge/Brave debloat, OneDrive removal, Home & Gallery removal.
+   - **Column 3 — Customize Preferences**: 25 direct toggles (Dark Mode, File Extensions, Verbose Logon, Mouse Acceleration, End Task on Right-Click, etc.), DNS provider switcher (Cloudflare, Quad9, Google, AdGuard, NextDNS), and Ultimate Performance power plan.
+   - **Tweakora Extras**: Collapsible expander with all additional verified privacy, AI, gaming, and system tweaks.
+   - **Presets**: `Standard`, `Minimal`, `Advanced`, and `Clear`.
+3. **`CONFIG`**:
+   - 33 Windows optional features with real-time status detection.
+   - 14 Legacy Windows Control Panel applets (God Mode, Control Panel, Network Connections, Device Manager, Sound, etc.).
+   - Quick Fixes: Autologin helper, Reset Windows Update cache, Network reset, DISM / SFC repair, WinGet reinstaller, and NTP time sync.
+   - OpenSSH Server setup with explicit confirmation.
+4. **`UPDATES`**:
+   - **Default Settings (Out of Box)**: Restores Microsoft standard update behavior.
+   - **Recommended (Security Focus)**: Delays feature upgrades by 2 years while installing security updates smoothly.
+   - **Disable All Updates (NOT Recommended)**: Disables update services with typed "I understand" confirmation.
+5. **`TOOLBOX`**:
+   - Built-in maintenance tools: Startup Manager, Services Manager, Smart Cleaner, App Uninstaller, Fixes Center, and Rollback History.
+
+---
+
+## 🛡️ Reversible by Design
+
 - **Write-Ahead Rollback Journal**: Saves your computer's exact original state to disk *before* making any change. If you ever want to revert, your original settings are restored with one click.
 - **System Restore Shield**: Automatically checks and verifies Windows System Restore points before applying modifications.
 - **Dry-Run Diff Preview**: Inspect the exact registry keys, values, and services that will be changed before touching anything.
-- **Crash Recovery**: If your PC shuts down unexpectedly during a change, Tweakora detects it on next launch and offers an instant rollback.
-
-### 2. 84 Curated & Verified Tweaks
-Every tweak in Tweakora has a documented source (Microsoft Learn / official docs) and is strictly validated against our JSON schema:
-- **Privacy & Telemetry**: Reduce diagnostic telemetry, turn off advertising ID, disable lock-screen ads, and manage store app permissions.
-- **UI & Taskbar**: Restore Windows 10 classic context menu, enable seconds on taskbar clock, show hidden files/extensions, and customize taskbar icons.
-- **Gaming & Low Latency**: Disable background DVR recording, enable Game Mode, and disable mouse acceleration for stable frame times.
-- **Performance**: Enable Storage Sense, manage svchost thresholds, disable startup app delays, and tune NTFS access timestamps.
-- **AI & Copilot**: Toggle Copilot button, disable Bing web searches in Start, and manage Windows Recall snapshot policies.
-- **Network**: Enable DNS over HTTPS (DoH), tune delivery optimization peering, and disable Wi-Fi Hotspot reporting.
-- **Security**: Disable Remote Assistance, enforce SmartScreen, disable LLMNR multicast resolution, and disable Windows Script Host.
-- **Updates**: Prevent automatic reboots while logged in, exclude driver updates from Windows Update, and configure active hours.
-
-### 3. Curated Profiles & Export Tools
-- **Recommended Baseline**: Safe, sensible settings for everyone.
-- **Privacy & Security Shield**: Maximizes privacy for sensitive workstations.
-- **Gaming & Low-Latency**: Streamlines background overhead for competitive play.
-- **Minimalist Clean Desktop**: Removes clutter (Copilot, Widgets, Teams, Gallery).
-- **Export Anywhere**: Export any profile to **JSON**, standard **Windows Registry (.reg)**, or an unattended **PowerShell script (.ps1)**.
-
-### 4. Built-In Maintenance Toolbox
-- **System Dashboard**: Live hardware specs, Windows build, memory usage, and storage overview.
-- **Startup Apps Manager**: Inspect and disable startup applications that slow down boot times.
-- **Services Manager**: View background Windows services with safe status indicators.
-- **Smart Cleaner**: Preview and safely delete temporary files and crash dumps using a strict non-destructive whitelist.
-- **WinGet App Store**: One-click install for popular, trusted open-source utilities.
-- **App Uninstaller**: View installed desktop software and run clean uninstallations.
-- **Fixes Center**: One-click repairs for Windows Update cache, DNS flush, network reset, Print Spooler, and Icon cache.
-- **DNS Switcher**: Live ping latency tester and instant switcher for Cloudflare, Quad9, Google, and AdGuard DNS.
-
-### 5. Modern Fluent UI
-- Built with **WPF UI** (`lepoco/wpfui`) featuring Windows 11 Mica material and dark/light modes.
-- Dark and Light themes with dynamic switching and extensible localization support.
-- **Command Palette (`Ctrl+K`)**: Rapid keyboard-first navigation across all tweaks and tools.
+- **Config Export / Import**: Save full system presets to JSON files, and automate them with `tweakora.exe --config <path> --run`.
 
 ---
 
@@ -96,11 +89,17 @@ cd tweakora
 # Build solution
 dotnet build Tweakora.sln
 
-# Run test suite (23 unit tests)
-dotnet test Tweakora.sln
+# Run engine test suite (37 unit tests)
+dotnet test src/Tweakora.Tests/Tweakora.Tests.csproj
 
-# Run catalog schema validator
-dotnet run --project tools/CatalogValidator/CatalogValidator.csproj -- Catalog/
+# Run automated UI test suite (FlaUI UIA3)
+dotnet test src/Tweakora.UiTests/Tweakora.UiTests.csproj
+
+# Run catalog schema validator (141 tweaks)
+dotnet run --project tools/CatalogValidator/CatalogValidator.csproj
+
+# Run catalog source URL checker
+dotnet run --project tools/SourceChecker/SourceChecker.csproj
 
 # Run application
 dotnet run --project src/Tweakora.App/Tweakora.App.csproj
@@ -116,6 +115,10 @@ Tweakora includes a dedicated headless CLI (`Tweakora.Cli.exe`) for automation:
 # List all tweaks in catalog
 tweakora.exe --list
 
+# Apply or dry-run a full exported configuration JSON
+tweakora.exe --config my-setup.json --run
+tweakora.exe --config my-setup.json --dry-run
+
 # Preview a tweak without applying (Dry-Run)
 tweakora.exe --apply "ui.explorer.classic-context-menu" --dry-run
 
@@ -123,7 +126,7 @@ tweakora.exe --apply "ui.explorer.classic-context-menu" --dry-run
 tweakora.exe --apply "ui.explorer.classic-context-menu"
 
 # Apply a preset profile
-tweakora.exe --preset "preset.recommended"
+tweakora.exe --preset "preset.standard"
 
 # Revert / Undo a tweak
 tweakora.exe --undo "ui.explorer.classic-context-menu"

@@ -4,6 +4,50 @@ All notable changes to **Tweakora** are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-10-13
+
+### Added
+- **WinUtil Parity & Top Horizontal Layout**:
+  - Full feature set and UI structure inspired by Chris Titus Tech's WinUtil (`github.com/ChrisTitusTech/winutil`), backed by Tweakora's C#/.NET 10 architecture and write-ahead rollback journal.
+  - Top horizontal navigation bar with 5 tabs: `INSTALL`, `TWEAKS`, `CONFIG`, `UPDATES`, and `TOOLBOX`.
+  - Global live search box filtering active tab items in real-time.
+  - JSON Config Export and Import across all tabs, plus CLI `--config <path> [--run|--dry-run]` automation.
+
+- **Tab 1 — Install**:
+  - 236 applications curated across 10 categories: Browsers, Dev, Documents, Games, Multimedia, Utilities, Tools, Social, Security, and System.
+  - Package manager selector supporting WinGet and Chocolatey.
+  - Dense multi-column view with category filtering, select all/clear, and real-time installation logs.
+
+- **Tab 2 — Tweaks (141 Verified Tweaks)**:
+  - 3-column layout matching WinUtil:
+    - **Essential Tweaks**: Restore Point, Disable Telemetry, Disable Diagnostics, Bing Search in Start, Activity History, Location Tracking, and more.
+    - **Advanced Tweaks (CAUTION)**: BitLocker disable with prominent red warning card, Edge/Brave debloat, OneDrive removal, Home/Gallery removal.
+    - **Customize Preferences**: 25 direct toggles (Dark Mode, File Extensions, Hidden Files, Verbose Logon, Mouse Acceleration, End Task on Right-Click, etc.), plus DNS selector (8 providers) and Ultimate Performance Power Plan switcher.
+  - **Tweakora Extras**: Collapsible expander with all original Tweakora system, privacy, and gaming tweaks.
+  - Preset buttons: `Standard`, `Minimal`, `Advanced`, and `Clear`.
+  - Dry-Run Diff Preview modal dialog showing exact before-and-after registry/script actions.
+
+- **Tab 3 — Config**:
+  - 33 Windows optional features toggle list with status detection.
+  - 14 Legacy Windows Control Panel applet launchers (God Mode, Control Panel, Network Connections, Device Manager, Sound, Power Options, System Properties, etc.).
+  - Quick Fixes: Autologin helper, Reset Windows Update cache, Network reset, DISM / SFC health repair, WinGet reinstaller, and NTP time sync.
+  - OpenSSH Server configuration with safety confirmation dialog.
+
+- **Tab 4 — Updates**:
+  - 3 Windows Update profiles:
+    - **Default Settings (Out of Box)**: Restores Microsoft standard update behavior.
+    - **Recommended (Security Focus)**: Delays feature upgrades by 2 years while installing security updates smoothly.
+    - **Disable All Updates (NOT Recommended)**: Disables Windows Update services; requires typed "I understand" confirmation.
+
+- **Tab 5 — Toolbox**:
+  - Integrated system tools: Startup Manager, Services Manager, Smart Cleaner, App Uninstaller, Fixes Center, and Rollback History.
+
+- **Validation & Testing**:
+  - 37 unit and integration tests passing (`Tweakora.Tests`).
+  - 1 comprehensive FlaUI UI test suite verifying all 5 tabs and 3-round rapid tab switching.
+  - 141/141 tweaks passed schema validation (`CatalogValidator`).
+  - 141/141 source URLs verified 200 OK (`SourceChecker`).
+
 ## [0.1.0] - 2026-10-12
 
 ### Added

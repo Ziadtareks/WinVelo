@@ -519,10 +519,25 @@ public sealed partial class MainViewModel : ViewModelBase
     private object _currentPage;
 
     [ObservableProperty]
+    private string _activeTab = "Install"; // "Install", "Tweaks", "Config", "Updates", "Toolbox"
+
+    [ObservableProperty]
+    private string _topSearchText = string.Empty;
+
+    [ObservableProperty]
     private bool _isLogPanelOpen;
 
     [ObservableProperty]
     private bool _isCommandPaletteOpen;
+
+    [ObservableProperty]
+    private bool _isAboutDialogOpen;
+
+    [ObservableProperty]
+    private bool _isConfigDialogOpen;
+
+    [ObservableProperty]
+    private string _configDialogText = string.Empty;
 
     [ObservableProperty]
     private string _paletteQuery = string.Empty;
@@ -531,9 +546,14 @@ public sealed partial class MainViewModel : ViewModelBase
     public UiLogSink LogSink => UiLogSink.Instance;
     public bool IsTestModeActive => Tweakora.Core.Safety.TestModeManager.IsTestMode;
 
-    public DashboardViewModel DashboardVM { get; }
+    public InstallViewModel InstallVM { get; }
     public TweaksViewModel TweaksVM { get; }
+    public ConfigViewModel ConfigVM { get; }
+    public UpdatesViewModel UpdatesVM { get; }
     public ToolboxViewModel ToolboxVM { get; }
+
+    // Legacy / secondary VMs
+    public DashboardViewModel DashboardVM { get; }
     public AppsViewModel AppsVM { get; }
     public PresetsViewModel PresetsVM { get; }
     public SettingsViewModel SettingsVM { get; }
@@ -542,37 +562,128 @@ public sealed partial class MainViewModel : ViewModelBase
     public ObservableCollection<PaletteItem> PaletteResults { get; } = new();
 
     public MainViewModel(
-        DashboardViewModel dashboardVM,
+        InstallViewModel installVM,
         TweaksViewModel tweaksVM,
+        ConfigViewModel configVM,
+        UpdatesViewModel updatesVM,
         ToolboxViewModel toolboxVM,
+        DashboardViewModel dashboardVM,
         AppsViewModel appsVM,
         PresetsViewModel presetsVM,
         SettingsViewModel settingsVM)
     {
-        DashboardVM = dashboardVM;
+        InstallVM = installVM;
         TweaksVM = tweaksVM;
+        ConfigVM = configVM;
+        UpdatesVM = updatesVM;
         ToolboxVM = toolboxVM;
+        DashboardVM = dashboardVM;
         AppsVM = appsVM;
         PresetsVM = presetsVM;
         SettingsVM = settingsVM;
 
-        _currentPage = DashboardVM;
+        _currentPage = InstallVM;
+        _activeTab = "Install";
 
         InitializePalette();
     }
 
+    partial void OnTopSearchTextChanged(string value)
+    {
+        switch (ActiveTab)
+        {
+            case "Install":
+                InstallVM.SetSearchQuery(value);
+                break;
+            case "Tweaks":
+                TweaksVM.SetSearchQuery(value);
+                break;
+            case "Config":
+                ConfigVM.SetSearchQuery(value);
+                break;
+        }
+    }
+
+    [RelayCommand]
+    public void SwitchTab(string tabName)
+    {
+        ActiveTab = tabName;
+        CurrentPage = tabName switch
+        {
+            "Install" => InstallVM,
+            "Tweaks" => TweaksVM,
+            "Config" => ConfigVM,
+            "Updates" => UpdatesVM,
+            "Toolbox" => ToolboxVM,
+            _ => InstallVM
+        };
+
+        // Sync search text to new tab
+        OnTopSearchTextChanged(TopSearchText);
+        Serilog.Log.Debug("Switched active tab to: {Tab}", tabName);
+    }
+
+    [RelayCommand]
+    public void ExportConfig()
+    {
+        var config = new TweakoraConfig
+        {
+            SelectedApps = InstallVM.GetSelectedAppKeys(),
+            SelectedTweaks = TweaksVM.GetSelectedTweakIds(),
+            SelectedFeatures = ConfigVM.GetSelectedFeatureKeys(),
+            SelectedDns = TweaksVM.SelectedDns?.Name,
+            UpdatesMode = UpdatesVM.GetSelectedModeString()
+        };
+
+        ConfigDialogText = ConfigManager.ExportConfigToJson(config);
+        IsConfigDialogOpen = true;
+    }
+
+    [RelayCommand]
+    public void ImportConfig(string? json)
+    {
+        if (string.IsNullOrWhiteSpace(json)) return;
+
+        var config = ConfigManager.ImportConfigFromJson(json);
+        if (config != null)
+        {
+            InstallVM.SetSelectedAppKeys(config.SelectedApps);
+            TweaksVM.SetSelectedTweakIds(config.SelectedTweaks);
+            ConfigVM.SetSelectedFeatureKeys(config.SelectedFeatures);
+            if (!string.IsNullOrWhiteSpace(config.UpdatesMode))
+            {
+                UpdatesVM.SetSelectedModeString(config.UpdatesMode);
+            }
+            IsConfigDialogOpen = false;
+        }
+    }
+
+    [RelayCommand]
+    public void CloseConfigDialog()
+    {
+        IsConfigDialogOpen = false;
+    }
+
+    [RelayCommand]
+    public void OpenAboutDialog()
+    {
+        IsAboutDialogOpen = true;
+    }
+
+    [RelayCommand]
+    public void CloseAboutDialog()
+    {
+        IsAboutDialogOpen = false;
+    }
+
     private void InitializePalette()
     {
-        _allPaletteItems.Add(new PaletteItem { Title = "Dashboard", Subtitle = "View system overview and safety shield", Category = "Page", IconSymbol = "Home24", ActionToExecute = () => Navigate("Dashboard") });
-        _allPaletteItems.Add(new PaletteItem { Title = "Windows Tweaks", Subtitle = "Browse and apply 79+ verified system tweaks", Category = "Page", IconSymbol = "Wrench24", ActionToExecute = () => Navigate("Tweaks") });
-        _allPaletteItems.Add(new PaletteItem { Title = "Smart Cleaner", Subtitle = "Safely scan and clean whitelisted temporary files", Category = "Tool", IconSymbol = "Broom24", ActionToExecute = () => { Navigate("Toolbox"); ToolboxVM.SelectToolCommand.Execute("Cleaner"); } });
-        _allPaletteItems.Add(new PaletteItem { Title = "Startup Applications", Subtitle = "Manage startup programs and boot delay", Category = "Tool", IconSymbol = "Apps24", ActionToExecute = () => { Navigate("Toolbox"); ToolboxVM.SelectToolCommand.Execute("Startup"); } });
-        _allPaletteItems.Add(new PaletteItem { Title = "Services Inspector", Subtitle = "Inspect and configure Windows services startup", Category = "Tool", IconSymbol = "Settings24", ActionToExecute = () => { Navigate("Toolbox"); ToolboxVM.SelectToolCommand.Execute("Services"); } });
-        _allPaletteItems.Add(new PaletteItem { Title = "Fixes Center", Subtitle = "One-click repairs for DNS, updates, and store", Category = "Tool", IconSymbol = "Wrench24", ActionToExecute = () => { Navigate("Toolbox"); ToolboxVM.SelectToolCommand.Execute("Fixes"); } });
-        _allPaletteItems.Add(new PaletteItem { Title = "DNS Switcher", Subtitle = "Switch to Cloudflare, Quad9, Google, or AdGuard DNS", Category = "Tool", IconSymbol = "Globe24", ActionToExecute = () => { Navigate("Toolbox"); ToolboxVM.SelectToolCommand.Execute("Network"); } });
-        _allPaletteItems.Add(new PaletteItem { Title = "WinGet App Store", Subtitle = "Install popular, curated open-source applications", Category = "Page", IconSymbol = "Apps24", ActionToExecute = () => Navigate("Apps") });
-        _allPaletteItems.Add(new PaletteItem { Title = "Presets & Profiles", Subtitle = "Apply Recommended, Privacy, or Gaming profiles", Category = "Page", IconSymbol = "Bookmark24", ActionToExecute = () => Navigate("Presets") });
-        _allPaletteItems.Add(new PaletteItem { Title = "Settings", Subtitle = "Configure language, theme, and safety options", Category = "Page", IconSymbol = "Settings24", ActionToExecute = () => Navigate("Settings") });
+        _allPaletteItems.Add(new PaletteItem { Title = "Install Tab", Subtitle = "Browse and install 236 curated Windows applications", Category = "Tab", IconSymbol = "Apps24", ActionToExecute = () => SwitchTab("Install") });
+        _allPaletteItems.Add(new PaletteItem { Title = "Tweaks Tab", Subtitle = "Essential, Advanced, and Preference Windows tweaks", Category = "Tab", IconSymbol = "Wrench24", ActionToExecute = () => SwitchTab("Tweaks") });
+        _allPaletteItems.Add(new PaletteItem { Title = "Config Tab", Subtitle = "Windows Features, Fixes, and 14 Legacy Control Panels", Category = "Tab", IconSymbol = "Settings24", ActionToExecute = () => SwitchTab("Config") });
+        _allPaletteItems.Add(new PaletteItem { Title = "Updates Tab", Subtitle = "Default, Security, and Update Management policies", Category = "Tab", IconSymbol = "ArrowSync24", ActionToExecute = () => SwitchTab("Updates") });
+        _allPaletteItems.Add(new PaletteItem { Title = "Toolbox Tab", Subtitle = "Startup, Services, Cleaner, and Rollback Journal", Category = "Tab", IconSymbol = "Toolbox24", ActionToExecute = () => SwitchTab("Toolbox") });
+        _allPaletteItems.Add(new PaletteItem { Title = "Export Configuration", Subtitle = "Export current selections to portable JSON", Category = "Action", IconSymbol = "ArrowDownload24", ActionToExecute = ExportConfig });
         _allPaletteItems.Add(new PaletteItem { Title = "Toggle Dark/Light Theme", Subtitle = "Switch application appearance theme", Category = "Action", IconSymbol = "DarkTheme24", ActionToExecute = ToggleTheme });
         _allPaletteItems.Add(new PaletteItem { Title = "Toggle Activity Log", Subtitle = "Show or hide live debug log sink drawer", Category = "Action", IconSymbol = "DocumentBulletList24", ActionToExecute = ToggleLogPanel });
 
@@ -617,22 +728,6 @@ public sealed partial class MainViewModel : ViewModelBase
     {
         IsCommandPaletteOpen = false;
         item.ActionToExecute();
-    }
-
-    [RelayCommand]
-    private void Navigate(string pageKey)
-    {
-        CurrentPage = pageKey switch
-        {
-            "Dashboard" => DashboardVM,
-            "Tweaks" => TweaksVM,
-            "Toolbox" => ToolboxVM,
-            "Apps" => AppsVM,
-            "Presets" => PresetsVM,
-            "Settings" => SettingsVM,
-            _ => DashboardVM
-        };
-        Serilog.Log.Debug("Navigated to page: {Page}", pageKey);
     }
 
     [RelayCommand]

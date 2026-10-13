@@ -28,8 +28,8 @@ public sealed class CatalogCompletenessTests
             allTweaks.AddRange(list);
         }
 
-        // Verify exactly 79 verified tweaks
-        Assert.Equal(79, allTweaks.Count);
+        // Verify all 141 verified tweaks in catalog
+        Assert.Equal(141, allTweaks.Count);
 
         HashSet<string> seenIds = new(StringComparer.OrdinalIgnoreCase);
 

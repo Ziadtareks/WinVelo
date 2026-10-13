@@ -53,4 +53,7 @@ public interface IShellService
 {
     void RestartExplorer();
     void RefreshShellEnvironment();
+    Task<string> ExecutePowerShellAsync(string script, int timeoutSeconds = 60);
+    void OpenUrl(string url);
+    void LaunchApplet(string appletCommand);
 }

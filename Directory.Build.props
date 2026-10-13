@@ -7,7 +7,7 @@
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <Company>Tweakora Team</Company>
     <Product>Tweakora</Product>
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
     <Authors>Tweakora Contributors</Authors>
     <RepositoryUrl>https://github.com/tweakora/tweakora</RepositoryUrl>
     <NeutralLanguage>en</NeutralLanguage>

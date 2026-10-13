@@ -33,9 +33,12 @@ public partial class App : Application
             {
                 // ViewModels
                 services.AddSingleton<MainViewModel>();
-                services.AddSingleton<DashboardViewModel>();
+                services.AddSingleton<InstallViewModel>();
                 services.AddSingleton<TweaksViewModel>();
+                services.AddSingleton<ConfigViewModel>();
+                services.AddSingleton<UpdatesViewModel>();
                 services.AddSingleton<ToolboxViewModel>();
+                services.AddSingleton<DashboardViewModel>();
                 services.AddSingleton<AppsViewModel>();
                 services.AddSingleton<PresetsViewModel>();
                 services.AddSingleton<SettingsViewModel>();

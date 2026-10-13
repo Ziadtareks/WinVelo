@@ -1,3 +1,6 @@
+using System;
+using System.IO;
+using System.Linq;
 using System.Text.Json.Nodes;
 using Json.Schema;
 using Xunit;
@@ -7,37 +10,49 @@ namespace Tweakora.Tests.CatalogTests;
 public sealed class CatalogSchemaTests
 {
     [Fact]
-    public void PrivacyTweak_PassesStrictSchemaValidation()
+    public void AllCatalogTweaks_PassStrictSchemaValidation()
     {
         // Arrange
         string baseDir = AppContext.BaseDirectory;
         string schemaPath = FindFileUpwards(baseDir, Path.Combine("Catalog", "schema", "tweak.schema.json"));
-        string tweakPath = FindFileUpwards(baseDir, Path.Combine("Catalog", "Tweaks", "privacy.json"));
+        string tweaksDir = FindDirectoryUpwards(baseDir, Path.Combine("Catalog", "Tweaks"));
 
         Assert.True(File.Exists(schemaPath), $"Schema not found at {schemaPath}");
-        Assert.True(File.Exists(tweakPath), $"Tweak not found at {tweakPath}");
+        Assert.True(Directory.Exists(tweaksDir), $"Tweaks directory not found at {tweaksDir}");
 
         string schemaJson = File.ReadAllText(schemaPath);
-        string tweakJson = File.ReadAllText(tweakPath);
-
         JsonSchema schema = JsonSchema.FromText(schemaJson);
-        JsonNode? tweakNode = JsonNode.Parse(tweakJson);
 
-        Assert.NotNull(tweakNode);
-        JsonArray array = Assert.IsAssignableFrom<JsonArray>(tweakNode);
-        Assert.NotEmpty(array);
+        string[] tweakFiles = Directory.GetFiles(tweaksDir, "*.json", SearchOption.AllDirectories);
+        Assert.NotEmpty(tweakFiles);
 
-        // Act & Assert
-        foreach (JsonNode? item in array)
+        int totalEvaluated = 0;
+
+        foreach (string tweakFile in tweakFiles)
         {
-            Assert.NotNull(item);
-            EvaluationResults result = schema.Evaluate(item, new EvaluationOptions
-            {
-                OutputFormat = OutputFormat.List
-            });
+            string tweakJson = File.ReadAllText(tweakFile);
+            JsonNode? tweakNode = JsonNode.Parse(tweakJson);
 
-            Assert.True(result.IsValid, $"Validation failed: {string.Join(", ", result.Details.Where(d => d.HasErrors).SelectMany(d => d.Errors?.Values ?? []))}");
+            Assert.NotNull(tweakNode);
+            JsonArray array = Assert.IsAssignableFrom<JsonArray>(tweakNode);
+            Assert.NotEmpty(array);
+
+            // Act & Assert
+            foreach (JsonNode? item in array)
+            {
+                Assert.NotNull(item);
+                EvaluationResults result = schema.Evaluate(item, new EvaluationOptions
+                {
+                    OutputFormat = OutputFormat.List
+                });
+
+                string errStr = string.Join("; ", result.Details.Where(d => d.HasErrors).SelectMany(d => d.Errors?.Values ?? []));
+                Assert.True(result.IsValid, $"File {Path.GetFileName(tweakFile)}: Tweak validation failed: {errStr}");
+                totalEvaluated++;
+            }
         }
+
+        Assert.Equal(141, totalEvaluated);
     }
 
     private static string FindFileUpwards(string startDir, string relativePath)
@@ -47,6 +62,21 @@ public sealed class CatalogSchemaTests
         {
             string candidate = Path.Combine(current, relativePath);
             if (File.Exists(candidate))
+            {
+                return candidate;
+            }
+            current = Directory.GetParent(current)?.FullName;
+        }
+        return Path.Combine(startDir, relativePath);
+    }
+
+    private static string FindDirectoryUpwards(string startDir, string relativePath)
+    {
+        string? current = startDir;
+        while (current != null)
+        {
+            string candidate = Path.Combine(current, relativePath);
+            if (Directory.Exists(candidate))
             {
                 return candidate;
             }

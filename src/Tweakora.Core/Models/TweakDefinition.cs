@@ -57,6 +57,7 @@ public sealed class DetectStructure
     [JsonPropertyName("expectedEnabled")]
     public bool? ExpectedEnabled { get; set; }
 
+    [JsonIgnore]
     public bool IsComposite => (All != null && All.Count > 0) || (Any != null && Any.Count > 0);
 
     public DetectRule AsSingleRule()
@@ -89,6 +90,9 @@ public sealed class TweakDefinition
 
     [JsonPropertyName("id")]
     public string Id { get; set; } = string.Empty;
+
+    [JsonPropertyName("origin")]
+    public string? Origin { get; set; }
 
     [JsonPropertyName("name")]
     public string Name { get; set; } = string.Empty;

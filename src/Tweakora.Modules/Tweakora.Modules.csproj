@@ -6,6 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Tweakora.Core\Tweakora.Core.csproj" />
     <ProjectReference Include="..\Tweakora.Platform\Tweakora.Platform.csproj" />
   </ItemGroup>

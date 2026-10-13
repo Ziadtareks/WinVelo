@@ -6,8 +6,8 @@
                   xmlns:views="clr-namespace:Tweakora.App.Views"
                   xmlns:loc="clr-namespace:Tweakora.App.Localization"
                   Title="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[AppTitle]}"
-                  Height="780" Width="1180"
-                  MinHeight="600" MinWidth="900"
+                  Height="820" Width="1240"
+                  MinHeight="650" MinWidth="960"
                   WindowStartupLocation="CenterScreen"
                   ExtendsContentIntoTitleBar="True"
                   AutomationProperties.AutomationId="TweakoraMainWindow">
@@ -18,14 +18,27 @@
 
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisConverter" />
-        <DataTemplate DataType="{x:Type vm:DashboardViewModel}">
-            <views:DashboardPage />
+
+        <!-- View Data Templates for the 5 Top Tabs -->
+        <DataTemplate DataType="{x:Type vm:InstallViewModel}">
+            <views:InstallTabView />
         </DataTemplate>
         <DataTemplate DataType="{x:Type vm:TweaksViewModel}">
-            <views:TweaksPage />
+            <views:TweaksTabView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ConfigViewModel}">
+            <views:ConfigTabView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:UpdatesViewModel}">
+            <views:UpdatesTabView />
         </DataTemplate>
         <DataTemplate DataType="{x:Type vm:ToolboxViewModel}">
             <views:ToolboxPage />
+        </DataTemplate>
+
+        <!-- Legacy Data Templates for compatibility -->
+        <DataTemplate DataType="{x:Type vm:DashboardViewModel}">
+            <views:DashboardPage />
         </DataTemplate>
         <DataTemplate DataType="{x:Type vm:AppsViewModel}">
             <views:AppsPage />
@@ -42,11 +55,12 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" /> <!-- TitleBar -->
             <RowDefinition Height="Auto" /> <!-- Test Mode Warning Banner -->
-            <RowDefinition Height="*" />    <!-- Main Workspace (Nav + Page Content) -->
+            <RowDefinition Height="Auto" /> <!-- Top Horizontal Navigation Bar -->
+            <RowDefinition Height="*" />    <!-- Main Active Tab Content -->
             <RowDefinition Height="Auto" /> <!-- Activity Log Panel -->
         </Grid.RowDefinitions>
 
-        <!-- Fluent Titlebar with Icon, Title, and Action Buttons -->
+        <!-- TitleBar with Search, Theme Toggle, Config Menu, Log Button -->
         <ui:TitleBar Grid.Row="0"
                      x:Name="AppTitleBar"
                      Title="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[AppTitle]}"
@@ -58,21 +72,49 @@
             </ui:TitleBar.Icon>
             <ui:TitleBar.TrailingContent>
                 <StackPanel Orientation="Horizontal" Margin="0,0,8,0">
+                    <!-- Live Search Box (Filters Active Tab) -->
+                    <ui:TextBox AutomationProperties.AutomationId="TopSearchBox"
+                                PlaceholderText="Search active tab..."
+                                Text="{Binding TopSearchText, UpdateSourceTrigger=PropertyChanged}"
+                                Icon="{ui:SymbolIcon Search24}"
+                                Width="240" Margin="0,0,10,0" VerticalAlignment="Center" />
+
+                    <!-- Command Palette Shortcut Button (Ctrl+K) -->
                     <ui:Button AutomationProperties.AutomationId="OpenCommandPaletteButton"
-                               Icon="{ui:SymbolIcon Search24}"
-                               ToolTip="Command Palette &amp; Search (Ctrl+K)"
+                               Icon="{ui:SymbolIcon AppGeneric24}"
+                               ToolTip="Command Palette (Ctrl+K)"
                                Command="{Binding ToggleCommandPaletteCommand}"
                                Appearance="Transparent" Margin="0,0,4,0" />
+
+                    <!-- Config / Settings Menu Button -->
+                    <ui:Button AutomationProperties.AutomationId="ConfigMenuButton"
+                               Icon="{ui:SymbolIcon Settings24}"
+                               ToolTip="Config &amp; About"
+                               Appearance="Transparent" Margin="0,0,4,0">
+                        <ui:Button.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="Export Config JSON..." Command="{Binding ExportConfigCommand}" />
+                                <MenuItem Header="Import Config JSON..." Command="{Binding ExportConfigCommand}" />
+                                <Separator />
+                                <MenuItem Header="About Tweakora" Command="{Binding OpenAboutDialogCommand}" />
+                            </ContextMenu>
+                        </ui:Button.ContextMenu>
+                    </ui:Button>
+
+                    <!-- Theme Toggle Button -->
                     <ui:Button AutomationProperties.AutomationId="ToggleThemeButton"
                                Icon="{ui:SymbolIcon DarkTheme24}"
                                ToolTip="Toggle Dark / Light Theme"
                                Command="{Binding ToggleThemeCommand}"
                                Appearance="Transparent" Margin="0,0,4,0" />
+
+                    <!-- Activity Log Button -->
                     <ui:Button AutomationProperties.AutomationId="ToggleLogButton"
                                Icon="{ui:SymbolIcon DocumentBulletList24}"
                                ToolTip="Toggle Activity Log"
                                Command="{Binding ToggleLogPanelCommand}"
                                Appearance="Transparent" />
+
                     <TextBlock AutomationProperties.AutomationId="CurrentThemeText"
                                Text="{Binding CurrentThemeName}"
                                Width="0" Height="0" Opacity="0" />
@@ -80,82 +122,128 @@
             </ui:TitleBar.TrailingContent>
         </ui:TitleBar>
 
-        <!-- Test Mode Warning Banner (Visible when simulated platform is active) -->
+        <!-- Test Mode Warning Banner -->
         <Border Grid.Row="1" Background="#FFF3CD" BorderBrush="#FFEEBA" BorderThickness="0,0,0,1" Padding="12,6"
                 Visibility="{Binding IsTestModeActive, Converter={StaticResource BoolToVisConverter}}">
             <DockPanel>
                 <ui:SymbolIcon Symbol="Warning24" Foreground="#856404" FontSize="18" Margin="0,0,10,0" VerticalAlignment="Center" />
                 <TextBlock AutomationProperties.AutomationId="TestModeBanner"
-                           Text="TEST MODE ACTIVE — Simulated Platform Engine. Real Windows system is untouched."
+                           Text="TEST MODE ACTIVE — Simulated Platform Engine. Real Windows host system is untouched."
                            FontWeight="Bold" Foreground="#856404" FontSize="12" VerticalAlignment="Center" />
             </DockPanel>
         </Border>
 
-        <!-- Main Workspace: Left Nav + Content -->
-        <Grid Grid.Row="2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="220" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
+        <!-- TOP HORIZONTAL TAB BAR (Like WinUtil, Modernized) -->
+        <Border Grid.Row="2" Background="{DynamicResource SolidBackgroundFillColorSecondaryBrush}"
+                BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                BorderThickness="0,0,0,1" Padding="16,8">
+            <DockPanel LastChildFill="False">
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                    <!-- Brand Label -->
+                    <TextBlock Text="TWEAKORA" FontSize="15" FontWeight="ExtraBold" VerticalAlignment="Center"
+                               Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}" Margin="0,0,24,0" />
 
-            <!-- Navigation Rail -->
-            <Border Grid.Column="0" BorderThickness="0,0,1,0"
-                    BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
-                    Background="{DynamicResource SolidBackgroundFillColorSecondaryBrush}">
-                <DockPanel LastChildFill="False">
-                    <StackPanel DockPanel.Dock="Top" Margin="8,16,8,8">
-                        <!-- Brand Header -->
-                        <TextBlock Text="Tweakora" FontSize="18" FontWeight="Bold" Margin="12,0,0,16"
-                                   Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}" />
+                    <!-- TAB 1: INSTALL -->
+                    <ui:Button AutomationProperties.AutomationId="Tab_Install"
+                               Content="INSTALL" Icon="{ui:SymbolIcon ArrowDownload24}"
+                               Command="{Binding SwitchTabCommand}" CommandParameter="Install"
+                               Margin="0,0,6,0" Padding="14,7" FontWeight="Bold">
+                        <ui:Button.Style>
+                            <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+                                <Setter Property="Appearance" Value="Transparent" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ActiveTab}" Value="Install">
+                                        <Setter Property="Appearance" Value="Primary" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ui:Button.Style>
+                    </ui:Button>
 
-                        <!-- Nav Buttons with AutomationProperties -->
-                        <ui:Button AutomationProperties.AutomationId="Nav_Dashboard"
-                                   Content="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[NavHome]}"
-                                   Icon="{ui:SymbolIcon Home24}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
-                                   Appearance="Transparent" Margin="0,0,0,4"
-                                   Command="{Binding NavigateCommand}" CommandParameter="Dashboard" />
+                    <!-- TAB 2: TWEAKS -->
+                    <ui:Button AutomationProperties.AutomationId="Tab_Tweaks"
+                               Content="TWEAKS" Icon="{ui:SymbolIcon Wrench24}"
+                               Command="{Binding SwitchTabCommand}" CommandParameter="Tweaks"
+                               Margin="0,0,6,0" Padding="14,7" FontWeight="Bold">
+                        <ui:Button.Style>
+                            <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+                                <Setter Property="Appearance" Value="Transparent" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ActiveTab}" Value="Tweaks">
+                                        <Setter Property="Appearance" Value="Primary" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ui:Button.Style>
+                    </ui:Button>
 
-                        <ui:Button AutomationProperties.AutomationId="Nav_Tweaks"
-                                   Content="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[NavTweaks]}"
-                                   Icon="{ui:SymbolIcon Wrench24}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
-                                   Appearance="Transparent" Margin="0,0,0,4"
-                                   Command="{Binding NavigateCommand}" CommandParameter="Tweaks" />
+                    <!-- TAB 3: CONFIG -->
+                    <ui:Button AutomationProperties.AutomationId="Tab_Config"
+                               Content="CONFIG" Icon="{ui:SymbolIcon Settings24}"
+                               Command="{Binding SwitchTabCommand}" CommandParameter="Config"
+                               Margin="0,0,6,0" Padding="14,7" FontWeight="Bold">
+                        <ui:Button.Style>
+                            <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+                                <Setter Property="Appearance" Value="Transparent" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ActiveTab}" Value="Config">
+                                        <Setter Property="Appearance" Value="Primary" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ui:Button.Style>
+                    </ui:Button>
 
-                        <ui:Button AutomationProperties.AutomationId="Nav_Toolbox"
-                                   Content="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[NavTools]}"
-                                   Icon="{ui:SymbolIcon Toolbox24}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
-                                   Appearance="Transparent" Margin="0,0,0,4"
-                                   Command="{Binding NavigateCommand}" CommandParameter="Toolbox" />
+                    <!-- TAB 4: UPDATES -->
+                    <ui:Button AutomationProperties.AutomationId="Tab_Updates"
+                               Content="UPDATES" Icon="{ui:SymbolIcon ArrowSync24}"
+                               Command="{Binding SwitchTabCommand}" CommandParameter="Updates"
+                               Margin="0,0,6,0" Padding="14,7" FontWeight="Bold">
+                        <ui:Button.Style>
+                            <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+                                <Setter Property="Appearance" Value="Transparent" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ActiveTab}" Value="Updates">
+                                        <Setter Property="Appearance" Value="Primary" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ui:Button.Style>
+                    </ui:Button>
 
-                        <ui:Button AutomationProperties.AutomationId="Nav_Apps"
-                                   Content="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[NavApps]}"
-                                   Icon="{ui:SymbolIcon Apps24}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
-                                   Appearance="Transparent" Margin="0,0,0,4"
-                                   Command="{Binding NavigateCommand}" CommandParameter="Apps" />
+                    <!-- TAB 5: TOOLBOX -->
+                    <ui:Button AutomationProperties.AutomationId="Tab_Toolbox"
+                               Content="TOOLBOX" Icon="{ui:SymbolIcon Toolbox24}"
+                               Command="{Binding SwitchTabCommand}" CommandParameter="Toolbox"
+                               Margin="0,0,6,0" Padding="14,7" FontWeight="Bold">
+                        <ui:Button.Style>
+                            <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+                                <Setter Property="Appearance" Value="Transparent" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ActiveTab}" Value="Toolbox">
+                                        <Setter Property="Appearance" Value="Primary" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ui:Button.Style>
+                    </ui:Button>
+                </StackPanel>
 
-                        <ui:Button AutomationProperties.AutomationId="Nav_Presets"
-                                   Content="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[NavPresets]}"
-                                   Icon="{ui:SymbolIcon Bookmark24}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
-                                   Appearance="Transparent" Margin="0,0,0,4"
-                                   Command="{Binding NavigateCommand}" CommandParameter="Presets" />
-                    </StackPanel>
+                <!-- Right Side Info Label -->
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center">
+                    <TextBlock Text="v0.2.0" FontSize="11" Foreground="{DynamicResource TextFillColorSecondaryBrush}" VerticalAlignment="Center" Margin="0,0,10,0" />
+                    <ui:Button Content="Config JSON" Icon="{ui:SymbolIcon ArrowDownload24}"
+                               Appearance="Transparent" Padding="8,4" FontSize="11"
+                               Command="{Binding ExportConfigCommand}" />
+                </StackPanel>
+            </DockPanel>
+        </Border>
 
-                    <StackPanel DockPanel.Dock="Bottom" Margin="8,8,8,16">
-                        <ui:Button AutomationProperties.AutomationId="Nav_Settings"
-                                   Content="{Binding Source={x:Static loc:LocalizationManager.Instance}, Path=[NavSettings]}"
-                                   Icon="{ui:SymbolIcon Settings24}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
-                                   Appearance="Transparent"
-                                   Command="{Binding NavigateCommand}" CommandParameter="Settings" />
-                    </StackPanel>
-                </DockPanel>
-            </Border>
-
-            <!-- Page Content Host -->
-            <ContentControl Grid.Column="1" Content="{Binding CurrentPage}" />
-        </Grid>
+        <!-- MAIN PAGE CONTENT HOST -->
+        <ContentControl Grid.Row="3" Content="{Binding CurrentPage}" />
 
         <!-- Collapsible Bottom Log Panel -->
-        <Border Grid.Row="3" Height="140"
+        <Border Grid.Row="4" Height="140"
                 Visibility="{Binding IsLogPanelOpen, Converter={StaticResource BoolToVisConverter}}"
                 BorderThickness="0,1,0,0"
                 BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
@@ -183,7 +271,7 @@
         </Border>
 
         <!-- ==================== COMMAND PALETTE (Ctrl+K) OVERLAY ==================== -->
-        <Grid Grid.Row="0" Grid.RowSpan="4" Background="#70000000"
+        <Grid Grid.Row="0" Grid.RowSpan="5" Background="#70000000"
               Visibility="{Binding IsCommandPaletteOpen, Converter={StaticResource BoolToVisConverter}}">
             <Border Background="{DynamicResource SolidBackgroundFillColorBaseBrush}"
                     BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
@@ -194,13 +282,12 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
-                    <!-- Search Header -->
                     <DockPanel Grid.Row="0" Margin="0,0,0,12">
                         <ui:Button DockPanel.Dock="Right" Icon="{ui:SymbolIcon Dismiss16}" Appearance="Transparent"
                                    AutomationProperties.AutomationId="CloseCommandPaletteButton"
                                    Command="{Binding ToggleCommandPaletteCommand}" Margin="8,0,0,0" />
                         <ui:TextBox AutomationProperties.AutomationId="CommandPaletteSearchBox"
-                                    PlaceholderText="Search tweaks, tools, apps, and actions... (Ctrl+K)"
+                                    PlaceholderText="Search tabs, tweaks, tools, apps, and actions... (Ctrl+K)"
                                     Text="{Binding PaletteQuery, UpdateSourceTrigger=PropertyChanged}"
                                     Icon="{ui:SymbolIcon Search24}">
                             <ui:TextBox.InputBindings>
@@ -209,7 +296,6 @@
                         </ui:TextBox>
                     </DockPanel>
 
-                    <!-- Results List -->
                     <ScrollViewer Grid.Row="1" MaxHeight="350" VerticalScrollBarVisibility="Auto">
                         <ItemsControl ItemsSource="{Binding PaletteResults}">
                             <ItemsControl.ItemTemplate>
@@ -239,6 +325,80 @@
                         </ItemsControl>
                     </ScrollViewer>
                 </Grid>
+            </Border>
+        </Grid>
+
+        <!-- ==================== CONFIG JSON IMPORT/EXPORT MODAL ==================== -->
+        <Grid Grid.Row="0" Grid.RowSpan="5" Background="#70000000"
+              Visibility="{Binding IsConfigDialogOpen, Converter={StaticResource BoolToVisConverter}}">
+            <Border Background="{DynamicResource SolidBackgroundFillColorBaseBrush}"
+                    BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                    BorderThickness="1" CornerRadius="8"
+                    Width="650" MaxHeight="500" VerticalAlignment="Center" Margin="20" Padding="20">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <DockPanel Grid.Row="0" Margin="0,0,0,12">
+                        <TextBlock Text="Configuration Profile JSON" FontSize="17" FontWeight="Bold" VerticalAlignment="Center" />
+                        <ui:Button DockPanel.Dock="Right" Icon="{ui:SymbolIcon Dismiss16}" Appearance="Transparent"
+                                   Command="{Binding CloseConfigDialogCommand}" HorizontalAlignment="Right" />
+                    </DockPanel>
+
+                    <TextBox Grid.Row="1" Text="{Binding ConfigDialogText, UpdateSourceTrigger=PropertyChanged}"
+                             VerticalScrollBarVisibility="Auto" AcceptsReturn="True"
+                             FontFamily="Consolas, Cascadia Code, Courier New" FontSize="12"
+                             Background="{DynamicResource ControlFillColorSecondaryBrush}"
+                             BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                             Padding="10" Margin="0,0,0,14" />
+
+                    <DockPanel Grid.Row="2" LastChildFill="False">
+                        <TextBlock Text="Paste a JSON profile to import, or copy this text to export."
+                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="11"
+                                   VerticalAlignment="Center" DockPanel.Dock="Left" />
+                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                            <ui:Button Content="Close" Command="{Binding CloseConfigDialogCommand}" Margin="0,0,8,0" />
+                            <ui:Button Content="Apply &amp; Import Profile" Appearance="Primary"
+                                       Command="{Binding ImportConfigCommand}" CommandParameter="{Binding ConfigDialogText}" />
+                        </StackPanel>
+                    </DockPanel>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- ==================== ABOUT TWEAKORA MODAL ==================== -->
+        <Grid Grid.Row="0" Grid.RowSpan="5" Background="#70000000"
+              Visibility="{Binding IsAboutDialogOpen, Converter={StaticResource BoolToVisConverter}}">
+            <Border Background="{DynamicResource SolidBackgroundFillColorBaseBrush}"
+                    BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                    BorderThickness="1" CornerRadius="8"
+                    Width="520" VerticalAlignment="Center" Margin="20" Padding="24">
+                <StackPanel>
+                    <DockPanel Margin="0,0,0,16">
+                        <ui:SymbolIcon Symbol="Shield24" FontSize="28" Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}" Margin="0,0,10,0" VerticalAlignment="Center" />
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="Tweakora v0.2.0" FontSize="18" FontWeight="Bold" />
+                            <TextBlock Text="Professional Windows 10/11 Tweak &amp; Toolbox" Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12" />
+                        </StackPanel>
+                        <ui:Button DockPanel.Dock="Right" Icon="{ui:SymbolIcon Dismiss16}" Appearance="Transparent"
+                                   Command="{Binding CloseAboutDialogCommand}" HorizontalAlignment="Right" />
+                    </DockPanel>
+
+                    <TextBlock Text="Engine &amp; Safety Architecture:" FontWeight="SemiBold" FontSize="13" Margin="0,0,0,4" />
+                    <TextBlock Text="• Write-ahead rollback journal with baseline protection.&#x0a;• Dry-run diff preview before making changes.&#x0a;• Non-destructive simulated test mode.&#x0a;• .NET 10 LTS + WPF Fluent Modern UI."
+                               FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,14" />
+
+                    <TextBlock Text="Attribution &amp; Credits:" FontWeight="SemiBold" FontSize="13" Margin="0,0,0,4" />
+                    <TextBlock Text="Based on ideas and tweak data from Chris Titus Tech's WinUtil (MIT License). Open source under the MIT License."
+                               FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" Margin="0,0,0,20" />
+
+                    <DockPanel LastChildFill="False">
+                        <ui:Button DockPanel.Dock="Right" Content="Close" Appearance="Primary" Command="{Binding CloseAboutDialogCommand}" />
+                    </DockPanel>
+                </StackPanel>
             </Border>
         </Grid>
     </Grid>

@@ -27,6 +27,9 @@
       "type": "string",
       "pattern": "^[a-z0-9]+(\\.[a-z0-9-]+)+$"
     },
+    "origin": {
+      "type": "string"
+    },
     "name": {
       "type": "string",
       "minLength": 3

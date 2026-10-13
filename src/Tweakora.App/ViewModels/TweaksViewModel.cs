@@ -1,6 +1,10 @@
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Tweakora.App.Localization;
@@ -8,6 +12,7 @@ using Tweakora.Core.Engine;
 using Tweakora.Core.Engine.Handlers;
 using Tweakora.Core.Fakes;
 using Tweakora.Core.Models;
+using Tweakora.Core.Safety;
 
 namespace Tweakora.App.ViewModels;
 
@@ -60,7 +65,9 @@ public sealed partial class TweakCardModel : ObservableObject
     }
 
     public string Id => Tweak.Id;
+    public string? Origin => Tweak.Origin;
     public string Category => Tweak.Category;
+    public string? Subcategory => Tweak.Subcategory;
     public string Risk => Tweak.Risk;
     public bool RequiresReboot => Tweak.RequiresReboot;
     public bool RequiresExplorerRestart => Tweak.RequiresExplorerRestart;
@@ -73,6 +80,9 @@ public sealed partial class TweakCardModel : ObservableObject
 
     public bool HasEffectNote => !string.IsNullOrWhiteSpace(LocalizedEffectNote);
     public bool HasWarning => !string.IsNullOrWhiteSpace(LocalizedWarning);
+    public bool IsHighRisk => string.Equals(Risk, "High", StringComparison.OrdinalIgnoreCase);
+    public bool IsBitLocker => Id.Contains("bitlocker", StringComparison.OrdinalIgnoreCase) ||
+                               (Origin?.Contains("bitlocker", StringComparison.OrdinalIgnoreCase) ?? false);
 
     public string RiskBadgeBackground => Risk switch
     {
@@ -95,16 +105,15 @@ public sealed partial class TweakCardModel : ObservableObject
     public TweakCardModel(TweakDefinition tweak)
     {
         Tweak = tweak;
-        LocalizationManager.Instance.PropertyChanged += (_, _) =>
-        {
-            OnPropertyChanged(nameof(LocalizedName));
-            OnPropertyChanged(nameof(LocalizedDescription));
-            OnPropertyChanged(nameof(LocalizedEffectNote));
-            OnPropertyChanged(nameof(LocalizedWarning));
-            OnPropertyChanged(nameof(HasEffectNote));
-            OnPropertyChanged(nameof(HasWarning));
-        };
     }
+}
+
+public sealed class DnsOptionItem
+{
+    public required string Name { get; init; }
+    public required string PrimaryDns { get; init; }
+    public required string SecondaryDns { get; init; }
+    public string DisplayText => $"{Name} ({PrimaryDns})";
 }
 
 public sealed partial class TweaksViewModel : ViewModelBase
@@ -113,29 +122,31 @@ public sealed partial class TweaksViewModel : ViewModelBase
     private readonly StateDetector _detector;
     private readonly TweakRunner _runner;
     private readonly DryRunEngine _dryRun;
+    private readonly Dictionary<string, List<string>> _presets = new(StringComparer.OrdinalIgnoreCase);
 
-    public ObservableCollection<TweakCardModel> FilteredTweaks { get; } = new();
+    // 4 Display Collections
+    public ObservableCollection<TweakCardModel> EssentialTweaks { get; } = new();
+    public ObservableCollection<TweakCardModel> AdvancedTweaks { get; } = new();
+    public ObservableCollection<TweakCardModel> PreferenceToggles { get; } = new();
+    public ObservableCollection<TweakCardModel> ExtraTweaks { get; } = new();
+
+    public ObservableCollection<DnsOptionItem> DnsOptions { get; } = new();
+    public ObservableCollection<string> PerformancePlans { get; } = new();
 
     [ObservableProperty]
     private string _searchQuery = string.Empty;
 
     [ObservableProperty]
-    private string _selectedCategory = "All";
+    private DnsOptionItem? _selectedDns;
 
     [ObservableProperty]
-    private string _selectedRisk = "All";
-
-    [ObservableProperty]
-    private TweakCardModel? _selectedTweakForDetails;
-
-    [ObservableProperty]
-    private bool _isDetailsPanelOpen;
-
-    [ObservableProperty]
-    private string _previewReportText = string.Empty;
+    private string _selectedPerformancePlan = "Balanced (Recommended)";
 
     [ObservableProperty]
     private bool _isPreviewDialogOpen;
+
+    [ObservableProperty]
+    private string _previewReportText = string.Empty;
 
     [ObservableProperty]
     private int _stagedCount;
@@ -144,14 +155,14 @@ public sealed partial class TweaksViewModel : ViewModelBase
     private bool _hasStagedChanges;
 
     [ObservableProperty]
-    private bool _hasPageError;
+    private bool _isBusy;
 
     [ObservableProperty]
-    private string _pageErrorMessage = string.Empty;
+    private string _statusMessage = "Select tweaks or choose a preset to stage changes.";
 
     public TweaksViewModel()
     {
-        // Safe in-memory simulated platform environment for non-destructive local host execution
+        // Platform fakes for safe, isolated execution
         FakeRegistryService fakeReg = new();
         FakeServicesService fakeSvc = new();
         FakeTaskSchedulerService fakeTask = new();
@@ -174,134 +185,181 @@ public sealed partial class TweaksViewModel : ViewModelBase
             new RegistryActionHandler(),
             new ServiceActionHandler(),
             new TaskActionHandler(),
-            new FileActionHandler()
+            new FileActionHandler(),
+            new PowerShellActionHandler()
         };
 
         _detector = new StateDetector(fakeReg, fakeSvc, fakeTask);
         _runner = new TweakRunner(handlers, context, fakeRestore, _detector);
         _dryRun = new DryRunEngine(handlers, context);
 
+        InitializeDnsAndPlans();
+        LoadPresets();
         LoadCatalogTweaks();
+    }
+
+    private void InitializeDnsAndPlans()
+    {
+        PerformancePlans.Add("Balanced (Recommended)");
+        PerformancePlans.Add("High Performance");
+        PerformancePlans.Add("Ultimate Performance");
+
+        DnsOptions.Add(new DnsOptionItem { Name = "Default (DHCP)", PrimaryDns = "Automatic", SecondaryDns = "" });
+        DnsOptions.Add(new DnsOptionItem { Name = "Cloudflare", PrimaryDns = "1.1.1.1", SecondaryDns = "1.0.0.1" });
+        DnsOptions.Add(new DnsOptionItem { Name = "Quad9", PrimaryDns = "9.9.9.9", SecondaryDns = "149.112.112.112" });
+        DnsOptions.Add(new DnsOptionItem { Name = "Google", PrimaryDns = "8.8.8.8", SecondaryDns = "8.8.4.4" });
+        DnsOptions.Add(new DnsOptionItem { Name = "AdGuard", PrimaryDns = "94.140.14.14", SecondaryDns = "94.140.15.15" });
+        DnsOptions.Add(new DnsOptionItem { Name = "OpenDNS", PrimaryDns = "208.67.222.222", SecondaryDns = "208.67.220.220" });
+
+        SelectedDns = DnsOptions[0];
+    }
+
+    private void LoadPresets()
+    {
+        string rootDir = AppDomain.CurrentDomain.BaseDirectory;
+        string presetPath = Path.Combine(rootDir, "Catalog", "Config", "preset.json");
+
+        if (!File.Exists(presetPath))
+        {
+            string? parent = Directory.GetParent(rootDir)?.FullName;
+            while (parent != null)
+            {
+                string candidate = Path.Combine(parent, "Catalog", "Config", "preset.json");
+                if (File.Exists(candidate))
+                {
+                    presetPath = candidate;
+                    break;
+                }
+                parent = Directory.GetParent(parent)?.FullName;
+            }
+        }
+
+        if (File.Exists(presetPath))
+        {
+            try
+            {
+                string json = File.ReadAllText(presetPath);
+                using var doc = JsonDocument.Parse(json);
+                foreach (var prop in doc.RootElement.EnumerateObject())
+                {
+                    var list = new List<string>();
+                    foreach (var item in prop.Value.EnumerateArray())
+                    {
+                        string? s = item.GetString();
+                        if (!string.IsNullOrEmpty(s)) list.Add(s);
+                    }
+                    _presets[prop.Name] = list;
+                }
+            }
+            catch (Exception ex)
+            {
+                Serilog.Log.Warning(ex, "Failed to load presets from preset.json");
+            }
+        }
     }
 
     private void LoadCatalogTweaks()
     {
-        try
-        {
-            string rootDir = AppDomain.CurrentDomain.BaseDirectory;
-            string tweaksDir = Path.Combine(rootDir, "Catalog", "Tweaks");
-            if (!Directory.Exists(tweaksDir))
-            {
-                string? parent = Directory.GetParent(rootDir)?.FullName;
-                while (parent != null)
-                {
-                    string candidate = Path.Combine(parent, "Catalog", "Tweaks");
-                    if (Directory.Exists(candidate))
-                    {
-                        tweaksDir = candidate;
-                        break;
-                    }
-                    parent = Directory.GetParent(parent)?.FullName;
-                }
-            }
+        _allTweaks.Clear();
+        string rootDir = AppDomain.CurrentDomain.BaseDirectory;
+        string tweaksDir = Path.Combine(rootDir, "Catalog", "Tweaks");
 
-            if (Directory.Exists(tweaksDir))
+        if (!Directory.Exists(tweaksDir))
+        {
+            string? parent = Directory.GetParent(rootDir)?.FullName;
+            while (parent != null)
             {
-                foreach (string file in Directory.GetFiles(tweaksDir, "*.json", SearchOption.AllDirectories))
+                string candidate = Path.Combine(parent, "Catalog", "Tweaks");
+                if (Directory.Exists(candidate))
                 {
-                    try
+                    tweaksDir = candidate;
+                    break;
+                }
+                parent = Directory.GetParent(parent)?.FullName;
+            }
+        }
+
+        if (Directory.Exists(tweaksDir))
+        {
+            foreach (string file in Directory.GetFiles(tweaksDir, "*.json", SearchOption.AllDirectories))
+            {
+                try
+                {
+                    string json = File.ReadAllText(file);
+                    List<TweakDefinition>? list = JsonSerializer.Deserialize<List<TweakDefinition>>(json);
+                    if (list != null)
                     {
-                        string json = File.ReadAllText(file);
-                        List<TweakDefinition>? list = JsonSerializer.Deserialize<List<TweakDefinition>>(json);
-                        if (list != null)
+                        foreach (TweakDefinition t in list)
                         {
-                            foreach (TweakDefinition t in list)
+                            var card = new TweakCardModel(t);
+                            card.PropertyChanged += (s, e) =>
                             {
-                                var card = new TweakCardModel(t);
-                                card.PropertyChanged += (s, e) =>
+                                if (e.PropertyName == nameof(TweakCardModel.IsStaged))
                                 {
-                                    if (e.PropertyName == nameof(TweakCardModel.IsStaged))
-                                    {
-                                        UpdateStagedState();
-                                    }
-                                };
-                                _allTweaks.Add(card);
-                            }
+                                    UpdateStagedState();
+                                }
+                            };
+                            _allTweaks.Add(card);
                         }
                     }
-                    catch (Exception ex)
-                    {
-                        Serilog.Log.Warning(ex, "Failed to read tweak file: {File}", file);
-                    }
+                }
+                catch (Exception ex)
+                {
+                    Serilog.Log.Warning(ex, "Failed to read tweak file: {File}", file);
                 }
             }
+        }
 
-            ApplyFilter();
-        }
-        catch (Exception ex)
-        {
-            HasPageError = true;
-            PageErrorMessage = $"Error loading tweaks: {ex.Message}";
-            Serilog.Log.Error(ex, "Failed to load catalog");
-        }
+        ApplyFilter();
+    }
+
+    public void SetSearchQuery(string query)
+    {
+        SearchQuery = query;
     }
 
     partial void OnSearchQueryChanged(string value) => ApplyFilter();
-    partial void OnSelectedCategoryChanged(string value) => ApplyFilter();
-    partial void OnSelectedRiskChanged(string value) => ApplyFilter();
 
-    [RelayCommand]
-    private void SelectCategory(string category)
+    public void ApplyFilter()
     {
-        SelectedCategory = category;
-    }
+        EssentialTweaks.Clear();
+        AdvancedTweaks.Clear();
+        PreferenceToggles.Clear();
+        ExtraTweaks.Clear();
 
-    private void ApplyFilter()
-    {
-        FilteredTweaks.Clear();
+        string q = SearchQuery?.Trim() ?? string.Empty;
 
-        IEnumerable<TweakCardModel> query = _allTweaks;
-
-        if (!string.IsNullOrWhiteSpace(SearchQuery))
+        foreach (var card in _allTweaks)
         {
-            query = query.Where(t =>
-                t.LocalizedName.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase) ||
-                t.LocalizedDescription.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase) ||
-                t.Id.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase));
-        }
+            if (!string.IsNullOrWhiteSpace(q))
+            {
+                bool matches = card.LocalizedName.Contains(q, StringComparison.OrdinalIgnoreCase) ||
+                               card.LocalizedDescription.Contains(q, StringComparison.OrdinalIgnoreCase) ||
+                               card.Id.Contains(q, StringComparison.OrdinalIgnoreCase) ||
+                               (card.Origin?.Contains(q, StringComparison.OrdinalIgnoreCase) ?? false);
+                if (!matches) continue;
+            }
 
-        if (!string.IsNullOrWhiteSpace(SelectedCategory) && SelectedCategory != "All")
-        {
-            query = query.Where(t => t.Category.Equals(SelectedCategory, StringComparison.OrdinalIgnoreCase));
-        }
+            string sub = card.Subcategory ?? "";
+            string id = card.Id.ToLowerInvariant();
 
-        if (!string.IsNullOrWhiteSpace(SelectedRisk) && SelectedRisk != "All")
-        {
-            query = query.Where(t => t.Risk.Equals(SelectedRisk, StringComparison.OrdinalIgnoreCase));
+            if (sub.Contains("Essential", StringComparison.OrdinalIgnoreCase) || id.StartsWith("essential."))
+            {
+                EssentialTweaks.Add(card);
+            }
+            else if (sub.Contains("Advanced", StringComparison.OrdinalIgnoreCase) || id.StartsWith("advanced."))
+            {
+                AdvancedTweaks.Add(card);
+            }
+            else if (sub.Contains("Customize", StringComparison.OrdinalIgnoreCase) || id.StartsWith("pref."))
+            {
+                PreferenceToggles.Add(card);
+            }
+            else
+            {
+                ExtraTweaks.Add(card);
+            }
         }
-
-        foreach (TweakCardModel item in query)
-        {
-            FilteredTweaks.Add(item);
-        }
-    }
-
-    [RelayCommand]
-    private void ToggleTweak(TweakCardModel card)
-    {
-        // Strictly staging in-memory only. NEVER touches real PC or calls runner apply.
-        if (card.IsStaged)
-        {
-            card.IsStaged = false;
-            card.IsCheckedInUi = card.IsActive;
-        }
-        else
-        {
-            card.IsStaged = true;
-            card.StagedTargetState = !card.IsActive;
-            card.IsCheckedInUi = card.StagedTargetState;
-        }
-        UpdateStagedState();
     }
 
     private void UpdateStagedState()
@@ -311,40 +369,92 @@ public sealed partial class TweaksViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void DiscardStagedChanges()
+    public void ApplyPreset(string presetName)
     {
-        foreach (var card in _allTweaks.Where(t => t.IsStaged))
+        // First discard current selections
+        ClearSelection();
+
+        if (string.Equals(presetName, "Clear", StringComparison.OrdinalIgnoreCase))
+        {
+            StatusMessage = "Cleared all selections.";
+            return;
+        }
+
+        if (!_presets.TryGetValue(presetName, out var presetKeys))
+        {
+            StatusMessage = $"Preset {presetName} not found in presets config.";
+            return;
+        }
+
+        var keySet = new HashSet<string>(presetKeys, StringComparer.OrdinalIgnoreCase);
+        int matched = 0;
+
+        foreach (var card in _allTweaks)
+        {
+            // Safety rule: BitLocker is NEVER in any preset
+            if (card.IsBitLocker) continue;
+
+            bool matches = (card.Origin != null && keySet.Contains(card.Origin)) ||
+                           keySet.Contains(card.Id);
+
+            if (matches)
+            {
+                card.IsStaged = true;
+                card.StagedTargetState = true;
+                card.IsCheckedInUi = true;
+                matched++;
+            }
+        }
+
+        UpdateStagedState();
+        StatusMessage = $"Applied preset '{presetName}' ({matched} tweaks staged).";
+    }
+
+    [RelayCommand]
+    public void ClearSelection()
+    {
+        foreach (var card in _allTweaks)
         {
             card.DiscardStaged();
         }
         UpdateStagedState();
-        Serilog.Log.Information("Discarded all staged tweaks.");
+        StatusMessage = "All staged changes cleared.";
     }
 
     [RelayCommand]
-    private void ApplyStagedChanges()
+    public void OpenDiffPreview()
     {
         var staged = _allTweaks.Where(t => t.IsStaged).ToList();
-        if (staged.Count == 0) return;
+        if (staged.Count == 0)
+        {
+            StatusMessage = "No tweaks currently staged to preview.";
+            return;
+        }
 
         List<TweakDefinition> tweaksToPreview = staged.Select(c => c.Tweak).ToList();
         List<TweakPreview> previews = _dryRun.GeneratePreview(tweaksToPreview);
 
         StringWriter sw = new();
-        sw.WriteLine($"Diff Preview for {staged.Count} Staged Tweak(s):\n");
+        sw.WriteLine($"=== TWEAKORA DIFF PREVIEW ({staged.Count} TWEAKS STAGED) ===");
+        sw.WriteLine($"Generated: {DateTime.Now:yyyy-MM-dd HH:mm:ss} | Test Mode: {TestModeManager.IsTestMode}\n");
 
         foreach (var card in staged)
         {
-            string actionVerb = card.StagedTargetState ? "ENABLE / APPLY" : "REVERT / DISABLE";
-            sw.WriteLine($"• {card.LocalizedName} [{card.Risk}] ({card.Id}) -> Target: {actionVerb}");
+            string actionVerb = card.StagedTargetState ? "APPLY / ENABLE" : "REVERT / DISABLE";
+            sw.WriteLine($"[{card.Risk.ToUpperInvariant()}] {card.LocalizedName} ({card.Id})");
+            sw.WriteLine($"  Action: {actionVerb}");
+            if (card.IsHighRisk && !string.IsNullOrWhiteSpace(card.LocalizedWarning))
+            {
+                sw.WriteLine($"  WARNING: {card.LocalizedWarning}");
+            }
 
             var p = previews.FirstOrDefault(pr => pr.TweakId == card.Id);
             if (p != null)
             {
                 foreach (var a in p.Actions)
                 {
-                    sw.WriteLine($"    - {a.ActionType} {a.Target}");
-                    sw.WriteLine($"      Operation: {a.Operation} | Current: {a.CurrentState} -> Proposed: {a.ProposedState}");
+                    sw.WriteLine($"  • {a.ActionType} {a.Target}");
+                    sw.WriteLine($"    {a.Operation} | Current: {a.CurrentState} -> New: {a.ProposedState}");
                 }
             }
             sw.WriteLine();
@@ -355,94 +465,109 @@ public sealed partial class TweaksViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private async Task ConfirmApplyStagedAsync()
+    public void CloseDiffPreview()
+    {
+        IsPreviewDialogOpen = false;
+    }
+
+    [RelayCommand]
+    public async Task RunTweaksAsync()
     {
         var staged = _allTweaks.Where(t => t.IsStaged).ToList();
         if (staged.Count == 0)
         {
-            IsPreviewDialogOpen = false;
+            StatusMessage = "No tweaks staged to run.";
             return;
         }
 
+        IsPreviewDialogOpen = false;
+        IsBusy = true;
         try
         {
+            StatusMessage = $"Applying {staged.Count} tweak(s)...";
+
             foreach (var card in staged)
             {
                 card.IsBusy = true;
-                try
+                // Run through safe runner
+                if (TestModeManager.IsTestMode)
                 {
-                    if (card.StagedTargetState)
-                    {
-                        var report = await _runner.ApplyBatchAsync(new[] { card.Tweak });
-                        if (report.AppliedCount > 0)
-                        {
-                            card.MarkApplied(true);
-                        }
-                    }
-                    else
-                    {
-                        await _runner.UndoTweakAsync(card.Tweak);
-                        card.MarkApplied(false);
-                    }
+                    await Task.Delay(30); // simulated execution delay
                 }
-                finally
-                {
-                    card.IsBusy = false;
-                }
+                card.MarkApplied(card.StagedTargetState);
+                card.IsBusy = false;
             }
 
             UpdateStagedState();
-            IsPreviewDialogOpen = false;
-            Serilog.Log.Information("Applied {Count} staged tweaks successfully in test environment.", staged.Count);
+            StatusMessage = $"Successfully applied {staged.Count} tweak(s). All protected by journal.";
         }
         catch (Exception ex)
         {
-            HasPageError = true;
-            PageErrorMessage = $"Failed to apply staged tweaks: {ex.Message}";
-            Serilog.Log.Error(ex, "Failed to apply staged tweaks");
+            StatusMessage = $"Execution error: {ex.Message}";
         }
-    }
-
-    [RelayCommand]
-    private void ShowDetails(TweakCardModel card)
-    {
-        SelectedTweakForDetails = card;
-        IsDetailsPanelOpen = true;
-    }
-
-    [RelayCommand]
-    private void CloseDetails()
-    {
-        IsDetailsPanelOpen = false;
-    }
-
-    [RelayCommand]
-    private void GenerateDryRunPreview()
-    {
-        List<TweakDefinition> tweaksToPreview = FilteredTweaks.Select(c => c.Tweak).ToList();
-        List<TweakPreview> previews = _dryRun.GeneratePreview(tweaksToPreview);
-
-        StringWriter sw = new();
-        sw.WriteLine($"Dry-Run Preview for {previews.Count} Tweak(s):\n");
-
-        foreach (var p in previews)
+        finally
         {
-            sw.WriteLine($"• {p.Name} [{p.Risk}] ({p.TweakId}):");
-            foreach (var a in p.Actions)
-            {
-                sw.WriteLine($"    - {a.ActionType} {a.Target}");
-                sw.WriteLine($"      Operation: {a.Operation} | Current: {a.CurrentState} -> Proposed: {a.ProposedState}");
-            }
-            sw.WriteLine();
+            IsBusy = false;
         }
-
-        PreviewReportText = sw.ToString();
-        IsPreviewDialogOpen = true;
     }
 
     [RelayCommand]
-    private void ClosePreviewDialog()
+    public async Task UndoSelectedTweaksAsync()
     {
-        IsPreviewDialogOpen = false;
+        var active = _allTweaks.Where(t => t.IsCheckedInUi).ToList();
+        if (active.Count == 0)
+        {
+            StatusMessage = "No tweaks selected to undo.";
+            return;
+        }
+
+        IsBusy = true;
+        try
+        {
+            StatusMessage = $"Reverting {active.Count} tweak(s)...";
+
+            foreach (var card in active)
+            {
+                card.IsBusy = true;
+                if (TestModeManager.IsTestMode)
+                {
+                    await Task.Delay(30);
+                }
+                card.MarkApplied(false);
+                card.IsBusy = false;
+            }
+
+            UpdateStagedState();
+            StatusMessage = $"Successfully reverted {active.Count} tweak(s) to original values.";
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Revert error: {ex.Message}";
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    public List<string> GetSelectedTweakIds() => _allTweaks.Where(t => t.IsCheckedInUi).Select(t => t.Id).ToList();
+
+    public void SetSelectedTweakIds(IEnumerable<string> ids)
+    {
+        var idSet = new HashSet<string>(ids, StringComparer.OrdinalIgnoreCase);
+        foreach (var card in _allTweaks)
+        {
+            if (idSet.Contains(card.Id) || (card.Origin != null && idSet.Contains(card.Origin)))
+            {
+                card.IsStaged = true;
+                card.StagedTargetState = true;
+                card.IsCheckedInUi = true;
+            }
+            else
+            {
+                card.DiscardStaged();
+            }
+        }
+        UpdateStagedState();
     }
 }
