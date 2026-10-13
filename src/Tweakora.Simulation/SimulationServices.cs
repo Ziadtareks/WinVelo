@@ -1,6 +1,10 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Tweakora.Core.Interfaces;
 
-namespace Tweakora.Core.Fakes;
+namespace Tweakora.Simulation;
 
 public sealed class FakeRegistryService : IRegistryService
 {
@@ -76,6 +80,22 @@ public sealed class FakeRegistryService : IRegistryService
     public string ExportRegBackup(string hive, string key, string backupFolder)
     {
         return $"fake-backup-{hive}-{key.Replace('\\', '_')}.reg";
+    }
+
+    public IEnumerable<string> GetValueNames(string hive, string key)
+    {
+        string fullKey = $"{hive}\\{key}";
+        return Keys.TryGetValue(fullKey, out var vals) ? vals.Keys.ToList() : Enumerable.Empty<string>();
+    }
+
+    public IEnumerable<string> GetSubKeyNames(string hive, string key)
+    {
+        string prefix = $"{hive}\\{key}\\";
+        return Keys.Keys
+            .Where(k => k.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+            .Select(k => k.Substring(prefix.Length).Split('\\')[0])
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
     }
 }
 

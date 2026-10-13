@@ -6,17 +6,18 @@ using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Tweakora.Core.Safety;
+using Tweakora.Core.Operations;
 using Tweakora.Modules.Apps;
 
 namespace Tweakora.App.ViewModels;
 
-public sealed partial class InstallViewModel : ViewModelBase
+public sealed partial class InstallViewModel : ObservableObject
 {
-    private readonly ApplicationCatalogManager _catalogManager = new() { IsSimulationMode = true };
-    private readonly List<AppItemViewModel> _allApps = new();
+    private readonly IAppInstallService _installService;
+    private readonly IOperationRunner _runner;
+    private readonly List<ApplicationItem> _allApps = new();
 
-    public ObservableCollection<AppItemViewModel> FilteredApps { get; } = new();
+    public ObservableCollection<ApplicationItem> FilteredApps { get; } = new();
     public ObservableCollection<string> Categories { get; } = new();
     public ObservableCollection<string> OperationLogs { get; } = new();
 
@@ -30,6 +31,9 @@ public sealed partial class InstallViewModel : ViewModelBase
     private string _packageManager = "WinGet"; // "WinGet" or "Chocolatey"
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(InstallSelectedCommand))]
+    [NotifyCanExecuteChangedFor(nameof(UninstallSelectedCommand))]
+    [NotifyCanExecuteChangedFor(nameof(UpgradeAllCommand))]
     private bool _isBusy;
 
     [ObservableProperty]
@@ -41,10 +45,12 @@ public sealed partial class InstallViewModel : ViewModelBase
     [ObservableProperty]
     private int _selectedCount;
 
-    public InstallViewModel()
+    public InstallViewModel(IAppInstallService installService, IOperationRunner runner)
     {
-        _catalogManager.IsSimulationMode = TestModeManager.IsTestMode;
-        _catalogManager.OnLog += msg =>
+        _installService = installService;
+        _runner = runner;
+
+        _runner.OnLog += msg =>
         {
             System.Windows.Application.Current?.Dispatcher?.Invoke(() =>
             {
@@ -52,7 +58,8 @@ public sealed partial class InstallViewModel : ViewModelBase
                 if (OperationLogs.Count > 200) OperationLogs.RemoveAt(0);
             });
         };
-        _catalogManager.OnProgress += (status, percent) =>
+
+        _runner.OnProgress += (status, percent) =>
         {
             System.Windows.Application.Current?.Dispatcher?.Invoke(() =>
             {
@@ -70,12 +77,12 @@ public sealed partial class InstallViewModel : ViewModelBase
         Categories.Clear();
         Categories.Add("All");
 
-        var loaded = _catalogManager.LoadCatalog();
+        var loaded = _installService.LoadApplications();
         foreach (var app in loaded)
         {
             app.PropertyChanged += (s, e) =>
             {
-                if (e.PropertyName == nameof(AppItemViewModel.IsSelected))
+                if (e.PropertyName == nameof(ApplicationItem.IsSelected))
                 {
                     UpdateSelectedCount();
                 }
@@ -148,7 +155,9 @@ public sealed partial class InstallViewModel : ViewModelBase
         UpdateSelectedCount();
     }
 
-    [RelayCommand]
+    private bool CanExecuteAction() => !IsBusy;
+
+    [RelayCommand(CanExecute = nameof(CanExecuteAction))]
     private async Task InstallSelectedAsync()
     {
         var selected = _allApps.Where(a => a.IsSelected).ToList();
@@ -161,8 +170,9 @@ public sealed partial class InstallViewModel : ViewModelBase
         IsBusy = true;
         try
         {
-            await _catalogManager.InstallAppsAsync(selected, PackageManager);
-            StatusMessage = $"Installation completed for {selected.Count} application(s).";
+            StatusMessage = $"Installing {selected.Count} application(s) via {PackageManager}...";
+            var report = await _installService.InstallAppsAsync(selected, PackageManager, _runner);
+            StatusMessage = $"Installation completed: {report.Summary}.";
         }
         catch (Exception ex)
         {
@@ -174,7 +184,7 @@ public sealed partial class InstallViewModel : ViewModelBase
         }
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanExecuteAction))]
     private async Task UninstallSelectedAsync()
     {
         var selected = _allApps.Where(a => a.IsSelected).ToList();
@@ -187,8 +197,9 @@ public sealed partial class InstallViewModel : ViewModelBase
         IsBusy = true;
         try
         {
-            await _catalogManager.UninstallAppsAsync(selected, PackageManager);
-            StatusMessage = $"Uninstallation completed for {selected.Count} application(s).";
+            StatusMessage = $"Uninstalling {selected.Count} application(s) via {PackageManager}...";
+            var report = await _installService.UninstallAppsAsync(selected, PackageManager, _runner);
+            StatusMessage = $"Uninstallation completed: {report.Summary}.";
         }
         catch (Exception ex)
         {
@@ -200,16 +211,20 @@ public sealed partial class InstallViewModel : ViewModelBase
         }
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanExecuteAction))]
     private async Task UpgradeAllAsync()
     {
         IsBusy = true;
         try
         {
-            OperationLogs.Add($"[UPGRADE] Checking for updates via {PackageManager}...");
-            await Task.Delay(TestModeManager.IsTestMode ? 100 : 500);
-            OperationLogs.Add($"[UPGRADE] All installed applications are up to date.");
+            StatusMessage = $"Checking and upgrading all applications via {PackageManager}...";
+            string output = await _installService.UpgradeAllAsync(PackageManager);
             StatusMessage = "Upgrade check completed.";
+            OperationLogs.Add(output);
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Upgrade error: {ex.Message}";
         }
         finally
         {
@@ -218,7 +233,7 @@ public sealed partial class InstallViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void OpenAppWebsite(AppItemViewModel app)
+    private void OpenAppWebsite(ApplicationItem app)
     {
         if (string.IsNullOrWhiteSpace(app.Link)) return;
         try

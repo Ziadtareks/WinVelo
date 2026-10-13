@@ -7,12 +7,9 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Tweakora.App.Localization;
-using Tweakora.Core.Engine;
-using Tweakora.Core.Engine.Handlers;
-using Tweakora.Core.Fakes;
 using Tweakora.Core.Models;
-using Tweakora.Core.Safety;
+using Tweakora.Core.Operations;
+using Tweakora.Modules.Tweaks;
 
 namespace Tweakora.App.ViewModels;
 
@@ -116,12 +113,11 @@ public sealed class DnsOptionItem
     public string DisplayText => $"{Name} ({PrimaryDns})";
 }
 
-public sealed partial class TweaksViewModel : ViewModelBase
+public sealed partial class TweaksViewModel : ObservableObject
 {
+    private readonly ITweakService _tweakService;
+    private readonly IOperationRunner _runner;
     private readonly List<TweakCardModel> _allTweaks = new();
-    private readonly StateDetector _detector;
-    private readonly TweakRunner _runner;
-    private readonly DryRunEngine _dryRun;
     private readonly Dictionary<string, List<string>> _presets = new(StringComparer.OrdinalIgnoreCase);
 
     // 4 Display Collections
@@ -155,43 +151,17 @@ public sealed partial class TweaksViewModel : ViewModelBase
     private bool _hasStagedChanges;
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(RunTweaksCommand))]
+    [NotifyCanExecuteChangedFor(nameof(UndoSelectedTweaksCommand))]
     private bool _isBusy;
 
     [ObservableProperty]
     private string _statusMessage = "Select tweaks or choose a preset to stage changes.";
 
-    public TweaksViewModel()
+    public TweaksViewModel(ITweakService tweakService, IOperationRunner runner)
     {
-        // Platform fakes for safe, isolated execution
-        FakeRegistryService fakeReg = new();
-        FakeServicesService fakeSvc = new();
-        FakeTaskSchedulerService fakeTask = new();
-        FakeRestoreService fakeRestore = new();
-        FakeShellService fakeShell = new();
-        RollbackJournalManager journal = new(Path.Combine(Path.GetTempPath(), "Tweakora_App_Journal"));
-
-        Core.Engine.ExecutionContext context = new()
-        {
-            Registry = fakeReg,
-            Services = fakeSvc,
-            Tasks = fakeTask,
-            Shell = fakeShell,
-            Journal = journal,
-            IsDryRun = false
-        };
-
-        List<IActionHandler> handlers = new()
-        {
-            new RegistryActionHandler(),
-            new ServiceActionHandler(),
-            new TaskActionHandler(),
-            new FileActionHandler(),
-            new PowerShellActionHandler()
-        };
-
-        _detector = new StateDetector(fakeReg, fakeSvc, fakeTask);
-        _runner = new TweakRunner(handlers, context, fakeRestore, _detector);
-        _dryRun = new DryRunEngine(handlers, context);
+        _tweakService = tweakService;
+        _runner = runner;
 
         InitializeDnsAndPlans();
         LoadPresets();
@@ -261,53 +231,20 @@ public sealed partial class TweaksViewModel : ViewModelBase
     private void LoadCatalogTweaks()
     {
         _allTweaks.Clear();
-        string rootDir = AppDomain.CurrentDomain.BaseDirectory;
-        string tweaksDir = Path.Combine(rootDir, "Catalog", "Tweaks");
+        var catalog = _tweakService.LoadCatalog();
 
-        if (!Directory.Exists(tweaksDir))
+        foreach (var tweak in catalog)
         {
-            string? parent = Directory.GetParent(rootDir)?.FullName;
-            while (parent != null)
+            var card = new TweakCardModel(tweak);
+            card.IsActive = _tweakService.DetectState(tweak);
+            card.PropertyChanged += (s, e) =>
             {
-                string candidate = Path.Combine(parent, "Catalog", "Tweaks");
-                if (Directory.Exists(candidate))
+                if (e.PropertyName == nameof(TweakCardModel.IsStaged))
                 {
-                    tweaksDir = candidate;
-                    break;
+                    UpdateStagedState();
                 }
-                parent = Directory.GetParent(parent)?.FullName;
-            }
-        }
-
-        if (Directory.Exists(tweaksDir))
-        {
-            foreach (string file in Directory.GetFiles(tweaksDir, "*.json", SearchOption.AllDirectories))
-            {
-                try
-                {
-                    string json = File.ReadAllText(file);
-                    List<TweakDefinition>? list = JsonSerializer.Deserialize<List<TweakDefinition>>(json);
-                    if (list != null)
-                    {
-                        foreach (TweakDefinition t in list)
-                        {
-                            var card = new TweakCardModel(t);
-                            card.PropertyChanged += (s, e) =>
-                            {
-                                if (e.PropertyName == nameof(TweakCardModel.IsStaged))
-                                {
-                                    UpdateStagedState();
-                                }
-                            };
-                            _allTweaks.Add(card);
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Serilog.Log.Warning(ex, "Failed to read tweak file: {File}", file);
-                }
-            }
+            };
+            _allTweaks.Add(card);
         }
 
         ApplyFilter();
@@ -371,7 +308,6 @@ public sealed partial class TweaksViewModel : ViewModelBase
     [RelayCommand]
     public void ApplyPreset(string presetName)
     {
-        // First discard current selections
         ClearSelection();
 
         if (string.Equals(presetName, "Clear", StringComparison.OrdinalIgnoreCase))
@@ -391,7 +327,6 @@ public sealed partial class TweaksViewModel : ViewModelBase
 
         foreach (var card in _allTweaks)
         {
-            // Safety rule: BitLocker is NEVER in any preset
             if (card.IsBitLocker) continue;
 
             bool matches = (card.Origin != null && keySet.Contains(card.Origin)) ||
@@ -422,7 +357,7 @@ public sealed partial class TweaksViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    public void OpenDiffPreview()
+    public async Task OpenDiffPreviewAsync()
     {
         var staged = _allTweaks.Where(t => t.IsStaged).ToList();
         if (staged.Count == 0)
@@ -432,35 +367,7 @@ public sealed partial class TweaksViewModel : ViewModelBase
         }
 
         List<TweakDefinition> tweaksToPreview = staged.Select(c => c.Tweak).ToList();
-        List<TweakPreview> previews = _dryRun.GeneratePreview(tweaksToPreview);
-
-        StringWriter sw = new();
-        sw.WriteLine($"=== TWEAKORA DIFF PREVIEW ({staged.Count} TWEAKS STAGED) ===");
-        sw.WriteLine($"Generated: {DateTime.Now:yyyy-MM-dd HH:mm:ss} | Test Mode: {TestModeManager.IsTestMode}\n");
-
-        foreach (var card in staged)
-        {
-            string actionVerb = card.StagedTargetState ? "APPLY / ENABLE" : "REVERT / DISABLE";
-            sw.WriteLine($"[{card.Risk.ToUpperInvariant()}] {card.LocalizedName} ({card.Id})");
-            sw.WriteLine($"  Action: {actionVerb}");
-            if (card.IsHighRisk && !string.IsNullOrWhiteSpace(card.LocalizedWarning))
-            {
-                sw.WriteLine($"  WARNING: {card.LocalizedWarning}");
-            }
-
-            var p = previews.FirstOrDefault(pr => pr.TweakId == card.Id);
-            if (p != null)
-            {
-                foreach (var a in p.Actions)
-                {
-                    sw.WriteLine($"  • {a.ActionType} {a.Target}");
-                    sw.WriteLine($"    {a.Operation} | Current: {a.CurrentState} -> New: {a.ProposedState}");
-                }
-            }
-            sw.WriteLine();
-        }
-
-        PreviewReportText = sw.ToString();
+        PreviewReportText = await _tweakService.GenerateDryRunDiffAsync(tweaksToPreview);
         IsPreviewDialogOpen = true;
     }
 
@@ -470,7 +377,9 @@ public sealed partial class TweaksViewModel : ViewModelBase
         IsPreviewDialogOpen = false;
     }
 
-    [RelayCommand]
+    private bool CanRunTweaks() => !IsBusy;
+
+    [RelayCommand(CanExecute = nameof(CanRunTweaks))]
     public async Task RunTweaksAsync()
     {
         var staged = _allTweaks.Where(t => t.IsStaged).ToList();
@@ -486,20 +395,27 @@ public sealed partial class TweaksViewModel : ViewModelBase
         {
             StatusMessage = $"Applying {staged.Count} tweak(s)...";
 
+            var report = await _tweakService.ApplyTweaksAsync(staged.Select(c => c.Tweak).ToList(), _runner);
+
             foreach (var card in staged)
             {
-                card.IsBusy = true;
-                // Run through safe runner
-                if (TestModeManager.IsTestMode)
-                {
-                    await Task.Delay(30); // simulated execution delay
-                }
                 card.MarkApplied(card.StagedTargetState);
-                card.IsBusy = false;
+            }
+
+            // Apply selected performance plan if customized
+            if (!string.IsNullOrWhiteSpace(SelectedPerformancePlan))
+            {
+                await _tweakService.SetPerformancePlanAsync(SelectedPerformancePlan);
+            }
+
+            // Apply selected DNS if not default
+            if (SelectedDns != null && SelectedDns.PrimaryDns != "Automatic")
+            {
+                await _tweakService.SetDnsAsync(SelectedDns.PrimaryDns, SelectedDns.SecondaryDns);
             }
 
             UpdateStagedState();
-            StatusMessage = $"Successfully applied {staged.Count} tweak(s). All protected by journal.";
+            StatusMessage = $"Execution completed: {report.Summary}. All protected by journal.";
         }
         catch (Exception ex)
         {
@@ -511,7 +427,7 @@ public sealed partial class TweaksViewModel : ViewModelBase
         }
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanRunTweaks))]
     public async Task UndoSelectedTweaksAsync()
     {
         var active = _allTweaks.Where(t => t.IsCheckedInUi).ToList();
@@ -526,19 +442,15 @@ public sealed partial class TweaksViewModel : ViewModelBase
         {
             StatusMessage = $"Reverting {active.Count} tweak(s)...";
 
+            var report = await _tweakService.UndoTweaksAsync(active.Select(c => c.Tweak).ToList(), _runner);
+
             foreach (var card in active)
             {
-                card.IsBusy = true;
-                if (TestModeManager.IsTestMode)
-                {
-                    await Task.Delay(30);
-                }
                 card.MarkApplied(false);
-                card.IsBusy = false;
             }
 
             UpdateStagedState();
-            StatusMessage = $"Successfully reverted {active.Count} tweak(s) to original values.";
+            StatusMessage = $"Revert completed: {report.Summary}.";
         }
         catch (Exception ex)
         {

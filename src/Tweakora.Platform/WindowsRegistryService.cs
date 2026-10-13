@@ -157,4 +157,21 @@ public sealed class WindowsRegistryService : IRegistryService
 
         return backupFile;
     }
+
+    public IEnumerable<string> GetValueNames(string hive, string key)
+    {
+        EnsureNotTestMode();
+        using var baseKey = GetHiveKey(hive);
+        using var subKey = baseKey.OpenSubKey(key, false);
+        return subKey?.GetValueNames() ?? Enumerable.Empty<string>();
+    }
+
+    public IEnumerable<string> GetSubKeyNames(string hive, string key)
+    {
+        EnsureNotTestMode();
+        using var baseKey = GetHiveKey(hive);
+        using var subKey = baseKey.OpenSubKey(key, false);
+        return subKey?.GetSubKeyNames() ?? Enumerable.Empty<string>();
+    }
 }
+

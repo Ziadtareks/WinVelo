@@ -35,29 +35,16 @@
         <DataTemplate DataType="{x:Type vm:ToolboxViewModel}">
             <views:ToolboxPage />
         </DataTemplate>
-
-        <!-- Legacy Data Templates for compatibility -->
-        <DataTemplate DataType="{x:Type vm:DashboardViewModel}">
-            <views:DashboardPage />
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type vm:AppsViewModel}">
-            <views:AppsPage />
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type vm:PresetsViewModel}">
-            <views:PresetsPage />
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
-            <views:SettingsPage />
-        </DataTemplate>
     </Window.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" /> <!-- TitleBar -->
-            <RowDefinition Height="Auto" /> <!-- Test Mode Warning Banner -->
-            <RowDefinition Height="Auto" /> <!-- Top Horizontal Navigation Bar -->
-            <RowDefinition Height="*" />    <!-- Main Active Tab Content -->
-            <RowDefinition Height="Auto" /> <!-- Activity Log Panel -->
+            <RowDefinition Height="Auto" /> <!-- TitleBar (Row 0) -->
+            <RowDefinition Height="Auto" /> <!-- Test Mode Warning Banner (Row 1) -->
+            <RowDefinition Height="Auto" /> <!-- Admin Privilege Warning Banner (Row 2) -->
+            <RowDefinition Height="Auto" /> <!-- Top Horizontal Navigation Bar (Row 3) -->
+            <RowDefinition Height="*" />    <!-- Main Active Tab Content (Row 4) -->
+            <RowDefinition Height="Auto" /> <!-- Activity Log Panel (Row 5) -->
         </Grid.RowDefinitions>
 
         <!-- TitleBar with Search, Theme Toggle, Config Menu, Log Button -->
@@ -133,8 +120,25 @@
             </DockPanel>
         </Border>
 
+        <!-- Admin Privilege Warning Banner -->
+        <Border Grid.Row="2" Background="#FCE8E6" BorderBrush="#F5C6CB" BorderThickness="0,0,0,1" Padding="12,6"
+                Visibility="{Binding IsMissingAdministratorPrivileges, Converter={StaticResource BoolToVisConverter}}">
+            <DockPanel LastChildFill="False">
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" VerticalAlignment="Center">
+                    <ui:SymbolIcon Symbol="ShieldError24" Foreground="#C5221F" FontSize="18" Margin="0,0,10,0" VerticalAlignment="Center" />
+                    <TextBlock AutomationProperties.AutomationId="AdminWarningBanner"
+                               Text="LIMITED ACCESS — Tweakora is not running as Administrator. Modifying tweaks, services, and optional features requires elevated privileges."
+                               FontWeight="Bold" Foreground="#721C24" FontSize="12" VerticalAlignment="Center" />
+                </StackPanel>
+                <ui:Button DockPanel.Dock="Right" Content="Restart as Administrator"
+                           AutomationProperties.AutomationId="RestartAsAdminButton"
+                           Appearance="Primary" Command="{Binding RestartAsAdminCommand}"
+                           Padding="10,4" FontSize="11" />
+            </DockPanel>
+        </Border>
+
         <!-- TOP HORIZONTAL TAB BAR (Like WinUtil, Modernized) -->
-        <Border Grid.Row="2" Background="{DynamicResource SolidBackgroundFillColorSecondaryBrush}"
+        <Border Grid.Row="3" Background="{DynamicResource SolidBackgroundFillColorSecondaryBrush}"
                 BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
                 BorderThickness="0,0,0,1" Padding="16,8">
             <DockPanel LastChildFill="False">
@@ -240,10 +244,10 @@
         </Border>
 
         <!-- MAIN PAGE CONTENT HOST -->
-        <ContentControl Grid.Row="3" Content="{Binding CurrentPage}" />
+        <ContentControl Grid.Row="4" Content="{Binding CurrentPage}" />
 
         <!-- Collapsible Bottom Log Panel -->
-        <Border Grid.Row="4" Height="140"
+        <Border Grid.Row="5" Height="140"
                 Visibility="{Binding IsLogPanelOpen, Converter={StaticResource BoolToVisConverter}}"
                 BorderThickness="0,1,0,0"
                 BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
@@ -271,7 +275,7 @@
         </Border>
 
         <!-- ==================== COMMAND PALETTE (Ctrl+K) OVERLAY ==================== -->
-        <Grid Grid.Row="0" Grid.RowSpan="5" Background="#70000000"
+        <Grid Grid.Row="0" Grid.RowSpan="6" Background="#70000000"
               Visibility="{Binding IsCommandPaletteOpen, Converter={StaticResource BoolToVisConverter}}">
             <Border Background="{DynamicResource SolidBackgroundFillColorBaseBrush}"
                     BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
@@ -329,7 +333,7 @@
         </Grid>
 
         <!-- ==================== CONFIG JSON IMPORT/EXPORT MODAL ==================== -->
-        <Grid Grid.Row="0" Grid.RowSpan="5" Background="#70000000"
+        <Grid Grid.Row="0" Grid.RowSpan="6" Background="#70000000"
               Visibility="{Binding IsConfigDialogOpen, Converter={StaticResource BoolToVisConverter}}">
             <Border Background="{DynamicResource SolidBackgroundFillColorBaseBrush}"
                     BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
@@ -370,7 +374,7 @@
         </Grid>
 
         <!-- ==================== ABOUT TWEAKORA MODAL ==================== -->
-        <Grid Grid.Row="0" Grid.RowSpan="5" Background="#70000000"
+        <Grid Grid.Row="0" Grid.RowSpan="6" Background="#70000000"
               Visibility="{Binding IsAboutDialogOpen, Converter={StaticResource BoolToVisConverter}}">
             <Border Background="{DynamicResource SolidBackgroundFillColorBaseBrush}"
                     BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"

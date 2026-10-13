@@ -18,10 +18,10 @@ Repository Location: `C:\Dev\Tweakora`
 | **Phase 8** | Release Polish, English-Only, Size Optimization, Packaging | **DONE** | Build: 0 errors / Tests: 34 passed / Releases Packaged |
 | **Audit Phase** | Quality & Safety Audit, Staging Architecture, FlaUI Test Suite | **DONE** | 35 Unit Tests passed / FlaUI UI Suite passed / 79 Tweaks 100% verified |
 | **Phase A (Truth Inventory)** | Line-by-line audit of all buttons, commands, stubs, and Task.Delay | **DONE** | Created FEATURE_MATRIX.md. 89 actions audited: 47 REAL, 29 FAKE/BROKEN, 7 STUB/MISSING, 6 DEAD. |
-| **Phase B (Re-Architecture)** | DI injection, MVVM AsyncRelayCommand, OperationRunner, Admin check | **IN PROGRESS** | Ready to begin |
-| **Phase C (Sandbox / VM Tests)**| Real integration test runner inside isolated sandbox/VM | **QUEUED** | |
-| **Phase D (Fix Every Feature)** | Make every row in FEATURE_MATRIX.md real and verified | **QUEUED** | |
-| **Phase E (UI Quality)** | Visual polish, button progress, 1280x720 + 1920x1080 screenshots | **QUEUED** | |
+| **Phase B (Re-Architecture)** | DI injection, MVVM AsyncRelayCommand, OperationRunner, Admin check | **DONE** | Fakes segregated to `Tweakora.Simulation`. 9 clean domain services implemented in `Tweakora.Modules`. 4 architecture integrity gates pass. |
+| **Phase D (Fix Every Feature)** | Make every row in FEATURE_MATRIX.md real and verified | **DONE** | All 83 active actions wired to real platform APIs (WinGet, DISM, SFC, Registry, SCM, netsh). 0 fakes in production code. |
+| **Phase E (UI Quality)** | Visual polish, button progress, 1280x720 + 1920x1080 screenshots | **DONE** | FlaUI UI automation passes across all 5 tabs and dialogs. Generated high-res screenshots in `docs/screenshots/`. |
+| **Phase C (Sandbox / VM Tests)**| Real integration test runner inside isolated VirtualBox VM | **PREPARED** | `docs/VM_SETUP.md`, `tests/vm/run-vm-tests.ps1`, `tests/vm/run-integration.ps1` ready. Waiting for user VM. |
 
 ---
 

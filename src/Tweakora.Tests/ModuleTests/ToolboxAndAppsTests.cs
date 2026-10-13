@@ -1,11 +1,14 @@
-using Tweakora.Core.Fakes;
+using System.Linq;
+using System.Threading.Tasks;
+using Tweakora.Core.Operations;
 using Tweakora.Modules.Apps;
 using Tweakora.Modules.Cleaner;
-using Tweakora.Modules.Fixes;
+using Tweakora.Modules.Config;
 using Tweakora.Modules.Network;
 using Tweakora.Modules.Services;
 using Tweakora.Modules.Startup;
-using Tweakora.Modules.Uninstaller;
+using Tweakora.Modules.Updates;
+using Tweakora.Simulation;
 using Xunit;
 
 namespace Tweakora.Tests.ModuleTests;
@@ -13,110 +16,139 @@ namespace Tweakora.Tests.ModuleTests;
 public class ToolboxAndAppsTests
 {
     [Fact]
-    public async Task SmartCleaner_ScanAndClean_Simulation_DoesNotThrow()
+    public async Task CleanerService_ScanCategories_ReturnsWhitelistedLocations()
     {
-        var cleaner = new SmartCleaner(isSimulationMode: true);
+        var fakeSvc = new FakeServicesService();
+        var cleaner = new CleanerService(fakeSvc);
+
         var categories = await cleaner.ScanCategoriesAsync();
 
         Assert.NotEmpty(categories);
         Assert.All(categories, c => Assert.False(string.IsNullOrWhiteSpace(c.Name)));
-
-        long cleaned = await cleaner.CleanCategoriesAsync(categories.Select(c => c.Id));
-        Assert.True(cleaned >= 0);
+        Assert.Contains(categories, c => c.Id == "UserTemp");
+        Assert.Contains(categories, c => c.Id == "WindowsTemp");
+        Assert.Contains(categories, c => c.Id == "UpdateCache");
     }
 
     [Fact]
-    public void StartupManager_GetAndSetState_UsesRegistry()
+    public async Task StartupService_GetAndSetState_UsesRegistry()
     {
         var fakeReg = new FakeRegistryService();
         fakeReg.SetValue("HKCU", @"Software\Microsoft\Windows\CurrentVersion\Run", "Discord", "Discord.exe", "String");
 
-        var manager = new StartupManager(fakeReg);
-        var entries = manager.GetStartupEntries();
+        var service = new StartupService(fakeReg);
+        var entries = await service.GetStartupEntriesAsync();
 
         Assert.Contains(entries, e => e.Name == "Discord");
 
         var discord = entries.First(e => e.Name == "Discord");
-        manager.SetEntryState(discord, false);
+        bool ok = await service.SetEntryStateAsync(discord, false);
 
+        Assert.True(ok);
         Assert.False(discord.IsEnabled);
         Assert.False(fakeReg.ValueExists("HKCU", @"Software\Microsoft\Windows\CurrentVersion\Run", "Discord"));
     }
 
     [Fact]
-    public void ServicesManager_GetServices_ReturnsPopulatedList()
+    public async Task ServicesManagerService_GetServices_ReturnsPopulatedList()
     {
         var fakeSvc = new FakeServicesService();
         fakeSvc.Services["wuauserv"] = ("Manual", "Running");
-        var manager = new ServicesManager(fakeSvc);
+        var service = new ServicesManagerService(fakeSvc);
 
-        var services = manager.GetServices();
+        var services = service.GetServices();
         Assert.NotEmpty(services);
 
-        manager.ChangeStartupType("wuauserv", "Disabled");
+        bool changed = await service.SetStartupTypeAsync("wuauserv", "Disabled");
+        Assert.True(changed);
         Assert.Equal("Disabled", fakeSvc.GetStartupType("wuauserv"));
+
+        bool stopped = await service.ToggleServiceStateAsync("wuauserv", false);
+        Assert.True(stopped);
+        Assert.Equal("Stopped", fakeSvc.GetState("wuauserv"));
     }
 
     [Fact]
-    public async Task WinGetManager_SimulatedInstall_Succeeds()
+    public async Task AppInstallService_InstallAndUninstall_UsesRunnerAndShell()
     {
-        var manager = new WinGetManager(catalogPath: null, isSimulationMode: true);
-        var app = new WinGetApp
+        var fakeShell = new FakeShellService();
+        var service = new AppInstallService(fakeShell);
+        var runner = new OperationRunner();
+
+        var apps = new[]
         {
-            Id = "Mozilla.Firefox",
-            Name = "Mozilla Firefox",
-            Category = "Browsers",
-            Description = "Fast private browser",
-            Publisher = "Mozilla"
+            new ApplicationItem
+            {
+                Key = "Mozilla.Firefox",
+                Name = "Mozilla Firefox",
+                Category = "Browsers",
+                WingetId = "Mozilla.Firefox",
+                IsSelected = true
+            }
         };
 
-        bool ok = await manager.InstallAppAsync(app);
-        Assert.True(ok);
-        Assert.True(app.IsInstalled);
+        var installReport = await service.InstallAppsAsync(apps, "WinGet", runner);
+        Assert.Equal(1, installReport.SucceededCount);
+        Assert.True(apps[0].IsInstalled);
 
-        string script = WinGetManager.GenerateBatchInstallScript(new[] { app });
-        Assert.Contains("winget install --id Mozilla.Firefox", script);
+        var uninstallReport = await service.UninstallAppsAsync(apps, "WinGet", runner);
+        Assert.Equal(1, uninstallReport.SucceededCount);
+        Assert.False(apps[0].IsInstalled);
     }
 
     [Fact]
-    public async Task AppUninstaller_ListAndUninstall_Simulation_Succeeds()
+    public async Task FixService_GetAvailableFixesAndPanels_ReturnsItems()
     {
-        var fakeReg = new FakeRegistryService();
-        var uninstaller = new AppUninstaller(fakeReg, isSimulationMode: true);
+        var fakeShell = new FakeShellService();
+        var service = new FixService(fakeShell);
+        var runner = new OperationRunner();
 
-        var apps = uninstaller.GetInstalledApps();
-        Assert.NotEmpty(apps);
-
-        bool result = await uninstaller.UninstallAppAsync(apps.First());
-        Assert.True(result);
-    }
-
-    [Fact]
-    public async Task FixesCenter_RunFix_Simulation_Succeeds()
-    {
-        var center = new FixesCenter(isSimulationMode: true);
-        var fixes = center.GetAvailableFixes();
-
+        var fixes = service.GetAvailableFixes();
         Assert.NotEmpty(fixes);
-        var dnsFix = fixes.First(f => f.Id == "fix.dns.flush");
+        Assert.Contains(fixes, f => f.Id == "dns_flush");
 
-        bool result = await center.RunFixAsync(dnsFix);
-        Assert.True(result);
+        var panels = service.GetLegacyApplets();
+        Assert.Equal(14, panels.Count);
+
+        var report = await service.RunFixAsync("dns_flush", runner);
+        Assert.Equal(1, report.SucceededCount);
     }
 
     [Fact]
-    public async Task DnsSwitcher_ApplyDns_Simulation_Succeeds()
+    public async Task DnsService_ApplyAndPing_Succeeds()
     {
-        var switcher = new DnsSwitcher(isSimulationMode: true);
-        var providers = switcher.GetProviders();
+        var fakeShell = new FakeShellService();
+        var service = new DnsService(fakeShell);
 
+        var providers = service.GetProviders();
         Assert.NotEmpty(providers);
         var cloudflare = providers.First(p => p.Id == "dns.cloudflare.standard");
 
-        bool applied = await switcher.ApplyDnsAsync(cloudflare);
+        bool applied = await service.ApplyDnsAsync(cloudflare);
         Assert.True(applied);
 
-        int dhcpPing = await switcher.PingDnsAsync("DHCP");
+        int dhcpPing = await service.PingDnsAsync("DHCP");
         Assert.Equal(0, dhcpPing);
+    }
+
+    [Fact]
+    public async Task UpdateModeService_ApplyModes_SetsRegistryAndServices()
+    {
+        var fakeReg = new FakeRegistryService();
+        var fakeSvc = new FakeServicesService();
+        var fakeTask = new FakeTaskSchedulerService();
+        var service = new UpdateModeService(fakeReg, fakeSvc, fakeTask);
+        var runner = new OperationRunner();
+
+        // Apply Security mode
+        var report = await service.ApplyModeAsync(UpdateProfileMode.Security, runner);
+        Assert.Equal(1, report.SucceededCount);
+
+        var mode = service.DetectCurrentMode();
+        Assert.Equal(UpdateProfileMode.Security, mode);
+
+        // Apply DisableAll mode
+        await service.ApplyModeAsync(UpdateProfileMode.DisableAll, runner);
+        Assert.Equal(UpdateProfileMode.DisableAll, service.DetectCurrentMode());
     }
 }

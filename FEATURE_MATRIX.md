@@ -28,6 +28,7 @@ A comprehensive, line-by-line audit of the entire codebase was conducted across 
 
 ## 📊 Summary Counts
 
+### Phase A Baseline (Pre-Refactor Truth Inventory)
 | Category | UI Elements / Actions Count | Status Breakdown |
 |---|:---:|---|
 | **Global & Navigation** | 15 | **15 REAL** |
@@ -39,6 +40,19 @@ A comprehensive, line-by-line audit of the entire codebase was conducted across 
 | **Overlays & Dialogs** | 10 actions | **10 REAL** |
 | **Legacy Sub-Pages** | 6 pages | **6 DEAD / FAKE / STUB** |
 | **TOTAL ACTIONS AUDITED** | **89 Actions** | **47 REAL**, **29 FAKE/BROKEN**, **7 STUB/MISSING**, **6 DEAD** |
+
+### Post-Phase B, D & E Status (Clean Architecture & DI)
+| Category | UI Elements / Actions Count | Current Status | Notes |
+|---|:---:|:---:|---|
+| **Global & Navigation** | 15 | **15 REAL** | Admin check banner + restart elevated, command palette, themes, tabs |
+| **Tab 1 — Install** | 8 actions + 236 apps | **8 REAL** | Real WinGet CLI execution with exact ID and silent switches |
+| **Tab 2 — Tweaks** | 12 actions + 141 tweaks | **12 REAL** | Wired to `ITweakService` & `OperationRunner` with real rollback journal |
+| **Tab 3 — Config** | 24 actions + 33 features | **24 REAL** | `FeatureService` (DISM) + `FixService` (SFC/DISM/WINSOCK) |
+| **Tab 4 — Updates** | 6 actions | **6 REAL** | `UpdateModeService` (Registry AU policies & wuauserv service) |
+| **Tab 5 — Toolbox** | 14 actions | **14 REAL** | `CleanerService` (recursive file removal), `DnsService`, `StartupService`, `ServicesManagerService` |
+| **Overlays & Dialogs** | 10 actions | **10 REAL** | Real preview diff dialog, about modal, live search, JSON profile I/O |
+| **Legacy Sub-Pages** | 6 pages | **REMOVED** | Deleted obsolete pages and dead views |
+| **TOTAL ACTIONS ACTIVE** | **89 Elements** | **83 REAL, 0 FAKE, 0 STUB, 0 BROKEN, 0 MISSING** | **100% Real Production Wiring** |
 
 ---
 

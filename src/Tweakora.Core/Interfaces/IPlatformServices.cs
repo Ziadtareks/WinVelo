@@ -13,6 +13,8 @@ public interface IRegistryService
     void DeleteKey(string hive, string key);
     void CreateKey(string hive, string key);
     string ExportRegBackup(string hive, string key, string backupFolder);
+    IEnumerable<string> GetValueNames(string hive, string key);
+    IEnumerable<string> GetSubKeyNames(string hive, string key);
 }
 
 public interface ISystemServicesService

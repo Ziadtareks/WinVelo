@@ -1,30 +1,33 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Tweakora.Core.Fakes;
-using Tweakora.Core.Safety;
+using Tweakora.Core.Operations;
 using Tweakora.Modules.Config;
 
 namespace Tweakora.App.ViewModels;
 
-public sealed partial class ConfigViewModel : ViewModelBase
+public sealed partial class ConfigViewModel : ObservableObject
 {
-    private readonly WindowsConfigManager _configManager;
-    private readonly List<FeatureItemViewModel> _allFeatures = new();
+    private readonly IFeatureService _featureService;
+    private readonly IFixService _fixService;
+    private readonly IOperationRunner _runner;
+    private readonly List<FeatureDefinition> _allFeatures = new();
 
-    public ObservableCollection<FeatureItemViewModel> FilteredFeatures { get; } = new();
-    public ObservableCollection<LegacyPanelItem> LegacyPanels { get; } = new();
+    public ObservableCollection<FeatureDefinition> FilteredFeatures { get; } = new();
+    public ObservableCollection<LegacyAppletDefinition> LegacyPanels { get; } = new();
     public ObservableCollection<string> ConfigLogs { get; } = new();
 
     [ObservableProperty]
     private string _searchQuery = string.Empty;
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(InstallSelectedFeaturesCommand))]
+    [NotifyCanExecuteChangedFor(nameof(UninstallSelectedFeaturesCommand))]
+    [NotifyCanExecuteChangedFor(nameof(RunFixCommand))]
     private bool _isBusy;
 
     [ObservableProperty]
@@ -36,13 +39,16 @@ public sealed partial class ConfigViewModel : ViewModelBase
     [ObservableProperty]
     private bool _isOpenSshConfirmOpen;
 
-    public ConfigViewModel()
+    public ConfigViewModel(
+        IFeatureService featureService,
+        IFixService fixService,
+        IOperationRunner runner)
     {
-        var fakeShell = new FakeShellService();
-        _configManager = new WindowsConfigManager(fakeShell, isSimulationMode: true);
-        _configManager.IsSimulationMode = TestModeManager.IsTestMode;
+        _featureService = featureService;
+        _fixService = fixService;
+        _runner = runner;
 
-        _configManager.OnLog += msg =>
+        _runner.OnLog += msg =>
         {
             System.Windows.Application.Current?.Dispatcher?.Invoke(() =>
             {
@@ -57,21 +63,14 @@ public sealed partial class ConfigViewModel : ViewModelBase
     public void LoadData()
     {
         _allFeatures.Clear();
-        var features = _configManager.LoadFeatures();
+        var features = _featureService.LoadFeatures();
         foreach (var f in features)
         {
-            f.PropertyChanged += (s, e) =>
-            {
-                if (e.PropertyName == nameof(FeatureItemViewModel.IsSelected))
-                {
-                    UpdateSelectedCount();
-                }
-            };
             _allFeatures.Add(f);
         }
 
         LegacyPanels.Clear();
-        foreach (var panel in _configManager.GetLegacyPanels())
+        foreach (var panel in _fixService.GetLegacyApplets())
         {
             LegacyPanels.Add(panel);
         }
@@ -112,7 +111,9 @@ public sealed partial class ConfigViewModel : ViewModelBase
         SelectedFeaturesCount = _allFeatures.Count(f => f.IsSelected);
     }
 
-    [RelayCommand]
+    private bool CanExecuteAction() => !IsBusy;
+
+    [RelayCommand(CanExecute = nameof(CanExecuteAction))]
     private async Task InstallSelectedFeaturesAsync()
     {
         var selected = _allFeatures.Where(f => f.IsSelected).ToList();
@@ -126,8 +127,8 @@ public sealed partial class ConfigViewModel : ViewModelBase
         try
         {
             StatusMessage = $"Enabling {selected.Count} Windows feature(s)...";
-            await _configManager.InstallFeaturesAsync(selected);
-            StatusMessage = $"Successfully enabled {selected.Count} Windows feature(s).";
+            var report = await _featureService.EnableFeaturesAsync(selected, _runner);
+            StatusMessage = $"Enable features completed: {report.Summary}.";
         }
         catch (Exception ex)
         {
@@ -139,7 +140,7 @@ public sealed partial class ConfigViewModel : ViewModelBase
         }
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanExecuteAction))]
     private async Task UninstallSelectedFeaturesAsync()
     {
         var selected = _allFeatures.Where(f => f.IsSelected).ToList();
@@ -153,8 +154,8 @@ public sealed partial class ConfigViewModel : ViewModelBase
         try
         {
             StatusMessage = $"Disabling {selected.Count} Windows feature(s)...";
-            await _configManager.UninstallFeaturesAsync(selected);
-            StatusMessage = $"Successfully disabled {selected.Count} Windows feature(s).";
+            var report = await _featureService.DisableFeaturesAsync(selected, _runner);
+            StatusMessage = $"Disable features completed: {report.Summary}.";
         }
         catch (Exception ex)
         {
@@ -166,17 +167,22 @@ public sealed partial class ConfigViewModel : ViewModelBase
         }
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanExecuteAction))]
     private async Task RunFixAsync(string fixKey)
     {
+        if (string.Equals(fixKey, "autologon", StringComparison.OrdinalIgnoreCase))
+        {
+            _fixService.OpenUrl("https://learn.microsoft.com/en-us/sysinternals/downloads/autologon");
+            StatusMessage = "Opened Sysinternals AutoLogon page in browser.";
+            return;
+        }
+
         IsBusy = true;
         try
         {
-            StatusMessage = $"Running maintenance action: {fixKey}...";
-            bool success = await _configManager.RunFixAsync(fixKey);
-            StatusMessage = success
-                ? $"Action {fixKey} completed successfully."
-                : $"Action {fixKey} reported warnings. Check log.";
+            StatusMessage = $"Running maintenance fix: {fixKey}...";
+            var report = await _fixService.RunFixAsync(fixKey, _runner);
+            StatusMessage = $"Fix completed: {report.Summary}.";
         }
         catch (Exception ex)
         {
@@ -189,10 +195,10 @@ public sealed partial class ConfigViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void LaunchPanel(LegacyPanelItem panel)
+    private void LaunchPanel(LegacyAppletDefinition panel)
     {
         StatusMessage = $"Opening {panel.Name}...";
-        _configManager.LaunchPanel(panel);
+        _fixService.LaunchApplet(panel.Command);
     }
 
     [RelayCommand]
@@ -209,8 +215,8 @@ public sealed partial class ConfigViewModel : ViewModelBase
         try
         {
             StatusMessage = "Configuring OpenSSH Server...";
-            await _configManager.ConfigureOpenSshAsync(true);
-            StatusMessage = "OpenSSH Server configured.";
+            bool success = await _featureService.ConfigureOpenSshAsync(true);
+            StatusMessage = success ? "OpenSSH Server configured successfully." : "OpenSSH configuration encountered warnings.";
         }
         catch (Exception ex)
         {

@@ -11,6 +11,7 @@
     <ProjectReference Include="..\Tweakora.Core\Tweakora.Core.csproj" />
     <ProjectReference Include="..\Tweakora.Platform\Tweakora.Platform.csproj" />
     <ProjectReference Include="..\Tweakora.Modules\Tweakora.Modules.csproj" />
+    <ProjectReference Include="..\Tweakora.Simulation\Tweakora.Simulation.csproj" />
   </ItemGroup>
 
   <ItemGroup>

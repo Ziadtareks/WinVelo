@@ -1,0 +1,241 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
+using Tweakora.Core.Engine;
+using Tweakora.Core.Engine.Handlers;
+using Tweakora.Core.Interfaces;
+using Tweakora.Core.Models;
+using Tweakora.Core.Operations;
+
+namespace Tweakora.Modules.Tweaks;
+
+public interface ITweakService
+{
+    IReadOnlyList<TweakDefinition> LoadCatalog();
+    bool DetectState(TweakDefinition tweak);
+    Task<string> GenerateDryRunDiffAsync(IEnumerable<TweakDefinition> tweaks);
+    Task<OperationExecutionReport> ApplyTweaksAsync(
+        IReadOnlyList<TweakDefinition> tweaks,
+        IOperationRunner runner,
+        CancellationToken cancellationToken = default);
+    Task<OperationExecutionReport> UndoTweaksAsync(
+        IReadOnlyList<TweakDefinition> tweaks,
+        IOperationRunner runner,
+        CancellationToken cancellationToken = default);
+    Task<bool> SetPerformancePlanAsync(string planName);
+    Task<bool> SetDnsAsync(string primary, string secondary);
+}
+
+public sealed class TweakService : ITweakService
+{
+    private readonly IRegistryService _registry;
+    private readonly ISystemServicesService _services;
+    private readonly ITaskSchedulerService _tasks;
+    private readonly ISystemRestoreService _restore;
+    private readonly IShellService _shell;
+    private readonly RollbackJournalManager _journal;
+
+    private readonly List<IActionHandler> _handlers;
+    private readonly StateDetector _detector;
+    private readonly TweakRunner _runner;
+    private readonly DryRunEngine _dryRun;
+
+    public TweakService(
+        IRegistryService registry,
+        ISystemServicesService services,
+        ITaskSchedulerService tasks,
+        ISystemRestoreService restore,
+        IShellService shell,
+        RollbackJournalManager journal)
+    {
+        _registry = registry;
+        _services = services;
+        _tasks = tasks;
+        _restore = restore;
+        _shell = shell;
+        _journal = journal;
+
+        _handlers = new List<IActionHandler>
+        {
+            new RegistryActionHandler(),
+            new ServiceActionHandler(),
+            new TaskActionHandler(),
+            new FileActionHandler(),
+            new PowerShellActionHandler()
+        };
+
+        var context = new Core.Engine.ExecutionContext
+        {
+            Registry = _registry,
+            Services = _services,
+            Tasks = _tasks,
+            Shell = _shell,
+            Journal = _journal,
+            IsDryRun = false,
+            BackupDirectory = Path.Combine(Path.GetTempPath(), "Tweakora_Backups")
+        };
+
+        _detector = new StateDetector(_registry, _services, _tasks);
+        _runner = new TweakRunner(_handlers, context, _restore, _detector);
+        _dryRun = new DryRunEngine(_handlers, context);
+    }
+
+    public IReadOnlyList<TweakDefinition> LoadCatalog()
+    {
+        string rootDir = AppDomain.CurrentDomain.BaseDirectory;
+        string tweaksDir = Path.Combine(rootDir, "Catalog", "Tweaks");
+
+        if (!Directory.Exists(tweaksDir))
+        {
+            string? parent = Directory.GetParent(rootDir)?.FullName;
+            while (parent != null)
+            {
+                string candidate = Path.Combine(parent, "Catalog", "Tweaks");
+                if (Directory.Exists(candidate))
+                {
+                    tweaksDir = candidate;
+                    break;
+                }
+                parent = Directory.GetParent(parent)?.FullName;
+            }
+        }
+
+        List<TweakDefinition> list = new();
+        if (Directory.Exists(tweaksDir))
+        {
+            foreach (string file in Directory.GetFiles(tweaksDir, "*.json", SearchOption.AllDirectories))
+            {
+                try
+                {
+                    string json = File.ReadAllText(file);
+                    var items = JsonSerializer.Deserialize<List<TweakDefinition>>(json, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
+                    if (items != null) list.AddRange(items);
+                }
+                catch { }
+            }
+        }
+
+        return list;
+    }
+
+    public bool DetectState(TweakDefinition tweak)
+    {
+        return _detector.IsTweakActiveAsync(tweak, useCache: false).GetAwaiter().GetResult();
+    }
+
+    public Task<string> GenerateDryRunDiffAsync(IEnumerable<TweakDefinition> tweaks)
+    {
+        var list = tweaks.ToList();
+        if (list.Count == 0) return Task.FromResult("No tweaks selected for preview.");
+
+        var previews = _dryRun.GeneratePreview(list);
+        using var sw = new StringWriter();
+        sw.WriteLine($"=== TWEAKORA DIFF PREVIEW ({list.Count} TWEAKS STAGED) ===");
+        sw.WriteLine($"Generated: {DateTime.Now:yyyy-MM-dd HH:mm:ss}\n");
+
+        foreach (var p in previews)
+        {
+            sw.WriteLine($"[{p.Risk.ToUpperInvariant()}] {p.Name} ({p.TweakId})");
+            foreach (var a in p.Actions)
+            {
+                sw.WriteLine($"  • {a.ActionType} {a.Target}");
+                sw.WriteLine($"    {a.Operation} | Current: {a.CurrentState} -> Proposed: {a.ProposedState}");
+            }
+            sw.WriteLine();
+        }
+
+        return Task.FromResult(sw.ToString());
+    }
+
+    public async Task<OperationExecutionReport> ApplyTweaksAsync(
+        IReadOnlyList<TweakDefinition> tweaks,
+        IOperationRunner runner,
+        CancellationToken cancellationToken = default)
+    {
+        return await runner.RunAsync(
+            "Apply Tweaks",
+            tweaks,
+            async (tweak, ct) =>
+            {
+                var batchReport = await _runner.ApplyBatchAsync(new[] { tweak }, cancellationToken: ct);
+                var itemResult = batchReport.Results.FirstOrDefault();
+
+                bool succeeded = itemResult?.Status == TweakExecutionStatus.Applied;
+                bool skipped = itemResult?.Status == TweakExecutionStatus.Skipped;
+
+                return new OperationItemResult
+                {
+                    Id = tweak.Id,
+                    Name = tweak.Name,
+                    Status = succeeded ? OperationItemStatus.Succeeded : (skipped ? OperationItemStatus.Skipped : OperationItemStatus.Failed),
+                    Reason = itemResult?.Message ?? (succeeded ? "Applied successfully." : "Execution failed.")
+                };
+            },
+            cancellationToken);
+    }
+
+    public async Task<OperationExecutionReport> UndoTweaksAsync(
+        IReadOnlyList<TweakDefinition> tweaks,
+        IOperationRunner runner,
+        CancellationToken cancellationToken = default)
+    {
+        return await runner.RunAsync(
+            "Undo Tweaks",
+            tweaks,
+            async (tweak, ct) =>
+            {
+                var actionResult = await _runner.UndoTweakAsync(tweak);
+                return new OperationItemResult
+                {
+                    Id = tweak.Id,
+                    Name = tweak.Name,
+                    Status = actionResult.Success ? OperationItemStatus.Succeeded : OperationItemStatus.Failed,
+                    Reason = actionResult.Message
+                };
+            },
+            cancellationToken);
+    }
+
+    public async Task<bool> SetPerformancePlanAsync(string planName)
+    {
+        if (string.Equals(planName, "Ultimate Performance", StringComparison.OrdinalIgnoreCase))
+        {
+            string script = "powercfg -duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61; powercfg /setactive e9a42b02-d5df-448d-aa00-03f14749eb61";
+            string outStr = await _shell.ExecutePowerShellAsync(script, 30);
+            return !outStr.Contains("Error", StringComparison.OrdinalIgnoreCase);
+        }
+        else
+        {
+            string script = "powercfg /setactive 381b4222-f694-41f0-9685-ff5bb260df2e";
+            string outStr = await _shell.ExecutePowerShellAsync(script, 30);
+            return !outStr.Contains("Error", StringComparison.OrdinalIgnoreCase);
+        }
+    }
+
+    public async Task<bool> SetDnsAsync(string primary, string secondary)
+    {
+        string script;
+        if (string.Equals(primary, "DHCP", StringComparison.OrdinalIgnoreCase) || string.Equals(primary, "Automatic", StringComparison.OrdinalIgnoreCase))
+        {
+            script = "Get-NetAdapter | Where-Object Status -eq 'Up' | Set-DnsClientServerAddress -ResetServerAddresses";
+        }
+        else if (string.IsNullOrWhiteSpace(secondary))
+        {
+            script = $"Get-NetAdapter | Where-Object Status -eq 'Up' | Set-DnsClientServerAddress -ServerAddresses '{primary}'";
+        }
+        else
+        {
+            script = $"Get-NetAdapter | Where-Object Status -eq 'Up' | Set-DnsClientServerAddress -ServerAddresses '{primary}', '{secondary}'";
+        }
+
+        string outStr = await _shell.ExecutePowerShellAsync(script, 30);
+        return !outStr.Contains("Error", StringComparison.OrdinalIgnoreCase);
+    }
+}

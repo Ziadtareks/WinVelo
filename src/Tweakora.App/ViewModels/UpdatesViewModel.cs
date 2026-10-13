@@ -3,15 +3,15 @@ using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Tweakora.Core.Fakes;
-using Tweakora.Core.Safety;
+using Tweakora.Core.Operations;
 using Tweakora.Modules.Updates;
 
 namespace Tweakora.App.ViewModels;
 
-public sealed partial class UpdatesViewModel : ViewModelBase
+public sealed partial class UpdatesViewModel : ObservableObject
 {
-    private readonly WindowsUpdatesManager _updatesManager;
+    private readonly IUpdateModeService _updatesService;
+    private readonly IOperationRunner _runner;
 
     [ObservableProperty]
     private UpdateProfileMode _selectedMode = UpdateProfileMode.Security;
@@ -32,6 +32,7 @@ public sealed partial class UpdatesViewModel : ViewModelBase
     private bool _isApplyEnabled = true;
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(ApplySelectedModeCommand))]
     private bool _isBusy;
 
     [ObservableProperty]
@@ -39,16 +40,12 @@ public sealed partial class UpdatesViewModel : ViewModelBase
 
     public ObservableCollection<string> UpdateLogs { get; } = new();
 
-    public UpdatesViewModel()
+    public UpdatesViewModel(IUpdateModeService updatesService, IOperationRunner runner)
     {
-        var fakeReg = new FakeRegistryService();
-        var fakeSvc = new FakeServicesService();
-        var fakeTasks = new FakeTaskSchedulerService();
+        _updatesService = updatesService;
+        _runner = runner;
 
-        _updatesManager = new WindowsUpdatesManager(fakeReg, fakeSvc, fakeTasks, isSimulationMode: true);
-        _updatesManager.IsSimulationMode = TestModeManager.IsTestMode;
-
-        _updatesManager.OnLog += msg =>
+        _runner.OnLog += msg =>
         {
             System.Windows.Application.Current?.Dispatcher?.Invoke(() =>
             {
@@ -63,7 +60,7 @@ public sealed partial class UpdatesViewModel : ViewModelBase
 
     public void DetectCurrentMode()
     {
-        ActiveMode = _updatesManager.DetectCurrentMode();
+        ActiveMode = _updatesService.DetectCurrentMode();
         ActiveModeTitle = ActiveMode switch
         {
             UpdateProfileMode.Security => "Security (Recommended)",
@@ -99,7 +96,9 @@ public sealed partial class UpdatesViewModel : ViewModelBase
         }
     }
 
-    [RelayCommand]
+    private bool CanApplyMode() => IsApplyEnabled && !IsBusy;
+
+    [RelayCommand(CanExecute = nameof(CanApplyMode))]
     private async Task ApplySelectedModeAsync()
     {
         if (!IsApplyEnabled) return;
@@ -108,7 +107,7 @@ public sealed partial class UpdatesViewModel : ViewModelBase
         try
         {
             StatusMessage = $"Applying {SelectedMode} updates profile...";
-            await _updatesManager.ApplyModeAsync(SelectedMode);
+            var report = await _updatesService.ApplyModeAsync(SelectedMode, _runner);
             ActiveMode = SelectedMode;
             ActiveModeTitle = SelectedMode switch
             {
@@ -116,7 +115,7 @@ public sealed partial class UpdatesViewModel : ViewModelBase
                 UpdateProfileMode.DisableAll => "Updates Disabled (Caution)",
                 _ => "Default (Out of Box)"
             };
-            StatusMessage = $"Successfully applied {ActiveModeTitle} profile.";
+            StatusMessage = $"Applied {ActiveModeTitle} profile: {report.Summary}.";
             TypedConfirmation = string.Empty;
             UpdateApplyEnabled();
         }

@@ -1,8 +1,13 @@
+using System;
+using System.Collections.Generic;
 using System.Net.NetworkInformation;
+using System.Threading;
+using System.Threading.Tasks;
+using Tweakora.Core.Interfaces;
 
 namespace Tweakora.Modules.Network;
 
-public sealed class DnsProvider
+public sealed class DnsProviderDefinition
 {
     public required string Id { get; init; }
     public required string Name { get; init; }
@@ -13,18 +18,25 @@ public sealed class DnsProvider
     public int PingMs { get; set; } = -1;
 }
 
-public sealed class DnsSwitcher
+public interface IDnsService
 {
-    public bool IsSimulationMode { get; set; }
+    IReadOnlyList<DnsProviderDefinition> GetProviders();
+    Task<int> PingDnsAsync(string ip, CancellationToken cancellationToken = default);
+    Task<bool> ApplyDnsAsync(DnsProviderDefinition provider, CancellationToken cancellationToken = default);
+}
 
-    public DnsSwitcher(bool isSimulationMode = true)
+public sealed class DnsService : IDnsService
+{
+    private readonly IShellService _shell;
+
+    public DnsService(IShellService shell)
     {
-        IsSimulationMode = isSimulationMode;
+        _shell = shell;
     }
 
-    public List<DnsProvider> GetProviders()
+    public IReadOnlyList<DnsProviderDefinition> GetProviders()
     {
-        return new List<DnsProvider>
+        return new List<DnsProviderDefinition>
         {
             new()
             {
@@ -78,7 +90,7 @@ public sealed class DnsSwitcher
         };
     }
 
-    public async Task<int> PingDnsAsync(string ip)
+    public async Task<int> PingDnsAsync(string ip, CancellationToken cancellationToken = default)
     {
         if (ip.Equals("DHCP", StringComparison.OrdinalIgnoreCase)) return 0;
 
@@ -98,17 +110,23 @@ public sealed class DnsSwitcher
         }
     }
 
-    public async Task<bool> ApplyDnsAsync(DnsProvider provider)
+    public async Task<bool> ApplyDnsAsync(DnsProviderDefinition provider, CancellationToken cancellationToken = default)
     {
-        if (IsSimulationMode)
+        string script;
+        if (string.Equals(provider.PrimaryDns, "DHCP", StringComparison.OrdinalIgnoreCase))
         {
-            // Simulation mode: safe execution delay without changing host adapter settings
-            await Task.Delay(200);
-            return true;
+            script = "Get-NetAdapter | Where-Object Status -eq 'Up' | Set-DnsClientServerAddress -ResetServerAddresses";
+        }
+        else if (string.IsNullOrWhiteSpace(provider.SecondaryDns) || provider.SecondaryDns == "DHCP")
+        {
+            script = $"Get-NetAdapter | Where-Object Status -eq 'Up' | Set-DnsClientServerAddress -ServerAddresses '{provider.PrimaryDns}'";
+        }
+        else
+        {
+            script = $"Get-NetAdapter | Where-Object Status -eq 'Up' | Set-DnsClientServerAddress -ServerAddresses '{provider.PrimaryDns}', '{provider.SecondaryDns}'";
         }
 
-        // In VM real execution: configure network adapter DNS via powershell or netsh
-        await Task.CompletedTask;
-        return true;
+        string output = await _shell.ExecutePowerShellAsync(script, 30);
+        return !output.Contains("Error", StringComparison.OrdinalIgnoreCase);
     }
 }

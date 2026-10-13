@@ -1,3 +1,8 @@
+using System;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using Microsoft.Extensions.DependencyInjection;
@@ -6,7 +11,20 @@ using Serilog;
 using Tweakora.App.Services;
 using Tweakora.App.ViewModels;
 using Tweakora.App.Views;
+using Tweakora.Core.Engine;
+using Tweakora.Core.Interfaces;
+using Tweakora.Core.Operations;
 using Tweakora.Core.Safety;
+using Tweakora.Modules.Apps;
+using Tweakora.Modules.Cleaner;
+using Tweakora.Modules.Config;
+using Tweakora.Modules.Network;
+using Tweakora.Modules.Services;
+using Tweakora.Modules.Startup;
+using Tweakora.Modules.Tweaks;
+using Tweakora.Modules.Updates;
+using Tweakora.Platform;
+using Tweakora.Simulation;
 
 namespace Tweakora.App;
 
@@ -27,21 +45,68 @@ public partial class App : Application
         DispatcherUnhandledException += OnDispatcherUnhandledException;
         TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
 
-        // 3. Setup Dependency Injection host
+        // 3. Detect Test Mode from command line arguments or environment variable
+        string[] args = Environment.GetCommandLineArgs();
+        bool isTestMode = args.Any(a => string.Equals(a, "--test-mode", StringComparison.OrdinalIgnoreCase)) ||
+                          string.Equals(Environment.GetEnvironmentVariable("TWEAKORA_TEST_MODE"), "1", StringComparison.OrdinalIgnoreCase);
+
+        if (isTestMode)
+        {
+            TestModeManager.EnableTestMode();
+            Log.Warning("⚠️ Tweakora launched in TEST MODE. All system operations are simulated with in-memory fakes.");
+        }
+        else
+        {
+            Log.Information("Tweakora launched in NORMAL PRODUCTION MODE. Using real Windows platform drivers.");
+        }
+
+        // 4. Setup Dependency Injection host
         _host = Host.CreateDefaultBuilder()
             .ConfigureServices((context, services) =>
             {
+                // Register platform services based on mode
+                if (isTestMode)
+                {
+                    services.AddSingleton<IRegistryService, FakeRegistryService>();
+                    services.AddSingleton<ISystemServicesService, FakeServicesService>();
+                    services.AddSingleton<ITaskSchedulerService, FakeTaskSchedulerService>();
+                    services.AddSingleton<ISystemRestoreService, FakeRestoreService>();
+                    services.AddSingleton<IShellService, FakeShellService>();
+                }
+                else
+                {
+                    services.AddSingleton<IRegistryService, WindowsRegistryService>();
+                    services.AddSingleton<ISystemServicesService, WindowsServicesService>();
+                    services.AddSingleton<ITaskSchedulerService, WindowsTaskSchedulerService>();
+                    services.AddSingleton<ISystemRestoreService, WindowsRestoreService>();
+                    services.AddSingleton<IShellService, WindowsShellService>();
+                }
+
+                // Core Engine and Operation Infrastructure
+                string journalDir = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                    "Tweakora", "Journal");
+                services.AddSingleton(new RollbackJournalManager(journalDir));
+                services.AddSingleton<IOperationRunner, OperationRunner>();
+
+                // Domain Feature Services
+                services.AddSingleton<ICleanerService, CleanerService>();
+                services.AddSingleton<ITweakService, TweakService>();
+                services.AddSingleton<IAppInstallService, AppInstallService>();
+                services.AddSingleton<IFeatureService, FeatureService>();
+                services.AddSingleton<IFixService, FixService>();
+                services.AddSingleton<IUpdateModeService, UpdateModeService>();
+                services.AddSingleton<IDnsService, DnsService>();
+                services.AddSingleton<IStartupService, StartupService>();
+                services.AddSingleton<IServicesManagerService, ServicesManagerService>();
+
                 // ViewModels
-                services.AddSingleton<MainViewModel>();
                 services.AddSingleton<InstallViewModel>();
                 services.AddSingleton<TweaksViewModel>();
                 services.AddSingleton<ConfigViewModel>();
                 services.AddSingleton<UpdatesViewModel>();
                 services.AddSingleton<ToolboxViewModel>();
-                services.AddSingleton<DashboardViewModel>();
-                services.AddSingleton<AppsViewModel>();
-                services.AddSingleton<PresetsViewModel>();
-                services.AddSingleton<SettingsViewModel>();
+                services.AddSingleton<MainViewModel>();
 
                 // Views
                 services.AddSingleton<MainWindow>();
@@ -52,13 +117,6 @@ public partial class App : Application
     protected override async void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
-
-        if (e.Args.Any(a => string.Equals(a, "--test-mode", StringComparison.OrdinalIgnoreCase)) ||
-            string.Equals(Environment.GetEnvironmentVariable("TWEAKORA_TEST_MODE"), "1", StringComparison.OrdinalIgnoreCase))
-        {
-            TestModeManager.EnableTestMode();
-            Log.Warning("⚠️ Tweakora launched in TEST MODE. All system operations are simulated with in-memory fakes.");
-        }
 
         try
         {
@@ -110,7 +168,6 @@ public partial class App : Application
         Log.Fatal(e.Exception, "Unhandled Dispatcher Exception #{Count} captured", count);
         e.Handled = true;
 
-        // Re-entrancy guard: strictly prevent infinite dialog storms & stack overflow
         if (Interlocked.CompareExchange(ref _isShowingDispatcherDialog, 1, 0) == 0)
         {
             try
