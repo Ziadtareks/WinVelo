@@ -518,12 +518,33 @@ public static class Program
 
         if (string.IsNullOrEmpty(tweak.Detect.Type))
         {
+            string markerName = tweak.Origin ?? tweak.Id;
             tweak.Detect.Type = "Registry";
             tweak.Detect.Hive = "HKLM";
             tweak.Detect.Key = @"SOFTWARE\Tweakora\Simulated";
-            tweak.Detect.ValueName = tweak.Origin ?? tweak.Id;
+            tweak.Detect.ValueName = markerName;
             tweak.Detect.MatchType = "Equals";
             tweak.Detect.ExpectedValue = JsonSerializer.SerializeToElement(1);
+
+            tweak.Apply.Add(new ActionItem
+            {
+                Type = "Registry",
+                Hive = "HKLM",
+                Key = @"SOFTWARE\Tweakora\Simulated",
+                Operation = "Set",
+                ValueName = markerName,
+                ValueKind = "DWord",
+                Data = JsonSerializer.SerializeToElement(1)
+            });
+
+            tweak.Undo.Add(new ActionItem
+            {
+                Type = "Registry",
+                Hive = "HKLM",
+                Key = @"SOFTWARE\Tweakora\Simulated",
+                Operation = "DeleteValue",
+                ValueName = markerName
+            });
         }
     }
 

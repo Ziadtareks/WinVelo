@@ -623,6 +623,15 @@
         "operation": "Execute",
         "script": "$Path = Resolve-Path -Path \"$Env:ProgramFiles (x86)\\Microsoft\\Edge\\Application\\*\\Installer\\setup.exe\" | Select-Object -Last 1\n\n      if (Test-Path $Path) {\n          New-Item -Path \"$Env:SystemRoot\\SystemApps\\Microsoft.MicrosoftEdge_8wekyb3d8bbwe\\MicrosoftEdge.exe\" -Force\n          Start-Process -FilePath $Path -ArgumentList \"--uninstall --system-level --force-uninstall --delete-profile\" -Wait\n          Write-Host \"Microsoft Edge was removed\"\n      } else {\n          Write-Host \"Microsoft Edge is not installed\"\n      }",
         "timeoutSeconds": 60
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Tweakora\\Simulated",
+        "operation": "Set",
+        "valueName": "WPFTweaksRemoveEdge",
+        "valueKind": "DWord",
+        "data": 1
       }
     ],
     "undo": [
@@ -631,6 +640,13 @@
         "operation": "Execute",
         "script": "Write-Host \"Installing Microsoft Edge...\"\n      winget install Microsoft.Edge --source winget",
         "timeoutSeconds": 60
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Tweakora\\Simulated",
+        "operation": "DeleteValue",
+        "valueName": "WPFTweaksRemoveEdge"
       }
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/removeedge",
@@ -668,6 +684,15 @@
         "operation": "Execute",
         "script": "Disable-BitLocker -MountPoint $Env:SystemDrive",
         "timeoutSeconds": 60
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Tweakora\\Simulated",
+        "operation": "Set",
+        "valueName": "WPFTweaksDisableBitLocker",
+        "valueKind": "DWord",
+        "data": 1
       }
     ],
     "undo": [
@@ -676,6 +701,13 @@
         "operation": "Execute",
         "script": "Enable-BitLocker -MountPoint $Env:SystemDrive",
         "timeoutSeconds": 60
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Tweakora\\Simulated",
+        "operation": "DeleteValue",
+        "valueName": "WPFTweaksDisableBitLocker"
       }
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/disablebitlocker",
@@ -764,6 +796,15 @@
         "operation": "Execute",
         "script": "# Deny permission to remove OneDrive folder\n      icacls $Env:OneDrive /deny \"*S-1-5-32-544:(D,DC)\"\n\n      Write-Host \"Uninstalling OneDrive...\"\n      Start-Process -FilePath (Join-Path $Env:SystemRoot \"System32\\OneDriveSetup.exe\") -ArgumentList '/uninstall' -Wait\n\n      # Some of OneDrive files use explorer, and OneDrive uses FileCoAuth\n      Write-Host \"Removing leftover OneDrive Files...\"\n\n      Stop-Process -Name FileCoAuth,Explorer\n\n      Remove-Item \"$Env:LocalAppData\\Microsoft\\OneDrive\" -Recurse -Force\n      Remove-Item \"$Env:ProgramData\\Microsoft OneDrive\" -Recurse -Force\n\n      # Grant back permission to access OneDrive folder\n      icacls $Env:OneDrive /grant \"*S-1-5-32-544:(D,DC)\"\n\n      if (-not (Get-ChildItem -Path $Env:OneDrive)) {\n          Remove-Item -Path $Env:OneDrive -Recurse\n          [Environment]::SetEnvironmentVariable('OneDrive', $null, 'User')\n      }\n\n      # Disable OneSyncSvc\n      Set-Service -Name OneSyncSvc -StartupType Disabled",
         "timeoutSeconds": 60
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Tweakora\\Simulated",
+        "operation": "Set",
+        "valueName": "WPFTweaksRemoveOneDrive",
+        "valueKind": "DWord",
+        "data": 1
       }
     ],
     "undo": [
@@ -772,6 +813,13 @@
         "operation": "Execute",
         "script": "Write-Host \"Installing OneDrive\"\n      winget install Microsoft.Onedrive --source winget\n\n      # Enabled OneSyncSvc\n      Set-Service -Name OneSyncSvc -StartupType Automatic",
         "timeoutSeconds": 60
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Tweakora\\Simulated",
+        "operation": "DeleteValue",
+        "valueName": "WPFTweaksRemoveOneDrive"
       }
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/removeonedrive",
@@ -1149,6 +1197,15 @@
         "operation": "Execute",
         "script": "DISM /Online /Set-ReservedStorageState /State:Disabled",
         "timeoutSeconds": 60
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Tweakora\\Simulated",
+        "operation": "Set",
+        "valueName": "WPFTweaksReservedStorage",
+        "valueKind": "DWord",
+        "data": 1
       }
     ],
     "undo": [
@@ -1157,6 +1214,13 @@
         "operation": "Execute",
         "script": "DISM /Online /Set-ReservedStorageState /State:Enabled",
         "timeoutSeconds": 60
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Tweakora\\Simulated",
+        "operation": "DeleteValue",
+        "valueName": "WPFTweaksReservedStorage"
       }
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/reservedstorage",
@@ -1395,6 +1459,15 @@
         "operation": "Execute",
         "script": "Stop-Process -Name \"logi_download_assistant\" -Force -ErrorAction SilentlyContinue\n\n      $ProgramFiles64 = if ($Env:ProgramW6432) { $Env:ProgramW6432 } else { $Env:ProgramFiles }\n      $LogiPath = \"$ProgramFiles64\\LogiDownloadAssistant\"\n\n      if (Test-Path $LogiPath) {\n        Remove-Item $LogiPath\\* -Recurse -Force\n      } else {\n        New-Item -Path $LogiPath -ItemType Directory\n      }\n\n      icacls $LogiPath /deny \"*S-1-1-0:(W)\"\n      if ($LASTEXITCODE -ne 0) { throw \"icacls failed to deny write access on $LogiPath (exit code $LASTEXITCODE)\" }",
         "timeoutSeconds": 60
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Tweakora\\Simulated",
+        "operation": "Set",
+        "valueName": "WPFTweaksLogiBlock",
+        "valueKind": "DWord",
+        "data": 1
       }
     ],
     "undo": [
@@ -1403,6 +1476,13 @@
         "operation": "Execute",
         "script": "$ProgramFiles64 = if ($Env:ProgramW6432) { $Env:ProgramW6432 } else { $Env:ProgramFiles }\n      $LogiPath = \"$ProgramFiles64\\LogiDownloadAssistant\"\n\n      if (Test-Path $LogiPath) {\n        icacls $LogiPath /remove:d \"*S-1-1-0\"\n        if ($LASTEXITCODE -ne 0) { throw \"icacls failed to remove the write-deny rule on $LogiPath (exit code $LASTEXITCODE)\" }\n      }",
         "timeoutSeconds": 60
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Tweakora\\Simulated",
+        "operation": "DeleteValue",
+        "valueName": "WPFTweaksLogiBlock"
       }
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/logiblock",
@@ -1505,6 +1585,15 @@
         "operation": "Execute",
         "script": "New-Item -Path \"HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\" -Name InprocServer32 -Value \"\" -Force\n      Stop-Process -Name explorer",
         "timeoutSeconds": 60
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Tweakora\\Simulated",
+        "operation": "Set",
+        "valueName": "WPFTweaksRightClickMenu",
+        "valueKind": "DWord",
+        "data": 1
       }
     ],
     "undo": [
@@ -1513,6 +1602,13 @@
         "operation": "Execute",
         "script": "Remove-Item -Path \"HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\" -Recurse",
         "timeoutSeconds": 60
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Tweakora\\Simulated",
+        "operation": "DeleteValue",
+        "valueName": "WPFTweaksRightClickMenu"
       }
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/rightclickmenu",

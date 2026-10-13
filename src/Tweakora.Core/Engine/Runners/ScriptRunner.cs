@@ -20,7 +20,7 @@ public sealed class ScriptRunner
     public async Task<ScriptExecutionResult> RunPowerShellAsync(
         string script,
         Action<string>? onOutputLine = null,
-        int timeoutSeconds = 60,
+        int timeoutSeconds = 30,
         CancellationToken cancellationToken = default)
     {
         var outputBuilder = new StringBuilder();
@@ -68,12 +68,14 @@ public sealed class ScriptRunner
             cts.CancelAfter(TimeSpan.FromSeconds(Math.Clamp(timeoutSeconds, 1, 300)));
 
             await process.WaitForExitAsync(cts.Token);
+            bool isSuccess = process.ExitCode == 0;
             return new ScriptExecutionResult
             {
-                Success = process.ExitCode == 0,
+                Success = isSuccess,
                 ExitCode = process.ExitCode,
                 Output = outputBuilder.ToString(),
-                Error = errorBuilder.ToString()
+                // Suppress non-fatal stderr noise when exit code is 0
+                Error = isSuccess ? string.Empty : errorBuilder.ToString()
             };
         }
         catch (OperationCanceledException)
@@ -102,7 +104,7 @@ public sealed class ScriptRunner
     public async Task<ScriptExecutionResult> RunCmdAsync(
         string command,
         Action<string>? onOutputLine = null,
-        int timeoutSeconds = 60,
+        int timeoutSeconds = 30,
         CancellationToken cancellationToken = default)
     {
         var outputBuilder = new StringBuilder();
@@ -148,12 +150,14 @@ public sealed class ScriptRunner
             cts.CancelAfter(TimeSpan.FromSeconds(Math.Clamp(timeoutSeconds, 1, 300)));
 
             await process.WaitForExitAsync(cts.Token);
+            bool isSuccess = process.ExitCode == 0;
             return new ScriptExecutionResult
             {
-                Success = process.ExitCode == 0,
+                Success = isSuccess,
                 ExitCode = process.ExitCode,
                 Output = outputBuilder.ToString(),
-                Error = errorBuilder.ToString()
+                // Suppress non-fatal stderr noise when exit code is 0
+                Error = isSuccess ? string.Empty : errorBuilder.ToString()
             };
         }
         catch (OperationCanceledException)

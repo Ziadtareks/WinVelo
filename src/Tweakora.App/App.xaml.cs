@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -129,6 +131,14 @@ public partial class App : Application
             window.Show();
 
             Log.Information("Tweakora main window shown successfully.");
+
+            if (e.Args.Any(a => string.Equals(a, "--capture-screenshots", StringComparison.OrdinalIgnoreCase)))
+            {
+                int idx = Array.FindIndex(e.Args, a => string.Equals(a, "--capture-screenshots", StringComparison.OrdinalIgnoreCase));
+                string targetDir = (idx >= 0 && idx + 1 < e.Args.Length && !e.Args[idx + 1].StartsWith("--")) ? e.Args[idx + 1] : "docs/screenshots";
+                window.Loaded += (_, _) => CaptureAllScreenshots(window, targetDir);
+                return;
+            }
         }
         catch (Exception ex)
         {
@@ -142,6 +152,99 @@ public partial class App : Application
 
             Shutdown(1);
         }
+    }
+
+    private void CaptureAllScreenshots(MainWindow window, string targetDir)
+    {
+        try
+        {
+            Directory.CreateDirectory(targetDir);
+            window.Width = 1440;
+            window.Height = 900;
+            FlushUi(window);
+
+            var vm = (MainViewModel)window.DataContext;
+
+            // 1. Tweaks Tab
+            vm.SwitchTabCommand.Execute("Tweaks");
+            FlushUi(window);
+            SaveVisualToPng(window, 1440, 900, Path.Combine(targetDir, "tweaks.png"));
+
+            // 2. Install Tab
+            vm.SwitchTabCommand.Execute("Install");
+            FlushUi(window);
+            SaveVisualToPng(window, 1440, 900, Path.Combine(targetDir, "install.png"));
+
+            // 3. Config Tab
+            vm.SwitchTabCommand.Execute("Config");
+            FlushUi(window);
+            SaveVisualToPng(window, 1440, 900, Path.Combine(targetDir, "config.png"));
+
+            // 4. Updates Tab
+            vm.SwitchTabCommand.Execute("Updates");
+            FlushUi(window);
+            SaveVisualToPng(window, 1440, 900, Path.Combine(targetDir, "updates.png"));
+
+            // 5. Toolbox Tab
+            vm.SwitchTabCommand.Execute("Toolbox");
+            FlushUi(window);
+            SaveVisualToPng(window, 1440, 900, Path.Combine(targetDir, "toolbox.png"));
+
+            // 6. Backups Tab
+            vm.SwitchTabCommand.Execute("Backups");
+            FlushUi(window);
+            SaveVisualToPng(window, 1440, 900, Path.Combine(targetDir, "backups.png"));
+
+            // 7. Diff Preview Overlay
+            vm.SwitchTabCommand.Execute("Tweaks");
+            vm.TweaksVM.ApplyPresetCommand.Execute("Minimal");
+            FlushUi(window);
+            vm.TweaksVM.OpenDiffPreviewCommand.Execute(null);
+            FlushUi(window);
+            SaveVisualToPng(window, 1440, 900, Path.Combine(targetDir, "diff-preview.png"));
+            vm.TweaksVM.CloseDiffPreviewCommand.Execute(null);
+            vm.TweaksVM.ClearSelectionCommand.Execute(null);
+            FlushUi(window);
+
+            // 8. Command Palette Overlay
+            vm.ToggleCommandPaletteCommand.Execute(null);
+            FlushUi(window);
+            SaveVisualToPng(window, 1440, 900, Path.Combine(targetDir, "command-palette.png"));
+            vm.ToggleCommandPaletteCommand.Execute(null);
+
+            Log.Information("All UI screenshots successfully captured to {TargetDir}", targetDir);
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Failed to capture automated UI screenshots");
+        }
+        finally
+        {
+            Shutdown(0);
+        }
+    }
+
+    private static void FlushUi(Window window)
+    {
+        window.UpdateLayout();
+        var frame = new DispatcherFrame();
+        Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, new DispatcherOperationCallback(f =>
+        {
+            ((DispatcherFrame)f).Continue = false;
+            return null;
+        }), frame);
+        Dispatcher.PushFrame(frame);
+        window.UpdateLayout();
+    }
+
+    private static void SaveVisualToPng(Visual visual, int width, int height, string filePath)
+    {
+        var rtb = new RenderTargetBitmap(width, height, 96, 96, PixelFormats.Pbgra32);
+        rtb.Render(visual);
+        var encoder = new PngBitmapEncoder();
+        encoder.Frames.Add(BitmapFrame.Create(rtb));
+        using var stream = File.Create(filePath);
+        encoder.Save(stream);
     }
 
     protected override async void OnExit(ExitEventArgs e)

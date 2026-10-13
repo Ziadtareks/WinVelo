@@ -87,24 +87,24 @@ public sealed partial class TweakCardModel : ObservableObject
     public string CategoryGroup { get; }
 
     public string StatusBadgeText => IsActive ? "APPLIED" : "DEFAULT";
-    public string StatusBadgeBackground => IsActive ? "#064E3B" : "#1F2937";
-    public string StatusBadgeForeground => IsActive ? "#34D399" : "#9CA3AF";
-    public string StatusBadgeBorder => IsActive ? "#059669" : "#374151";
+    public string StatusBadgeBackground => IsActive ? "#064E3B" : "#1E222D";
+    public string StatusBadgeForeground => IsActive ? "#10B981" : "#94A3B8";
+    public string StatusBadgeBorder => IsActive ? "#059669" : "#334155";
 
     public string RiskBadgeBackground => Risk switch
     {
         "Safe" => "#064E3B",
-        "Low" or "Moderate" or "Medium" => "#78350F",
-        "Caution" or "High" => "#7F1D1D",
-        _ => "#1F2937"
+        "Low" or "Moderate" or "Medium" => "#451A03",
+        "Caution" or "High" => "#450A0A",
+        _ => "#1E222D"
     };
 
     public string RiskBadgeForeground => Risk switch
     {
-        "Safe" => "#34D399",
-        "Low" or "Moderate" or "Medium" => "#FBBF24",
-        "Caution" or "High" => "#F87171",
-        _ => "#9CA3AF"
+        "Safe" => "#10B981",
+        "Low" or "Moderate" or "Medium" => "#F59E0B",
+        "Caution" or "High" => "#EF4444",
+        _ => "#94A3B8"
     };
 
     public string RiskBadgeBorder => Risk switch
@@ -112,7 +112,7 @@ public sealed partial class TweakCardModel : ObservableObject
         "Safe" => "#059669",
         "Low" or "Moderate" or "Medium" => "#D97706",
         "Caution" or "High" => "#DC2626",
-        _ => "#374151"
+        _ => "#334155"
     };
 
     public TweakCardModel(TweakDefinition tweak)

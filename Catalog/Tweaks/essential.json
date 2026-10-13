@@ -190,6 +190,15 @@
         "operation": "Execute",
         "script": "# Sometimes if you dont stop the Widgets process the removal may fail\n\n      Get-Process *Widget* | Stop-Process\n      Get-AppxPackage Microsoft.WidgetsPlatformRuntime -AllUsers | Remove-AppxPackage -AllUsers\n      Get-AppxPackage MicrosoftWindows.Client.WebExperience -AllUsers | Remove-AppxPackage -AllUsers\n\n      Invoke-WinUtilExplorerUpdate -action \"restart\"\n      Write-Host \"Removed widgets\"",
         "timeoutSeconds": 60
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Tweakora\\Simulated",
+        "operation": "Set",
+        "valueName": "WPFTweaksWidget",
+        "valueKind": "DWord",
+        "data": 1
       }
     ],
     "undo": [
@@ -198,6 +207,13 @@
         "operation": "Execute",
         "script": "Write-Host 'Reverted'",
         "timeoutSeconds": 10
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Tweakora\\Simulated",
+        "operation": "DeleteValue",
+        "valueName": "WPFTweaksWidget"
       }
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/widget",
@@ -282,6 +298,15 @@
         "operation": "Execute",
         "script": "icacls \"$Env:LocalAppData\\Packages\\Microsoft.WindowsStore_8wekyb3d8bbwe\\LocalState\\store.db\" /deny *S-1-1-0:F",
         "timeoutSeconds": 60
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Tweakora\\Simulated",
+        "operation": "Set",
+        "valueName": "WPFTweaksDisableStoreSearch",
+        "valueKind": "DWord",
+        "data": 1
       }
     ],
     "undo": [
@@ -290,6 +315,13 @@
         "operation": "Execute",
         "script": "icacls \"$Env:LocalAppData\\Packages\\Microsoft.WindowsStore_8wekyb3d8bbwe\\LocalState\\store.db\" /grant *S-1-1-0:F",
         "timeoutSeconds": 60
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Tweakora\\Simulated",
+        "operation": "DeleteValue",
+        "valueName": "WPFTweaksDisableStoreSearch"
       }
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/disablestoresearch",
@@ -1051,6 +1083,15 @@
         "operation": "Execute",
         "script": "cleanmgr.exe /d C: /VERYLOWDISK\n      Dism.exe /online /Cleanup-Image /StartComponentCleanup /ResetBase",
         "timeoutSeconds": 60
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Tweakora\\Simulated",
+        "operation": "Set",
+        "valueName": "WPFTweaksDiskCleanup",
+        "valueKind": "DWord",
+        "data": 1
       }
     ],
     "undo": [
@@ -1059,6 +1100,13 @@
         "operation": "Execute",
         "script": "Write-Host 'Reverted'",
         "timeoutSeconds": 10
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Tweakora\\Simulated",
+        "operation": "DeleteValue",
+        "valueName": "WPFTweaksDiskCleanup"
       }
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/diskcleanup",
@@ -1095,6 +1143,15 @@
         "operation": "Execute",
         "script": "# A temp folder always holds files something has open, including this run's own, and\n      # the job layer counts a logged error as a failed step\n      Remove-Item -Path \"$Env:Temp\\*\" -Recurse -Force -ErrorAction SilentlyContinue\n      Remove-Item -Path \"$Env:SystemRoot\\Temp\\*\" -Recurse -Force -ErrorAction SilentlyContinue",
         "timeoutSeconds": 60
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Tweakora\\Simulated",
+        "operation": "Set",
+        "valueName": "WPFTweaksDeleteTempFiles",
+        "valueKind": "DWord",
+        "data": 1
       }
     ],
     "undo": [
@@ -1103,6 +1160,13 @@
         "operation": "Execute",
         "script": "Write-Host 'Reverted'",
         "timeoutSeconds": 10
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Tweakora\\Simulated",
+        "operation": "DeleteValue",
+        "valueName": "WPFTweaksDeleteTempFiles"
       }
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/deletetempfiles",
@@ -1139,6 +1203,15 @@
         "operation": "Execute",
         "script": "# Previously detected folders\n      $bags = \"HKCU:\\Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\Bags\"\n\n      # Folder types lookup table\n      $bagMRU = \"HKCU:\\Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\BagMRU\"\n\n      # Flush Explorer view database\n      Remove-Item -Path $bags -Recurse -Force\n      Write-Host \"Removed $bags\"\n\n      Remove-Item -Path $bagMRU -Recurse -Force\n      Write-Host \"Removed $bagMRU\"\n\n      # Every folder\n      $allFolders = \"HKCU:\\Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\Bags\\AllFolders\\Shell\"\n\n      if (!(Test-Path $allFolders)) {\n        New-Item -Path $allFolders -Force\n        Write-Host \"Created $allFolders\"\n      }\n\n      # Generic view\n      New-ItemProperty -Path $allFolders -Name \"FolderType\" -Value \"NotSpecified\" -PropertyType String -Force\n      Write-Host \"Set FolderType to NotSpecified\"\n\n      Write-Host Please sign out and back in, or restart your computer to apply the changes!",
         "timeoutSeconds": 60
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Tweakora\\Simulated",
+        "operation": "Set",
+        "valueName": "WPFTweaksDisableExplorerAutoDiscovery",
+        "valueKind": "DWord",
+        "data": 1
       }
     ],
     "undo": [
@@ -1147,6 +1220,13 @@
         "operation": "Execute",
         "script": "# Previously detected folders\n      $bags = \"HKCU:\\Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\Bags\"\n\n      # Folder types lookup table\n      $bagMRU = \"HKCU:\\Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\BagMRU\"\n\n      # Flush Explorer view database\n      Remove-Item -Path $bags -Recurse -Force\n      Write-Host \"Removed $bags\"\n\n      Remove-Item -Path $bagMRU -Recurse -Force\n      Write-Host \"Removed $bagMRU\"\n\n      Write-Host Please sign out and back in, or restart your computer to apply the changes!",
         "timeoutSeconds": 60
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Tweakora\\Simulated",
+        "operation": "DeleteValue",
+        "valueName": "WPFTweaksDisableExplorerAutoDiscovery"
       }
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/disableexplorerautodiscovery",

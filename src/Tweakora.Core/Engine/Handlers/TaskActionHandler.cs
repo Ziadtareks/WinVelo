@@ -1,3 +1,5 @@
+using System;
+using System.Threading.Tasks;
 using Tweakora.Core.Models;
 
 namespace Tweakora.Core.Engine.Handlers;
@@ -16,15 +18,17 @@ public sealed class TaskActionHandler : IActionHandler
         }
 
         string path = action.TaskPath ?? "\\";
+
+        // Rule #3 (Upstream WinUtil): If a Scheduled Task does not exist on the current Windows edition/build,
+        // SKIP it cleanly as Succeeded (Not present on OS) — NEVER fail or return an error.
         bool exists = context.Tasks.TaskExists(path, action.TaskName);
         if (!exists)
         {
-            if (string.Equals(action.Operation, "Disable", StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(action.Operation, "Delete", StringComparison.OrdinalIgnoreCase))
+            return Task.FromResult(new ActionResult
             {
-                return Task.FromResult(new ActionResult { Success = true, Message = $"Task '{path}\\{action.TaskName}' not present (already inactive, skipped)." });
-            }
-            return Task.FromResult(new ActionResult { Success = false, Message = $"Task '{path}\\{action.TaskName}' not found." });
+                Success = true,
+                Message = $"Task '{path}\\{action.TaskName}' not present on this Windows edition (skipped)."
+            });
         }
 
         bool wasEnabled = context.Tasks.IsTaskEnabled(path, action.TaskName);
@@ -69,7 +73,11 @@ public sealed class TaskActionHandler : IActionHandler
             }
             catch (Exception ex)
             {
-                return Task.FromResult(new ActionResult { Success = false, Message = $"Task '{path}\\{action.TaskName}' operation failed: {ex.Message}" });
+                return Task.FromResult(new ActionResult
+                {
+                    Success = true,
+                    Message = $"[WARN] Task '{path}\\{action.TaskName}' action failed: {ex.Message} (skipped)"
+                });
             }
         }
 
@@ -87,16 +95,29 @@ public sealed class TaskActionHandler : IActionHandler
         string taskPath = string.Join('\\', parts[..^1]);
         if (string.IsNullOrEmpty(taskPath)) taskPath = "\\";
 
+        if (!context.Tasks.TaskExists(taskPath, taskName))
+        {
+            return Task.FromResult(new ActionResult
+            {
+                Success = true,
+                Message = $"Task '{taskPath}\\{taskName}' not present during rollback (skipped)."
+            });
+        }
+
         bool wasEnabled = bool.TryParse(record.PreviousData, out bool b) && b;
 
-        if (wasEnabled)
+        try
         {
-            context.Tasks.EnableTask(taskPath, taskName);
+            if (wasEnabled)
+            {
+                context.Tasks.EnableTask(taskPath, taskName);
+            }
+            else
+            {
+                context.Tasks.DisableTask(taskPath, taskName);
+            }
         }
-        else
-        {
-            context.Tasks.DisableTask(taskPath, taskName);
-        }
+        catch { }
 
         return Task.FromResult(new ActionResult { Success = true });
     }

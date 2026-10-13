@@ -6,8 +6,8 @@
                    xmlns:views="clr-namespace:Tweakora.App.Views"
                    xmlns:loc="clr-namespace:Tweakora.App.Localization"
                    Title="Tweakora — Windows 10/11 Performance &amp; Privacy Utility"
-                   Height="850" Width="1280"
-                   MinHeight="680" MinWidth="1020"
+                   Height="860" Width="1360"
+                   MinHeight="700" MinWidth="1080"
                    WindowStartupLocation="CenterScreen"
                    ExtendsContentIntoTitleBar="True"
                    AutomationProperties.AutomationId="TweakoraMainWindow">
@@ -126,7 +126,7 @@
         <!-- MAIN LAYOUT: LEFT SIDEBAR + WORKSPACE -->
         <Grid Grid.Row="3">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="260" /> <!-- Left Sidebar Navigation -->
+                <ColumnDefinition Width="240" /> <!-- Left Sidebar Navigation -->
                 <ColumnDefinition Width="*" />   <!-- Center & Bottom Workspace -->
             </Grid.ColumnDefinitions>
 
@@ -322,7 +322,8 @@
                             <StackPanel>
                                 <DockPanel LastChildFill="False">
                                     <TextBlock Text="{Binding SystemInfo.OsName}" FontSize="12" FontWeight="Bold"
-                                               Foreground="{DynamicResource TextPrimaryBrush}" DockPanel.Dock="Left" />
+                                               Foreground="{DynamicResource TextPrimaryBrush}" DockPanel.Dock="Left"
+                                               MaxWidth="160" TextTrimming="CharacterEllipsis" ToolTip="{Binding SystemInfo.OsName}" />
                                     <Border DockPanel.Dock="Right" Background="{DynamicResource StatusAppliedBgBrush}" CornerRadius="4" Padding="4,1"
                                             Visibility="{Binding IsAdministrator, Converter={StaticResource BoolToVisConverter}}">
                                         <TextBlock Text="ADMIN" FontSize="9" FontWeight="ExtraBold" Foreground="{DynamicResource StatusAppliedFgBrush}" />
@@ -359,7 +360,7 @@
                                         PlaceholderText="Search tweaks by title, ID, or description..."
                                         Text="{Binding TopSearchText, UpdateSourceTrigger=PropertyChanged}"
                                         Icon="{ui:SymbolIcon Search24}"
-                                        Width="260" Margin="0,0,14,0" VerticalAlignment="Center" />
+                                        Width="320" Margin="0,0,14,0" VerticalAlignment="Center" />
 
                             <!-- Presets Toolbar -->
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">

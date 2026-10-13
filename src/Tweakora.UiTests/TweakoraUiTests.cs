@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 using FlaUI.Core;
 using FlaUI.Core.AutomationElements;
@@ -14,9 +15,12 @@ using Xunit.Abstractions;
 
 namespace Tweakora.UiTests;
 
-public sealed class TweakoraUiTests
+public sealed partial class TweakoraUiTests
 {
     private readonly ITestOutputHelper _output;
+
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
 
     public TweakoraUiTests(ITestOutputHelper output)
     {
@@ -129,6 +133,11 @@ public sealed class TweakoraUiTests
         var window = Retry.WhileNull(() => app.GetMainWindow(automation), TimeSpan.FromSeconds(15)).Result;
         Assert.NotNull(window);
         window.Focus();
+        try
+        {
+            SetWindowPos(window.Properties.NativeWindowHandle, IntPtr.Zero, 40, 40, 1440, 900, 0x0040);
+        }
+        catch { }
         Thread.Sleep(2000);
 
         _output.WriteLine("[UI-AUDIT] Tweakora launched successfully in --test-mode");
@@ -245,7 +254,19 @@ public sealed class TweakoraUiTests
         Assert.NotNull(presetClear);
         SafeInvoke(presetClear);
         Thread.Sleep(400);
-        _output.WriteLine("[UI-AUDIT] TWEAKS Tab verified.");
+
+        // Capture Command Palette
+        var openPaletteBtn = Retry.WhileNull(() => window.FindFirstDescendant(cf => cf.ByAutomationId("OpenCommandPaletteButton")), TimeSpan.FromSeconds(3)).Result;
+        if (openPaletteBtn != null)
+        {
+            SafeInvoke(openPaletteBtn);
+            Thread.Sleep(500);
+            CaptureViewScreenshot(window, screenshotsDir, "command-palette.png");
+            // Close palette
+            SafeInvoke(openPaletteBtn);
+            Thread.Sleep(300);
+        }
+        _output.WriteLine("[UI-AUDIT] TWEAKS Tab & Command Palette verified.");
 
         // 5. Test CONFIG Tab
         _output.WriteLine("[UI-AUDIT] Testing CONFIG Tab...");

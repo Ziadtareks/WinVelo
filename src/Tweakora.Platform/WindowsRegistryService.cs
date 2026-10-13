@@ -1,8 +1,12 @@
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using Microsoft.Win32;
 using Tweakora.Core.Interfaces;
 using Tweakora.Core.Safety;
+using Tweakora.Core.Utilities;
 
 namespace Tweakora.Platform;
 
@@ -25,7 +29,8 @@ public sealed class WindowsRegistryService : IRegistryService
     {
         EnsureNotTestMode();
         var view = Environment.Is64BitOperatingSystem ? RegistryView.Registry64 : RegistryView.Default;
-        return hive.ToUpperInvariant() switch
+        string h = hive.ToUpperInvariant().TrimEnd(':', '\\');
+        return h switch
         {
             "HKEY_LOCAL_MACHINE" or "HKLM" => RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, view),
             "HKEY_CURRENT_USER" or "HKCU" => RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, view),
@@ -41,8 +46,9 @@ public sealed class WindowsRegistryService : IRegistryService
         EnsureNotTestMode();
         try
         {
-            using var baseKey = GetHiveKey(hive);
-            using var subKey = baseKey.OpenSubKey(key, false);
+            var (normHive, normKey) = RegistryPathHelper.Normalize(hive, key);
+            using var baseKey = GetHiveKey(normHive);
+            using var subKey = baseKey.OpenSubKey(normKey, false);
             return subKey != null;
         }
         catch (Exception ex) when (ex is UnauthorizedAccessException or System.Security.SecurityException)
@@ -56,10 +62,11 @@ public sealed class WindowsRegistryService : IRegistryService
         EnsureNotTestMode();
         try
         {
-            using var baseKey = GetHiveKey(hive);
-            using var subKey = baseKey.OpenSubKey(key, false);
+            var (normHive, normKey) = RegistryPathHelper.Normalize(hive, key);
+            using var baseKey = GetHiveKey(normHive);
+            using var subKey = baseKey.OpenSubKey(normKey, false);
             if (subKey == null) return false;
-            return subKey.GetValueNames().Contains(valueName, StringComparer.OrdinalIgnoreCase);
+            return subKey.GetValueNames().Contains(valueName ?? string.Empty, StringComparer.OrdinalIgnoreCase);
         }
         catch (Exception ex) when (ex is UnauthorizedAccessException or System.Security.SecurityException)
         {
@@ -72,9 +79,10 @@ public sealed class WindowsRegistryService : IRegistryService
         EnsureNotTestMode();
         try
         {
-            using var baseKey = GetHiveKey(hive);
-            using var subKey = baseKey.OpenSubKey(key, false);
-            return subKey?.GetValue(valueName);
+            var (normHive, normKey) = RegistryPathHelper.Normalize(hive, key);
+            using var baseKey = GetHiveKey(normHive);
+            using var subKey = baseKey.OpenSubKey(normKey, false);
+            return subKey?.GetValue(valueName ?? string.Empty);
         }
         catch (Exception ex) when (ex is UnauthorizedAccessException or System.Security.SecurityException)
         {
@@ -87,10 +95,11 @@ public sealed class WindowsRegistryService : IRegistryService
         EnsureNotTestMode();
         try
         {
-            using var baseKey = GetHiveKey(hive);
-            using var subKey = baseKey.OpenSubKey(key, false);
+            var (normHive, normKey) = RegistryPathHelper.Normalize(hive, key);
+            using var baseKey = GetHiveKey(normHive);
+            using var subKey = baseKey.OpenSubKey(normKey, false);
             if (subKey == null) return null;
-            var kind = subKey.GetValueKind(valueName);
+            var kind = subKey.GetValueKind(valueName ?? string.Empty);
             return kind switch
             {
                 RegistryValueKind.DWord => "DWord",
@@ -113,11 +122,12 @@ public sealed class WindowsRegistryService : IRegistryService
         EnsureNotTestMode();
         try
         {
-            using var baseKey = GetHiveKey(hive, true);
-            using var subKey = baseKey.CreateSubKey(key, true);
-            if (subKey == null) throw new InvalidOperationException($"Could not open or create key {hive}\\{key}");
+            var (normHive, normKey) = RegistryPathHelper.Normalize(hive, key);
+            using var baseKey = GetHiveKey(normHive, true);
+            using var subKey = baseKey.CreateSubKey(normKey, true);
+            if (subKey == null) throw new InvalidOperationException($"Could not open or create key {normHive}\\{normKey}");
 
-            RegistryValueKind kind = valueKind switch
+            RegistryValueKind kind = (valueKind ?? "DWord") switch
             {
                 "DWord" => RegistryValueKind.DWord,
                 "QWord" => RegistryValueKind.QWord,
@@ -128,17 +138,15 @@ public sealed class WindowsRegistryService : IRegistryService
                 _ => RegistryValueKind.DWord
             };
 
-            object realData = data;
-            if (kind == RegistryValueKind.DWord && data is not int)
+            object realData = kind switch
             {
-                realData = Convert.ToInt32(data);
-            }
-            else if (kind == RegistryValueKind.QWord && data is not long)
-            {
-                realData = Convert.ToInt64(data);
-            }
+                RegistryValueKind.DWord => RegistryPathHelper.ParseDWord(data),
+                RegistryValueKind.QWord => RegistryPathHelper.ParseQWord(data),
+                RegistryValueKind.Binary => data is byte[] b ? b : (data is string s ? (s.Length > 0 ? Convert.FromBase64String(s) : Array.Empty<byte>()) : Array.Empty<byte>()),
+                _ => data?.ToString() ?? string.Empty
+            };
 
-            subKey.SetValue(valueName, realData, kind);
+            subKey.SetValue(valueName ?? string.Empty, realData, kind);
         }
         catch (Exception ex) when (ex is UnauthorizedAccessException or System.Security.SecurityException)
         {
@@ -151,9 +159,10 @@ public sealed class WindowsRegistryService : IRegistryService
         EnsureNotTestMode();
         try
         {
-            using var baseKey = GetHiveKey(hive, true);
-            using var subKey = baseKey.OpenSubKey(key, true);
-            subKey?.DeleteValue(valueName, false);
+            var (normHive, normKey) = RegistryPathHelper.Normalize(hive, key);
+            using var baseKey = GetHiveKey(normHive, true);
+            using var subKey = baseKey.OpenSubKey(normKey, true);
+            subKey?.DeleteValue(valueName ?? string.Empty, false);
         }
         catch (Exception ex) when (ex is UnauthorizedAccessException or System.Security.SecurityException)
         {
@@ -166,8 +175,9 @@ public sealed class WindowsRegistryService : IRegistryService
         EnsureNotTestMode();
         try
         {
-            using var baseKey = GetHiveKey(hive, true);
-            baseKey.DeleteSubKeyTree(key, false);
+            var (normHive, normKey) = RegistryPathHelper.Normalize(hive, key);
+            using var baseKey = GetHiveKey(normHive, true);
+            baseKey.DeleteSubKeyTree(normKey, false);
         }
         catch (Exception ex) when (ex is UnauthorizedAccessException or System.Security.SecurityException)
         {
@@ -180,8 +190,9 @@ public sealed class WindowsRegistryService : IRegistryService
         EnsureNotTestMode();
         try
         {
-            using var baseKey = GetHiveKey(hive, true);
-            using var created = baseKey.CreateSubKey(key, true);
+            var (normHive, normKey) = RegistryPathHelper.Normalize(hive, key);
+            using var baseKey = GetHiveKey(normHive, true);
+            using var created = baseKey.CreateSubKey(normKey, true);
         }
         catch (Exception ex) when (ex is UnauthorizedAccessException or System.Security.SecurityException)
         {
@@ -193,13 +204,14 @@ public sealed class WindowsRegistryService : IRegistryService
     {
         EnsureNotTestMode();
         Directory.CreateDirectory(backupFolder);
-        string safeName = $"{hive}_{key}".Replace('\\', '_').Replace('/', '_').Replace(':', '_');
+        var (normHive, normKey) = RegistryPathHelper.Normalize(hive, key);
+        string safeName = $"{normHive}_{normKey}".Replace('\\', '_').Replace('/', '_').Replace(':', '_');
         string backupFile = Path.Combine(backupFolder, $"{safeName}_{DateTime.UtcNow:yyyyMMddHHmmss}.reg");
 
         using var process = Process.Start(new ProcessStartInfo
         {
             FileName = "reg.exe",
-            Arguments = $"export \"{hive}\\{key}\" \"{backupFile}\" /y",
+            Arguments = $"export \"{normHive}\\{normKey}\" \"{backupFile}\" /y",
             CreateNoWindow = true,
             UseShellExecute = false
         });
@@ -213,8 +225,9 @@ public sealed class WindowsRegistryService : IRegistryService
         EnsureNotTestMode();
         try
         {
-            using var baseKey = GetHiveKey(hive);
-            using var subKey = baseKey.OpenSubKey(key, false);
+            var (normHive, normKey) = RegistryPathHelper.Normalize(hive, key);
+            using var baseKey = GetHiveKey(normHive);
+            using var subKey = baseKey.OpenSubKey(normKey, false);
             return subKey?.GetValueNames() ?? Enumerable.Empty<string>();
         }
         catch (Exception ex) when (ex is UnauthorizedAccessException or System.Security.SecurityException)
@@ -228,8 +241,9 @@ public sealed class WindowsRegistryService : IRegistryService
         EnsureNotTestMode();
         try
         {
-            using var baseKey = GetHiveKey(hive);
-            using var subKey = baseKey.OpenSubKey(key, false);
+            var (normHive, normKey) = RegistryPathHelper.Normalize(hive, key);
+            using var baseKey = GetHiveKey(normHive);
+            using var subKey = baseKey.OpenSubKey(normKey, false);
             return subKey?.GetSubKeyNames() ?? Enumerable.Empty<string>();
         }
         catch (Exception ex) when (ex is UnauthorizedAccessException or System.Security.SecurityException)
@@ -238,4 +252,3 @@ public sealed class WindowsRegistryService : IRegistryService
         }
     }
 }
-
