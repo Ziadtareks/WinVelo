@@ -12,7 +12,21 @@ public static class Program
         Console.WriteLine("  Tweakora Catalog Validator (CI Tool) ");
         Console.WriteLine("========================================");
 
-        string rootDir = Directory.GetCurrentDirectory();
+        string rootDir = @"C:\Dev\Tweakora";
+        string? candidateRoot = AppContext.BaseDirectory;
+        while (candidateRoot != null && !File.Exists(Path.Combine(candidateRoot, "Tweakora.sln")))
+        {
+            candidateRoot = Directory.GetParent(candidateRoot)?.FullName;
+        }
+        if (candidateRoot != null && File.Exists(Path.Combine(candidateRoot, "Tweakora.sln")))
+        {
+            rootDir = candidateRoot;
+        }
+        else if (!Directory.Exists(rootDir))
+        {
+            rootDir = Directory.GetCurrentDirectory();
+        }
+
         string schemaPath = Path.Combine(rootDir, "Catalog", "schema", "tweak.schema.json");
         string tweaksDir = Path.Combine(rootDir, "Catalog", "Tweaks");
 

@@ -38,7 +38,7 @@ public static class Program
     public static async Task<int> Main(string[] args)
     {
         Console.WriteLine("========================================");
-        Console.WriteLine("          Tweakora CLI v0.3.0           ");
+        Console.WriteLine("        Tweakora CLI v1.0.0-rc1         ");
         Console.WriteLine("========================================");
 
         if (args.Length == 0 || args.Contains("--help") || args.Contains("-h"))
@@ -49,17 +49,18 @@ public static class Program
 
         bool isSelfTest = args.Contains("--self-test");
         bool isTestMode = args.Contains("--test-mode");
-        bool isRealMode = args.Contains("--real-mode") || (isSelfTest && !isTestMode);
+        bool isDetectAll = args.Contains("--detect-all");
+        bool isRealMode = args.Contains("--real-mode") || (isSelfTest && !isTestMode) || (isDetectAll && !isTestMode);
         bool isDryRun = args.Contains("--dry-run");
         bool isRun = args.Contains("--run") || args.Contains("--apply") || args.Contains("--enable") || args.Contains("--disable") || args.Contains("--clean") || args.Contains("--dns") || args.Contains("--update-mode") || args.Contains("--fix") || args.Contains("--undo") || isSelfTest;
 
         if (isRealMode)
         {
             TestModeManager.DisableTestMode();
-            Console.WriteLine("[MODE] REAL-MODE ACTIVE — Modifying host OS configuration.");
+            Console.WriteLine("[MODE] REAL-MODE ACTIVE — Operating directly against host OS.");
 
-            // Strict Elevation Check: Fail with clear error if not running as administrator
-            if (!AdminPrivilegeHelper.IsRunningAsAdministrator())
+            // Strict Elevation Check: Only required for modifying operations
+            if (!isDetectAll && !AdminPrivilegeHelper.IsRunningAsAdministrator())
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("\n[ERROR] Administrator privileges are required to run Tweakora CLI in real-mode.");
@@ -170,6 +171,28 @@ public static class Program
             }
 
             return await ExecuteSelfTestAsync(level, catalog, registry, runner, detector, restore, isTestMode);
+        }
+
+        // ---------------------------------------------------------------------
+        // CLI COMMAND: --detect-all (Read-only inspection of host state)
+        // ---------------------------------------------------------------------
+        if (args.Contains("--detect-all"))
+        {
+            var regDrv = isTestMode ? (IRegistryService)new FakeRegistryService() : new WindowsRegistryService();
+            var svcDrv = isTestMode ? (ISystemServicesService)new FakeServicesService() : new WindowsServicesService();
+            var tskDrv = isTestMode ? (ITaskSchedulerService)new FakeTaskSchedulerService() : new WindowsTaskSchedulerService();
+            var realDetector = new StateDetector(regDrv, svcDrv, tskDrv);
+            return await ExecuteDetectAllAsync(catalog, realDetector, regDrv, svcDrv, tskDrv);
+        }
+
+        // ---------------------------------------------------------------------
+        // CLI COMMAND: --preset <name> [--dry-run | --run]
+        // ---------------------------------------------------------------------
+        int presetIdx = Array.FindIndex(args, a => string.Equals(a, "--preset", StringComparison.OrdinalIgnoreCase) || string.Equals(a, "-p", StringComparison.OrdinalIgnoreCase));
+        if (presetIdx >= 0 && presetIdx < args.Length - 1)
+        {
+            string presetName = args[presetIdx + 1];
+            return await ExecutePresetAsync(presetName, catalog, dryRun, isDryRun, handlers, context, runner, tweaksDir);
         }
 
         // 1. Single Tweak execution: --tweak <id> [--apply | --undo]
@@ -663,6 +686,208 @@ public static class Program
         return string.Equals(actual.ToString(), expected.ToString(), StringComparison.OrdinalIgnoreCase);
     }
 
+    private static async Task<int> ExecuteDetectAllAsync(
+        List<TweakDefinition> catalog,
+        StateDetector detector,
+        IRegistryService registry,
+        ISystemServicesService services,
+        ITaskSchedulerService tasks)
+    {
+        Console.WriteLine("\n=======================================================");
+        Console.WriteLine("    HOST MACHINE AUDIT: READ-ONLY TWEAK DETECTION      ");
+        Console.WriteLine("=======================================================");
+        Console.WriteLine($"Scanning host machine state for all {catalog.Count} tweaks in catalog...\n");
+
+        string rootDir = AppDomain.CurrentDomain.BaseDirectory;
+        string verifyDir = Path.Combine(rootDir, "verify");
+        string? parent = rootDir;
+        while (parent != null)
+        {
+            if (File.Exists(Path.Combine(parent, "Tweakora.sln")))
+            {
+                verifyDir = Path.Combine(parent, "verify");
+                break;
+            }
+            parent = Directory.GetParent(parent)?.FullName;
+        }
+
+        if (!Directory.Exists(verifyDir))
+        {
+            Directory.CreateDirectory(verifyDir);
+        }
+
+        string reportPath = Path.Combine(verifyDir, "detect-report.md");
+
+        var lines = new List<string>
+        {
+            "# Host System Tweak Detection Report",
+            "",
+            $"- **Execution Timestamp**: {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} UTC",
+            $"- **Host OS**: {Environment.OSVersion}",
+            $"- **Machine**: {Environment.MachineName}",
+            $"- **Total Tweaks Audited**: {catalog.Count}",
+            "",
+            "| # | Tweak ID | Name | Category | Risk | Status | Error/Exception |",
+            "|---|---|---|---|:---:|:---:|---|"
+        };
+
+        int appliedCount = 0;
+        int defaultCount = 0;
+        int errorCount = 0;
+
+        for (int i = 0; i < catalog.Count; i++)
+        {
+            var tweak = catalog[i];
+            string status = "Default";
+            string errorDetails = "None";
+
+            try
+            {
+                bool isActive = await detector.IsTweakActiveAsync(tweak, useCache: false);
+                if (isActive)
+                {
+                    status = "Applied";
+                    appliedCount++;
+                }
+                else
+                {
+                    status = "Default";
+                    defaultCount++;
+                }
+            }
+            catch (Exception ex)
+            {
+                status = "Error";
+                errorDetails = ex.Message;
+                errorCount++;
+            }
+
+            Console.WriteLine($"[{i + 1,3}/{catalog.Count}] [{status,-7}] {tweak.Id,-45} ({tweak.Name})");
+            lines.Add($"| {i + 1} | `{tweak.Id}` | {tweak.Name} | {tweak.Category} | {tweak.Risk} | **{status}** | {errorDetails} |");
+        }
+
+        lines.Add("");
+        lines.Add("## Summary");
+        lines.Add("");
+        lines.Add($"- **Applied**: {appliedCount}");
+        lines.Add($"- **Default (Inactive)**: {defaultCount}");
+        lines.Add($"- **Errors/Access Issues**: {errorCount}");
+
+        File.WriteAllText(reportPath, string.Join(Environment.NewLine, lines));
+
+        Console.WriteLine("\n=======================================================");
+        Console.WriteLine($"Detection Complete! Applied: {appliedCount}, Default: {defaultCount}, Errors: {errorCount}");
+        Console.WriteLine($"Saved full detection report to: {reportPath}");
+        Console.WriteLine("=======================================================");
+
+        return 0;
+    }
+
+    private static Task<int> ExecutePresetAsync(
+        string presetName,
+        List<TweakDefinition> catalog,
+        DryRunEngine dryRun,
+        bool isDryRun,
+        List<IActionHandler> handlers,
+        Core.Engine.ExecutionContext context,
+        TweakRunner runner,
+        string catalogDir)
+    {
+        string presetPath = Path.Combine(catalogDir, "..", "Config", "preset.json");
+        if (!File.Exists(presetPath))
+        {
+            string? p = Directory.GetParent(catalogDir)?.FullName;
+            if (p != null)
+            {
+                presetPath = Path.Combine(p, "Config", "preset.json");
+            }
+        }
+
+        if (!File.Exists(presetPath))
+        {
+            Console.WriteLine($"[ERROR] Presets file not found: {presetPath}");
+            return Task.FromResult(1);
+        }
+
+        string presetJson = File.ReadAllText(presetPath);
+        using var presetDoc = JsonDocument.Parse(presetJson);
+
+        if (!presetDoc.RootElement.TryGetProperty(presetName, out var presetElem))
+        {
+            Console.WriteLine($"[ERROR] Preset '{presetName}' not found in preset.json.");
+            Console.WriteLine("Available presets: " + string.Join(", ", presetDoc.RootElement.EnumerateObject().Select(x => x.Name)));
+            return Task.FromResult(1);
+        }
+
+        List<string> keys = presetElem.EnumerateArray().Select(x => x.GetString() ?? "").Where(s => !string.IsNullOrEmpty(s)).ToList();
+        var keySet = new HashSet<string>(keys, StringComparer.OrdinalIgnoreCase);
+
+        var targetTweaks = catalog.Where(t => keySet.Contains(t.Id) || (t.Origin != null && keySet.Contains(t.Origin))).ToList();
+        Console.WriteLine($"[INFO] Preset '{presetName}' matched {targetTweaks.Count} of {keys.Count} configured keys.");
+
+        string rootDir = AppDomain.CurrentDomain.BaseDirectory;
+        string verifyDir = Path.Combine(rootDir, "verify");
+        string? parent = rootDir;
+        while (parent != null)
+        {
+            if (File.Exists(Path.Combine(parent, "Tweakora.sln")))
+            {
+                verifyDir = Path.Combine(parent, "verify");
+                break;
+            }
+            parent = Directory.GetParent(parent)?.FullName;
+        }
+
+        if (!Directory.Exists(verifyDir))
+        {
+            Directory.CreateDirectory(verifyDir);
+        }
+
+        string dryRunReportPath = Path.Combine(verifyDir, $"dryrun-{presetName.ToLowerInvariant()}.md");
+
+        var previews = dryRun.GeneratePreview(targetTweaks);
+
+        var reportLines = new List<string>
+        {
+            $"# Tweakora Dry-Run Plan: Preset `{presetName}`",
+            "",
+            $"- **Generated At**: {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} UTC",
+            $"- **Preset**: `{presetName}`",
+            $"- **Total Tweaks In Preset**: {targetTweaks.Count}",
+            $"- **Total Actions Planned**: {previews.Sum(p => p.Actions.Count)}",
+            "",
+            "## Planned Execution Actions",
+            ""
+        };
+
+        foreach (var p in previews)
+        {
+            reportLines.Add($"### `{p.TweakId}`: {p.Name} (Risk: **{p.Risk}**)");
+            reportLines.Add("| Action Type | Target | Operation | Current State | Proposed State |");
+            reportLines.Add("|---|---|---|---|---|");
+            foreach (var a in p.Actions)
+            {
+                reportLines.Add($"| {a.ActionType} | `{a.Target}` | `{a.Operation}` | `{a.CurrentState}` | `{a.ProposedState}` |");
+            }
+            reportLines.Add("");
+        }
+
+        File.WriteAllText(dryRunReportPath, string.Join(Environment.NewLine, reportLines));
+
+        Console.WriteLine($"\n[DRY RUN PREVIEW] Preset '{presetName}' ({targetTweaks.Count} tweaks):");
+        foreach (var p in previews)
+        {
+            Console.WriteLine($"\n[{p.Risk}] {p.TweakId} ({p.Name})");
+            foreach (var a in p.Actions)
+            {
+                Console.WriteLine($"  • {a.ActionType} {a.Target} -> {a.Operation} (Current: {a.CurrentState} | Proposed: {a.ProposedState})");
+            }
+        }
+
+        Console.WriteLine($"\n[INFO] Dry-run plan saved to: {dryRunReportPath}");
+        return Task.FromResult(0);
+    }
+
     private static List<TweakDefinition> LoadCatalog(string tweaksDir)
     {
         List<TweakDefinition> tweaks = new();
@@ -685,6 +910,8 @@ public static class Program
     {
         Console.WriteLine("Usage:");
         Console.WriteLine("  tweakora-cli --self-test --level 1        Run automated safe HKCU self-test with restore point");
+        Console.WriteLine("  tweakora-cli --detect-all                 Non-destructive read-only detection across all tweaks");
+        Console.WriteLine("  tweakora-cli --preset <name> [--dry-run]  Inspect or apply preset (Standard, Minimal, Advanced)");
         Console.WriteLine("  tweakora-cli --list                       List all catalog tweaks");
         Console.WriteLine("  tweakora-cli --dry-run                    Preview all catalog tweaks without modifying system");
         Console.WriteLine("  tweakora-cli --tweak <id> --apply         Apply a specific tweak (add --real-mode for real OS)");

@@ -17,7 +17,7 @@ public sealed class ServiceActionHandler : IActionHandler
         bool exists = context.Services.ServiceExists(action.ServiceName);
         if (!exists)
         {
-            return Task.FromResult(new ActionResult { Success = false, Message = $"Service '{action.ServiceName}' not found." });
+            return Task.FromResult(new ActionResult { Success = true, Message = $"Service '{action.ServiceName}' not found (skipped per WinUtil policy)." });
         }
 
         string previousStartup = context.Services.GetStartupType(action.ServiceName);
@@ -76,7 +76,7 @@ public sealed class ServiceActionHandler : IActionHandler
     {
         if (!context.Services.ServiceExists(record.TargetIdentifier))
         {
-            return Task.FromResult(new ActionResult { Success = false, Message = $"Service '{record.TargetIdentifier}' not found during rollback." });
+            return Task.FromResult(new ActionResult { Success = true, Message = $"Service '{record.TargetIdentifier}' not found during rollback (skipped)." });
         }
 
         string[] parts = (record.PreviousData ?? "Manual|Stopped").Split('|');

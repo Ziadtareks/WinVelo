@@ -597,7 +597,7 @@
     "origin": "WPFTweaksRemoveEdge",
     "name": "Microsoft Edge - Remove",
     "description": "Uninstalls Microsoft Edge by creating dummy MicrosoftEdge.exe file in the legacy Edge folder. This tricks Windows into unlocking the official Edge uninstaller allowing for a system-level removal.",
-    "category": "ui",
+    "category": "system",
     "subcategory": "z__Advanced Tweaks - CAUTION",
     "risk": "High",
     "impacts": [
@@ -1218,7 +1218,7 @@
     "origin": "WPFTweaksWindowsAI",
     "name": "Windows AI - Disable And Remove",
     "description": "Removes and disables all AI features/packages",
-    "category": "ai",
+    "category": "system",
     "subcategory": "z__Advanced Tweaks - CAUTION",
     "risk": "High",
     "impacts": [

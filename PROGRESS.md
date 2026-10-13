@@ -1,61 +1,74 @@
 # Tweakora Progress Tracker
 
-Last Updated: 2026-10-12
-Repository Location: `C:\Dev\Tweakora`
+Last Updated: 2026-10-13  
+Repository Location: `C:\Dev\Tweakora`  
+Current Release: `v1.0.0-rc1`  
+Upstream Reference: [ChrisTitusTech/winutil](https://github.com/ChrisTitusTech/winutil) @ `07ccd8e2e755a706f31569808b31f5b77acad6a9`  
 
 ## Overall Status
 
 | Phase | Description | Status | Build / Tests Result |
 |---|---|---|---|
 | **Phase 0** | Architecture, JSON Schema & Project Tree | **DONE** | Validated |
-| **Phase 1** | Scaffolding, .NET 10, WPF UI, Mica, RTL, Crash Handlers | **DONE** | Build: 0 errors / Tests: 1 passed / Process alive 10s confirmed |
-| **Phase 2** | Engine + Safety Layer (Rollback Journal, DryRun, Fakes, CLI) | **DONE** | Build: 0 errors / Tests: 11 passed / CLI works / Process alive 10s confirmed |
-| **Phase 3** | Tweaks UI, Toggles, Badges, First 40 Verified Tweaks, Presets | **DONE** | 40 Verified Tweaks Validated / UI Cards & Filters / Tests: 11 passed |
-| **Phase 4** | Dashboard, Startup Manager, Services Manager, Smart Cleaner | **DONE** | Build: 0 errors / Tests: 11 passed / Process alive 10s |
-| **Phase 5** | App Installer (WinGet), Uninstaller, Fixes Center, Network Tools | **DONE** | Build: 0 errors / Tests: 18 passed / Process alive 10s |
-| **Phase 6** | Expand Catalog to 80+ Verified Tweaks | **DONE** | 84 Verified Tweaks Validated (0 errors) |
-| **Phase 7** | Change History, Profiles, Command Palette (Ctrl+K), Settings & First-Run | **DONE** | Build: 0 errors / Tests: 23 passed / Process alive 10s |
-| **Phase 8** | Release Polish, English-Only, Size Optimization, Packaging | **DONE** | Build: 0 errors / Tests: 34 passed / Releases Packaged |
-| **Audit Phase** | Quality & Safety Audit, Staging Architecture, FlaUI Test Suite | **DONE** | 35 Unit Tests passed / FlaUI UI Suite passed / 79 Tweaks 100% verified |
-| **Phase A (Truth Inventory)** | Line-by-line audit of all buttons, commands, stubs, and Task.Delay | **DONE** | Created FEATURE_MATRIX.md. 89 actions audited: 47 REAL, 29 FAKE/BROKEN, 7 STUB/MISSING, 6 DEAD. |
-| **Phase B (Re-Architecture)** | DI injection, MVVM AsyncRelayCommand, OperationRunner, Admin check | **DONE** | Fakes segregated to `Tweakora.Simulation`. 9 clean domain services implemented in `Tweakora.Modules`. 4 architecture integrity gates pass. |
-| **Phase D (Fix Every Feature)** | Make every row in FEATURE_MATRIX.md real and verified | **DONE** | All 83 active actions wired to real platform APIs (WinGet, DISM, SFC, Registry, SCM, netsh). 0 fakes in production code. |
-| **Phase E (UI Quality)** | Visual polish, button progress, 1280x720 + 1920x1080 screenshots | **DONE** | FlaUI UI automation passes across all 5 tabs and dialogs. Generated high-res screenshots in `docs/screenshots/`. |
-| **Host Verification Phase**    | User-driven real host verification (3 safety levels) | **ACTIVE** | `TEST_PLAN_HOST.md` created. `tweakora-cli --self-test --level 1` implemented with restore point and roundtrip verification. VM scripts preserved in `tests/vm/` for future optional use. |
+| **Phase 1** | Scaffolding, .NET 10, WPF UI, Mica, Crash Handlers | **DONE** | Build: 0 errors / Tests passed |
+| **Phase 2** | Engine + Safety Layer (Rollback Journal, DryRun, Fakes, CLI) | **DONE** | Build: 0 errors / CLI works |
+| **Phase 3** | Tweaks UI, Toggles, Badges, Presets | **DONE** | UI Cards & Filters / Tests passed |
+| **Phase 4** | Dashboard, Startup Manager, Services Manager, Smart Cleaner | **DONE** | Build: 0 errors |
+| **Phase 5** | App Installer (WinGet), Uninstaller, Fixes Center, Network Tools | **DONE** | Build: 0 errors |
+| **Phase 6** | Expand Catalog to 80+ Verified Tweaks | **DONE** | Validated |
+| **Phase 7** | Change History, Profiles, Command Palette (Ctrl+K), Settings | **DONE** | Build: 0 errors |
+| **Phase 8** | Release Polish, Size Optimization, Packaging | **DONE** | Build: 0 errors |
+| **Audit Phase** | Quality & Safety Audit, Staging Architecture, FlaUI Test Suite | **DONE** | Unit Tests passed / FlaUI UI Suite passed |
+| **Phase A (Truth Inventory)** | Line-by-line audit of all buttons, commands, stubs, and Task.Delay | **DONE** | Created `FEATURE_MATRIX.md`. Audited every UI action. |
+| **Phase B (Re-Architecture)** | DI injection, MVVM AsyncRelayCommand, Admin check | **DONE** | Fakes segregated to `Tweakora.Simulation`. 9 clean domain services in `Tweakora.Modules`. 4 architecture integrity gates pass. |
+| **Phase D (Fix Every Feature)** | Make every row in FEATURE_MATRIX.md real and verified | **DONE** | All 83 active actions wired to real platform APIs. 0 fakes in production code. |
+| **Phase E (UI Quality)** | Visual polish, button progress, screenshots | **DONE** | FlaUI UI automation passes across all 5 tabs and dialogs. |
+| **Upstream Parity & Quality Audit** | Chris Titus WinUtil 1:1 Parity & Engine Verification | **DONE** | 141 verified tweaks synchronized. 64 unit/architecture tests pass. Non-destructive host detection (`--detect-all`) 100% clean. |
+| **Release v1.0.0-rc1** | Packaging, SHA256 checksums, documentation | **DONE** | Portable (~95 MB) & Small (~4.1 MB) zip releases generated in `dist/`. |
 
 ---
 
-## Strict Quality & Safety Audit Results (v0.1.0)
+## v1.0.0-rc1 Verification Summary
 
-- **Emergency Check**:
-  - `%LOCALAPPDATA%\Tweakora` inspected. Zero host system changes occurred.
-- **Crash Root Cause (0xC00000FD)**:
-  - Missing XAML converter resource `BoolToVisConverter` in `TweaksPage.xaml`.
-  - Nested `MessageBox.Show` inside `DispatcherUnhandledException` pumped message loop during layout pass, causing infinite re-entrancy.
-  - Fixed with application-wide converters in `App.xaml` and atomic `Interlocked.CompareExchange` re-entrancy guard.
-- **Safety Layer**:
-  - `TestModeManager.IsTestMode` actively protects all real platform services (`WindowsRegistryService`, etc.). Any call throws `InvalidOperationException`.
-  - 35/35 unit tests pass.
-- **Tweak Staging Architecture**:
-  - Toggles only stage changes in memory.
-  - `Apply Staged (N)` displays dry-run diff preview dialog before applying.
-- **Catalog Hardening**:
-  - 5 unverified tweaks moved to `docs/NEEDS_VERIFICATION.md`.
-  - 79 active tweaks validated with `CatalogValidator` (0 errors).
-  - 79 active tweaks verified with `SourceChecker` (79/79 HTTP 200 OK from Microsoft Learn).
-- **FlaUI Automated UI Test Suite**:
-  - 6 end-to-end scenarios run via `Tweakora.UiTests.csproj` against the real GUI in test mode.
-  - All tests passed in 2m 21s.
-  - Captured screenshots in `docs/screenshots/` (dashboard, tweaks, diff dialog, command palette, settings).
+- **Host Safety Verification**:
+  - **Zero host changes applied** during development, testing, and release build.
+  - Read-only detection (`tweakora-cli --detect-all`) tested non-destructively against the host PC across all 141 tweaks: **69 Applied, 72 Default, 0 Errors/Exceptions**.
+  - Generated full inspection report in `verify/detect-report.md`.
+- **Upstream Parity**:
+  - Synchronized with upstream WinUtil at commit `07ccd8e2e755a706f31569808b31f5b77acad6a9`.
+  - Upstream behavior documented in `docs/UPSTREAM_BEHAVIOR.md`.
+  - All 141 catalog tweaks verified against `tweak.schema.json` with `CatalogValidator` (0 errors).
+  - All 141 tweak documentation URLs verified with `SourceChecker` (141/141 HTTP 200 OK).
+  - Preset dry-run audits recorded in `verify/dryrun-standard.md`, `verify/dryrun-minimal.md`, `verify/dryrun-advanced.md`.
+- **Root Cause Bug Fixes**:
+  - **BUG-001**: StackOverflowException resolved (resource lookup fix + atomic lock).
+  - **BUG-002**: Window backdrop fallback on unsupported hardware.
+  - **BUG-003**: Production fakes removed; simulation isolated in `Tweakora.Simulation`.
+  - **BUG-004**: Global WPF converters centralized in `App.xaml`.
+  - **BUG-005**: WinGet exit codes properly parsed.
+  - **BUG-006**: RegistryActionHandler handles `<RemoveEntry>` string sentinels without format exceptions.
+  - **BUG-007**: ServiceActionHandler handles non-existent services gracefully without failing batches.
+  - **BUG-008**: Admin elevation strictly enforced with diagnostic instructions.
+- **Safety Overrides Enforced**:
+  - BitLocker (`advanced.disablebitlocker`): High risk, red warning card, excluded from all presets.
+  - Adobe Network Block: Excluded from catalog.
+  - O&O ShutUp10++: Replaced with safe official web link.
+  - Disable Updates: Requires typing "I understand" before staging/applying.
+- **Test Automation**:
+  - 64 Unit & Architecture Tests (`Tweakora.Tests`): 64/64 PASSED (734 ms).
+  - FlaUI Automated UI Test (`Tweakora.UiTests`): 1/1 PASSED (1 m 45 s) covering all 5 horizontal tabs (Install, Tweaks, Config, Updates, Toolbox).
 - **Release Packages (`dist/`)**:
-  - `dist\Tweakora-v0.1.0-win-x64-portable.zip` (62,551,878 bytes / ~59.6 MB)
-  - `dist\Tweakora-v0.1.0-win-x64-small.zip` (3,416,480 bytes / ~3.25 MB)
-  - `dist\SHA256SUMS.txt` (SHA-256 verified)
+  - `dist\Tweakora-v1.0.0-rc1-win-x64-portable.zip` (SHA-256: `4507FE29EABAFD61AAA529278726AC450BC203AD70D419B210C21364CD28B27F`)
+  - `dist\Tweakora-v1.0.0-rc1-win-x64-small.zip` (SHA-256: `A37E053AE6D7821946A13EABA2B4606F7A085A9CB26C2761280D30434FC05884`)
+  - `dist\SHA256SUMS.txt` updated.
 
 ---
 
 ## Questions for Ziad
 
-1. **GitHub Repository**: When you are ready to publish Tweakora to GitHub, do you want us to set up GitHub Actions CI for automated build and release uploading?
-2. **Catalog Additions**: Are there specific additional tools or Windows features you would like added in the next release (v0.2.0)?
-3. **Inno Setup**: When you install Inno Setup on your workstation, we can automatically compile `installer\tweakora.iss` to produce `Tweakora-Setup-v0.1.0-x64.exe`.
+1. **Host PC Self-Test**: You can now safely test Level 1 (HKCU-only) changes whenever you wish by running:
+   ```powershell
+   .\tweakora-cli.exe --self-test --level 1
+   ```
+   It will create a restore point, test each HKCU tweak, revert it immediately, and confirm the original state is restored.
+2. **Release Distribution**: The release packages are ready in `C:\Dev\Tweakora\dist\`. Would you like to publish these to GitHub Releases or create an installer with Inno Setup?

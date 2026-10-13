@@ -89,7 +89,7 @@ cd tweakora
 # Build solution
 dotnet build Tweakora.sln
 
-# Run engine test suite (37 unit tests)
+# Run engine test suite (64 unit and architecture tests)
 dotnet test src/Tweakora.Tests/Tweakora.Tests.csproj
 
 # Run automated UI test suite (FlaUI UIA3)

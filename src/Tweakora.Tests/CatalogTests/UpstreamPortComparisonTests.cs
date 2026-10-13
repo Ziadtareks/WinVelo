@@ -42,6 +42,11 @@ public sealed class UpstreamPortComparisonTests
         HashSet<string> ourOrigins = new(ourTweaks.Where(t => t.Origin != null).Select(t => t.Origin!), StringComparer.OrdinalIgnoreCase);
         HashSet<string> ourIds = new(ourTweaks.Select(t => t.Id), StringComparer.OrdinalIgnoreCase);
 
+        string overridesPath = FindFileUpwards(baseDir, Path.Combine("Catalog", "overrides.json"));
+        Assert.True(File.Exists(overridesPath), $"Catalog/overrides.json missing at {overridesPath}");
+        string rawOverrides = File.ReadAllText(overridesPath);
+        using var overridesDoc = JsonDocument.Parse(rawOverrides);
+
         List<string> unportedAndUndocumented = new();
 
         foreach (var prop in upstreamDocJson.RootElement.EnumerateObject())
@@ -57,6 +62,19 @@ public sealed class UpstreamPortComparisonTests
         }
 
         Assert.Empty(unportedAndUndocumented);
+
+        // Safety Assertions:
+        // 1. BitLocker must be High risk and have a clear warning
+        var bitLockerTweak = ourTweaks.FirstOrDefault(t => string.Equals(t.Origin, "WPFTweaksDisableBitLocker", StringComparison.OrdinalIgnoreCase));
+        Assert.NotNull(bitLockerTweak);
+        Assert.Equal("High", bitLockerTweak.Risk);
+        Assert.NotNull(bitLockerTweak.Warnings);
+
+        // 2. Presets must NOT contain BitLocker
+        string presetPath = FindFileUpwards(baseDir, Path.Combine("Catalog", "Config", "preset.json"));
+        Assert.True(File.Exists(presetPath));
+        string presetText = File.ReadAllText(presetPath);
+        Assert.DoesNotContain("WPFTweaksDisableBitLocker", presetText, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]

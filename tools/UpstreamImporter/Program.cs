@@ -8,7 +8,28 @@ using System.Text.Json.Nodes;
 using Json.Schema;
 using Tweakora.Core.Models;
 
-namespace WinUtilPorter;
+namespace UpstreamImporter;
+
+public class OverridesConfig
+{
+    public Dictionary<string, ExcludedTweakInfo> ExcludedTweaks { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+    public Dictionary<string, TweakOverrideInfo> TweakOverrides { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+}
+
+public class ExcludedTweakInfo
+{
+    public string Reason { get; set; } = "";
+    public string? Documentation { get; set; }
+}
+
+public class TweakOverrideInfo
+{
+    public string? Category { get; set; }
+    public string? Risk { get; set; }
+    public List<string>? Impacts { get; set; }
+    public string? Warning { get; set; }
+    public bool ExcludeFromPresets { get; set; }
+}
 
 public static class Program
 {
@@ -21,21 +42,34 @@ public static class Program
 
     public static int Main(string[] args)
     {
-        Console.WriteLine("========================================");
-        Console.WriteLine("   WinUtil to Tweakora Catalog Porter   ");
-        Console.WriteLine("========================================");
+        Console.WriteLine("==============================================");
+        Console.WriteLine("   WinUtil Upstream Importer with Overrides   ");
+        Console.WriteLine("==============================================");
 
-        string rootDir = Directory.GetCurrentDirectory();
-        while (!File.Exists(Path.Combine(rootDir, "Tweakora.sln")))
+        string rootDir = @"C:\Dev\Tweakora";
+        string? candidate = AppContext.BaseDirectory;
+        while (candidate != null && !File.Exists(Path.Combine(candidate, "Tweakora.sln")))
         {
-            var p = Directory.GetParent(rootDir);
-            if (p == null) break;
-            rootDir = p.FullName;
+            candidate = Directory.GetParent(candidate)?.FullName;
+        }
+        if (candidate != null && File.Exists(Path.Combine(candidate, "Tweakora.sln")))
+        {
+            rootDir = candidate;
+        }
+        else if (!Directory.Exists(rootDir))
+        {
+            rootDir = Directory.GetCurrentDirectory();
         }
 
         string upstreamDir = Path.Combine(rootDir, "upstream", "winutil", "config");
+        if (!Directory.Exists(upstreamDir))
+        {
+            upstreamDir = @"C:\Dev\upstream\winutil\config";
+        }
+
         string catalogDir = Path.Combine(rootDir, "Catalog");
         string schemaPath = Path.Combine(catalogDir, "schema", "tweak.schema.json");
+        string overridesPath = Path.Combine(catalogDir, "overrides.json");
 
         if (!Directory.Exists(upstreamDir))
         {
@@ -43,22 +77,84 @@ public static class Program
             return 1;
         }
 
+        // 1. Load overrides.json
+        OverridesConfig overrides = new();
+        if (File.Exists(overridesPath))
+        {
+            try
+            {
+                string overridesJson = File.ReadAllText(overridesPath);
+                var parsed = JsonSerializer.Deserialize<OverridesConfig>(overridesJson, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+                if (parsed != null)
+                {
+                    overrides = parsed;
+                    Console.WriteLine($"[INFO] Loaded overrides.json: {overrides.ExcludedTweaks.Count} exclusions, {overrides.TweakOverrides.Count} overrides.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[WARN] Could not parse overrides.json: {ex.Message}");
+            }
+        }
+        else
+        {
+            Console.WriteLine($"[WARN] No overrides.json found at {overridesPath}");
+        }
+
         JsonSchema schema = JsonSchema.FromFile(schemaPath);
 
-        // 1. Copy config files to Catalog/Apps and Catalog/Config
+        // 2. Copy and prepare config files
         Directory.CreateDirectory(Path.Combine(catalogDir, "Apps"));
         Directory.CreateDirectory(Path.Combine(catalogDir, "Config"));
         Directory.CreateDirectory(Path.Combine(catalogDir, "Tweaks"));
 
         File.Copy(Path.Combine(upstreamDir, "applications.json"), Path.Combine(catalogDir, "Apps", "applications.json"), true);
         File.Copy(Path.Combine(upstreamDir, "feature.json"), Path.Combine(catalogDir, "Config", "feature.json"), true);
-        File.Copy(Path.Combine(upstreamDir, "preset.json"), Path.Combine(catalogDir, "Config", "preset.json"), true);
         File.Copy(Path.Combine(upstreamDir, "dns.json"), Path.Combine(catalogDir, "Config", "dns.json"), true);
         File.Copy(Path.Combine(upstreamDir, "appx.json"), Path.Combine(catalogDir, "Config", "appx.json"), true);
 
-        Console.WriteLine("[INFO] Copied applications, feature, preset, dns, appx configs to Catalog/");
+        // Process preset.json respecting excludeFromPresets
+        string presetRaw = File.ReadAllText(Path.Combine(upstreamDir, "preset.json"));
+        var presetNode = JsonNode.Parse(presetRaw);
+        if (presetNode is JsonObject presetObj)
+        {
+            var keysToExclude = overrides.TweakOverrides
+                .Where(kv => kv.Value.ExcludeFromPresets)
+                .Select(kv => kv.Key)
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
-        // 2. Port tweaks from tweaks.json
+            foreach (var presetProp in presetObj)
+            {
+                if (presetProp.Value is JsonArray arr)
+                {
+                    var itemsToRemove = new List<JsonNode>();
+                    foreach (var item in arr)
+                    {
+                        if (item != null && keysToExclude.Contains(item.ToString()))
+                        {
+                            itemsToRemove.Add(item);
+                        }
+                    }
+                    foreach (var item in itemsToRemove)
+                    {
+                        arr.Remove(item);
+                        Console.WriteLine($"[PRESET] Removed {item} from preset {presetProp.Key} per safety override.");
+                    }
+                }
+            }
+            File.WriteAllText(Path.Combine(catalogDir, "Config", "preset.json"), presetObj.ToJsonString(JsonOptions));
+        }
+        else
+        {
+            File.Copy(Path.Combine(upstreamDir, "preset.json"), Path.Combine(catalogDir, "Config", "preset.json"), true);
+        }
+
+        Console.WriteLine("[INFO] Config files synchronized with upstream.");
+
+        // 3. Port tweaks from tweaks.json
         string tweaksRaw = File.ReadAllText(Path.Combine(upstreamDir, "tweaks.json"));
         using JsonDocument doc = JsonDocument.Parse(tweaksRaw);
 
@@ -67,26 +163,18 @@ public static class Program
         List<TweakDefinition> preferencesTweaks = new();
 
         int portedCount = 0;
-        int skippedCount = 0;
+        int excludedCount = 0;
 
         foreach (JsonProperty prop in doc.RootElement.EnumerateObject())
         {
             string key = prop.Name;
             JsonElement elem = prop.Value;
 
-            // Skip Adobe block list (safety / licensing)
-            if (key == "WPFTweaksBlockAdobeNet")
+            // Check if key is explicitly excluded
+            if (overrides.ExcludedTweaks.TryGetValue(key, out var exclInfo))
             {
-                Console.WriteLine($"[SKIP] {key}: Excluded (licensing bypass / safety policy)");
-                skippedCount++;
-                continue;
-            }
-
-            // Skip pure UI buttons or comboboxes that aren't tweak checkboxes
-            if (key == "WPFOOSUbutton" || key == "WPFchangedns" || key == "WPFAddUltPerf" || key == "WPFRemoveUltPerf")
-            {
-                Console.WriteLine($"[SKIP/ACTION] {key}: Handled as UI Action / Dropdown");
-                skippedCount++;
+                Console.WriteLine($"[EXCLUDE] {key}: {exclInfo.Reason}");
+                excludedCount++;
                 continue;
             }
 
@@ -103,42 +191,13 @@ public static class Program
             List<string> impacts = new() { "ui" };
             string? warning = null;
 
-            // Specific Safety Adjustments per requirements
-            if (key == "WPFTweaksDisableBitLocker")
+            // Apply overrides if defined
+            if (overrides.TweakOverrides.TryGetValue(key, out var overrideInfo))
             {
-                category = "z__Advanced Tweaks - CAUTION";
-                risk = "High";
-                schemaCategory = "system";
-                impacts = new() { "security" };
-                warning = "Disabling BitLocker removes disk encryption and leaves drive data completely unprotected against unauthorized physical access.";
-            }
-            else if (key == "WPFTweaksRemoveEdge")
-            {
-                risk = "High";
-                schemaCategory = "ui";
-                impacts = new() { "ui", "performance" };
-                warning = "Removes Microsoft Edge from the system. Some Windows components, widgets, or web-authentication dialogs may be affected.";
-            }
-            else if (key == "WPFTweaksRemoveOneDrive")
-            {
-                risk = "High";
-                schemaCategory = "system";
-                impacts = new() { "storage", "performance" };
-                warning = "Completely uninstalls OneDrive and stops file synchronization. Ensure all cloud documents are backed up locally.";
-            }
-            else if (key == "WPFTweaksWindowsAI")
-            {
-                risk = "High";
-                schemaCategory = "ai";
-                impacts = new() { "privacy", "performance" };
-                warning = "Removes and disables Windows AI, Recall, and Copilot packages system-wide.";
-            }
-            else if (key == "WPFTweaksDisableIPv6")
-            {
-                risk = "High";
-                schemaCategory = "network";
-                impacts = new() { "network" };
-                warning = "Disables IPv6 on all network adapters. Some modern networks and services requiring IPv6 may lose connectivity.";
+                if (!string.IsNullOrEmpty(overrideInfo.Category)) category = overrideInfo.Category;
+                if (!string.IsNullOrEmpty(overrideInfo.Risk)) risk = overrideInfo.Risk;
+                if (overrideInfo.Impacts != null && overrideInfo.Impacts.Count > 0) impacts = new List<string>(overrideInfo.Impacts);
+                if (!string.IsNullOrEmpty(overrideInfo.Warning)) warning = overrideInfo.Warning;
             }
             else if (category.Contains("Advanced", StringComparison.OrdinalIgnoreCase))
             {
@@ -151,11 +210,11 @@ public static class Program
 
             string id = GenerateId(key, content, category);
 
-            // Map schema category & impacts
+            // Determine schema category
             if (category == "Customize Preferences")
             {
                 schemaCategory = "ui";
-                impacts = new() { "ui" };
+                if (impacts.Count == 0) impacts.Add("ui");
             }
             else if (key.Contains("Telemetry") || key.Contains("Location") || key.Contains("Activity"))
             {
@@ -194,7 +253,6 @@ public static class Program
                 VerifiedOnBuild = "26100"
             };
 
-            // Build Actions and Detect
             BuildActionsAndDetect(elem, tweak);
 
             if (category == "Essential Tweaks")
@@ -213,26 +271,15 @@ public static class Program
             portedCount++;
         }
 
-        Console.WriteLine($"[INFO] Ported {portedCount} WinUtil tweaks ({essentialTweaks.Count} Essential, {advancedTweaks.Count} Advanced, {preferencesTweaks.Count} Preferences).");
+        Console.WriteLine($"[INFO] Imported {portedCount} WinUtil tweaks ({essentialTweaks.Count} Essential, {advancedTweaks.Count} Advanced, {preferencesTweaks.Count} Preferences). Excluded {excludedCount}.");
 
-        // 3. Write out catalog files
+        // 4. Write catalog files
         File.WriteAllText(Path.Combine(catalogDir, "Tweaks", "essential.json"), JsonSerializer.Serialize(essentialTweaks, JsonOptions));
         File.WriteAllText(Path.Combine(catalogDir, "Tweaks", "advanced.json"), JsonSerializer.Serialize(advancedTweaks, JsonOptions));
         File.WriteAllText(Path.Combine(catalogDir, "Tweaks", "preferences.json"), JsonSerializer.Serialize(preferencesTweaks, JsonOptions));
 
-        // 4. Preserve existing unique Tweakora extras in extras.json
+        // 5. Preserve existing unique Tweakora extras in extras.json
         BuildTweakoraExtras(catalogDir, essentialTweaks.Concat(advancedTweaks).Concat(preferencesTweaks).ToList());
-
-        // 5. Clean up old category files now replaced by essential/advanced/preferences/extras
-        string[] oldFiles = { "ai.json", "gaming.json", "network.json", "performance.json", "privacy.json", "security.json", "ui.json", "updates.json" };
-        foreach (string old in oldFiles)
-        {
-            string oldPath = Path.Combine(catalogDir, "Tweaks", old);
-            if (File.Exists(oldPath))
-            {
-                File.Delete(oldPath);
-            }
-        }
 
         // 6. Validate all newly generated catalog files against schema
         Console.WriteLine("\n[VALIDATING CATALOG AGAINST SCHEMA...]");
@@ -269,9 +316,9 @@ public static class Program
             }
         }
 
-        Console.WriteLine($"\n========================================");
+        Console.WriteLine($"==============================================");
         Console.WriteLine($"Result: {totalValid} tweaks valid, {errorCount} errors.");
-        Console.WriteLine($"========================================");
+        Console.WriteLine($"==============================================");
 
         return errorCount == 0 ? 0 : 1;
     }
@@ -499,32 +546,27 @@ public static class Program
         var portedIds = new HashSet<string>(portedTweaks.Select(t => t.Id), StringComparer.OrdinalIgnoreCase);
         var portedOrigins = new HashSet<string>(portedTweaks.Where(t => t.Origin != null).Select(t => t.Origin!), StringComparer.OrdinalIgnoreCase);
 
-        // Gather all existing tweaks in old category files
         string tweaksFolder = Path.Combine(catalogDir, "Tweaks");
-        string[] oldFiles = { "ai.json", "gaming.json", "network.json", "performance.json", "privacy.json", "security.json", "ui.json", "updates.json" };
+        string extrasPath = Path.Combine(tweaksFolder, "extras.json");
         List<TweakDefinition> extras = new();
 
-        foreach (string file in oldFiles)
+        if (File.Exists(extrasPath))
         {
-            string filePath = Path.Combine(tweaksFolder, file);
-            if (File.Exists(filePath))
+            string text = File.ReadAllText(extrasPath);
+            var list = JsonSerializer.Deserialize<List<TweakDefinition>>(text);
+            if (list != null)
             {
-                string text = File.ReadAllText(filePath);
-                var list = JsonSerializer.Deserialize<List<TweakDefinition>>(text);
-                if (list != null)
+                foreach (var item in list)
                 {
-                    foreach (var item in list)
+                    if (!portedIds.Contains(item.Id) && (item.Origin == null || !portedOrigins.Contains(item.Origin)))
                     {
-                        if (!portedIds.Contains(item.Id) && (item.Origin == null || !portedOrigins.Contains(item.Origin)))
-                        {
-                            extras.Add(item);
-                        }
+                        extras.Add(item);
                     }
                 }
             }
         }
 
-        Console.WriteLine($"[INFO] Compiled {extras.Count} unique Tweakora Extras into extras.json");
-        File.WriteAllText(Path.Combine(tweaksFolder, "extras.json"), JsonSerializer.Serialize(extras, JsonOptions));
+        Console.WriteLine($"[INFO] Compiled {extras.Count} unique Tweakora Extras in extras.json");
+        File.WriteAllText(extrasPath, JsonSerializer.Serialize(extras, JsonOptions));
     }
 }

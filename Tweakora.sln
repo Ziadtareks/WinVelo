@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
@@ -25,7 +25,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SourceChecker", "tools\Sour
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tweakora.UiTests", "src\Tweakora.UiTests\Tweakora.UiTests.csproj", "{8769D403-1E36-44AC-A189-CE50B87CC22C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinUtilPorter", "tools\WinUtilPorter\WinUtilPorter.csproj", "{986424D0-BBCE-4831-A10C-07327EC0E61E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UpstreamImporter", "tools\UpstreamImporter\UpstreamImporter.csproj", "{986424D0-BBCE-4831-A10C-07327EC0E61E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tweakora.Simulation", "src\Tweakora.Simulation\Tweakora.Simulation.csproj", "{A077F6B5-6798-4EDD-A333-0046199C65C1}"
 EndProject

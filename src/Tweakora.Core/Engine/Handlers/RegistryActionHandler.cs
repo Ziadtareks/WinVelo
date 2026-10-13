@@ -64,9 +64,19 @@ public sealed class RegistryActionHandler : IActionHandler
             switch (action.Operation)
             {
                 case "Set":
-                    if (!keyExisted) context.Registry.CreateKey(action.Hive, action.Key);
                     object dataToSet = ParseData(action.Data, action.ValueKind ?? "DWord");
-                    context.Registry.SetValue(action.Hive, action.Key, action.ValueName ?? string.Empty, dataToSet, action.ValueKind ?? "DWord");
+                    if (dataToSet is string s && s == "<RemoveEntry>")
+                    {
+                        if (keyExisted && valueExisted && !string.IsNullOrEmpty(action.ValueName))
+                        {
+                            context.Registry.DeleteValue(action.Hive, action.Key, action.ValueName);
+                        }
+                    }
+                    else
+                    {
+                        if (!keyExisted) context.Registry.CreateKey(action.Hive, action.Key);
+                        context.Registry.SetValue(action.Hive, action.Key, action.ValueName ?? string.Empty, dataToSet, action.ValueKind ?? "DWord");
+                    }
                     break;
 
                 case "DeleteValue":
@@ -169,10 +179,15 @@ public sealed class RegistryActionHandler : IActionHandler
         if (!element.HasValue) return 0;
         JsonElement val = element.Value;
 
+        if (val.ValueKind == JsonValueKind.String && string.Equals(val.GetString(), "<RemoveEntry>", StringComparison.OrdinalIgnoreCase))
+        {
+            return "<RemoveEntry>";
+        }
+
         return kind switch
         {
-            "DWord" => val.ValueKind == JsonValueKind.Number ? val.GetInt32() : int.Parse(val.GetString() ?? "0"),
-            "QWord" => val.ValueKind == JsonValueKind.Number ? val.GetInt64() : long.Parse(val.GetString() ?? "0"),
+            "DWord" => val.ValueKind == JsonValueKind.Number ? val.GetInt32() : (int.TryParse(val.GetString(), out int d) ? d : 0),
+            "QWord" => val.ValueKind == JsonValueKind.Number ? val.GetInt64() : (long.TryParse(val.GetString(), out long q) ? q : 0L),
             "Binary" => val.ValueKind == JsonValueKind.String ? Convert.FromBase64String(val.GetString()!) : Array.Empty<byte>(),
             _ => val.GetString() ?? string.Empty
         };

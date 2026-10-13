@@ -134,11 +134,21 @@ public sealed class FakeServicesService : ISystemServicesService
             Services[serviceName] = (s.Startup, "Stopped");
         }
     }
+
+    public void RegisterService(string serviceName, string startup, string state)
+    {
+        Services[serviceName] = (startup, state);
+    }
 }
 
 public sealed class FakeTaskSchedulerService : ITaskSchedulerService
 {
     public Dictionary<string, bool> Tasks { get; } = new(StringComparer.OrdinalIgnoreCase);
+
+    public void RegisterTask(string path, string taskName, bool isEnabled = true)
+    {
+        Tasks[$"{path}\\{taskName}"] = isEnabled;
+    }
 
     public bool TaskExists(string path, string taskName) => Tasks.ContainsKey($"{path}\\{taskName}");
 
