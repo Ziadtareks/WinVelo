@@ -132,6 +132,12 @@ dotnet run --project src/Tweakora.App/Tweakora.App.csproj -- --test-mode
 
 ---
 
+## 🏷️ Naming
+
+WinVelo was previously developed under the project name **Tweakora**. To avoid breaking internal solution references, package configurations, and project dependencies, internal C# namespaces, project files (`.csproj`), directory names, and the solution file (`Tweakora.sln`) retain the `Tweakora.*` prefix. All user-facing executables (`WinVelo.exe`, `winvelo-cli.exe`), desktop shortcuts, installer packages, documentation, and user data directories use the **WinVelo** name.
+
+---
+
 ## 📄 License
 
 WinVelo is released under the **[MIT License](LICENSE)**. Feel free to use, modify, and distribute it freely.

@@ -1,6 +1,6 @@
-# Tweakora Architecture Specification
+# WinVelo Architecture Specification
 
-Tweakora is an open-source, modular, data-driven Windows 10/11 system configuration and toolbox platform. It is engineered with a strict separation between UI, business logic, platform operations, and execution environments.
+WinVelo is an open-source, modular, data-driven Windows 10/11 system configuration and toolbox platform. It is engineered with a strict separation between UI, business logic, platform operations, and execution environments.
 
 ---
 

@@ -1,4 +1,4 @@
-# Tweakora Product Roadmap 🗺️
+# WinVelo Product Roadmap 🗺️
 
 ## v0.1.0 — Foundation & Strict Safety (Delivered)
 - Modern C# 12 / .NET 10 LTS WPF application.
@@ -16,7 +16,7 @@
 - Top-level 5-tab layout (Install, Tweaks, Config, Updates, Toolbox).
 - Dense multi-column view with live search filtering across all tabs.
 - TAB 1 - INSTALL: 236 applications across 10 categories (WinGet & Chocolatey support).
-- TAB 2 - TWEAKS: Standard, Minimal, Advanced presets; Essential Tweaks, Advanced Tweaks CAUTION, Customize Preferences (25 live toggles), Performance Plans, DNS selector, Tweakora Extras.
+- TAB 2 - TWEAKS: Standard, Minimal, Advanced presets; Essential Tweaks, Advanced Tweaks CAUTION, Customize Preferences (25 live toggles), Performance Plans, DNS selector, WinVelo Extras.
 - TAB 3 - CONFIG: Windows Features installation, Quick Fixes (Autologin, Update Reset, Network Reset, DISM/SFC), 14 Legacy Control Panels, OpenSSH server.
 - TAB 4 - UPDATES: Default, Security (recommended), and Disable All Updates (with typed confirmation).
 - TAB 5 - TOOLBOX: Integrated Startup Manager, Services Manager, Smart Cleaner, App Uninstaller, Fixes Center, Change History.

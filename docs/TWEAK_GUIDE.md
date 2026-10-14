@@ -1,6 +1,6 @@
 # Tweak Authoring Guide
 
-Every tweak in Tweakora is data-driven, defined as a JSON document in the `Catalog/Tweaks/` directory, and strictly validated against `Catalog/schema/tweak.schema.json`.
+Every tweak in WinVelo is data-driven, defined as a JSON document in the `Catalog/Tweaks/` directory, and strictly validated against `Catalog/schema/tweak.schema.json`.
 
 ---
 

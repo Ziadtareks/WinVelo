@@ -1,8 +1,18 @@
 # Changelog
 
-All notable changes to **Tweakora** are documented in this file.
+All notable changes to **WinVelo** (formerly Tweakora) are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [1.0.0] - 2026-10-14
+
+### Rebranded
+- **Project Rebranded from Tweakora to WinVelo**:
+  - Application binary officially released as `WinVelo.exe` and `winvelo-cli.exe`.
+  - Windows user-facing data directory transitioned to `%APPDATA%\WinVelo\Journal` and `%LOCALAPPDATA%\WinVelo\Logs` with automatic one-time migration for legacy `Tweakora` user data.
+  - Setup installer updated to `WinVelo-Setup-1.0.0-x64.exe`.
+  - All user documentation, CLI commands, and UI strings updated to WinVelo.
+  - Historical changelog entries below preserve the original project name during pre-1.0 development.
 
 ## [0.2.0] - 2026-10-13
 

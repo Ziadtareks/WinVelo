@@ -1,12 +1,12 @@
-# Tweakora Bug Inventory & Root Cause Analysis
+# WinVelo Bug Inventory & Root Cause Analysis
 
-This document catalogs all historical, discovered, and audited bugs, crashes, stubs, fakes, and behavioral inconsistencies across Tweakora, with their root causes and verified fixes.
+This document catalogs all historical, discovered, and audited bugs, crashes, stubs, fakes, and behavioral inconsistencies across WinVelo, with their root causes and verified fixes.
 
 ---
 
 ## BUG-001: Infinite Dispatcher Loop and StackOverflowException (0xC00000FD)
 - **Component**: `Tweakora.App` (`Views/TweaksPage.xaml`, `App.xaml.cs`)
-- **Finding**: Opening the Tweaks page caused hundreds of cascading "Tweakora Error" dialogs and crashed the process with `0xC00000FD` (`A new guard page for the stack cannot be created`).
+- **Finding**: Opening the Tweaks page caused hundreds of cascading "WinVelo Error" dialogs and crashed the process with `0xC00000FD` (`A new guard page for the stack cannot be created`).
 - **Root Cause**:
   1. `TweaksPage.xaml` referenced `{StaticResource BoolToVisConverter}`, but the converter was declared locally on `MainWindow` instead of application-wide in `App.xaml`.
   2. The resulting `XamlParseException` triggered `DispatcherUnhandledException`. The handler called `MessageBox.Show()`, which pumped the WPF dispatcher message loop during the ongoing layout pass.

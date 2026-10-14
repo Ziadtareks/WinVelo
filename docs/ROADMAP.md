@@ -1,4 +1,4 @@
-# Tweakora Roadmap
+# WinVelo Roadmap
 
 - **Phase 0**: Architecture, JSON Schema, and Project Tree. (Completed)
 - **Phase 1**: Solution Setup, .NET 10, WPF Fluent Shell, en/ar RTL, Logging, CatalogValidator. (In Progress)

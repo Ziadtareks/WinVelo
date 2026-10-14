@@ -1,6 +1,6 @@
 # Third-Party Notices
 
-Tweakora uses open-source libraries and benefits from community research. We are grateful to the authors and contributors of these projects.
+WinVelo uses open-source libraries and benefits from community research. We are grateful to the authors and contributors of these projects.
 
 ---
 
