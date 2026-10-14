@@ -205,3 +205,21 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
   4. Updated `DetectTweakStateAsync` catch block to fail safe to `Unknown`.
   5. Updated `RealRegistrySyncTests.cs` (`DisableTelemetry_ExternalRegistrySync_DetectsChangeImmediately`) to assert `Partial` when only 1 policy key is set and `Applied` when all keys are set.
   6. Added regression tests in `CompositeStateDetectionTests.cs` and documented the rule in `docs/TWEAK_GUIDE.md`.
+
+---
+
+## BUG-016: Native Command Failures Invisible in PowerShell Scripts
+- **Component**: `Catalog/Tweaks/*.json` (`advanced.json`, `essential.json`), `Tweakora.Tests` (`CatalogPowerShellSyntaxTests.cs`)
+- **Finding**: In Windows PowerShell 5.1, executing external native CLI tools (e.g., `winget`, `dism`, `powercfg`, `cleanmgr`, `netsh`) does not throw a terminating or non-terminating PowerShell exception when the process exits with a non-zero error code. Because the PowerShell runner wrapped script execution in try/catch, scripts that suffered complete native command failures continued running silently and returned success with exit code 0.
+- **Root Cause**: PowerShell 5.1 treats native executable stderr output and non-zero exit codes as normal pipeline output rather than exceptions, requiring explicit post-call checks against `$LASTEXITCODE`.
+- **Fix**:
+  1. Audited all PowerShell actions calling native CLI utilities across the catalog.
+  2. Added explicit `$LASTEXITCODE` checks after all native tool invocations:
+     - `advanced.removeedge`: checked `$proc.ExitCode` on `setup.exe` uninstaller and `$LASTEXITCODE` on `winget install`.
+     - `advanced.removeonedrive`: checked `$proc.ExitCode` on `OneDriveSetup.exe` uninstaller and `$LASTEXITCODE` on `winget install`.
+     - `advanced.reservedstorage`: checked `$LASTEXITCODE` on `DISM` apply and undo (allowing reboot-required code 3010).
+     - `advanced.windowsai`: checked `$LASTEXITCODE` on `winget uninstall` (allowing known-OK codes 3010, -1978335135, -1978335189, -1978335212).
+     - `advanced.teredo`: checked `$LASTEXITCODE` on `netsh` apply and undo.
+     - `essential.hiber`: checked `$LASTEXITCODE` on `powercfg.exe` apply and undo.
+     - `essential.diskcleanup`: checked `$LASTEXITCODE` on `cleanmgr.exe` and `Dism.exe`.
+  3. Added an automated regression test `AllCatalogPowerShellScripts_NativeCommandsMustCheckLastExitCode` in `CatalogPowerShellSyntaxTests.cs` that parses all catalog scripts and fails if any native command invocation (`winget`, `dism`, `powercfg`, `fsutil`, `bcdedit`, `reg`, `sc`, `cleanmgr`, `cipher`, `compact`, `vssadmin`, `wevtutil`, `netsh`) is not immediately followed by a `$LASTEXITCODE` validation.

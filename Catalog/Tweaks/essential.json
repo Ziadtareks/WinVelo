@@ -126,7 +126,7 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "powercfg.exe /hibernate off",
+        "script": "powercfg.exe /hibernate off\n      if ($LASTEXITCODE -ne 0) { throw \"powercfg failed with exit code $LASTEXITCODE\" }",
         "timeoutSeconds": 60
       }
     ],
@@ -152,7 +152,7 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "powercfg.exe /hibernate on",
+        "script": "powercfg.exe /hibernate on\n      if ($LASTEXITCODE -ne 0) { throw \"powercfg failed with exit code $LASTEXITCODE\" }",
         "timeoutSeconds": 60
       }
     ],
@@ -1116,7 +1116,7 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "cleanmgr.exe /d C: /VERYLOWDISK\n      Dism.exe /online /Cleanup-Image /StartComponentCleanup /ResetBase",
+        "script": "cleanmgr.exe /d C: /VERYLOWDISK\n      if ($LASTEXITCODE -ne 0) { throw \"cleanmgr failed with exit code $LASTEXITCODE\" }\n      Dism.exe /online /Cleanup-Image /StartComponentCleanup /ResetBase\n      if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 3010) { throw \"Dism failed with exit code $LASTEXITCODE\" }",
         "timeoutSeconds": 600
       },
       {

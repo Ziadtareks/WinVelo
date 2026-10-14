@@ -621,7 +621,7 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "$Path = Resolve-Path -Path \"$Env:ProgramFiles (x86)\\Microsoft\\Edge\\Application\\*\\Installer\\setup.exe\" -ErrorAction SilentlyContinue | Select-Object -Last 1\n\n      if ($Path -and (Test-Path $Path)) {\n          Start-Process -FilePath $Path -ArgumentList \"--uninstall --system-level --force-uninstall --delete-profile\" -Wait\n      }",
+        "script": "$Path = Resolve-Path -Path \"$Env:ProgramFiles (x86)\\Microsoft\\Edge\\Application\\*\\Installer\\setup.exe\" -ErrorAction SilentlyContinue | Select-Object -Last 1\n\n      if ($Path -and (Test-Path $Path)) {\n          $proc = Start-Process -FilePath $Path -ArgumentList \"--uninstall --system-level --force-uninstall --delete-profile\" -Wait -PassThru\n          if ($proc.ExitCode -ne 0) { throw \"setup.exe failed with exit code $($proc.ExitCode)\" }\n      }",
         "timeoutSeconds": 300
       },
       {
@@ -638,7 +638,7 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "winget install Microsoft.Edge --source winget --accept-package-agreements --accept-source-agreements",
+        "script": "winget install Microsoft.Edge --source winget --accept-package-agreements --accept-source-agreements\n      if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 3010 -and $LASTEXITCODE -ne -1978335135 -and $LASTEXITCODE -ne -1978335189) { throw \"winget failed with exit code $LASTEXITCODE\" }",
         "timeoutSeconds": 600
       },
       {
@@ -796,7 +796,7 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "$setup = Join-Path $Env:SystemRoot \"System32\\OneDriveSetup.exe\"\n      if (Test-Path $setup) { Start-Process -FilePath $setup -ArgumentList '/uninstall' -Wait -ErrorAction SilentlyContinue }\n      Stop-Process -Name FileCoAuth,OneDrive -Force -ErrorAction SilentlyContinue",
+        "script": "$setup = Join-Path $Env:SystemRoot \"System32\\OneDriveSetup.exe\"\n      if (Test-Path $setup) {\n          $proc = Start-Process -FilePath $setup -ArgumentList '/uninstall' -Wait -PassThru\n          if ($proc.ExitCode -ne 0) { throw \"OneDriveSetup.exe failed with exit code $($proc.ExitCode)\" }\n      }\n      Stop-Process -Name FileCoAuth,OneDrive -Force -ErrorAction SilentlyContinue",
         "timeoutSeconds": 300
       },
       {
@@ -813,7 +813,7 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "winget install Microsoft.OneDrive --source winget --accept-package-agreements --accept-source-agreements",
+        "script": "winget install Microsoft.OneDrive --source winget --accept-package-agreements --accept-source-agreements\n      if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 3010 -and $LASTEXITCODE -ne -1978335135 -and $LASTEXITCODE -ne -1978335189) { throw \"winget failed with exit code $LASTEXITCODE\" }",
         "timeoutSeconds": 600
       },
       {
@@ -1199,7 +1199,7 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "DISM /Online /Set-ReservedStorageState /State:Disabled",
+        "script": "DISM /Online /Set-ReservedStorageState /State:Disabled\n      if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 3010) { throw \"DISM failed with exit code $LASTEXITCODE\" }",
         "timeoutSeconds": 60
       },
       {
@@ -1216,7 +1216,7 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "DISM /Online /Set-ReservedStorageState /State:Enabled",
+        "script": "DISM /Online /Set-ReservedStorageState /State:Enabled\n      if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 3010) { throw \"DISM failed with exit code $LASTEXITCODE\" }",
         "timeoutSeconds": 60
       },
       {
@@ -1330,7 +1330,7 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "$AppxPackage = Get-AppxPackage MicrosoftWindows.Client.CoreAI -ErrorAction SilentlyContinue\n      $Appx = if ($AppxPackage) { $AppxPackage.PackageFullName } else { $null }\n\n      $user = Get-LocalUser $Env:UserName -ErrorAction SilentlyContinue\n      if ($user -and $Appx) {\n          $Sid = $user.Sid.Value\n          New-Item \"HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Appx\\AppxAllUserStore\\EndOfLife\\$Sid\\$Appx\" -Force -ErrorAction SilentlyContinue | Out-Null\n      }\n\n      Get-AppxPackage -AllUsers \"*Copilot*\" -ErrorAction SilentlyContinue | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue\n      winget uninstall -e --name \"Copilot\" --silent --force --accept-source-agreements 2>$null\n      Get-AppxPackage -AllUsers Microsoft.MicrosoftOfficeHub -ErrorAction SilentlyContinue | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue\n\n      if ($Appx) {\n          Remove-AppxPackage $Appx -ErrorAction SilentlyContinue\n      }\n\n      if (Get-Service -Name WSAIFabricSvc -ErrorAction SilentlyContinue) {\n          Set-Service -Name WSAIFabricSvc -StartupType Disabled -ErrorAction SilentlyContinue\n      }\n      Disable-WindowsOptionalFeature -FeatureName Recall -Online -NoRestart -ErrorAction SilentlyContinue\n\n      Write-Host \"Windows AI Disabled\"",
+        "script": "$AppxPackage = Get-AppxPackage MicrosoftWindows.Client.CoreAI -ErrorAction SilentlyContinue\n      $Appx = if ($AppxPackage) { $AppxPackage.PackageFullName } else { $null }\n\n      $user = Get-LocalUser $Env:UserName -ErrorAction SilentlyContinue\n      if ($user -and $Appx) {\n          $Sid = $user.Sid.Value\n          New-Item \"HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Appx\\AppxAllUserStore\\EndOfLife\\$Sid\\$Appx\" -Force -ErrorAction SilentlyContinue | Out-Null\n      }\n\n      Get-AppxPackage -AllUsers \"*Copilot*\" -ErrorAction SilentlyContinue | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue\n      winget uninstall -e --name \"Copilot\" --silent --force --accept-source-agreements 2>$null\n      if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 3010 -and $LASTEXITCODE -ne -1978335135 -and $LASTEXITCODE -ne -1978335189 -and $LASTEXITCODE -ne -1978335212) { throw \"winget failed with exit code $LASTEXITCODE\" }\n      Get-AppxPackage -AllUsers Microsoft.MicrosoftOfficeHub -ErrorAction SilentlyContinue | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue\n\n      if ($Appx) {\n          Remove-AppxPackage $Appx -ErrorAction SilentlyContinue\n      }\n\n      if (Get-Service -Name WSAIFabricSvc -ErrorAction SilentlyContinue) {\n          Set-Service -Name WSAIFabricSvc -StartupType Disabled -ErrorAction SilentlyContinue\n      }\n      Disable-WindowsOptionalFeature -FeatureName Recall -Online -NoRestart -ErrorAction SilentlyContinue\n\n      Write-Host \"Windows AI Disabled\"",
         "timeoutSeconds": 300
       }
     ],
@@ -1694,7 +1694,7 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "netsh interface teredo set state disabled",
+        "script": "netsh interface teredo set state disabled\n      if ($LASTEXITCODE -ne 0) { throw \"netsh failed with exit code $LASTEXITCODE\" }",
         "timeoutSeconds": 60
       }
     ],
@@ -1711,7 +1711,7 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "netsh interface teredo set state default",
+        "script": "netsh interface teredo set state default\n      if ($LASTEXITCODE -ne 0) { throw \"netsh failed with exit code $LASTEXITCODE\" }",
         "timeoutSeconds": 60
       }
     ],

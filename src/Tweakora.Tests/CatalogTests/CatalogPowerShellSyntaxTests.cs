@@ -30,6 +30,52 @@ public sealed class CatalogPowerShellSyntaxTests
     }
 
     [Fact]
+    public void AllCatalogPowerShellScripts_NativeCommandsMustCheckLastExitCode()
+    {
+        string baseDir = AppContext.BaseDirectory;
+        string tweaksDir = FindDirectoryUpwards(baseDir, Path.Combine("Catalog", "Tweaks"));
+        Assert.True(Directory.Exists(tweaksDir), $"Tweaks directory not found at {tweaksDir}");
+
+        var scripts = CollectScripts(tweaksDir);
+        Assert.NotEmpty(scripts);
+
+        var nativeToolRegex = new System.Text.RegularExpressions.Regex(
+            @"^(?:.*[;&|])?\s*(winget|dism|powercfg|fsutil|bcdedit|reg|sc|cleanmgr|cipher|compact|vssadmin|wevtutil|netsh)(?:\.exe)?(?:\s|$)",
+            System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.Compiled);
+
+        var failures = new List<string>();
+
+        foreach (var entry in scripts)
+        {
+            var lines = entry.Script.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+            for (int i = 0; i < lines.Length; i++)
+            {
+                string line = lines[i].Trim();
+                if (line.StartsWith("#") || line.Contains("$LASTEXITCODE"))
+                {
+                    continue;
+                }
+
+                var match = nativeToolRegex.Match(line);
+                if (match.Success)
+                {
+                    string toolName = match.Groups[1].Value;
+
+                    // The following statement/lines must check $LASTEXITCODE
+                    int endLine = Math.Min(i + 4, lines.Length);
+                    string context = string.Join(" ", lines.Skip(i).Take(endLine - i));
+                    if (!context.Contains("$LASTEXITCODE", StringComparison.OrdinalIgnoreCase))
+                    {
+                        failures.Add($"[{entry.File}] {entry.TweakId}: Call to native tool '{toolName}' on line '{line}' is not followed by a check on $LASTEXITCODE.");
+                    }
+                }
+            }
+        }
+
+        Assert.True(failures.Count == 0, "Native command calls without $LASTEXITCODE check found:\r\n" + string.Join("\r\n", failures));
+    }
+
+    [Fact]
     public void AllCatalogPowerShellScripts_PassAstSyntaxParsing()
     {
         string baseDir = AppContext.BaseDirectory;
