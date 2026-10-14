@@ -37,7 +37,7 @@ Backups/
 Journal/
 logs/
 publish/
-dist/
+dist/*
 !dist/SHA256SUMS.txt
 upstream/
 
