@@ -114,9 +114,48 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
     private readonly IMemoryOptimizerService _memoryService;
     private readonly ISmartAdvisorService _advisorService;
     private readonly IActivityTracker? _activityTracker;
+    private readonly IShellService? _shellService;
     private readonly List<TweakDefinition> _catalog = new();
     private bool _isRefreshingStates;
-    private System.Windows.Threading.DispatcherTimer? _ramMonitorTimer;
+
+    [ObservableProperty]
+    private bool _isSystemRestoreEnabled;
+
+    [ObservableProperty]
+    private DateTime? _latestRestorePointDate;
+
+    [ObservableProperty]
+    private string _systemRestoreStatusText = "Checking System Restore...";
+
+    [ObservableProperty]
+    private string _systemRestoreBadgeBg = "#064E3B";
+
+    [ObservableProperty]
+    private string _systemRestoreBadgeFg = "#10B981";
+
+    [ObservableProperty]
+    private int _appliedTweaksCount = 0;
+
+    [ObservableProperty]
+    private bool _isServicingHealthy = true;
+
+    [ObservableProperty]
+    private string _servicingHealthBadgeBg = "#064E3B";
+
+    [ObservableProperty]
+    private string _servicingHealthBadgeFg = "#10B981";
+
+    [ObservableProperty]
+    private bool _isRebootPending;
+
+    [ObservableProperty]
+    private string _rebootPendingMessage = "A system reboot is required to complete active modifications.";
+
+    [ObservableProperty]
+    private bool _isExplorerRestartPending;
+
+    [ObservableProperty]
+    private string _explorerRestartPendingMessage = "Explorer restart recommended for settings to take effect.";
 
     [ObservableProperty]
     private SystemInfoSummary _systemInfo = SystemInfoHelper.GetSystemInfo();
@@ -396,6 +435,7 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
             }
             catch { }
 
+            await RefreshCalmStatusAsync();
             await RefreshAllToggleStatesAsync();
             _ = RecalculateOptimizationScoreAsync();
         }
@@ -544,7 +584,8 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
         ISystemRestoreService restoreService,
         IMemoryOptimizerService memoryService,
         ISmartAdvisorService advisorService,
-        IActivityTracker? activityTracker = null)
+        IActivityTracker? activityTracker = null,
+        IShellService? shellService = null)
     {
         _tweakService = tweakService;
         _runner = runner;
@@ -552,6 +593,7 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
         _memoryService = memoryService;
         _advisorService = advisorService;
         _activityTracker = activityTracker;
+        _shellService = shellService;
 
         try
         {
@@ -562,13 +604,90 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
         InitializeProfiles();
         InitializeQuickToggles();
         UpdateRamMetrics();
-        InitializeRamTimer();
 
         _ = Task.Run(async () =>
         {
+            await RefreshCalmStatusAsync();
             await RefreshAllToggleStatesAsync();
             await RecalculateOptimizationScoreAsync();
         });
+    }
+
+    [RelayCommand]
+    private void RestartExplorer()
+    {
+        try
+        {
+            _shellService?.RestartExplorer();
+            IsExplorerRestartPending = false;
+            GlobalStatusMessage = "Windows Explorer restarted successfully.";
+        }
+        catch (Exception ex)
+        {
+            GlobalStatusMessage = $"Failed to restart Explorer: {ex.Message}";
+        }
+    }
+
+    public async Task RefreshCalmStatusAsync()
+    {
+        await Task.Yield();
+        try
+        {
+            bool srEnabled = _restoreService.IsSystemRestoreEnabled();
+            var latestDate = _restoreService.GetLatestRestorePointDate();
+            var activeTweaks = _tweakService.GetActiveJournalTweaks();
+            var health = await _tweakService.CheckServicingHealthAsync();
+            bool rebootPending = _tweakService.IsRebootPending();
+            bool explorerPending = _tweakService.IsExplorerRestartPending();
+
+            void Apply()
+            {
+                IsSystemRestoreEnabled = srEnabled;
+                LatestRestorePointDate = latestDate;
+                if (!srEnabled)
+                {
+                    SystemRestoreStatusText = "System Restore: Disabled";
+                    SystemRestoreBadgeBg = "#7F1D1D";
+                    SystemRestoreBadgeFg = "#F87171";
+                }
+                else if (latestDate.HasValue)
+                {
+                    SystemRestoreStatusText = $"System Restore: Active (Latest: {latestDate.Value:MMM d, yyyy h:mm tt})";
+                    SystemRestoreBadgeBg = "#064E3B";
+                    SystemRestoreBadgeFg = "#10B981";
+                }
+                else
+                {
+                    SystemRestoreStatusText = "System Restore: Active (No restore points yet)";
+                    SystemRestoreBadgeBg = "#064E3B";
+                    SystemRestoreBadgeFg = "#10B981";
+                }
+
+                AppliedTweaksCount = activeTweaks.Count;
+                AppliedTweaksSummaryText = $"{activeTweaks.Count} tweak{(activeTweaks.Count == 1 ? "" : "s")} applied by WinVelo";
+
+                LastServicingHealthReport = health;
+                IsServicingHealthy = health.IsHealthy;
+                ServicingHealthSummary = health.IsHealthy
+                    ? "Normal — Windows Update, BITS, Store, and Defender are operational."
+                    : string.Join("; ", health.Warnings);
+                ServicingHealthBadgeBg = health.IsHealthy ? "#064E3B" : "#78350F";
+                ServicingHealthBadgeFg = health.IsHealthy ? "#10B981" : "#FBBF24";
+
+                IsRebootPending = rebootPending;
+                IsExplorerRestartPending = explorerPending;
+            }
+
+            if (Application.Current?.Dispatcher != null && !Application.Current.Dispatcher.CheckAccess())
+            {
+                Application.Current.Dispatcher.Invoke(Apply);
+            }
+            else
+            {
+                Apply();
+            }
+        }
+        catch { }
     }
 
     public void UpdateRamMetrics()
@@ -604,28 +723,9 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
         }
     }
 
-    private void InitializeRamTimer()
-    {
-        if (Application.Current == null) return;
-
-        try
-        {
-            _ramMonitorTimer = new System.Windows.Threading.DispatcherTimer(
-                TimeSpan.FromSeconds(1),
-                System.Windows.Threading.DispatcherPriority.Background,
-                (s, e) => UpdateRamMetrics(),
-                Application.Current.Dispatcher);
-            _ramMonitorTimer.Start();
-        }
-        catch
-        {
-        }
-    }
-
     public void Dispose()
     {
-        _ramMonitorTimer?.Stop();
-        _ramMonitorTimer = null;
+        // No background polling timers
     }
 
     private void InitializeProfiles()
@@ -1007,6 +1107,7 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
         finally
         {
             IsCreatingRestorePoint = false;
+            await RefreshCalmStatusAsync();
         }
     }
 

@@ -435,3 +435,21 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
   4. Updated `MainViewModel` to support 5 primary tabs while preserving backward-compatible routing for legacy command links and updating the Ctrl+K command palette.
   5. Added DI registrations and updated architecture integrity and UI diagnostic tests.
 
+---
+
+## BUG-029: Gimmicky Telemetry Gauges, 1-Second Polling Timers, and Missing Calm System Status Indicators
+- **Component**: `src/Tweakora.App/Views/DashboardTabView.xaml`, `src/Tweakora.App/ViewModels/DashboardViewModel.cs`, `src/Tweakora.Core/Interfaces/IPlatformServices.cs`, `src/Tweakora.Platform/WindowsRestoreService.cs`, `src/Tweakora.Simulation/SimulationServices.cs`, `src/Tweakora.Modules/Tweaks/TweakService.cs`
+- **Finding**:
+  1. The Home tab featured animated 1-second live RAM polling (`DispatcherTimer`), CPU/RAM telemetry meters, and a "Free Up RAM (Purge Cache)" button that functioned as placebo decoration.
+  2. Essential system security and servicing states — admin status, System Restore status with latest restore point creation timestamp, exact count of tweaks applied by WinVelo, servicing health-check summary, and pending reboot / explorer restart notifications — were either absent or buried.
+  3. Pending reboots and explorer restarts caused by applied tweaks were not surfaced to users on the dashboard.
+- **Root Cause**: Reliance on decorative monitoring widgets instead of calm, transparent, and actionable system health indicators.
+- **Fix**:
+  1. Redesigned Home tab with 4 calm status tiles: Admin Privileges, System Restore with latest restore point date, "N tweaks applied by WinVelo" (active journal count), and Servicing Health status.
+  2. Added prominent contextual alert banners for pending reboots and pending explorer restarts (with one-click "Restart Explorer" command).
+  3. Added `GetLatestRestorePointDate()` to `ISystemRestoreService`, `WindowsRestoreService`, and `FakeRestoreService`.
+  4. Added `IsRebootPending()` and `IsExplorerRestartPending()` to `ITweakService` and `TweakService` querying component-based servicing, session manager rename operations, and active journal requirements.
+  5. Completely removed the 1-second background `_ramMonitorTimer`, pulsing animations, RAM progress bar / meters, and the RAM purge button.
+  6. Added comprehensive unit test coverage in `HomeCalmStatusTests.cs`.
+
+

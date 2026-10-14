@@ -21,6 +21,8 @@ public interface ITweakService
     IReadOnlyList<TweakDefinition> LoadCatalog();
     IReadOnlyList<PresetDefinition> LoadPresets() => Array.Empty<PresetDefinition>();
     IReadOnlyList<TweakDefinition> GetActiveJournalTweaks() => Array.Empty<TweakDefinition>();
+    bool IsRebootPending() => false;
+    bool IsExplorerRestartPending() => false;
     Task<ServicingHealthReport> CheckServicingHealthAsync() => Task.FromResult(new ServicingHealthReport());
     Task<List<string>> RestoreServicingHealthAsync() => Task.FromResult(new List<string>());
     bool DetectState(TweakDefinition tweak);
@@ -376,6 +378,39 @@ public sealed class TweakService : ITweakService
 
         var res = await _shell.ExecutePowerShellAsync(script, 30);
         return res.Success;
+    }
+
+    public bool IsRebootPending()
+    {
+        try
+        {
+            if (_registry.ValueExists("HKLM", @"SYSTEM\CurrentControlSet\Control\Session Manager", "PendingFileRenameOperations"))
+                return true;
+            if (_registry.KeyExists("HKLM", @"SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\RebootPending"))
+                return true;
+            if (_registry.KeyExists("HKLM", @"SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired"))
+                return true;
+
+            var active = GetActiveJournalTweaks();
+            return active.Any(t => t.RequiresReboot);
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    public bool IsExplorerRestartPending()
+    {
+        try
+        {
+            var active = GetActiveJournalTweaks();
+            return active.Any(t => t.RequiresExplorerRestart);
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     public IReadOnlyList<RollbackJournalSession> GetAllSessions() => _journal.GetAllSessions();

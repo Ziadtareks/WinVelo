@@ -48,6 +48,7 @@ public interface ISystemRestoreService
 {
     bool IsSystemRestoreEnabled();
     int GetRestorePointCount();
+    DateTime? GetLatestRestorePointDate();
     RestorePointResult CreateRestorePoint(string description);
 }
 

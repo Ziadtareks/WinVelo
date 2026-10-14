@@ -64,6 +64,33 @@ public sealed class WindowsRestoreService : ISystemRestoreService
         }
     }
 
+    public DateTime? GetLatestRestorePointDate()
+    {
+        EnsureNotTestMode();
+        try
+        {
+            using var process = Process.Start(new ProcessStartInfo
+            {
+                FileName = "powershell.exe",
+                Arguments = "-NoProfile -NonInteractive -Command \"(Get-ComputerRestorePoint | Sort-Object CreationTime -Descending | Select-Object -First 1).CreationTime\"",
+                CreateNoWindow = true,
+                UseShellExecute = false,
+                RedirectStandardOutput = true
+            });
+            string? output = process?.StandardOutput.ReadToEnd()?.Trim();
+            process?.WaitForExit(5000);
+            if (!string.IsNullOrEmpty(output) && DateTime.TryParse(output, out var dt))
+            {
+                return dt;
+            }
+            return null;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
     public RestorePointResult CreateRestorePoint(string description)
     {
         EnsureNotTestMode();

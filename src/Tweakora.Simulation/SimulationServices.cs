@@ -301,10 +301,13 @@ public sealed class FakeRestoreService : ISystemRestoreService
     public bool SimulateThrottled { get; set; } = false;
     public bool SimulateFailure { get; set; } = false;
     public int RestorePointsCount { get; set; } = 3;
+    public DateTime? LatestRestorePointDate { get; set; } = new DateTime(2026, 10, 14, 12, 0, 0);
 
     public bool IsSystemRestoreEnabled() => IsEnabled;
 
     public int GetRestorePointCount() => RestorePointsCount;
+
+    public DateTime? GetLatestRestorePointDate() => LatestRestorePointDate;
 
     public RestorePointResult CreateRestorePoint(string description)
     {
