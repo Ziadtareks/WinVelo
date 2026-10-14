@@ -223,3 +223,15 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
      - `essential.hiber`: checked `$LASTEXITCODE` on `powercfg.exe` apply and undo.
      - `essential.diskcleanup`: checked `$LASTEXITCODE` on `cleanmgr.exe` and `Dism.exe`.
   3. Added an automated regression test `AllCatalogPowerShellScripts_NativeCommandsMustCheckLastExitCode` in `CatalogPowerShellSyntaxTests.cs` that parses all catalog scripts and fails if any native command invocation (`winget`, `dism`, `powercfg`, `fsutil`, `bcdedit`, `reg`, `sc`, `cleanmgr`, `cipher`, `compact`, `vssadmin`, `wevtutil`, `netsh`) is not immediately followed by a `$LASTEXITCODE` validation.
+
+---
+
+## BUG-017: Aggressive Explorer Kill Left Blank Screen When Explorer Failed to Auto-Restart
+- **Component**: `Catalog/Tweaks/preferences.json` (`pref.hiddenfiles`, `pref.startmenurecommendations`, `pref.taskbaralignment`)
+- **Finding**: Several catalog tweaks invoked raw `Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue`. In many Windows environments (or under heavy load / policy configurations), Windows Explorer does not restart automatically upon termination, leaving the user with a frozen or completely blank desktop with no taskbar. Furthermore, tweaks like `pref.hiddenfiles` did not require killing Explorer at all because `WindowsSettingNotifier` already broadcasts `SHCNE_ASSOCCHANGED` and `WM_SETTINGCHANGE`.
+- **Root Cause**: Scripts assumed Explorer would always auto-spawn and failed to poll or restart `explorer.exe` if it did not relaunch, while other tweaks needlessly killed Explorer when shell notifications were sufficient.
+- **Fix**:
+  1. For `pref.hiddenfiles`, removed the PowerShell Explorer termination script entirely from apply and undo, relying on `WindowsSettingNotifier`'s non-blocking `SHChangeNotify(SHCNE_ASSOCCHANGED, ...)` broadcast to refresh File Explorer views.
+  2. For tweaks that require an Explorer restart (`pref.startmenurecommendations`, `pref.taskbaralignment`), replaced the raw kill with a safe restart snippet that polls for Explorer's return up to 5 seconds and explicitly launches `explorer.exe` if not detected:
+     `Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue; $timeout = 5; while ($timeout -gt 0 -and !(Get-Process explorer -ErrorAction SilentlyContinue)) { Start-Sleep -Milliseconds 500; $timeout -= 0.5 }; if (!(Get-Process explorer -ErrorAction SilentlyContinue)) { Start-Process explorer.exe }`
+  3. Verified that all tweaks requiring Explorer reload are flagged with `requiresExplorerRestart: true` in the catalog.

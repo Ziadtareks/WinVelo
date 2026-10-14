@@ -267,12 +267,6 @@
         "valueName": "Hidden",
         "valueKind": "DWord",
         "data": 1
-      },
-      {
-        "type": "PowerShell",
-        "operation": "Execute",
-        "script": "Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue",
-        "timeoutSeconds": 60
       }
     ],
     "undo": [
@@ -284,12 +278,6 @@
         "valueName": "Hidden",
         "valueKind": "DWord",
         "data": 0
-      },
-      {
-        "type": "PowerShell",
-        "operation": "Execute",
-        "script": "Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue",
-        "timeoutSeconds": 60
       }
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/hiddenfiles",
@@ -1147,7 +1135,7 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue",
+        "script": "Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue\n      $timeout = 5; while ($timeout -gt 0 -and !(Get-Process explorer -ErrorAction SilentlyContinue)) { Start-Sleep -Milliseconds 500; $timeout -= 0.5 }\n      if (!(Get-Process explorer -ErrorAction SilentlyContinue)) { Start-Process explorer.exe }",
         "timeoutSeconds": 60
       }
     ],
@@ -1182,7 +1170,7 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue",
+        "script": "Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue\n      $timeout = 5; while ($timeout -gt 0 -and !(Get-Process explorer -ErrorAction SilentlyContinue)) { Start-Sleep -Milliseconds 500; $timeout -= 0.5 }\n      if (!(Get-Process explorer -ErrorAction SilentlyContinue)) { Start-Process explorer.exe }",
         "timeoutSeconds": 60
       }
     ],
@@ -1277,7 +1265,7 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue",
+        "script": "Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue\n      $timeout = 5; while ($timeout -gt 0 -and !(Get-Process explorer -ErrorAction SilentlyContinue)) { Start-Sleep -Milliseconds 500; $timeout -= 0.5 }\n      if (!(Get-Process explorer -ErrorAction SilentlyContinue)) { Start-Process explorer.exe }",
         "timeoutSeconds": 60
       }
     ],
@@ -1294,7 +1282,7 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue",
+        "script": "Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue\n      $timeout = 5; while ($timeout -gt 0 -and !(Get-Process explorer -ErrorAction SilentlyContinue)) { Start-Sleep -Milliseconds 500; $timeout -= 0.5 }\n      if (!(Get-Process explorer -ErrorAction SilentlyContinue)) { Start-Process explorer.exe }",
         "timeoutSeconds": 60
       }
     ],
