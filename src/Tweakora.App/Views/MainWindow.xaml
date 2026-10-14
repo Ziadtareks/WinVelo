@@ -37,6 +37,9 @@
         <DataTemplate DataType="{x:Type vm:ToolboxViewModel}">
             <views:ToolboxPage />
         </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:StartupViewModel}">
+            <views:StartupTabView />
+        </DataTemplate>
         <DataTemplate DataType="{x:Type vm:BackupsViewModel}">
             <views:BackupsTabView />
         </DataTemplate>
@@ -271,6 +274,21 @@
                             <!-- SYSTEM TOOLS SECTION -->
                             <TextBlock Text="SYSTEM TOOLS" FontSize="11" FontWeight="Bold"
                                        Foreground="{DynamicResource TextMutedBrush}" Margin="8,16,0,6" />
+
+                            <!-- Startup Apps -->
+                            <Button AutomationProperties.AutomationId="Tab_Startup"
+                                    Style="{DynamicResource SidebarNavBtn}"
+                                    Command="{Binding SwitchTabCommand}" CommandParameter="Startup">
+                                <DockPanel LastChildFill="False">
+                                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                                        <ui:SymbolIcon Symbol="Rocket24" FontSize="16" Margin="0,0,8,0" Foreground="{DynamicResource AccentPrimaryBrush}" VerticalAlignment="Center" />
+                                        <TextBlock Text="Startup Apps" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <Border DockPanel.Dock="Right" Background="{DynamicResource AccentPrimaryBrush}" CornerRadius="8" Padding="6,1" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding StartupVM.EnabledCount}" FontSize="11" FontWeight="Bold" Foreground="White" />
+                                    </Border>
+                                </DockPanel>
+                            </Button>
 
                             <!-- Install Apps (WinGet) -->
                             <Button AutomationProperties.AutomationId="Tab_Install"

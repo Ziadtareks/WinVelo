@@ -85,6 +85,7 @@ public sealed partial class MainViewModel : ObservableObject
     public ConfigViewModel ConfigVM { get; }
     public UpdatesViewModel UpdatesVM { get; }
     public ToolboxViewModel ToolboxVM { get; }
+    public StartupViewModel StartupVM { get; }
     public BackupsViewModel BackupsVM { get; }
 
     private readonly List<PaletteItem> _allPaletteItems = new();
@@ -100,6 +101,7 @@ public sealed partial class MainViewModel : ObservableObject
         ConfigViewModel configVM,
         UpdatesViewModel updatesVM,
         ToolboxViewModel toolboxVM,
+        StartupViewModel startupVM,
         BackupsViewModel backupsVM,
         IActivityTracker? activityTracker = null)
     {
@@ -109,6 +111,7 @@ public sealed partial class MainViewModel : ObservableObject
         ConfigVM = configVM;
         UpdatesVM = updatesVM;
         ToolboxVM = toolboxVM;
+        StartupVM = startupVM;
         BackupsVM = backupsVM;
         _activityTracker = activityTracker;
 
@@ -174,6 +177,10 @@ public sealed partial class MainViewModel : ObservableObject
         {
             InstallVM.SetSearchQuery(value);
         }
+        else if (ActiveTab == "Startup")
+        {
+            StartupVM.SearchText = value;
+        }
     }
 
     [RelayCommand]
@@ -196,6 +203,7 @@ public sealed partial class MainViewModel : ObservableObject
             "Config" => ConfigVM,
             "Updates" => UpdatesVM,
             "Toolbox" => ToolboxVM,
+            "Startup" => StartupVM,
             "Backups" => BackupsVM,
             _ => DashboardVM
         };
@@ -212,6 +220,10 @@ public sealed partial class MainViewModel : ObservableObject
         else if (tabName == "Tweaks")
         {
             _ = TweaksVM.RefreshActiveStatesAsync();
+        }
+        else if (tabName == "Startup")
+        {
+            _ = StartupVM.RefreshStatesSilentAsync();
         }
     }
 
@@ -231,6 +243,10 @@ public sealed partial class MainViewModel : ObservableObject
                 if (ActiveTab == "Tweaks")
                 {
                     await TweaksVM.RefreshActiveStatesAsync();
+                }
+                else if (ActiveTab == "Startup")
+                {
+                    await StartupVM.RefreshStatesSilentAsync();
                 }
             }
             catch (Exception ex)
@@ -323,6 +339,7 @@ public sealed partial class MainViewModel : ObservableObject
         _allPaletteItems.Add(new PaletteItem { Title = "Advanced / Caution", Subtitle = "Deep optimizations and power user tweaks", Category = "Category", ActionToExecute = () => NavigateCategory("Advanced") });
 
         // Tools
+        _allPaletteItems.Add(new PaletteItem { Title = "Startup Apps Manager", Subtitle = "Control Windows boot programs and impact", Category = "Tool", ActionToExecute = () => SwitchTab("Startup") });
         _allPaletteItems.Add(new PaletteItem { Title = "Install Apps", Subtitle = "WinGet software package manager", Category = "Tool", ActionToExecute = () => SwitchTab("Install") });
         _allPaletteItems.Add(new PaletteItem { Title = "System Config", Subtitle = "Windows features and system repairs", Category = "Tool", ActionToExecute = () => SwitchTab("Config") });
         _allPaletteItems.Add(new PaletteItem { Title = "Windows Updates", Subtitle = "Manage update modes and policies", Category = "Tool", ActionToExecute = () => SwitchTab("Updates") });
@@ -330,6 +347,7 @@ public sealed partial class MainViewModel : ObservableObject
         _allPaletteItems.Add(new PaletteItem { Title = "Backups & Restore", Subtitle = "Inspect and restore system snapshots", Category = "Tool", ActionToExecute = () => SwitchTab("Backups") });
 
         // Actions
+        _allPaletteItems.Add(new PaletteItem { Title = "1-Click Optimize Startup", Subtitle = "Disable heavy non-essential apps for faster boot", Category = "Action", ActionToExecute = () => _ = StartupVM.OptimizeStartupAsync() });
         _allPaletteItems.Add(new PaletteItem { Title = "Standard Preset", Subtitle = "Select recommended desktop tweaks", Category = "Action", ActionToExecute = () => TweaksVM.ApplyPreset("Standard") });
         _allPaletteItems.Add(new PaletteItem { Title = "Minimal Preset", Subtitle = "Select essential telemetry reductions", Category = "Action", ActionToExecute = () => TweaksVM.ApplyPreset("Minimal") });
         _allPaletteItems.Add(new PaletteItem { Title = "Clear Selection", Subtitle = "Deselect all tweaks", Category = "Action", ActionToExecute = () => TweaksVM.ClearSelection() });

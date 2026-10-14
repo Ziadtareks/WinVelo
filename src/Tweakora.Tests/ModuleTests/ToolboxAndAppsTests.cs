@@ -46,7 +46,13 @@ public class ToolboxAndAppsTests
 
         Assert.True(ok);
         Assert.False(discord.IsEnabled);
-        Assert.False(fakeReg.ValueExists("HKCU", @"Software\Microsoft\Windows\CurrentVersion\Run", "Discord"));
+        // Authentic Windows behavior: Run command is NOT destroyed
+        Assert.True(fakeReg.ValueExists("HKCU", @"Software\Microsoft\Windows\CurrentVersion\Run", "Discord"));
+        // Authentic Windows behavior: StartupApproved has disabled flag set
+        Assert.True(fakeReg.ValueExists("HKCU", @"Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run", "Discord"));
+        var approvedBytes = fakeReg.GetValue("HKCU", @"Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run", "Discord") as byte[];
+        Assert.NotNull(approvedBytes);
+        Assert.Equal(0x01, approvedBytes[0] & 1); // Low bit = 1 indicates disabled
     }
 
     [Fact]

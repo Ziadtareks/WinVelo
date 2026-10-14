@@ -204,6 +204,7 @@ public sealed class ArchitectureIntegrityTests
         services.AddSingleton<ConfigViewModel>();
         services.AddSingleton<UpdatesViewModel>();
         services.AddSingleton<ToolboxViewModel>();
+        services.AddSingleton<StartupViewModel>();
         services.AddSingleton<BackupsViewModel>();
         services.AddSingleton<MainViewModel>();
 
@@ -217,6 +218,7 @@ public sealed class ArchitectureIntegrityTests
             typeof(ConfigViewModel),
             typeof(UpdatesViewModel),
             typeof(ToolboxViewModel),
+            typeof(StartupViewModel),
             typeof(BackupsViewModel),
             typeof(MainViewModel)
         };

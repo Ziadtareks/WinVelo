@@ -56,7 +56,7 @@ public sealed partial class ToolboxViewModel : ObservableObject
     private string _networkStatusText = "Network & Gaming Latency Optimizer ready.";
 
     public ObservableCollection<CleanerCategoryScan> CleanerCategories { get; } = new();
-    public ObservableCollection<StartupProgramItem> StartupItems { get; } = new();
+    public ObservableCollection<StartupAppItem> StartupItems { get; } = new();
     public ObservableCollection<WindowsServiceInfo> ServicesList { get; } = new();
     public ObservableCollection<SystemFixDefinition> FixesList { get; } = new();
     public ObservableCollection<DnsProviderDefinition> DnsProviders { get; } = new();
@@ -155,7 +155,7 @@ public sealed partial class ToolboxViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task ToggleStartupItemAsync(StartupProgramItem item)
+    private async Task ToggleStartupItemAsync(StartupAppItem item)
     {
         if (!Tweakora.App.Services.AppAdminGuard.EnsureAdmin("modify startup programs"))
         {

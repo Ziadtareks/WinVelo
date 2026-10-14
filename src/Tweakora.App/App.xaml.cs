@@ -116,6 +116,7 @@ public partial class App : Application
                 services.AddSingleton<ConfigViewModel>();
                 services.AddSingleton<UpdatesViewModel>();
                 services.AddSingleton<ToolboxViewModel>();
+                services.AddSingleton<StartupViewModel>();
                 services.AddSingleton<BackupsViewModel>();
                 services.AddSingleton<MainViewModel>();
 
@@ -214,7 +215,13 @@ public partial class App : Application
             SaveVisualToPng((Visual)window.Content ?? window, 1440, 900, Path.Combine(targetDir, "toolbox.png"));
             Log.Information("Captured toolbox.png");
 
-            // 6. Backups Tab
+            // 6. Startup Apps Tab
+            vm.SwitchTabCommand.Execute("Startup");
+            FlushUi(window);
+            SaveVisualToPng((Visual)window.Content ?? window, 1440, 900, Path.Combine(targetDir, "startup.png"));
+            Log.Information("Captured startup.png");
+
+            // 7. Backups Tab
             vm.SwitchTabCommand.Execute("Backups");
             FlushUi(window);
             SaveVisualToPng((Visual)window.Content ?? window, 1440, 900, Path.Combine(targetDir, "backups.png"));

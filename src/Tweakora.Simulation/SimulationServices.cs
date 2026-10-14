@@ -10,6 +10,48 @@ public sealed class FakeRegistryService : IRegistryService
 {
     public Dictionary<string, Dictionary<string, (object Data, string Kind)>> Keys { get; } = new(StringComparer.OrdinalIgnoreCase);
 
+    public FakeRegistryService()
+    {
+        SeedDefaultStartupApps();
+    }
+
+    public void SeedDefaultStartupApps()
+    {
+        byte[] enabledBytes = new byte[] { 0x02, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+        byte[] disabledBytes = new byte[] { 0x03, 0, 0, 0, 0x50, 0x4B, 0x1A, 0x6E, 0x9B, 0xDB, 0xD9, 0x01 };
+
+        // 1. HKCU Run
+        SetValue("HKCU", @"Software\Microsoft\Windows\CurrentVersion\Run", "Discord", "\"C:\\Users\\Test\\AppData\\Local\\Discord\\app-1.0.9000\\Discord.exe\" --processStart Discord.exe", "String");
+        SetValue("HKCU", @"Software\Microsoft\Windows\CurrentVersion\Run", "Steam", "\"C:\\Program Files (x86)\\Steam\\steam.exe\" -silent", "String");
+        SetValue("HKCU", @"Software\Microsoft\Windows\CurrentVersion\Run", "Spotify", "\"C:\\Users\\Test\\AppData\\Roaming\\Spotify\\Spotify.exe\"", "String");
+        SetValue("HKCU", @"Software\Microsoft\Windows\CurrentVersion\Run", "Telegram", "\"C:\\Users\\Test\\AppData\\Roaming\\Telegram Desktop\\Telegram.exe\" -autostart", "String");
+
+        // Seed StartupApproved for HKCU Run
+        SetValue("HKCU", @"Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run", "Discord", enabledBytes, "Binary");
+        SetValue("HKCU", @"Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run", "Steam", enabledBytes, "Binary");
+        SetValue("HKCU", @"Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run", "Spotify", enabledBytes, "Binary");
+        SetValue("HKCU", @"Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run", "Telegram", disabledBytes, "Binary");
+
+        // 2. HKLM Run (64-bit)
+        SetValue("HKLM", @"Software\Microsoft\Windows\CurrentVersion\Run", "SecurityHealth", "%windir%\\system32\\SecurityHealthSystray.exe", "String");
+        SetValue("HKLM", @"Software\Microsoft\Windows\CurrentVersion\Run", "RtkAudUService", "\"C:\\Program Files\\Realtek\\Audio\\HDA\\RtkAudUService64.exe\" -background", "String");
+        SetValue("HKLM", @"Software\Microsoft\Windows\CurrentVersion\Run", "OneDrive", "\"C:\\Program Files\\Microsoft OneDrive\\OneDrive.exe\" /background", "String");
+
+        SetValue("HKLM", @"Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run", "SecurityHealth", enabledBytes, "Binary");
+        SetValue("HKLM", @"Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run", "RtkAudUService", enabledBytes, "Binary");
+        SetValue("HKLM", @"Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run", "OneDrive", enabledBytes, "Binary");
+
+        // 3. HKLM WOW6432Node Run (32-bit)
+        SetValue("HKLM", @"Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Run", "Adobe Creative Cloud", "\"C:\\Program Files (x86)\\Adobe\\Adobe Creative Cloud\\ACC\\Creative Cloud.exe\" --showwindow=false", "String");
+        SetValue("HKLM", @"Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run32", "Adobe Creative Cloud", enabledBytes, "Binary");
+
+        // 4. User Startup Folder (tracked via StartupApproved)
+        SetValue("HKCU", @"Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\StartupFolder", "Microsoft Teams.lnk", enabledBytes, "Binary");
+
+        // 5. Common Startup Folder (tracked via StartupApproved)
+        SetValue("HKLM", @"Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\StartupFolder", "7-Zip Shell Helper.lnk", enabledBytes, "Binary");
+    }
+
     private static string GetFullKey(string hive, string key)
     {
         var (h, k) = Tweakora.Core.Utilities.RegistryPathHelper.Normalize(hive, key);
