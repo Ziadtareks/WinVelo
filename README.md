@@ -77,8 +77,10 @@ Real-time hardware metrics (Physical RAM usage, CPU model, Windows build), 4 one
 
 | Package | Type | Size | SHA256 Checksum |
 |---|---|---|---|
-| **[WinVelo-v1.0.0-win-x64-portable.zip](dist/WinVelo-v1.0.0-win-x64-portable.zip)** | Standalone Portable (Includes .NET Runtime) | ~95 MB | `E7C7A5B03C1B468EBBEED3EC8D4C4D8B2307F5F898E21B44338081C781A7B141` |
-| **[WinVelo-v1.0.0-win-x64-small.zip](dist/WinVelo-v1.0.0-win-x64-small.zip)** | Framework Dependent (Requires .NET 10) | ~3.6 MB | `3BD3C82964CD695FDF90133705D3CA2E00495683BCFFEAB33505B3E2195A46A3` |
+| **[WinVelo-v1.0.0-win-x64-portable.zip](dist/WinVelo-v1.0.0-win-x64-portable.zip)** | Standalone Portable (Includes .NET Runtime) | ~95 MB | See [dist/SHA256SUMS.txt](dist/SHA256SUMS.txt) |
+| **[WinVelo-v1.0.0-win-x64-small.zip](dist/WinVelo-v1.0.0-win-x64-small.zip)** | Framework Dependent (Requires .NET 10) | ~3.6 MB | See [dist/SHA256SUMS.txt](dist/SHA256SUMS.txt) |
+
+> 🔒 **Integrity Verification**: Checksum signatures for all packages are published in [dist/SHA256SUMS.txt](dist/SHA256SUMS.txt). Verify on PowerShell with: `Get-FileHash dist/WinVelo-v1.0.0-win-x64-portable.zip`
 
 ---
 
@@ -120,7 +122,7 @@ cd winvelo
 # Build solution
 dotnet build Tweakora.sln
 
-# Run unit test suite (109 tests)
+# Run unit test suite (113 tests)
 dotnet test src/Tweakora.Tests/Tweakora.Tests.csproj
 
 # Run UI automation test suite (FlaUI)
@@ -128,6 +130,9 @@ dotnet test src/Tweakora.UiTests/Tweakora.UiTests.csproj
 
 # Run application in safe simulated test mode
 dotnet run --project src/Tweakora.App/Tweakora.App.csproj -- --test-mode
+
+# Create reproducible release packages (Portable & Small)
+pwsh -File build/publish.ps1
 ```
 
 ---

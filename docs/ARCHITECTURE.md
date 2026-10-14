@@ -117,7 +117,7 @@ C:\Dev\Tweakora\
 │   ├── Tweakora.Modules\        # Domain feature implementations (Tweaks, Apps, Startup, etc.)
 │   ├── Tweakora.Platform\       # Windows native Win32 drivers
 │   ├── Tweakora.Simulation\     # In-memory mock drivers for testing
-│   ├── Tweakora.Tests\          # xUnit unit & integration test suite (109 tests)
+│   ├── Tweakora.Tests\          # xUnit unit & integration test suite (113 tests)
 │   └── Tweakora.UiTests\        # FlaUI UI automation test suite
 └── tools\
     ├── CatalogValidator\        # Schema verification utility

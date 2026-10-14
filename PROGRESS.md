@@ -29,8 +29,8 @@ Upstream Reference: [ChrisTitusTech/winutil](https://github.com/ChrisTitusTech/w
 | **Smart Optimization Upgrade** | Hardware Analyzer, Standby RAM Cleaner, DNS Latency Benchmark, Nagle's Disabler, 8 Gaming Tweaks | **DONE** | 80 unit tests passed / 149 tweaks verified / Release packages updated |
 | **UX & Performance Overhaul** | Eliminate UI Freezes, Floating Activity HUD Pill, Card Spinners, Task.Yield Offloading | **DONE** | 80 unit tests passed / 1 FlaUI UI test passed / 0 UI Freezes |
 | **Startup Apps Manager** | Native Windows Task Manager StartupApproved Bi-Directional Sync & Boot Speed Optimizer | **DONE** | 98 unit tests passed / 1 FlaUI UI test passed / 10 Screenshots Inspected |
-| **Final Deep QA Audit** | Toggle loops, Single-file resilience, Startup parsing, 63/63 Self-Test Engine | **DONE** | 109/109 unit tests passed / 63/63 self-test passed / FlaUI passed |
-| **Release v1.0.0** | Final Production Packaging, SHA256, Screenshots | **DONE** | WinVelo v1.0.0 Portable & Small zip packages created in `dist/`. |
+| **Final Deep QA Audit** | Toggle loops, Single-file resilience, Startup parsing, 63/63 Self-Test Engine | **DONE** | 113/113 unit tests passed / 63/63 self-test passed / FlaUI passed |
+| **Release v1.0.0** | Final Production Packaging, SHA256, Reproducible Build Script | **DONE** | WinVelo v1.0.0 Portable & Small zip packages created in `dist/`. |
 
 ---
 
@@ -97,14 +97,14 @@ Upstream Reference: [ChrisTitusTech/winutil](https://github.com/ChrisTitusTech/w
   - Direct 1-click toggle switches and preset buttons are cleanly disabled (`IsEnabled="{Binding IsNotToggling}"`) during operations to prevent duplicate race conditions.
 
 ### 3. Quality, Verification & Packaging
-- **109/109 Unit Tests PASSED** (0 failures).
+- **113/113 Unit Tests PASSED** (0 failures).
 - **FlaUI UI Automation Test PASSED** across all tabs and overlays.
 - **63/63 CLI Self-Test Checks PASSED** (100% roundtrip pass rate).
 - **All 10 Screenshots Refreshed & Visually Inspected** in `docs/screenshots/` (dashboard, startup, toolbox, tweaks, backups, config, command-palette, diff-preview, install, updates).
 - **Release Packages (`dist/`)**:
-  - `dist/WinVelo-v1.0.0-win-x64-portable.zip` (SHA-256: `E7C7A5B03C1B468EBBEED3EC8D4C4D8B2307F5F898E21B44338081C781A7B141`)
-  - `dist/WinVelo-v1.0.0-win-x64-small.zip` (SHA-256: `3BD3C82964CD695FDF90133705D3CA2E00495683BCFFEAB33505B3E2195A46A3`)
-  - `dist/SHA256SUMS.txt` updated.
+  - `dist/WinVelo-v1.0.0-win-x64-portable.zip`
+  - `dist/WinVelo-v1.0.0-win-x64-small.zip`
+  - Checksums recorded in `dist/SHA256SUMS.txt`.
 
 ---
 
