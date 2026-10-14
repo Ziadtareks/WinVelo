@@ -11,6 +11,7 @@ using Tweakora.Core.Engine.Runners;
 using Tweakora.Core.Interfaces;
 using Tweakora.Core.Models;
 using Tweakora.Core.Operations;
+using Tweakora.Platform;
 
 namespace Tweakora.Modules.Tweaks;
 
@@ -181,7 +182,7 @@ public sealed class TweakService : ITweakService
             System.Diagnostics.Debug.WriteLine($"[WARN] Could not create automatic backup snapshot before tweak application: {ex.Message}");
         }
 
-        return await runner.RunAsync(
+        var report = await runner.RunAsync(
             "Apply Tweaks",
             tweaks,
             async (tweak, ct) =>
@@ -201,6 +202,9 @@ public sealed class TweakService : ITweakService
                 };
             },
             cancellationToken);
+
+        _ = WindowsSettingNotifier.NotifySettingsChangedAsync();
+        return report;
     }
 
     public async Task<OperationExecutionReport> UndoTweaksAsync(
@@ -208,7 +212,7 @@ public sealed class TweakService : ITweakService
         IOperationRunner runner,
         CancellationToken cancellationToken = default)
     {
-        return await runner.RunAsync(
+        var report = await runner.RunAsync(
             "Undo Tweaks",
             tweaks,
             async (tweak, ct) =>
@@ -223,6 +227,9 @@ public sealed class TweakService : ITweakService
                 };
             },
             cancellationToken);
+
+        _ = WindowsSettingNotifier.NotifySettingsChangedAsync();
+        return report;
     }
 
     public async Task<bool> SetPerformancePlanAsync(string planName)

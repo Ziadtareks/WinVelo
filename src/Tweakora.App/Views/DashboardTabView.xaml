@@ -87,15 +87,24 @@
                             </StackPanel>
 
                             <!-- Smart Analyze & Optimize Button -->
+                            <!-- Smart Analyze & Optimize Button -->
                             <ui:Button Grid.Column="2"
                                        AutomationProperties.AutomationId="SmartAnalyzeOptimizeButton"
                                        Appearance="Primary"
-                                       Icon="{ui:SymbolIcon Sparkle24}"
-                                       Content="Smart Analyze &amp; Optimize"
                                        Command="{Binding SmartAnalyzeAndOptimizeCommand}"
+                                       IsEnabled="{Binding IsNotSmartOptimizing}"
                                        Padding="14,8"
                                        Margin="16,0,0,0"
-                                       VerticalAlignment="Center" />
+                                       VerticalAlignment="Center">
+                                <StackPanel Orientation="Horizontal">
+                                    <ui:ProgressRing IsIndeterminate="True" Width="16" Height="16" Margin="0,0,8,0"
+                                                     Foreground="#FFFFFF"
+                                                     Visibility="{Binding IsSmartOptimizing, Converter={StaticResource BoolToVisConverter}}" />
+                                    <ui:SymbolIcon Symbol="Sparkle24" Margin="0,0,8,0"
+                                                   Visibility="{Binding IsNotSmartOptimizing, Converter={StaticResource BoolToVisConverter}}" />
+                                    <TextBlock Text="Smart Analyze &amp; Optimize" FontWeight="SemiBold" />
+                                </StackPanel>
+                            </ui:Button>
                         </Grid>
                     </Border>
 
@@ -152,13 +161,21 @@
 
                                 <!-- Free Up RAM Button -->
                                 <ui:Button AutomationProperties.AutomationId="PurgeRamButton"
-                                           Icon="{ui:SymbolIcon Broom16}"
-                                           Content="Free Up RAM (Purge Cache)"
                                            Command="{Binding FreeUpRamCommand}"
+                                           IsEnabled="{Binding IsNotPurgingRam}"
                                            Appearance="Secondary"
                                            FontSize="11"
                                            Padding="8,4"
-                                           HorizontalAlignment="Stretch" />
+                                           HorizontalAlignment="Stretch">
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                        <ui:ProgressRing IsIndeterminate="True" Width="14" Height="14" Margin="0,0,6,0"
+                                                         Foreground="{DynamicResource AccentPrimaryBrush}"
+                                                         Visibility="{Binding IsPurgingRam, Converter={StaticResource BoolToVisConverter}}" />
+                                        <ui:SymbolIcon Symbol="Broom16" Margin="0,0,6,0"
+                                                       Visibility="{Binding IsNotPurgingRam, Converter={StaticResource BoolToVisConverter}}" />
+                                        <TextBlock Text="Free Up RAM (Purge Cache)" />
+                                    </StackPanel>
+                                </ui:Button>
                             </StackPanel>
                         </Border>
                     </Grid>
@@ -272,24 +289,37 @@
                                     <RowDefinition Height="Auto" />
                                 </Grid.RowDefinitions>
 
-                                <!-- Top Row: Icon + Toggle Switch -->
+                                <!-- Top Row: Icon + Toggle Switch + ProgressRing -->
                                 <DockPanel Grid.Row="0" LastChildFill="False" Margin="0,0,0,8">
                                     <Border DockPanel.Dock="Left" Background="{DynamicResource ControlFillColorSecondaryBrush}" CornerRadius="6" Width="30" Height="30">
                                         <ui:SymbolIcon Symbol="{Binding IconSymbol}" Foreground="{DynamicResource AccentPrimaryBrush}" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                     </Border>
 
-                                    <!-- Switch Button -->
-                                    <ui:ToggleSwitch DockPanel.Dock="Right"
-                                                     AutomationProperties.AutomationId="{Binding Id, StringFormat='Toggle_{0}'}"
-                                                     IsChecked="{Binding IsActive, Mode=OneWay}"
-                                                     Command="{Binding ToggleCommand}"
-                                                     CommandParameter="{Binding IsChecked, RelativeSource={RelativeSource Self}}"
-                                                     VerticalAlignment="Center" />
+                                    <!-- Switch Button + Animated Spinner -->
+                                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center">
+                                        <ui:ProgressRing IsIndeterminate="True" Width="16" Height="16" Margin="0,0,8,0"
+                                                         Foreground="#3B82F6"
+                                                         Visibility="{Binding IsApplying, Converter={StaticResource BoolToVisConverter}}" />
+                                        <ui:ToggleSwitch AutomationProperties.AutomationId="{Binding Id, StringFormat='Toggle_{0}'}"
+                                                         IsChecked="{Binding IsActive, Mode=OneWay}"
+                                                         IsEnabled="{Binding IsNotApplying}"
+                                                         Command="{Binding ToggleCommand}"
+                                                         CommandParameter="{Binding IsChecked, RelativeSource={RelativeSource Self}}"
+                                                         VerticalAlignment="Center" />
+                                    </StackPanel>
                                 </DockPanel>
 
-                                <!-- Title -->
-                                <TextBlock Grid.Row="1" Text="{Binding Title}" FontSize="13" FontWeight="Bold"
-                                           Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,4" TextTrimming="CharacterEllipsis" />
+                                <!-- Title and Status Badge -->
+                                <DockPanel Grid.Row="1" LastChildFill="False" Margin="0,0,0,4">
+                                    <TextBlock DockPanel.Dock="Left" Text="{Binding Title}" FontSize="13" FontWeight="Bold"
+                                               Foreground="{DynamicResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                                    <Border DockPanel.Dock="Right" Background="{Binding StatusBadgeBackground}"
+                                            BorderBrush="{Binding StatusBadgeBorder}" BorderThickness="1"
+                                            CornerRadius="4" Padding="5,2" VerticalAlignment="Center" Margin="4,0,0,0">
+                                        <TextBlock Text="{Binding StatusBadgeText}" FontSize="9" FontWeight="Bold"
+                                                   Foreground="{Binding StatusBadgeForeground}" />
+                                    </Border>
+                                </DockPanel>
 
                                 <!-- Description -->
                                 <TextBlock Grid.Row="2" Text="{Binding Description}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"

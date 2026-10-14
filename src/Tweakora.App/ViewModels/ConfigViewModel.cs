@@ -130,10 +130,12 @@ public sealed partial class ConfigViewModel : ObservableObject
         }
 
         IsBusy = true;
+        await Task.Yield();
+
         try
         {
             StatusMessage = $"Enabling {selected.Count} Windows feature(s)...";
-            var report = await _featureService.EnableFeaturesAsync(selected, _runner);
+            var report = await Task.Run(async () => await _featureService.EnableFeaturesAsync(selected, _runner));
             StatusMessage = $"Enable features completed: {report.Summary}.";
         }
         catch (Exception ex)
@@ -163,10 +165,12 @@ public sealed partial class ConfigViewModel : ObservableObject
         }
 
         IsBusy = true;
+        await Task.Yield();
+
         try
         {
             StatusMessage = $"Disabling {selected.Count} Windows feature(s)...";
-            var report = await _featureService.DisableFeaturesAsync(selected, _runner);
+            var report = await Task.Run(async () => await _featureService.DisableFeaturesAsync(selected, _runner));
             StatusMessage = $"Disable features completed: {report.Summary}.";
         }
         catch (Exception ex)
@@ -196,10 +200,12 @@ public sealed partial class ConfigViewModel : ObservableObject
         }
 
         IsBusy = true;
+        await Task.Yield();
+
         try
         {
             StatusMessage = $"Running maintenance fix: {fixKey}...";
-            var report = await _fixService.RunFixAsync(fixKey, _runner);
+            var report = await Task.Run(async () => await _fixService.RunFixAsync(fixKey, _runner));
             StatusMessage = $"Fix completed: {report.Summary}.";
         }
         catch (Exception ex)

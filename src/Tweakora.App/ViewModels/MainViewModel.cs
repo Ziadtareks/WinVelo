@@ -2,12 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Serilog;
 using Tweakora.App.Localization;
 using Tweakora.App.Services;
+using Tweakora.Core.Operations;
 using Tweakora.Core.Safety;
 using Wpf.Ui.Appearance;
 
@@ -51,6 +54,22 @@ public sealed partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private string _currentThemeName = "Dark";
 
+    // Activity HUD properties
+    [ObservableProperty]
+    private bool _isActivityVisible;
+
+    [ObservableProperty]
+    private bool _isActivityRunning;
+
+    [ObservableProperty]
+    private bool _isActivitySuccess;
+
+    [ObservableProperty]
+    private string _activityText = string.Empty;
+
+    [ObservableProperty]
+    private string _activityDoneText = string.Empty;
+
     public LocalizationManager Localization => LocalizationManager.Instance;
     public UiLogSink LogSink => UiLogSink.Instance;
 
@@ -71,6 +90,9 @@ public sealed partial class MainViewModel : ObservableObject
     private readonly List<PaletteItem> _allPaletteItems = new();
     public ObservableCollection<PaletteItem> PaletteResults { get; } = new();
 
+    private readonly IActivityTracker? _activityTracker;
+    private DispatcherTimer? _hudHideTimer;
+
     public MainViewModel(
         DashboardViewModel dashboardVM,
         InstallViewModel installVM,
@@ -78,7 +100,8 @@ public sealed partial class MainViewModel : ObservableObject
         ConfigViewModel configVM,
         UpdatesViewModel updatesVM,
         ToolboxViewModel toolboxVM,
-        BackupsViewModel backupsVM)
+        BackupsViewModel backupsVM,
+        IActivityTracker? activityTracker = null)
     {
         DashboardVM = dashboardVM;
         InstallVM = installVM;
@@ -87,9 +110,56 @@ public sealed partial class MainViewModel : ObservableObject
         UpdatesVM = updatesVM;
         ToolboxVM = toolboxVM;
         BackupsVM = backupsVM;
+        _activityTracker = activityTracker;
 
         _currentPage = DashboardVM;
         _activeTab = "Dashboard";
+
+        if (_activityTracker != null)
+        {
+            _activityTracker.OnActivityChanged += (active, text) =>
+            {
+                Application.Current?.Dispatcher?.InvokeAsync(() =>
+                {
+                    if (active)
+                    {
+                        _hudHideTimer?.Stop();
+                        IsActivityVisible = true;
+                        IsActivityRunning = true;
+                        IsActivitySuccess = false;
+                        ActivityText = text;
+                    }
+                    else
+                    {
+                        IsActivityRunning = false;
+                    }
+                });
+            };
+
+            _activityTracker.OnActivityCompleted += (msg) =>
+            {
+                Application.Current?.Dispatcher?.InvokeAsync(() =>
+                {
+                    IsActivityRunning = false;
+                    IsActivitySuccess = true;
+                    ActivityDoneText = msg;
+                    ActivityText = msg;
+
+                    _hudHideTimer?.Stop();
+                    _hudHideTimer = new DispatcherTimer
+                    {
+                        Interval = TimeSpan.FromMilliseconds(1200)
+                    };
+                    _hudHideTimer.Tick += (s, e) =>
+                    {
+                        _hudHideTimer?.Stop();
+                        IsActivityVisible = false;
+                        IsActivitySuccess = false;
+                    };
+                    _hudHideTimer.Start();
+                });
+            };
+        }
 
         InitializePalette();
     }
@@ -152,18 +222,22 @@ public sealed partial class MainViewModel : ObservableObject
         if (DateTime.UtcNow - _lastFocusScan < TimeSpan.FromSeconds(1)) return;
         _lastFocusScan = DateTime.UtcNow;
 
-        try
+        await Task.Yield();
+        await Task.Run(async () =>
         {
-            await DashboardVM.RefreshAllToggleStatesAsync();
-            if (ActiveTab == "Tweaks")
+            try
             {
-                await TweaksVM.RefreshActiveStatesAsync();
+                await DashboardVM.RefreshAllToggleStatesAsync();
+                if (ActiveTab == "Tweaks")
+                {
+                    await TweaksVM.RefreshActiveStatesAsync();
+                }
             }
-        }
-        catch (Exception ex)
-        {
-            Log.Warning(ex, "Failed to refresh system states on window focus");
-        }
+            catch (Exception ex)
+            {
+                Log.Warning(ex, "Failed to refresh system states on window focus");
+            }
+        });
     }
 
     [RelayCommand]

@@ -176,10 +176,12 @@ public sealed partial class InstallViewModel : ObservableObject
         }
 
         IsBusy = true;
+        await Task.Yield();
+
         try
         {
             StatusMessage = $"Installing {selected.Count} application(s) via {PackageManager}...";
-            var report = await _installService.InstallAppsAsync(selected, PackageManager, _runner);
+            var report = await Task.Run(async () => await _installService.InstallAppsAsync(selected, PackageManager, _runner));
             StatusMessage = $"Installation completed: {report.Summary}.";
         }
         catch (Exception ex)
@@ -209,10 +211,12 @@ public sealed partial class InstallViewModel : ObservableObject
         }
 
         IsBusy = true;
+        await Task.Yield();
+
         try
         {
             StatusMessage = $"Uninstalling {selected.Count} application(s) via {PackageManager}...";
-            var report = await _installService.UninstallAppsAsync(selected, PackageManager, _runner);
+            var report = await Task.Run(async () => await _installService.UninstallAppsAsync(selected, PackageManager, _runner));
             StatusMessage = $"Uninstallation completed: {report.Summary}.";
         }
         catch (Exception ex)
@@ -235,10 +239,12 @@ public sealed partial class InstallViewModel : ObservableObject
         }
 
         IsBusy = true;
+        await Task.Yield();
+
         try
         {
             StatusMessage = $"Checking and upgrading all applications via {PackageManager}...";
-            string output = await _installService.UpgradeAllAsync(PackageManager);
+            string output = await Task.Run(async () => await _installService.UpgradeAllAsync(PackageManager));
             StatusMessage = "Upgrade check completed.";
             OperationLogs.Add(output);
         }

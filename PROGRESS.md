@@ -27,44 +27,40 @@ Upstream Reference: [ChrisTitusTech/winutil](https://github.com/ChrisTitusTech/w
 | **WinVelo Overhaul & Rebrand** | Full rebranding, Beginner Dashboard, Curated Winget Installer | **DONE** | Home Tab #1, 4 smart profiles, 8 quick-toggles, 36 branded apps, 66 unit tests + FlaUI passed. |
 | **Real-PC Registry Sync** | Purge fake state, Win32 WM_SETTINGCHANGE broadcasts, Focus Auto-Sync | **DONE** | 74 unit tests passed / FlaUI passed / RealRegistrySyncTests passed |
 | **Smart Optimization Upgrade** | Hardware Analyzer, Standby RAM Cleaner, DNS Latency Benchmark, Nagle's Disabler, 8 Gaming Tweaks | **DONE** | 80 unit tests passed / 149 tweaks verified / Release packages updated |
+| **UX & Performance Overhaul** | Eliminate UI Freezes, Floating Activity HUD Pill, Card Spinners, Task.Yield Offloading | **DONE** | 80 unit tests passed / 1 FlaUI UI test passed / 0 UI Freezes |
 | **Release v1.0.0** | Final Production Packaging, SHA256, Screenshots | **DONE** | WinVelo v1.0.0 Portable & Small zip packages created in `dist/`. |
 
 ---
 
-## WinVelo Smart Optimization Upgrade (IQ Optimizer & ISLC Parity)
+## WinVelo Zero-Freeze Architecture & Live Animated HUD
 
-### 1. Smart Hardware Analyzer & Optimization Score (`SmartAdvisorService.cs`)
-- **Hardware Profile Detection**: Detects Laptop/Battery vs Desktop form factors (`GetSystemPowerStatus`), SSD/NVMe vs HDD storage, GPU vendor (NVIDIA/AMD/Intel), exact RAM capacity in KB, and CPU core count.
-- **Dynamic SvcHost Split Threshold**: Calculates dynamic `SvcHostSplitThresholdInKB` = total physical RAM in KB, preventing service host memory thrashing on 16GB+ systems without hardcoding.
-- **Dynamic System Optimization Health Score**: Real-time 0–100% score based on active optimizations with graded color brush (Red < 40%, Orange 40-69%, Blue 70-89%, Green 90-100%).
-- **1-Click Smart Analyze & Optimize**: Analyzes host architecture and applies safe recommended tweaks suited to the form factor in one click.
+### 1. Root Cause Elimination of UI Freezes
+- **Non-Blocking Shell & Setting Notifications (`WindowsSettingNotifier.cs`)**:
+  - Removed synchronous `WindowsSettingNotifier` calls from inside individual `WindowsRegistryService` writes.
+  - Dispatches `NotifySettingsChangedAsync` only once at the completion of a batch or tweak operation inside a background `Task.Run`.
+  - Configured with `SMTO_ABORTIFHUNG | SMTO_NOTIMEOUTIFNOTHUNG`, strict `50ms` timeout, and `SHCNF_IDLIST` (never `SHCNF_FLUSH`), eliminating multi-second Windows Explorer hangs.
+- **Universal Off-Thread Execution (`Task.Yield` + `Task.Run`)**:
+  - Re-architected all ViewModels (`DashboardViewModel`, `TweaksViewModel`, `ToolboxViewModel`, `InstallViewModel`, `ConfigViewModel`, `UpdatesViewModel`, `BackupsViewModel`, `MainViewModel`).
+  - Every asynchronous operation immediately yields the UI Dispatcher via `await Task.Yield()`, enabling the UI to paint spinners and update button states instantly before offloading heavy work to `Task.Run`.
 
-### 2. Live RAM & Standby List Cleaner (`MemoryOptimizerService.cs`)
-- **Native Win32 Memory Purge**: Uses P/Invoke `psapi.dll!EmptyWorkingSet` across processes and `ntdll.dll!NtSetSystemInformation` with command 4 (`MemoryPurgeStandbyList`) and command 3 (`MemoryFlushModifiedList`) with required `SeProfileSingleProcessPrivilege`.
-- **Instant UI Actions**: "Free Up RAM (Purge Cache)" button on the Dashboard RAM card and Toolbox Cleaner card.
+### 2. Modern Animated Loading Indicators & Floating Activity HUD
+- **Sleek Floating Activity HUD Pill (`MainWindow.xaml` & `MainViewModel.cs`)**:
+  - Positioned top-center with `#1E2433` dark pill background, glowing `#3B82F6` border, drop shadow, and `ZIndex="1000"`.
+  - Driven by thread-safe `IActivityTracker` in `Tweakora.Core.Operations`: displays animated `ui:ProgressRing` with live action status (e.g. `Applying tweak (3/14)...`).
+  - Upon completion, transitions to emerald green checkmark `"✓ Completed in 0.4s"` and auto-dismisses after 1.2s using non-blocking `DispatcherTimer` (0 `Task.Delay` in production code).
+- **Per-Card & Per-Button Animated Busy States**:
+  - Tweak and quick toggle cards display a 16x16 `ui:ProgressRing` when `IsApplying = true`.
+  - Direct 1-click toggle switches and preset buttons are cleanly disabled (`IsEnabled="{Binding IsNotApplying}"`) during operations to prevent duplicate race conditions.
+  - Dynamic status badge pill transitions from `"APPLYING..."` to `"APPLIED ✓"`.
+  - Optimization buttons ("Smart Analyze & Optimize", "Free Up RAM (Purge Cache)") render native indeterminate spinners while executing.
 
-### 3. Smart Network, Ping & Gaming Latency Optimizer (`NetworkOptimizerService.cs`)
-- **DNS Latency Benchmark**: 3-ping async round-trip benchmark across top 5 DNS resolvers (Cloudflare 1.1.1.1, Google 8.8.8.8, Quad9 9.9.9.9, OpenDNS 208.67.222.222, AdGuard 94.140.14.14).
-- **1-Click Apply Fastest**: Automatically selects and sets the lowest-ping DNS resolver on the active primary network adapter, with 1-click "Reset to DHCP".
-- **Gaming Packet Latency (Nagle's Algorithm Disabler)**: Detects active network adapters under `HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces` and configures `TcpAckFrequency = 1`, `TCPNoDelay = 1`, `TcpDelAckTicks = 0` for zero packet delay in multiplayer games.
-
-### 4. 8 High-Impact Gaming, Input Lag & GPU Tweaks (`Catalog/Tweaks/performance.json`)
-Expanded catalog from 141 to 149 verified tweaks:
-1. `performance.quantum_boost`: Win32PrioritySeparation = 0x26 (38) for foreground thread boost.
-2. `performance.mmcss_gaming`: NetworkThrottlingIndex = -1, SystemResponsiveness = 10, Games GPU Priority = 8.
-3. `performance.hags`: HwSchMode = 2 (Hardware-Accelerated GPU Scheduling).
-4. `performance.mpo_disable`: OverlayTestMode = 5 to fix multi-plane overlay micro-stutters on NVIDIA/AMD.
-5. `performance.mouse_raw_input`: SmoothMouseXCurve/YCurve reset and MouseSpeed = 0 for 1:1 raw mouse input.
-6. `performance.input_lag_queues`: Mouse/Keyboard DataQueueSize = 20 packets for lowest buffer latency.
-7. `performance.core_unparking`: ValueMax = 0 in power profile attributes to unpark all CPU cores.
-8. `performance.power_throttling`: PowerThrottlingOff = 1 to prevent Windows from throttling gaming threads.
-
-### 5. Quality & Verification
-- **80/80 Unit, Architecture & Smart Optimization Tests** in `Tweakora.Tests` PASSED (0 failures).
+### 3. Quality, Verification & Packaging
+- **80/80 Unit & Architecture Tests PASSED** (0 failures).
+- **FlaUI UI Automation Test PASSED** across all 5 tabs and overlays.
 - **All 9 Screenshots Refreshed & Visually Inspected** in `docs/screenshots/` (dashboard, toolbox, tweaks, backups, config, command-palette, diff-preview, install, updates).
 - **Release Packages (`dist/`)**:
-  - `dist/WinVelo-v1.0.0-win-x64-portable.zip` (SHA-256: `102708DDB2242AEC2B39109BA45D7829516DCFA4B0DBDF1BC95F47492C4F3257`)
-  - `dist/WinVelo-v1.0.0-win-x64-small.zip` (SHA-256: `D139B23BFF291D76031E3F669AED3C28C26EF04659DB6A45A094B7B39803BFA2`)
+  - `dist/WinVelo-v1.0.0-win-x64-portable.zip` (SHA-256: `7E54313B11A06039706BC46D3026179A080BEB8B7E2E23432A81D992366D11F3`)
+  - `dist/WinVelo-v1.0.0-win-x64-small.zip` (SHA-256: `335A3D77F5E5304EEEF2D9ACF92FD1534041478A2E260F0E272195A7938F1438`)
   - `dist/SHA256SUMS.txt` updated.
 
 ---

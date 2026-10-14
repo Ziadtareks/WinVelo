@@ -70,13 +70,15 @@ public sealed partial class BackupsViewModel : ObservableObject
 
         IsBusy = true;
         StatusMessage = $"Restoring backup snapshot {SelectedBackup.Id}...";
+        await Task.Yield();
 
         try
         {
-            bool success = await _tweakService.BackupManager.RestoreBackupAsync(SelectedBackup.DirectoryPath, msg =>
+            string backupDir = SelectedBackup.DirectoryPath;
+            bool success = await Task.Run(async () => await _tweakService.BackupManager.RestoreBackupAsync(backupDir, msg =>
             {
                 StatusMessage = msg;
-            });
+            }));
 
             StatusMessage = success
                 ? $"Backup snapshot {SelectedBackup.Id} restored successfully."
@@ -97,11 +99,15 @@ public sealed partial class BackupsViewModel : ObservableObject
     {
         IsBusy = true;
         StatusMessage = "Creating manual snapshot of all tweaks...";
+        await Task.Yield();
 
         try
         {
-            var tweaks = _tweakService.LoadCatalog();
-            string dir = await _tweakService.BackupManager.CreateSnapshotAsync(tweaks, "Manual full-state snapshot");
+            string dir = await Task.Run(async () =>
+            {
+                var tweaks = _tweakService.LoadCatalog();
+                return await _tweakService.BackupManager.CreateSnapshotAsync(tweaks, "Manual full-state snapshot");
+            });
             RefreshBackups();
             StatusMessage = $"Instant snapshot created at: {Path.GetFileName(dir)}";
         }

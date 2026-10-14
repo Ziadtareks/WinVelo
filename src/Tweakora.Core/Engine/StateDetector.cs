@@ -49,19 +49,22 @@ public sealed class StateDetector
             }
         }
 
-        bool result = false;
-        try
+        return Task.Run(() =>
         {
-            result = EvaluateStructure(tweak.Detect);
-        }
-        catch
-        {
-            // Detection must fail safe to false (Default), NEVER throw an error
-            result = false;
-        }
+            bool result = false;
+            try
+            {
+                result = EvaluateStructure(tweak.Detect);
+            }
+            catch
+            {
+                // Detection must fail safe to false (Default), NEVER throw an error
+                result = false;
+            }
 
-        _cache[tweak.Id] = (result, DateTime.UtcNow);
-        return Task.FromResult(result);
+            _cache[tweak.Id] = (result, DateTime.UtcNow);
+            return result;
+        });
     }
 
     private bool EvaluateStructure(DetectStructure detect)

@@ -147,7 +147,6 @@ public sealed class WindowsRegistryService : IRegistryService
             };
 
             subKey.SetValue(valueName ?? string.Empty, realData, kind);
-            WindowsSettingNotifier.NotifySettingChanged(normKey);
         }
         catch (Exception ex) when (ex is UnauthorizedAccessException or System.Security.SecurityException)
         {
@@ -164,7 +163,6 @@ public sealed class WindowsRegistryService : IRegistryService
             using var baseKey = GetHiveKey(normHive, true);
             using var subKey = baseKey.OpenSubKey(normKey, true);
             subKey?.DeleteValue(valueName ?? string.Empty, false);
-            WindowsSettingNotifier.NotifySettingChanged(normKey);
         }
         catch (Exception ex) when (ex is UnauthorizedAccessException or System.Security.SecurityException)
         {
@@ -180,7 +178,6 @@ public sealed class WindowsRegistryService : IRegistryService
             var (normHive, normKey) = RegistryPathHelper.Normalize(hive, key);
             using var baseKey = GetHiveKey(normHive, true);
             baseKey.DeleteSubKeyTree(normKey, false);
-            WindowsSettingNotifier.NotifySettingChanged(normKey);
         }
         catch (Exception ex) when (ex is UnauthorizedAccessException or System.Security.SecurityException)
         {
@@ -196,7 +193,6 @@ public sealed class WindowsRegistryService : IRegistryService
             var (normHive, normKey) = RegistryPathHelper.Normalize(hive, key);
             using var baseKey = GetHiveKey(normHive, true);
             using var created = baseKey.CreateSubKey(normKey, true);
-            WindowsSettingNotifier.NotifySettingChanged(normKey);
         }
         catch (Exception ex) when (ex is UnauthorizedAccessException or System.Security.SecurityException)
         {

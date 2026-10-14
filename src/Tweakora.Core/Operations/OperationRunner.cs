@@ -47,8 +47,15 @@ public interface IOperationRunner
 
 public sealed class OperationRunner : IOperationRunner
 {
+    private readonly IActivityTracker? _activityTracker;
+
     public event Action<string>? OnLog;
     public event Action<string, int>? OnProgress;
+
+    public OperationRunner(IActivityTracker? activityTracker = null)
+    {
+        _activityTracker = activityTracker;
+    }
 
     public async Task<OperationExecutionReport> RunAsync<T>(
         string operationTitle,
@@ -58,6 +65,8 @@ public sealed class OperationRunner : IOperationRunner
     {
         DateTime start = DateTime.UtcNow;
         List<OperationItemResult> results = new();
+
+        using var activity = _activityTracker?.BeginActivity($"{operationTitle} (0/{items.Count})...");
 
         OnLog?.Invoke($"[START] {operationTitle} ({items.Count} items)");
         OnProgress?.Invoke("Starting...", 0);
@@ -82,6 +91,7 @@ public sealed class OperationRunner : IOperationRunner
 
             T item = items[i];
             int percent = (int)(((double)(i + 1) / items.Count) * 100);
+            _activityTracker?.UpdateAction($"{operationTitle} ({i + 1}/{items.Count})...");
 
             try
             {

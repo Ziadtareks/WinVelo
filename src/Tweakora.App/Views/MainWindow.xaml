@@ -632,5 +632,39 @@
                 </Grid>
             </Border>
         </Grid>
+
+        <!-- SLEEK FLOATING LIVE ACTIVITY HUD PILL -->
+        <Border Grid.Row="0" Grid.RowSpan="4"
+                HorizontalAlignment="Center" VerticalAlignment="Top"
+                Margin="0,52,0,0"
+                Background="#1E2433"
+                BorderBrush="#3B82F6"
+                BorderThickness="1"
+                CornerRadius="20"
+                Padding="16,8"
+                Panel.ZIndex="1000"
+                IsHitTestVisible="False"
+                Visibility="{Binding IsActivityVisible, Converter={StaticResource BoolToVisConverter}}">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="20" ShadowDepth="4" Direction="270" Color="#000000" Opacity="0.6" />
+            </Border.Effect>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <!-- Running Animated Progress Ring -->
+                <ui:ProgressRing Width="16" Height="16" IsIndeterminate="True"
+                                 Margin="0,0,10,0" VerticalAlignment="Center"
+                                 Visibility="{Binding IsActivityRunning, Converter={StaticResource BoolToVisConverter}}" />
+
+                <!-- Emerald Green Success Icon -->
+                <TextBlock Text="✓" FontSize="14" FontWeight="ExtraBold" Foreground="#10B981"
+                           Margin="0,0,8,0" VerticalAlignment="Center"
+                           Visibility="{Binding IsActivitySuccess, Converter={StaticResource BoolToVisConverter}}" />
+
+                <!-- Dynamic Status / Action Text -->
+                <TextBlock Text="{Binding ActivityText}"
+                           FontSize="12" FontWeight="SemiBold"
+                           Foreground="{DynamicResource TextPrimaryBrush}"
+                           VerticalAlignment="Center" />
+            </StackPanel>
+        </Border>
     </Grid>
 </ui:FluentWindow>

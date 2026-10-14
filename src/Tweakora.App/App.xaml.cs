@@ -92,6 +92,7 @@ public partial class App : Application
                     Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
                     "WinVelo", "Journal");
                 services.AddSingleton(new RollbackJournalManager(journalDir));
+                services.AddSingleton<IActivityTracker, ActivityTracker>();
                 services.AddSingleton<IOperationRunner, OperationRunner>();
 
                 // Domain Feature Services

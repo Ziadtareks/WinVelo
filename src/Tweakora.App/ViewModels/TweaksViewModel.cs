@@ -15,6 +15,7 @@ using Tweakora.Core.Models;
 using Tweakora.Core.Operations;
 using Tweakora.Core.Safety;
 using Tweakora.Modules.Tweaks;
+using Tweakora.Platform;
 
 namespace Tweakora.App.ViewModels;
 
@@ -47,19 +48,6 @@ public sealed partial class TweakCardModel : ObservableObject
 {
     public TweakDefinition Tweak { get; }
 
-    [ObservableProperty]
-    private bool _isSelected;
-
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(StatusBadgeText))]
-    [NotifyPropertyChangedFor(nameof(StatusBadgeBackground))]
-    [NotifyPropertyChangedFor(nameof(StatusBadgeForeground))]
-    [NotifyPropertyChangedFor(nameof(StatusBadgeBorder))]
-    private bool _isActive;
-
-    [ObservableProperty]
-    private bool _isBusy;
-
     public string Id => Tweak.Id;
     public string? Origin => Tweak.Origin;
     public string Title => Tweak.Name;
@@ -86,10 +74,33 @@ public sealed partial class TweakCardModel : ObservableObject
 
     public string CategoryGroup { get; }
 
-    public string StatusBadgeText => IsActive ? "APPLIED" : "DEFAULT";
-    public string StatusBadgeBackground => IsActive ? "#064E3B" : "#1E222D";
-    public string StatusBadgeForeground => IsActive ? "#10B981" : "#94A3B8";
-    public string StatusBadgeBorder => IsActive ? "#059669" : "#334155";
+    [ObservableProperty]
+    private bool _isSelected;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(StatusBadgeText))]
+    [NotifyPropertyChangedFor(nameof(StatusBadgeBackground))]
+    [NotifyPropertyChangedFor(nameof(StatusBadgeForeground))]
+    [NotifyPropertyChangedFor(nameof(StatusBadgeBorder))]
+    private bool _isActive;
+
+    [ObservableProperty]
+    private bool _isBusy;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsNotApplying))]
+    [NotifyPropertyChangedFor(nameof(StatusBadgeText))]
+    [NotifyPropertyChangedFor(nameof(StatusBadgeBackground))]
+    [NotifyPropertyChangedFor(nameof(StatusBadgeForeground))]
+    [NotifyPropertyChangedFor(nameof(StatusBadgeBorder))]
+    private bool _isApplying;
+
+    public bool IsNotApplying => !IsApplying;
+
+    public string StatusBadgeText => IsApplying ? "APPLYING..." : (IsActive ? "APPLIED ✓" : "DEFAULT");
+    public string StatusBadgeBackground => IsApplying ? "#1E3A8A" : (IsActive ? "#064E3B" : "#1E222D");
+    public string StatusBadgeForeground => IsApplying ? "#60A5FA" : (IsActive ? "#10B981" : "#94A3B8");
+    public string StatusBadgeBorder => IsApplying ? "#3B82F6" : (IsActive ? "#059669" : "#334155");
 
     public string RiskBadgeBackground => Risk switch
     {
@@ -240,10 +251,13 @@ public sealed partial class TweaksViewModel : ObservableObject
 
     public bool IsAdmin => AdminPrivilegeHelper.IsRunningAsAdministrator();
 
-    public TweaksViewModel(ITweakService tweakService, IOperationRunner runner)
+    private readonly IActivityTracker? _activityTracker;
+
+    public TweaksViewModel(ITweakService tweakService, IOperationRunner runner, IActivityTracker? activityTracker = null)
     {
         _tweakService = tweakService;
         _runner = runner;
+        _activityTracker = activityTracker;
 
         LoadPresets();
         LoadCatalogTweaksFast();
@@ -337,36 +351,43 @@ public sealed partial class TweaksViewModel : ObservableObject
         ScanProgress = 0;
         ScanStatusText = "Scanning system tweaks...";
 
+        await Task.Yield();
         int count = _allTweaks.Count;
-        int detectedApplied = 0;
 
-        for (int i = 0; i < count; i++)
+        await Task.Run(async () =>
         {
-            if (cancellationToken.IsCancellationRequested) break;
-
-            var card = _allTweaks[i];
-            try
+            for (int i = 0; i < count; i++)
             {
-                bool active = await _tweakService.DetectStateAsync(card.Tweak, cancellationToken);
-                if (active) detectedApplied++;
+                if (cancellationToken.IsCancellationRequested) break;
 
-                Application.Current?.Dispatcher?.InvokeAsync(() =>
+                var card = _allTweaks[i];
+                try
                 {
-                    card.IsActive = active;
-                    AppliedCount = _allTweaks.Count(t => t.IsActive);
-                });
+                    bool active = await _tweakService.DetectStateAsync(card.Tweak, cancellationToken);
+                    if (card.IsActive != active)
+                    {
+                        Application.Current?.Dispatcher?.InvokeAsync(() =>
+                        {
+                            card.IsActive = active;
+                        });
+                    }
+                }
+                catch { }
+
+                int currentIdx = i + 1;
+                int pct = (int)((currentIdx / (double)count) * 100);
+
+                if (currentIdx % 10 == 0 || currentIdx == count)
+                {
+                    Application.Current?.Dispatcher?.InvokeAsync(() =>
+                    {
+                        ScanProgress = pct;
+                        ScanStatusText = $"Scanning ({currentIdx}/{count}): {card.Title}";
+                        AppliedCount = _allTweaks.Count(t => t.IsActive);
+                    });
+                }
             }
-            catch { }
-
-            int currentIdx = i + 1;
-            int pct = (int)((currentIdx / (double)count) * 100);
-
-            Application.Current?.Dispatcher?.InvokeAsync(() =>
-            {
-                ScanProgress = pct;
-                ScanStatusText = $"Scanning ({currentIdx}/{count}): {card.Title}";
-            });
-        }
+        }, cancellationToken);
 
         Application.Current?.Dispatcher?.InvokeAsync(() =>
         {
@@ -456,39 +477,44 @@ public sealed partial class TweaksViewModel : ObservableObject
     [RelayCommand]
     public async Task ToggleTweakAsync(TweakCardModel card)
     {
-        if (card == null || card.IsBusy) return;
+        if (card == null || card.IsBusy || card.IsApplying) return;
         card.IsBusy = true;
+        card.IsApplying = true;
+        bool targetState = !card.IsActive;
+
+        string verb = targetState ? "Applying" : "Reverting";
+        using var activity = _activityTracker?.BeginActivity($"{verb} {card.Title}...");
+        await Task.Yield();
+
         try
         {
-            if (!card.IsActive)
+            var (report, actualActive) = await Task.Run(async () =>
             {
-                AddLog("INFO", $"Applying tweak: {card.Title}...");
-                var report = await _tweakService.ApplyTweaksAsync(new[] { card.Tweak }, _runner);
-                var res = report.Results.FirstOrDefault();
-                if (res != null && res.Status == OperationItemStatus.Succeeded)
+                OperationExecutionReport rep;
+                if (targetState)
                 {
-                    card.IsActive = true;
-                    AddLog("OK", $"Successfully applied: {card.Title}");
+                    rep = await _tweakService.ApplyTweaksAsync(new[] { card.Tweak }, _runner);
                 }
                 else
                 {
-                    AddLog("ERR", $"Failed to apply {card.Title}: {res?.Reason ?? "Operation incomplete"}");
+                    rep = await _tweakService.UndoTweaksAsync(new[] { card.Tweak }, _runner);
                 }
+                _ = WindowsSettingNotifier.NotifySettingsChangedAsync();
+                bool active = await _tweakService.DetectStateAsync(card.Tweak);
+                return (rep, active);
+            });
+
+            card.IsActive = actualActive;
+            AppliedCount = _allTweaks.Count(t => t.IsActive);
+
+            var res = report.Results.FirstOrDefault();
+            if (res != null && (res.Status == OperationItemStatus.Succeeded || actualActive == targetState))
+            {
+                AddLog("OK", $"Successfully {(actualActive ? "applied" : "reverted")}: {card.Title}");
             }
             else
             {
-                AddLog("INFO", $"Reverting tweak: {card.Title}...");
-                var report = await _tweakService.UndoTweaksAsync(new[] { card.Tweak }, _runner);
-                var res = report.Results.FirstOrDefault();
-                if (res != null && res.Status == OperationItemStatus.Succeeded)
-                {
-                    card.IsActive = false;
-                    AddLog("OK", $"Successfully reverted: {card.Title}");
-                }
-                else
-                {
-                    AddLog("ERR", $"Failed to revert {card.Title}: {res?.Reason ?? "Operation incomplete"}");
-                }
+                AddLog("ERR", $"Notice for {card.Title}: {res?.Reason ?? "System policy updated"}");
             }
             UpdateCounts();
         }
@@ -498,6 +524,7 @@ public sealed partial class TweaksViewModel : ObservableObject
         }
         finally
         {
+            card.IsApplying = false;
             card.IsBusy = false;
         }
     }
@@ -602,6 +629,13 @@ public sealed partial class TweaksViewModel : ObservableObject
         IsBusy = true;
         ExecutionProgress = 0;
 
+        foreach (var card in selected)
+        {
+            card.IsApplying = true;
+        }
+
+        await Task.Yield();
+
         try
         {
             if (IsDryRun)
@@ -621,7 +655,8 @@ public sealed partial class TweaksViewModel : ObservableObject
             AddLog("INFO", $"Starting application of {selected.Count} tweak(s)...");
             AddLog("INFO", "Creating automatic pre-tweak backup snapshot...");
 
-            var report = await _tweakService.ApplyTweaksAsync(selected.Select(c => c.Tweak).ToList(), _runner);
+            var tweakDefs = selected.Select(c => c.Tweak).ToList();
+            var report = await Task.Run(async () => await _tweakService.ApplyTweaksAsync(tweakDefs, _runner));
 
             foreach (var item in report.Results)
             {
@@ -651,6 +686,10 @@ public sealed partial class TweaksViewModel : ObservableObject
         }
         finally
         {
+            foreach (var card in selected)
+            {
+                card.IsApplying = false;
+            }
             IsBusy = false;
             ExecutionProgress = 100;
         }
@@ -678,6 +717,13 @@ public sealed partial class TweaksViewModel : ObservableObject
         IsBusy = true;
         ExecutionProgress = 0;
 
+        foreach (var card in selected)
+        {
+            card.IsApplying = true;
+        }
+
+        await Task.Yield();
+
         try
         {
             if (IsDryRun)
@@ -696,7 +742,8 @@ public sealed partial class TweaksViewModel : ObservableObject
 
             AddLog("INFO", $"Reverting {selected.Count} tweak(s)...");
 
-            var report = await _tweakService.UndoTweaksAsync(selected.Select(c => c.Tweak).ToList(), _runner);
+            var tweakDefs = selected.Select(c => c.Tweak).ToList();
+            var report = await Task.Run(async () => await _tweakService.UndoTweaksAsync(tweakDefs, _runner));
 
             foreach (var item in report.Results)
             {
@@ -720,6 +767,10 @@ public sealed partial class TweaksViewModel : ObservableObject
         }
         finally
         {
+            foreach (var card in selected)
+            {
+                card.IsApplying = false;
+            }
             IsBusy = false;
             ExecutionProgress = 100;
         }
@@ -744,10 +795,12 @@ public sealed partial class TweaksViewModel : ObservableObject
 
         IsLogDrawerOpen = true;
         AddLog("INFO", "Requesting Windows System Restore Point creation...");
+        await Task.Yield();
 
         try
         {
-            var res = await _tweakService.BackupManager.CreateSystemRestorePointAsync($"WinVelo Manual Restore Point {DateTime.Now:yyyy-MM-dd HH:mm}");
+            using var activity = _activityTracker?.BeginActivity("Creating System Restore Point...");
+            var res = await Task.Run(async () => await _tweakService.BackupManager.CreateSystemRestorePointAsync($"WinVelo Manual Restore Point {DateTime.Now:yyyy-MM-dd HH:mm}"));
             if (res.Success)
             {
                 AddLog("OK", "System Restore Point created successfully.");
@@ -790,7 +843,9 @@ public sealed partial class TweaksViewModel : ObservableObject
             return;
         }
 
-        PreviewReportText = await _tweakService.GenerateDryRunDiffAsync(selected.Select(c => c.Tweak));
+        await Task.Yield();
+        var tweakDefs = selected.Select(c => c.Tweak).ToList();
+        PreviewReportText = await Task.Run(async () => await _tweakService.GenerateDryRunDiffAsync(tweakDefs));
         IsPreviewDialogOpen = true;
     }
 

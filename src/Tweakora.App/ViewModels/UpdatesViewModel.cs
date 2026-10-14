@@ -110,10 +110,12 @@ public sealed partial class UpdatesViewModel : ObservableObject
         }
 
         IsBusy = true;
+        await Task.Yield();
+
         try
         {
             StatusMessage = $"Applying {SelectedMode} updates profile...";
-            var report = await _updatesService.ApplyModeAsync(SelectedMode, _runner);
+            var report = await Task.Run(async () => await _updatesService.ApplyModeAsync(SelectedMode, _runner));
             ActiveMode = SelectedMode;
             ActiveModeTitle = SelectedMode switch
             {

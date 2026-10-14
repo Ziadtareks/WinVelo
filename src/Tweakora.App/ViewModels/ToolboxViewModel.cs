@@ -94,9 +94,11 @@ public sealed partial class ToolboxViewModel : ObservableObject
     {
         IsScanningCleaner = true;
         CleanerStatusText = "Scanning whitelisted system temporary directories...";
+        await Task.Yield();
+
         try
         {
-            var results = await _cleanerService.ScanCategoriesAsync();
+            var results = await Task.Run(async () => await _cleanerService.ScanCategoriesAsync());
             CleanerCategories.Clear();
             long totalBytes = 0;
             foreach (var r in results)
@@ -134,9 +136,11 @@ public sealed partial class ToolboxViewModel : ObservableObject
 
         IsCleaning = true;
         CleanerStatusText = "Cleaning selected safe cache locations...";
+        await Task.Yield();
+
         try
         {
-            var result = await _cleanerService.CleanCategoriesAsync(selected);
+            var result = await Task.Run(async () => await _cleanerService.CleanCategoriesAsync(selected));
             CleanerStatusText = $"Cleanup completed! {result.FormattedSummary}.";
             await ScanCleanerAsync();
         }
@@ -160,7 +164,8 @@ public sealed partial class ToolboxViewModel : ObservableObject
         }
 
         bool targetState = item.IsEnabled;
-        bool ok = await _startupService.SetEntryStateAsync(item, targetState);
+        await Task.Yield();
+        bool ok = await Task.Run(async () => await _startupService.SetEntryStateAsync(item, targetState));
         if (!ok)
         {
             // Revert UI toggle if state change failed
@@ -178,7 +183,8 @@ public sealed partial class ToolboxViewModel : ObservableObject
         }
 
         FixStatusText = $"Running repair: {fix.Title}...";
-        var report = await _fixService.RunFixAsync(fix.Id, _runner);
+        await Task.Yield();
+        var report = await Task.Run(async () => await _fixService.RunFixAsync(fix.Id, _runner));
         FixStatusText = report.FailedCount == 0
             ? $"Successfully completed: {fix.Title}."
             : $"Repair finished with notes: {report.Summary}.";
@@ -194,7 +200,8 @@ public sealed partial class ToolboxViewModel : ObservableObject
         }
 
         DnsStatusText = $"Applying {provider.Name} ({provider.PrimaryDns})...";
-        bool ok = await _dnsService.ApplyDnsAsync(provider);
+        await Task.Yield();
+        bool ok = await Task.Run(async () => await _dnsService.ApplyDnsAsync(provider));
         if (ok)
         {
             foreach (var p in DnsProviders)
@@ -213,7 +220,8 @@ public sealed partial class ToolboxViewModel : ObservableObject
     private async Task TestDnsLatencyAsync(DnsProviderDefinition provider)
     {
         DnsStatusText = $"Pinging {provider.PrimaryDns}...";
-        int ping = await _dnsService.PingDnsAsync(provider.PrimaryDns);
+        await Task.Yield();
+        int ping = await Task.Run(async () => await _dnsService.PingDnsAsync(provider.PrimaryDns));
         provider.PingMs = ping;
         DnsStatusText = ping >= 0 ? $"{provider.Name} latency: {ping} ms" : $"{provider.Name} ping timed out or unavailable.";
     }
@@ -222,9 +230,10 @@ public sealed partial class ToolboxViewModel : ObservableObject
     private async Task PurgeRamAsync()
     {
         CleanerStatusText = "Purging standby memory and trimming working sets...";
+        await Task.Yield();
         try
         {
-            var result = await _memoryOptimizer.PurgeMemoryAndStandbyListAsync();
+            var result = await Task.Run(async () => await _memoryOptimizer.PurgeMemoryAndStandbyListAsync());
             CleanerStatusText = $"Memory Purge Complete! Freed {result.FormattedFreed} of Standby & Process Cache.";
         }
         catch (Exception ex)
@@ -238,9 +247,10 @@ public sealed partial class ToolboxViewModel : ObservableObject
     {
         IsBenchmarkingDns = true;
         DnsStatusText = "Benchmarking top 5 DNS providers (3 pings each)...";
+        await Task.Yield();
         try
         {
-            var results = await _networkOptimizer.BenchmarkDnsProvidersAsync();
+            var results = await Task.Run(async () => await _networkOptimizer.BenchmarkDnsProvidersAsync());
             foreach (var res in results)
             {
                 var existing = DnsProviders.FirstOrDefault(p => p.PrimaryDns == res.PrimaryDns);
@@ -307,7 +317,8 @@ public sealed partial class ToolboxViewModel : ObservableObject
         }
 
         DnsStatusText = "Resetting network adapters to Automatic (DHCP) DNS...";
-        bool ok = await _networkOptimizer.ResetDnsToDhcpAsync();
+        await Task.Yield();
+        bool ok = await Task.Run(async () => await _networkOptimizer.ResetDnsToDhcpAsync());
         if (ok)
         {
             foreach (var p in DnsProviders)
@@ -332,11 +343,12 @@ public sealed partial class ToolboxViewModel : ObservableObject
 
         bool target = parameter is bool b ? b : !IsNagleDisabled;
         NetworkStatusText = $"{(target ? "Disabling Nagle's Algorithm (Low Latency Gaming)" : "Enabling default TCP packet batching")}...";
+        await Task.Yield();
 
-        bool ok = await _networkOptimizer.SetNagleAlgorithmStateAsync(target);
+        bool ok = await Task.Run(async () => await _networkOptimizer.SetNagleAlgorithmStateAsync(target));
         if (ok)
         {
-            IsNagleDisabled = await _networkOptimizer.DetectNagleAlgorithmDisabledAsync();
+            IsNagleDisabled = await Task.Run(async () => await _networkOptimizer.DetectNagleAlgorithmDisabledAsync());
             NetworkStatusText = IsNagleDisabled
                 ? "Nagle's Algorithm Disabled: Instant gaming packet transmission active on active NIC(s)."
                 : "Standard TCP packet batching restored.";
@@ -349,46 +361,41 @@ public sealed partial class ToolboxViewModel : ObservableObject
 
     public async void LoadToolsData()
     {
-        // Populate startup items
-        StartupItems.Clear();
-        var startupEntries = await _startupService.GetStartupEntriesAsync();
-        foreach (var item in startupEntries)
-        {
-            StartupItems.Add(item);
-        }
+        await Task.Yield();
 
-        // Populate services
-        ServicesList.Clear();
-        foreach (var svc in _servicesService.GetServices())
+        try
         {
-            ServicesList.Add(svc);
-        }
-
-        // Populate fixes
-        FixesList.Clear();
-        foreach (var fix in _fixService.GetAvailableFixes())
-        {
-            FixesList.Add(fix);
-        }
-
-        // Populate DNS providers
-        DnsProviders.Clear();
-        foreach (var dns in _dnsService.GetProviders())
-        {
-            DnsProviders.Add(dns);
-        }
-
-        _ = Task.Run(async () =>
-        {
-            try
+            var startupEntries = await Task.Run(async () => await _startupService.GetStartupEntriesAsync());
+            StartupItems.Clear();
+            foreach (var item in startupEntries)
             {
-                bool nagleDisabled = await _networkOptimizer.DetectNagleAlgorithmDisabledAsync();
-                System.Windows.Application.Current?.Dispatcher?.Invoke(() =>
-                {
-                    IsNagleDisabled = nagleDisabled;
-                });
+                StartupItems.Add(item);
             }
-            catch { }
-        });
+
+            var services = await Task.Run(() => _servicesService.GetServices().ToList());
+            ServicesList.Clear();
+            foreach (var svc in services)
+            {
+                ServicesList.Add(svc);
+            }
+
+            var fixes = _fixService.GetAvailableFixes().ToList();
+            FixesList.Clear();
+            foreach (var fix in fixes)
+            {
+                FixesList.Add(fix);
+            }
+
+            var dnsList = _dnsService.GetProviders().ToList();
+            DnsProviders.Clear();
+            foreach (var dns in dnsList)
+            {
+                DnsProviders.Add(dns);
+            }
+
+            bool nagleDisabled = await Task.Run(async () => await _networkOptimizer.DetectNagleAlgorithmDisabledAsync());
+            IsNagleDisabled = nagleDisabled;
+        }
+        catch { }
     }
 }
