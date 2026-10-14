@@ -129,7 +129,7 @@ public static class Program
             shell = new FakeShellService();
         }
 
-        MigrateLegacyDataDirectoryIfNeeded();
+        AppDataMigrator.Migrate();
 
         string journalDir = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
@@ -903,51 +903,5 @@ public static class Program
         Console.WriteLine("  winvelo-cli --config <path> --run        Apply configuration profile (protected by journal)");
         Console.WriteLine("  winvelo-cli --real-mode                  Use real Windows drivers (default is simulation)");
     }
-
-    private static void MigrateLegacyDataDirectoryIfNeeded()
-    {
-        try
-        {
-            string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            string legacyPath = Path.Combine(appData, "Tweakora");
-            string newPath = Path.Combine(appData, "WinVelo");
-
-            if (Directory.Exists(legacyPath))
-            {
-                if (!Directory.Exists(newPath))
-                {
-                    Directory.CreateDirectory(newPath);
-                }
-
-                CopyDirectoryRecursively(legacyPath, newPath);
-            }
-        }
-        catch
-        {
-            // Silently ignore migration issues in CLI non-interactive mode
-        }
-    }
-
-    private static void CopyDirectoryRecursively(string sourceDir, string targetDir)
-    {
-        foreach (string dirPath in Directory.GetDirectories(sourceDir, "*", SearchOption.AllDirectories))
-        {
-            string relative = Path.GetRelativePath(sourceDir, dirPath);
-            string destSubDir = Path.Combine(targetDir, relative);
-            if (!Directory.Exists(destSubDir))
-            {
-                Directory.CreateDirectory(destSubDir);
-            }
-        }
-
-        foreach (string filePath in Directory.GetFiles(sourceDir, "*.*", SearchOption.AllDirectories))
-        {
-            string relative = Path.GetRelativePath(sourceDir, filePath);
-            string destFile = Path.Combine(targetDir, relative);
-            if (!File.Exists(destFile))
-            {
-                File.Copy(filePath, destFile, overwrite: false);
-            }
-        }
-    }
 }
+

@@ -88,7 +88,11 @@ public partial class App : Application
                 }
 
                 // Core Engine and Operation Infrastructure
-                MigrateLegacyDataDirectoryIfNeeded();
+                AppDataMigrator.Migrate(logCallback: (msg, ex) =>
+                {
+                    if (ex != null) Log.Warning(ex, "{Message}", msg);
+                    else Log.Information("{Message}", msg);
+                });
                 string journalDir = Path.Combine(
                     Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
                     "WinVelo", "Journal");
@@ -363,54 +367,6 @@ public partial class App : Application
     {
         Log.Error(e.Exception, "Unobserved Task Exception captured");
         e.SetObserved();
-    }
-
-    private static void MigrateLegacyDataDirectoryIfNeeded()
-    {
-        try
-        {
-            string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            string legacyPath = Path.Combine(appData, "Tweakora");
-            string newPath = Path.Combine(appData, "WinVelo");
-
-            if (Directory.Exists(legacyPath))
-            {
-                if (!Directory.Exists(newPath))
-                {
-                    Directory.CreateDirectory(newPath);
-                }
-
-                CopyDirectoryRecursively(legacyPath, newPath);
-                Log.Information("Migrated legacy application data from {Legacy} to {New}", legacyPath, newPath);
-            }
-        }
-        catch (Exception ex)
-        {
-            Log.Warning(ex, "Failed to migrate legacy Tweakora data to WinVelo");
-        }
-    }
-
-    private static void CopyDirectoryRecursively(string sourceDir, string targetDir)
-    {
-        foreach (string dirPath in Directory.GetDirectories(sourceDir, "*", SearchOption.AllDirectories))
-        {
-            string relative = Path.GetRelativePath(sourceDir, dirPath);
-            string destSubDir = Path.Combine(targetDir, relative);
-            if (!Directory.Exists(destSubDir))
-            {
-                Directory.CreateDirectory(destSubDir);
-            }
-        }
-
-        foreach (string filePath in Directory.GetFiles(sourceDir, "*.*", SearchOption.AllDirectories))
-        {
-            string relative = Path.GetRelativePath(sourceDir, filePath);
-            string destFile = Path.Combine(targetDir, relative);
-            if (!File.Exists(destFile))
-            {
-                File.Copy(filePath, destFile, overwrite: false);
-            }
-        }
     }
 }
 
