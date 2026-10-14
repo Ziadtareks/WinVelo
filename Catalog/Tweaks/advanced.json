@@ -651,7 +651,9 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/removeedge",
     "verifiedOnBuild": "26100",
-    "warnings": "Removes Microsoft Edge from the system. Some Windows components, widgets, or web-authentication dialogs may be affected."
+    "warnings": "Removes Microsoft Edge from the system. Some Windows components, widgets, or web-authentication dialogs may be affected. Undo reinstalls Edge via WinGet, but does NOT restore deleted user profile data or browsing history.",
+    "reversible": false,
+    "irreversibleReason": "Uninstalls Microsoft Edge system binaries and deletes user profiles; undo reinstalls a blank Edge browser via winget but cannot restore deleted history, cookies, or user profile data."
   },
   {
     "schemaVersion": "1.0.0",
@@ -824,7 +826,9 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/removeonedrive",
     "verifiedOnBuild": "26100",
-    "warnings": "Completely uninstalls OneDrive and stops file synchronization. Ensure all cloud documents are backed up locally."
+    "warnings": "Completely uninstalls OneDrive and stops file synchronization. Ensure all cloud documents are backed up locally. Undo reinstalls OneDrive via WinGet, but does NOT restore unsynced files or cached sync state.",
+    "reversible": false,
+    "irreversibleReason": "Uninstalls Microsoft OneDrive client and stops synchronization; undo reinstalls OneDrive via winget and restores sync policies, but un-synced local changes and offline file cache are not restored."
   },
   {
     "schemaVersion": "1.0.0",
@@ -1348,7 +1352,9 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/windowsai",
     "verifiedOnBuild": "26100",
-    "warnings": "Removes and disables Windows AI, Recall, and Copilot packages system-wide."
+    "warnings": "Removes and disables Windows AI, Recall, and Copilot packages system-wide. Undo only restores registry policies; removed AppX and Windows features are NOT reinstalled.",
+    "reversible": false,
+    "irreversibleReason": "Permanently uninstalls Windows Copilot, Recall, and AI Appx packages; undo only reverts policy registry keys and does not reinstall the removed Appx or system features."
   },
   {
     "schemaVersion": "1.0.0",

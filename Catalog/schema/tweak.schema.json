@@ -117,8 +117,29 @@
     "verifiedOnBuild": { "type": "string" },
     "warnings": {
       "type": "string"
+    },
+    "reversible": {
+      "type": "boolean",
+      "default": true
+    },
+    "irreversibleReason": {
+      "type": "string",
+      "minLength": 5
     }
   },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "reversible": { "const": false }
+        },
+        "required": ["reversible"]
+      },
+      "then": {
+        "required": ["irreversibleReason"]
+      }
+    }
+  ],
   "definitions": {
     "detectStructure": {
       "oneOf": [

@@ -270,6 +270,56 @@ public sealed partial class TweaksViewModel : ObservableObject
     }
 
     [ObservableProperty]
+    private bool _isIrreversibleDialogOpen;
+
+    [ObservableProperty]
+    private string _irreversibleDialogTitle = "Irreversible Action Warning";
+
+    public ObservableCollection<IrreversibleItemModel> IrreversibleWarningItems { get; } = new();
+
+    private TaskCompletionSource<bool>? _irreversibleConfirmTcs;
+
+    [RelayCommand]
+    public void ConfirmIrreversible()
+    {
+        IsIrreversibleDialogOpen = false;
+        _irreversibleConfirmTcs?.TrySetResult(true);
+    }
+
+    [RelayCommand]
+    public void CancelIrreversible()
+    {
+        IsIrreversibleDialogOpen = false;
+        _irreversibleConfirmTcs?.TrySetResult(false);
+    }
+
+    public async Task<bool> RequestIrreversibleConfirmationAsync(IEnumerable<TweakDefinition> tweaks)
+    {
+        var irreversible = tweaks.Where(t => !t.Reversible).ToList();
+        if (irreversible.Count == 0) return true;
+
+        IrreversibleWarningItems.Clear();
+        foreach (var t in irreversible)
+        {
+            IrreversibleWarningItems.Add(new IrreversibleItemModel
+            {
+                Id = t.Id,
+                Name = t.Name,
+                Reason = t.IrreversibleReason ?? "Permanent system modification."
+            });
+        }
+
+        IrreversibleDialogTitle = irreversible.Count == 1
+            ? $"Irreversible Action — {irreversible[0].Name}"
+            : $"Irreversible Actions Warning ({irreversible.Count} tweaks)";
+
+        _irreversibleConfirmTcs = new TaskCompletionSource<bool>();
+        IsIrreversibleDialogOpen = true;
+
+        return await _irreversibleConfirmTcs.Task;
+    }
+
+    [ObservableProperty]
     private bool _isPreviewDialogOpen;
 
     [ObservableProperty]
@@ -504,9 +554,20 @@ public sealed partial class TweaksViewModel : ObservableObject
     public async Task ToggleTweakAsync(TweakCardModel card)
     {
         if (card == null || card.IsBusy || card.IsApplying || IsScanning) return;
+        bool targetState = !card.IsActive;
+
+        if (targetState && !card.Tweak.Reversible)
+        {
+            bool confirmed = await RequestIrreversibleConfirmationAsync(new[] { card.Tweak });
+            if (!confirmed)
+            {
+                AddLog("INFO", $"Cancelled application of irreversible tweak: {card.Title}");
+                return;
+            }
+        }
+
         card.IsBusy = true;
         card.IsApplying = true;
-        bool targetState = !card.IsActive;
 
         string verb = targetState ? "Applying" : "Reverting";
         using var activity = _activityTracker?.BeginActivity($"{verb} {card.Title}...");
@@ -652,6 +713,19 @@ public sealed partial class TweaksViewModel : ObservableObject
             return;
         }
 
+        var tweakDefs = selected.Select(c => c.Tweak).ToList();
+        var irreversible = tweakDefs.Where(t => !t.Reversible).ToList();
+        if (!IsDryRun && irreversible.Count > 0)
+        {
+            bool confirmed = await RequestIrreversibleConfirmationAsync(irreversible);
+            if (!confirmed)
+            {
+                StatusMessage = "Cancelled application of irreversible tweaks.";
+                AddLog("INFO", "Cancelled application of irreversible tweaks.");
+                return;
+            }
+        }
+
         IsLogDrawerOpen = true;
         IsBusy = true;
         ExecutionProgress = 0;
@@ -682,7 +756,6 @@ public sealed partial class TweaksViewModel : ObservableObject
             AddLog("INFO", $"Starting application of {selected.Count} tweak(s)...");
             AddLog("INFO", "Creating automatic pre-tweak backup snapshot...");
 
-            var tweakDefs = selected.Select(c => c.Tweak).ToList();
             var report = await Task.Run(async () => await _tweakService.ApplyTweaksAsync(tweakDefs, _runner));
 
             foreach (var item in report.Results)

@@ -194,7 +194,7 @@ public static class Program
         if (presetIdx >= 0 && presetIdx < args.Length - 1)
         {
             string presetName = args[presetIdx + 1];
-            return await ExecutePresetAsync(presetName, catalog, dryRun, isDryRun, isRun, handlers, context, runner, tweaksDir);
+            return await ExecutePresetAsync(presetName, catalog, dryRun, isDryRun, isRun, handlers, context, runner, tweaksDir, args);
         }
 
         // 1. Tweak execution: --tweak <id1,id2> / --tweaks <id1,id2> [--apply | --undo]
@@ -255,6 +255,11 @@ public static class Program
             }
             else
             {
+                if (!CheckIrreversibleTweaksGate(targetTweaks, args))
+                {
+                    return 1;
+                }
+
                 Console.WriteLine($"[EXECUTE] Applying {targetTweaks.Count} tweak(s)...");
                 var report = await runner.ApplyBatchAsync(targetTweaks);
                 foreach (var res in report.Results)
@@ -417,6 +422,11 @@ public static class Program
 
             if (isRun)
             {
+                if (!CheckIrreversibleTweaksGate(targetTweaks, args))
+                {
+                    return 1;
+                }
+
                 Console.WriteLine($"\n[EXECUTE] Running {targetTweaks.Count} configured tweak(s) (RealMode: {isRealMode})...");
                 var report = await runner.ApplyBatchAsync(targetTweaks);
                 foreach (var res in report.Results)
@@ -822,7 +832,8 @@ public static class Program
         IEnumerable<IActionHandler> handlers,
         Core.Engine.ExecutionContext context,
         TweakRunner runner,
-        string catalogDir)
+        string catalogDir,
+        string[] args)
     {
         string presetPath = Path.Combine(catalogDir, "..", "Config", "preset.json");
         if (!File.Exists(presetPath))
@@ -858,6 +869,11 @@ public static class Program
 
         if (isRun)
         {
+            if (!CheckIrreversibleTweaksGate(targetTweaks, args))
+            {
+                return 1;
+            }
+
             Console.WriteLine($"\n[EXECUTE] Running preset '{presetName}' ({targetTweaks.Count} tweaks)...");
             var report = await runner.ApplyBatchAsync(targetTweaks);
             foreach (var res in report.Results)
@@ -956,6 +972,32 @@ public static class Program
         return tweaks;
     }
 
+    private static bool CheckIrreversibleTweaksGate(IEnumerable<TweakDefinition> tweaks, string[] args)
+    {
+        var irreversible = tweaks.Where(t => !t.Reversible).ToList();
+        if (irreversible.Count == 0)
+        {
+            return true;
+        }
+
+        bool hasFlag = args.Any(a => string.Equals(a, "--yes-irreversible", StringComparison.OrdinalIgnoreCase));
+        if (hasFlag)
+        {
+            return true;
+        }
+
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine("[ERROR] The following tweak(s) are irreversible and cannot be fully restored by Undo:");
+        foreach (var t in irreversible)
+        {
+            Console.WriteLine($"  - {t.Id} ({t.Name}): {t.IrreversibleReason ?? "Permanent system modification."}");
+        }
+        Console.WriteLine();
+        Console.WriteLine("To proceed and apply these irreversible tweaks, re-run with --yes-irreversible.");
+        Console.ResetColor();
+        return false;
+    }
+
     private static void PrintUsage()
     {
         Console.WriteLine("Usage:");
@@ -966,6 +1008,7 @@ public static class Program
         Console.WriteLine("  winvelo-cli --dry-run                    Preview all catalog tweaks without modifying system");
         Console.WriteLine("  winvelo-cli --tweak <id> --apply         Apply a specific tweak (add --real-mode for real OS)");
         Console.WriteLine("  winvelo-cli --tweak <id> --undo          Undo a specific tweak (add --real-mode for real OS)");
+        Console.WriteLine("  winvelo-cli --yes-irreversible           Confirm application of irreversible tweaks");
         Console.WriteLine("  winvelo-cli --feature <key> --enable     Enable an optional Windows feature");
         Console.WriteLine("  winvelo-cli --feature <key> --disable    Disable an optional Windows feature");
         Console.WriteLine("  winvelo-cli --clean <category|all>       Clean safe temporary file categories");

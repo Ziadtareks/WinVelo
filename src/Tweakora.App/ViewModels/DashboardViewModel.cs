@@ -201,6 +201,56 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
         IsDetailsDialogOpen = false;
     }
 
+    [ObservableProperty]
+    private bool _isIrreversibleDialogOpen;
+
+    [ObservableProperty]
+    private string _irreversibleDialogTitle = "Irreversible Action Warning";
+
+    public ObservableCollection<IrreversibleItemModel> IrreversibleWarningItems { get; } = new();
+
+    private TaskCompletionSource<bool>? _irreversibleConfirmTcs;
+
+    [RelayCommand]
+    public void ConfirmIrreversible()
+    {
+        IsIrreversibleDialogOpen = false;
+        _irreversibleConfirmTcs?.TrySetResult(true);
+    }
+
+    [RelayCommand]
+    public void CancelIrreversible()
+    {
+        IsIrreversibleDialogOpen = false;
+        _irreversibleConfirmTcs?.TrySetResult(false);
+    }
+
+    public async Task<bool> RequestIrreversibleConfirmationAsync(IEnumerable<TweakDefinition> tweaks)
+    {
+        var irreversible = tweaks.Where(t => !t.Reversible).ToList();
+        if (irreversible.Count == 0) return true;
+
+        IrreversibleWarningItems.Clear();
+        foreach (var t in irreversible)
+        {
+            IrreversibleWarningItems.Add(new IrreversibleItemModel
+            {
+                Id = t.Id,
+                Name = t.Name,
+                Reason = t.IrreversibleReason ?? "Permanent system modification."
+            });
+        }
+
+        IrreversibleDialogTitle = irreversible.Count == 1
+            ? $"Irreversible Action — {irreversible[0].Name}"
+            : $"Irreversible Actions Warning ({irreversible.Count} tweaks)";
+
+        _irreversibleConfirmTcs = new TaskCompletionSource<bool>();
+        IsIrreversibleDialogOpen = true;
+
+        return await _irreversibleConfirmTcs.Task;
+    }
+
     public ObservableCollection<ProfileCardModel> Profiles { get; } = new();
     public ObservableCollection<QuickToggleCardModel> QuickToggles { get; } = new();
 
@@ -519,9 +569,20 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
         }
 
         if (_isRefreshingStates || model.IsBusy || model.IsApplying) return;
+        bool targetState = target ?? !model.IsActive;
+
+        if (targetState && !tweak.Reversible)
+        {
+            bool confirmed = await RequestIrreversibleConfirmationAsync(new[] { tweak });
+            if (!confirmed)
+            {
+                GlobalStatusMessage = $"Cancelled {model.Title}.";
+                return;
+            }
+        }
+
         model.IsBusy = true;
         model.IsApplying = true;
-        bool targetState = target ?? !model.IsActive;
 
         string verb = targetState ? "Enabling" : "Disabling";
         GlobalStatusMessage = $"{verb} {model.Title}...";
@@ -692,6 +753,18 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
 
             if (targets.Count > 0)
             {
+                var irreversible = targets.Where(t => !t.Reversible).ToList();
+                if (irreversible.Count > 0)
+                {
+                    bool confirmed = await RequestIrreversibleConfirmationAsync(irreversible);
+                    if (!confirmed)
+                    {
+                        card.StatusMessage = "Cancelled by user.";
+                        GlobalStatusMessage = "Profile application cancelled.";
+                        return;
+                    }
+                }
+
                 var report = await Task.Run(() => _tweakService.ApplyTweaksAsync(targets, _runner));
                 HandleProfileReport(card, report, isRestore: false);
             }
@@ -745,6 +818,18 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
 
             if (targets.Count > 0)
             {
+                var irreversible = targets.Where(t => !t.Reversible).ToList();
+                if (irreversible.Count > 0)
+                {
+                    bool confirmed = await RequestIrreversibleConfirmationAsync(irreversible);
+                    if (!confirmed)
+                    {
+                        card.StatusMessage = "Cancelled by user.";
+                        GlobalStatusMessage = "Profile application cancelled.";
+                        return;
+                    }
+                }
+
                 var report = await Task.Run(() => _tweakService.ApplyTweaksAsync(targets, _runner));
                 HandleProfileReport(card, report, isRestore: false);
             }
@@ -793,6 +878,18 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
 
             if (targets.Count > 0)
             {
+                var irreversible = targets.Where(t => !t.Reversible).ToList();
+                if (irreversible.Count > 0)
+                {
+                    bool confirmed = await RequestIrreversibleConfirmationAsync(irreversible);
+                    if (!confirmed)
+                    {
+                        card.StatusMessage = "Cancelled by user.";
+                        GlobalStatusMessage = "Profile application cancelled.";
+                        return;
+                    }
+                }
+
                 var report = await Task.Run(() => _tweakService.ApplyTweaksAsync(targets, _runner));
                 HandleProfileReport(card, report, isRestore: false);
             }

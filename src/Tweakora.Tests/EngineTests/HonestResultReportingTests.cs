@@ -23,6 +23,7 @@ using Xunit;
 
 namespace Tweakora.Tests.EngineTests;
 
+[Collection("CliConsoleTests")]
 public sealed class HonestResultReportingTests : IDisposable
 {
     private readonly string _tempJournalDir;

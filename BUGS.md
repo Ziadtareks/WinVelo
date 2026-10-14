@@ -136,3 +136,20 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
   3. Added structured step aggregation in `ActionResult` (`ExecutedSteps`, `FailedSteps`) and gated success strictly on zero failed steps.
   4. Updated partial failure rollback in `ApplyBatchAsync` to mark rolled back records as reverted and report `Failed (rolled back)` vs `Failed (rollback incomplete)`.
 
+---
+
+## BUG-012: Irreversible Destructive Tweaks Allowed Without Confirmation or Warning Gates
+- **Component**: `Catalog` (`tweak.schema.json`, `advanced.json`, `essential.json`), `Tweakora.Core` (`TweakDefinition.cs`, `IrreversibleItemModel.cs`), `Tweakora.Cli` (`Program.cs`), `Tweakora.App` (`TweaksViewModel.cs`, `TweaksTabView.xaml`, `DashboardViewModel.cs`, `DashboardTabView.xaml`), `CatalogValidator`
+- **Finding**:
+  1. Permanent destructive tweaks that delete files (purging temp directories, deleting user Edge/OneDrive profiles) or permanently purge Windows update baselines (DISM `/ResetBase`) could be applied silently and indiscriminately without any warning or confirmation.
+  2. The catalog schema and data models had no property to distinguish reversible tweaks from irreversible operations.
+  3. The CLI allowed applying irreversible tweaks without explicit confirmation flags.
+  4. The UI allowed 1-click execution of irreversible tweaks without presenting what cannot be restored.
+- **Root Cause**: The catalog schema and execution engines lacked an `irreversible` safety attribute and confirmation gates.
+- **Fix**:
+  1. Added `reversible` (boolean, default `true`) and `irreversibleReason` (string, minLength 5) to `Catalog/schema/tweak.schema.json` with an `allOf` validation enforcing non-empty `irreversibleReason` when `reversible: false`.
+  2. Added matching properties to `TweakDefinition.cs` and enforced validation in `CatalogValidator`.
+  3. Audited catalog and marked 6 permanent operations as `reversible: false` with detailed warnings and reasons: `advanced.removeedge`, `advanced.removeonedrive`, `advanced.windowsai`, `essential.widget`, `essential.diskcleanup`, and `essential.deletetempfiles`.
+  4. Added CLI gate `CheckIrreversibleTweaksGate` in `Program.cs` that refuses to apply irreversible tweaks without `--yes-irreversible`, displaying the affected tweaks and reasons.
+  5. Implemented unmissable confirmation dialog modals in `TweaksTabView` and `DashboardTabView` backed by `RequestIrreversibleConfirmationAsync` in `TweaksViewModel` and `DashboardViewModel`, allowing users to review permanent modifications and confirm or cancel before execution.
+

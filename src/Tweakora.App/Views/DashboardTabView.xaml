@@ -425,5 +425,60 @@
             </Grid>
         </Border>
     </Grid>
+
+    <!-- IRREVERSIBLE TWEAK WARNING MODAL -->
+    <Grid Background="#80000000"
+          Visibility="{Binding IsIrreversibleDialogOpen, Converter={StaticResource BoolToVisConverter}}"
+          Panel.ZIndex="2100">
+        <Border Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="#EF4444"
+                BorderThickness="1" CornerRadius="10"
+                Width="650" MaxHeight="520" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Grid Margin="20">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                
+                <DockPanel Grid.Row="0" Margin="0,0,0,8">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="⚠" FontSize="18" Foreground="#EF4444" Margin="0,0,8,0" VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding IrreversibleDialogTitle}" FontSize="16" FontWeight="Bold" Foreground="#EF4444" VerticalAlignment="Center" />
+                    </StackPanel>
+                    <Button DockPanel.Dock="Right" Content="✕" Style="{DynamicResource ModernGhostBtn}"
+                            Command="{Binding CancelIrreversibleCommand}" />
+                </DockPanel>
+
+                <TextBlock Grid.Row="1" Text="The following action(s) make permanent system changes that cannot be fully restored by Undo. Please review the details below before proceeding:"
+                           FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,0,0,12" />
+
+                <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" MaxHeight="300">
+                    <ItemsControl ItemsSource="{Binding IrreversibleWarningItems}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="#1E1E24" BorderBrush="#DC2626" BorderThickness="1"
+                                        CornerRadius="6" Padding="12,10" Margin="0,0,0,8">
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Name}" FontSize="13" FontWeight="Bold" Foreground="#FCA5A5" />
+                                        <TextBlock Text="{Binding Id, StringFormat='ID: {0}'}" FontSize="11" Foreground="#94A3B8" Margin="0,2,0,4" />
+                                        <TextBlock Text="{Binding Reason}" FontSize="12" Foreground="#F87171" TextWrapping="Wrap" />
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+
+                <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+                    <ui:Button Content="Cancel" Appearance="Secondary" Margin="0,0,10,0"
+                               Command="{Binding CancelIrreversibleCommand}" />
+                    <ui:Button Content="I Understand, Apply Changes" Appearance="Danger"
+                               Command="{Binding ConfirmIrreversibleCommand}" />
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
 </Grid>
 </UserControl>

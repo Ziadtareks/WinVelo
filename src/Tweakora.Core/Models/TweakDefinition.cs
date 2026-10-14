@@ -153,4 +153,10 @@ public sealed class TweakDefinition
 
     [JsonPropertyName("warnings")]
     public string? Warnings { get; set; }
+
+    [JsonPropertyName("reversible")]
+    public bool Reversible { get; set; } = true;
+
+    [JsonPropertyName("irreversibleReason")]
+    public string? IrreversibleReason { get; set; }
 }

@@ -115,6 +115,16 @@ public static class Program
                             OutputFormat = OutputFormat.List
                         });
 
+                        bool? isReversible = item["reversible"]?.GetValue<bool>();
+                        string? reason = item["irreversibleReason"]?.ToString();
+                        if (isReversible == false && string.IsNullOrWhiteSpace(reason))
+                        {
+                            errorCount++;
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine($"  [FAIL] Tweak '{id}' has reversible=false but missing or empty irreversibleReason.");
+                            Console.ResetColor();
+                        }
+
                         if (!result.IsValid)
                         {
                             errorCount++;
@@ -129,7 +139,7 @@ public static class Program
                             }
                             Console.ResetColor();
                         }
-                        else
+                        else if (isReversible != false || !string.IsNullOrWhiteSpace(reason))
                         {
                             Console.ForegroundColor = ConsoleColor.Green;
                             Console.WriteLine($"  [PASS] {id}");
@@ -154,6 +164,16 @@ public static class Program
                         OutputFormat = OutputFormat.List
                     });
 
+                    bool? isReversible = single["reversible"]?.GetValue<bool>();
+                    string? reason = single["irreversibleReason"]?.ToString();
+                    if (isReversible == false && string.IsNullOrWhiteSpace(reason))
+                    {
+                        errorCount++;
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine($"  [FAIL] Tweak '{id}' has reversible=false but missing or empty irreversibleReason.");
+                        Console.ResetColor();
+                    }
+
                     if (!result.IsValid)
                     {
                         errorCount++;
@@ -168,7 +188,7 @@ public static class Program
                         }
                         Console.ResetColor();
                     }
-                    else
+                    else if (isReversible != false || !string.IsNullOrWhiteSpace(reason))
                     {
                         Console.ForegroundColor = ConsoleColor.Green;
                         Console.WriteLine($"  [PASS] {id}");

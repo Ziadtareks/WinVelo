@@ -229,7 +229,10 @@
       }
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/widget",
-    "verifiedOnBuild": "26100"
+    "verifiedOnBuild": "26100",
+    "warnings": "Uninstalls the Windows Widgets Platform and WebExperience AppX packages for all users. Undo restores taskbar registry settings, but does NOT reinstall the removed AppX packages.",
+    "reversible": false,
+    "irreversibleReason": "Uninstalls Microsoft Widgets and WebExperience AppX packages for all users; undo only restores taskbar visibility registry keys and does not reinstall the packages."
   },
   {
     "schemaVersion": "1.0.0",
@@ -1136,7 +1139,10 @@
       }
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/diskcleanup",
-    "verifiedOnBuild": "26100"
+    "verifiedOnBuild": "26100",
+    "warnings": "Purges superseded Windows update components via DISM /ResetBase. Once executed, superseded updates cannot be rolled back. Undo only resets CleanMgr registry flags.",
+    "reversible": false,
+    "irreversibleReason": "Executes DISM ResetBase and CleanMgr which permanently purge superseded Windows update components; deleted update baselines cannot be restored."
   },
   {
     "schemaVersion": "1.0.0",
@@ -1190,7 +1196,10 @@
       }
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/deletetempfiles",
-    "verifiedOnBuild": "26100"
+    "verifiedOnBuild": "26100",
+    "warnings": "Permanently empties all user and system temp folders. Files deleted from temp cannot be recovered. Undo only resets the StorageSense registry flag.",
+    "reversible": false,
+    "irreversibleReason": "Permanently deletes all files in user and system TEMP directories; deleted temporary files cannot be restored."
   },
   {
     "schemaVersion": "1.0.0",
