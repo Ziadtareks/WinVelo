@@ -1,6 +1,8 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Text;
 using Tweakora.Core.Interfaces;
+using Tweakora.Core.Models;
 using Tweakora.Core.Safety;
 
 namespace Tweakora.Platform;
@@ -65,15 +67,31 @@ public sealed class WindowsShellService : IShellService
         catch { }
     }
 
-    public async Task<string> ExecutePowerShellAsync(string script, int timeoutSeconds = 60)
+    public async Task<PowerShellResult> ExecutePowerShellAsync(string script, int timeoutSeconds = 60)
     {
         EnsureNotTestMode();
+
+        int effectiveTimeout = timeoutSeconds <= 0 ? 60 : Math.Min(timeoutSeconds, 900);
+
+        string wrappedScript =
+            "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';\r\n" +
+            "try {\r\n" +
+            script + "\r\n" +
+            "} catch {\r\n" +
+            "    [Console]::Error.WriteLine($_)\r\n" +
+            "    exit 1\r\n" +
+            "}\r\n";
+
+        byte[] scriptBytes = Encoding.Unicode.GetBytes(wrappedScript);
+        string encodedCommand = Convert.ToBase64String(scriptBytes);
+
+        var stopwatch = Stopwatch.StartNew();
         using var process = new Process
         {
             StartInfo = new ProcessStartInfo
             {
                 FileName = "powershell.exe",
-                Arguments = $"-NoProfile -NonInteractive -ExecutionPolicy Bypass -Command \"{script.Replace("\"", "\\\"")}\"",
+                Arguments = $"-NoProfile -NonInteractive -ExecutionPolicy Bypass -EncodedCommand {encodedCommand}",
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
@@ -81,25 +99,73 @@ public sealed class WindowsShellService : IShellService
             }
         };
 
-        process.Start();
-        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(Math.Clamp(timeoutSeconds, 1, 300)));
         try
         {
-            string output = await process.StandardOutput.ReadToEndAsync(cts.Token);
-            string error = await process.StandardError.ReadToEndAsync(cts.Token);
-            await process.WaitForExitAsync(cts.Token);
-
-            if (!string.IsNullOrWhiteSpace(error) && process.ExitCode != 0)
+            process.Start();
+        }
+        catch (Exception ex)
+        {
+            stopwatch.Stop();
+            return new PowerShellResult
             {
-                throw new InvalidOperationException($"PowerShell script error (ExitCode {process.ExitCode}): {error}");
-            }
+                ExitCode = -1,
+                StdOut = string.Empty,
+                StdErr = ex.Message,
+                TimedOut = false,
+                Duration = stopwatch.Elapsed
+            };
+        }
 
-            return output;
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(effectiveTimeout));
+        var stdoutTask = process.StandardOutput.ReadToEndAsync();
+        var stderrTask = process.StandardError.ReadToEndAsync();
+
+        try
+        {
+            await process.WaitForExitAsync(cts.Token);
+            string stdout = await stdoutTask;
+            string stderr = await stderrTask;
+            stopwatch.Stop();
+
+            return new PowerShellResult
+            {
+                ExitCode = process.ExitCode,
+                StdOut = stdout,
+                StdErr = stderr,
+                TimedOut = false,
+                Duration = stopwatch.Elapsed
+            };
         }
         catch (OperationCanceledException)
         {
-            try { process.Kill(); } catch { }
-            throw new TimeoutException($"PowerShell script timed out after {timeoutSeconds} seconds.");
+            stopwatch.Stop();
+            try
+            {
+                process.Kill(entireProcessTree: true);
+            }
+            catch
+            {
+            }
+
+            string stdout = string.Empty;
+            string stderr = string.Empty;
+            try
+            {
+                if (stdoutTask.IsCompleted) stdout = await stdoutTask;
+                if (stderrTask.IsCompleted) stderr = await stderrTask;
+            }
+            catch
+            {
+            }
+
+            return new PowerShellResult
+            {
+                ExitCode = -1,
+                StdOut = stdout,
+                StdErr = stderr,
+                TimedOut = true,
+                Duration = stopwatch.Elapsed
+            };
         }
     }
 

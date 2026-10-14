@@ -37,11 +37,26 @@ public sealed class PowerShellActionHandler : IActionHandler
             try
             {
                 int timeout = action.TimeoutSeconds.HasValue && action.TimeoutSeconds.Value > 0 ? action.TimeoutSeconds.Value : 60;
-                string output = await context.Shell.ExecutePowerShellAsync(action.Script, timeout);
+                PowerShellResult result = await context.Shell.ExecutePowerShellAsync(action.Script, timeout);
+                if (!result.Success)
+                {
+                    string errorDetail = result.TimedOut
+                        ? $"Script timed out after {timeout} seconds."
+                        : !string.IsNullOrWhiteSpace(result.StdErr)
+                            ? result.StdErr.Trim()
+                            : $"Exited with code {result.ExitCode}";
+                    return new ActionResult
+                    {
+                        Success = false,
+                        Message = $"PowerShell execution failed: {errorDetail}",
+                        JournalRecord = journalRecord
+                    };
+                }
+
                 return new ActionResult
                 {
                     Success = true,
-                    Message = output,
+                    Message = !string.IsNullOrWhiteSpace(result.StdOut) ? result.StdOut.Trim() : "PowerShell script completed successfully.",
                     JournalRecord = journalRecord
                 };
             }
@@ -75,8 +90,22 @@ public sealed class PowerShellActionHandler : IActionHandler
         {
             try
             {
-                string output = await context.Shell.ExecutePowerShellAsync(record.PreviousData, 60);
-                return new ActionResult { Success = true, Message = output };
+                PowerShellResult result = await context.Shell.ExecutePowerShellAsync(record.PreviousData, 60);
+                if (!result.Success)
+                {
+                    string errorDetail = result.TimedOut
+                        ? "Undo script timed out."
+                        : !string.IsNullOrWhiteSpace(result.StdErr)
+                            ? result.StdErr.Trim()
+                            : $"Exited with code {result.ExitCode}";
+                    return new ActionResult { Success = false, Message = $"PowerShell undo failed: {errorDetail}" };
+                }
+
+                return new ActionResult
+                {
+                    Success = true,
+                    Message = !string.IsNullOrWhiteSpace(result.StdOut) ? result.StdOut.Trim() : "PowerShell undo completed successfully."
+                };
             }
             catch (Exception ex)
             {

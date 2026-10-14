@@ -271,7 +271,7 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "Invoke-WinUtilExplorerUpdate -action \"restart\"",
+        "script": "Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue",
         "timeoutSeconds": 60
       }
     ],
@@ -288,7 +288,7 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "Invoke-WinUtilExplorerUpdate -action \"restart\"",
+        "script": "Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue",
         "timeoutSeconds": 60
       }
     ],
@@ -1147,7 +1147,7 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "Invoke-WinUtilExplorerUpdate -action \"restart\"",
+        "script": "Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue",
         "timeoutSeconds": 60
       }
     ],
@@ -1182,7 +1182,7 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "Invoke-WinUtilExplorerUpdate -action \"restart\"",
+        "script": "Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue",
         "timeoutSeconds": 60
       }
     ],
@@ -1277,7 +1277,7 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "Invoke-WinUtilExplorerUpdate -action \"restart\"",
+        "script": "Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue",
         "timeoutSeconds": 60
       }
     ],
@@ -1294,7 +1294,7 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "Invoke-WinUtilExplorerUpdate -action \"restart\"",
+        "script": "Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue",
         "timeoutSeconds": 60
       }
     ],

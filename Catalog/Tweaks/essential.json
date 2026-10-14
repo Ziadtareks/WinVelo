@@ -737,7 +737,7 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "# Disable Defender Auto Sample Submission\n      Set-MpPreference -SubmitSamplesConsent 2\n\n      # Disable (Connected User Experiences and Telemetry) Service\n      Set-Service -Name diagtrack -StartupType Disabled\n\n      # Disable (Windows Error Reporting Manager) Service\n      Set-Service -Name wermgr -StartupType Disabled\n\n      # Disable PowerShell 7 telemetry\n      [Environment]::SetEnvironmentVariable('POWERSHELL_TELEMETRY_OPTOUT', '1', 'Machine')\n\n      Remove-ItemProperty -Path \"HKCU:\\Software\\Microsoft\\Siuf\\Rules\" -Name PeriodInNanoSeconds",
+        "script": "# Disable Defender Auto Sample Submission\n      if (Get-Command Set-MpPreference -ErrorAction SilentlyContinue) {\n          Set-MpPreference -SubmitSamplesConsent 2 -ErrorAction SilentlyContinue\n      }\n\n      # Disable (Connected User Experiences and Telemetry) Service\n      if (Get-Service -Name diagtrack -ErrorAction SilentlyContinue) {\n          Set-Service -Name diagtrack -StartupType Disabled -ErrorAction SilentlyContinue\n      }\n\n      # Disable (Windows Error Reporting Service)\n      if (Get-Service -Name WerSvc -ErrorAction SilentlyContinue) {\n          Set-Service -Name WerSvc -StartupType Disabled -ErrorAction SilentlyContinue\n      }\n\n      # Disable PowerShell 7 telemetry\n      [Environment]::SetEnvironmentVariable('POWERSHELL_TELEMETRY_OPTOUT', '1', 'Machine')\n\n      Remove-ItemProperty -Path \"HKCU:\\Software\\Microsoft\\Siuf\\Rules\" -Name PeriodInNanoSeconds -ErrorAction SilentlyContinue",
         "timeoutSeconds": 60
       }
     ],
@@ -829,7 +829,7 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "# Enable Defender Auto Sample Submission\n      Set-MpPreference -SubmitSamplesConsent 1\n\n      # Enable (Connected User Experiences and Telemetry) Service\n      Set-Service -Name diagtrack -StartupType Automatic\n\n      # Enable (Windows Error Reporting Manager) Service\n      Set-Service -Name wermgr -StartupType Automatic\n\n      # Enable PowerShell 7 telemetry\n      [Environment]::SetEnvironmentVariable('POWERSHELL_TELEMETRY_OPTOUT', '', 'Machine')",
+        "script": "# Enable Defender Auto Sample Submission\n      if (Get-Command Set-MpPreference -ErrorAction SilentlyContinue) {\n          Set-MpPreference -SubmitSamplesConsent 1 -ErrorAction SilentlyContinue\n      }\n\n      # Enable (Connected User Experiences and Telemetry) Service\n      if (Get-Service -Name diagtrack -ErrorAction SilentlyContinue) {\n          Set-Service -Name diagtrack -StartupType Automatic -ErrorAction SilentlyContinue\n      }\n\n      # Enable (Windows Error Reporting Service)\n      if (Get-Service -Name WerSvc -ErrorAction SilentlyContinue) {\n          Set-Service -Name WerSvc -StartupType Automatic -ErrorAction SilentlyContinue\n      }\n\n      # Enable PowerShell 7 telemetry\n      [Environment]::SetEnvironmentVariable('POWERSHELL_TELEMETRY_OPTOUT', '', 'Machine')",
         "timeoutSeconds": 60
       }
     ],
@@ -1113,8 +1113,8 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "cleanmgr.exe /d C: /VERYLOWDISK -ErrorAction SilentlyContinue\n      Dism.exe /online /Cleanup-Image /StartComponentCleanup /ResetBase -ErrorAction SilentlyContinue",
-        "timeoutSeconds": 60
+        "script": "cleanmgr.exe /d C: /VERYLOWDISK\n      Dism.exe /online /Cleanup-Image /StartComponentCleanup /ResetBase",
+        "timeoutSeconds": 600
       },
       {
         "type": "Registry",

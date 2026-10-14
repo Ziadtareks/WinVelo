@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Tweakora.Core.Interfaces;
+using Tweakora.Core.Models;
 using Tweakora.Core.Operations;
 
 namespace Tweakora.Modules.Apps;
@@ -275,8 +276,8 @@ public sealed class AppInstallService : IAppInstallService
                     @"Microsoft\WindowsApps\winget.exe");
                 if (File.Exists(localAppWinget)) return true;
 
-                string output = await _shell.ExecutePowerShellAsync("(Get-Command winget.exe -ErrorAction SilentlyContinue) -ne $null", 5);
-                return output.Contains("True", StringComparison.OrdinalIgnoreCase);
+                var res = await _shell.ExecutePowerShellAsync("(Get-Command winget.exe -ErrorAction SilentlyContinue) -ne $null", 5);
+                return res.Success && res.StdOut.Contains("True", StringComparison.OrdinalIgnoreCase);
             }
             else if (packageManager.Equals("Chocolatey", StringComparison.OrdinalIgnoreCase))
             {
@@ -285,8 +286,8 @@ public sealed class AppInstallService : IAppInstallService
                     @"chocolatey\bin\choco.exe");
                 if (File.Exists(chocoPath)) return true;
 
-                string output = await _shell.ExecutePowerShellAsync("(Get-Command choco.exe -ErrorAction SilentlyContinue) -ne $null", 5);
-                return output.Contains("True", StringComparison.OrdinalIgnoreCase);
+                var res = await _shell.ExecutePowerShellAsync("(Get-Command choco.exe -ErrorAction SilentlyContinue) -ne $null", 5);
+                return res.Success && res.StdOut.Contains("True", StringComparison.OrdinalIgnoreCase);
             }
         }
         catch
@@ -302,7 +303,8 @@ public sealed class AppInstallService : IAppInstallService
         try
         {
             // Rapid detection of installed applications via winget list
-            string output = await _shell.ExecutePowerShellAsync("winget list --accept-source-agreements", 30);
+            var res = await _shell.ExecutePowerShellAsync("winget list --accept-source-agreements", 30);
+            string output = res.StdOut;
             if (!string.IsNullOrWhiteSpace(output))
             {
                 foreach (var app in apps)
@@ -359,10 +361,11 @@ public sealed class AppInstallService : IAppInstallService
 
                 try
                 {
-                    string output = await _shell.ExecutePowerShellAsync(script, 300);
-                    bool success = !output.Contains("Error", StringComparison.OrdinalIgnoreCase) &&
-                                   !output.Contains("Failed", StringComparison.OrdinalIgnoreCase) &&
-                                   !output.Contains("Exit code: 1", StringComparison.OrdinalIgnoreCase);
+                    var res = await _shell.ExecutePowerShellAsync(script, 300);
+                    bool success = res.Success &&
+                                   !res.StdOut.Contains("Error", StringComparison.OrdinalIgnoreCase) &&
+                                   !res.StdOut.Contains("Failed", StringComparison.OrdinalIgnoreCase) &&
+                                   !res.StdOut.Contains("Exit code: 1", StringComparison.OrdinalIgnoreCase);
 
                     if (success)
                     {
@@ -374,12 +377,16 @@ public sealed class AppInstallService : IAppInstallService
                         app.StatusText = "Install Failed";
                     }
 
+                    string reason = success
+                        ? "Installed successfully."
+                        : (!string.IsNullOrWhiteSpace(res.StdErr) ? res.StdErr.Trim() : (!string.IsNullOrWhiteSpace(res.StdOut) ? res.StdOut.Trim() : "Install failed."));
+
                     return new OperationItemResult
                     {
                         Id = app.Key,
                         Name = app.Name,
                         Status = success ? OperationItemStatus.Succeeded : OperationItemStatus.Failed,
-                        Reason = success ? "Installed successfully." : output.Trim()
+                        Reason = reason
                     };
                 }
                 finally
@@ -422,9 +429,10 @@ public sealed class AppInstallService : IAppInstallService
 
                 try
                 {
-                    string output = await _shell.ExecutePowerShellAsync(script, 180);
-                    bool success = !output.Contains("Error", StringComparison.OrdinalIgnoreCase) &&
-                                   !output.Contains("Failed", StringComparison.OrdinalIgnoreCase);
+                    var res = await _shell.ExecutePowerShellAsync(script, 180);
+                    bool success = res.Success &&
+                                   !res.StdOut.Contains("Error", StringComparison.OrdinalIgnoreCase) &&
+                                   !res.StdOut.Contains("Failed", StringComparison.OrdinalIgnoreCase);
 
                     if (success)
                     {
@@ -436,12 +444,16 @@ public sealed class AppInstallService : IAppInstallService
                         app.StatusText = "Uninstall Failed";
                     }
 
+                    string reason = success
+                        ? "Uninstalled successfully."
+                        : (!string.IsNullOrWhiteSpace(res.StdErr) ? res.StdErr.Trim() : (!string.IsNullOrWhiteSpace(res.StdOut) ? res.StdOut.Trim() : "Uninstall failed."));
+
                     return new OperationItemResult
                     {
                         Id = app.Key,
                         Name = app.Name,
                         Status = success ? OperationItemStatus.Succeeded : OperationItemStatus.Failed,
-                        Reason = success ? "Uninstalled successfully." : output.Trim()
+                        Reason = reason
                     };
                 }
                 finally
@@ -458,6 +470,7 @@ public sealed class AppInstallService : IAppInstallService
             ? "choco upgrade all -y"
             : "winget upgrade --all --silent --accept-package-agreements --accept-source-agreements --disable-interactivity";
 
-        return await _shell.ExecutePowerShellAsync(script, 600);
+        var res = await _shell.ExecutePowerShellAsync(script, 600);
+        return res.Success ? (string.IsNullOrWhiteSpace(res.StdOut) ? "Upgrade completed." : res.StdOut) : $"Upgrade failed: {res.StdErr}";
     }
 }

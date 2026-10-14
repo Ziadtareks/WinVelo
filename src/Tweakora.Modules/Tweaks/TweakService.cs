@@ -237,14 +237,14 @@ public sealed class TweakService : ITweakService
         if (string.Equals(planName, "Ultimate Performance", StringComparison.OrdinalIgnoreCase))
         {
             string script = "powercfg -duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61; powercfg /setactive e9a42b02-d5df-448d-aa00-03f14749eb61";
-            string outStr = await _shell.ExecutePowerShellAsync(script, 30);
-            return !outStr.Contains("Error", StringComparison.OrdinalIgnoreCase);
+            var res = await _shell.ExecutePowerShellAsync(script, 30);
+            return res.Success;
         }
         else
         {
             string script = "powercfg /setactive 381b4222-f694-41f0-9685-ff5bb260df2e";
-            string outStr = await _shell.ExecutePowerShellAsync(script, 30);
-            return !outStr.Contains("Error", StringComparison.OrdinalIgnoreCase);
+            var res = await _shell.ExecutePowerShellAsync(script, 30);
+            return res.Success;
         }
     }
 
@@ -264,7 +264,7 @@ public sealed class TweakService : ITweakService
             script = $"Get-NetAdapter | Where-Object Status -eq 'Up' | Set-DnsClientServerAddress -ServerAddresses '{primary}', '{secondary}'";
         }
 
-        string outStr = await _shell.ExecutePowerShellAsync(script, 30);
-        return !outStr.Contains("Error", StringComparison.OrdinalIgnoreCase);
+        var res = await _shell.ExecutePowerShellAsync(script, 30);
+        return res.Success;
     }
 }

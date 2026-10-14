@@ -84,3 +84,21 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
 - **Finding**: "Disable All Updates" is a high-risk operation that disables critical security patches and background services. In previous builds, it could be triggered with a single accidental click.
 - **Root Cause**: Missing interactive confirmation dialog with type-to-confirm barrier.
 - **Fix**: Added high-risk modal barrier requiring the user to type `"I understand"` before the disable updates operation can be staged or executed.
+
+---
+
+## BUG-009: PowerShell Runner Deadlocks, Escaping Bugs, and Catalog Script Failures
+- **Component**: `Tweakora.Platform` (`WindowsShellService.cs`), `Tweakora.Core` (`PowerShellActionHandler.cs`), `Catalog/Tweaks`
+- **Finding**:
+  1. `ExecutePowerShellAsync` executed scripts via `-Command` with manual quote replacement, causing syntax failures on complex multiline scripts.
+  2. StandardOutput and StandardError were read sequentially, causing potential OS buffer deadlocks on large script outputs.
+  3. On timeout, the process was killed without child tree traversal (`process.Kill()`), leaving orphaned child processes behind.
+  4. Failure detection required both non-empty stderr and non-zero exit code, masking silent script failures.
+  5. Several catalog scripts contained nonexistent external cmdlets (`Invoke-WinUtilExplorerUpdate`), nonexistent services (`wermgr`), invalid PowerShell parameters on native EXEs (`DISM ... -ErrorAction SilentlyContinue`), and unrealistic timeouts (60s for DISM cleanup, Edge uninstall, OneDrive uninstall).
+- **Root Cause**: Lack of structured process execution harnessing, un-encoded script argument passing, sequential stream I/O, and unvalidated upstream script migration.
+- **Fix**:
+  1. Rewrote `ExecutePowerShellAsync` to pass scripts via `-EncodedCommand` (UTF-16LE Base64) wrapped in `$ErrorActionPreference='Stop'; $ProgressPreference='SilentlyContinue'` and try/catch.
+  2. Implemented concurrent asynchronous stream reading with `Stopwatch` duration tracking and full process tree termination (`Kill(entireProcessTree: true)`) on cancellation.
+  3. Created `PowerShellResult` model with explicit `ExitCode`, `StdOut`, `StdErr`, `TimedOut`, `Duration`, and `Success` fields.
+  4. Replaced `Invoke-WinUtilExplorerUpdate` with standard `Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue`.
+  5. Sanitized native CLI invocations (DISM, cleanmgr), guarded service calls (`diagtrack`, `WerSvc`), raised timeouts (300s/600s), and added AST syntax parse testing in `CatalogPowerShellSyntaxTests.cs`.

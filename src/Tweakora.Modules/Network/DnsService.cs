@@ -126,7 +126,7 @@ public sealed class DnsService : IDnsService
             script = $"Get-NetAdapter | Where-Object Status -eq 'Up' | Set-DnsClientServerAddress -ServerAddresses '{provider.PrimaryDns}', '{provider.SecondaryDns}'";
         }
 
-        string output = await _shell.ExecutePowerShellAsync(script, 30);
-        return !output.Contains("Error", StringComparison.OrdinalIgnoreCase);
+        var res = await _shell.ExecutePowerShellAsync(script, 30);
+        return res.Success;
     }
 }

@@ -127,12 +127,32 @@ public sealed class FeatureService : IFeatureService
                 foreach (string fn in feature.FeatureNames)
                 {
                     string script = $"Enable-WindowsOptionalFeature -Online -FeatureName '{fn}' -All -NoRestart";
-                    await _shell.ExecutePowerShellAsync(script, 180);
+                    var res = await _shell.ExecutePowerShellAsync(script, 180);
+                    if (!res.Success)
+                    {
+                        return new OperationItemResult
+                        {
+                            Id = feature.Key,
+                            Name = feature.Name,
+                            Status = OperationItemStatus.Failed,
+                            Reason = !string.IsNullOrWhiteSpace(res.StdErr) ? res.StdErr.Trim() : $"Failed to enable feature '{fn}'"
+                        };
+                    }
                 }
 
                 foreach (string sc in feature.InvokeScripts)
                 {
-                    await _shell.ExecutePowerShellAsync(sc, 180);
+                    var res = await _shell.ExecutePowerShellAsync(sc, 180);
+                    if (!res.Success)
+                    {
+                        return new OperationItemResult
+                        {
+                            Id = feature.Key,
+                            Name = feature.Name,
+                            Status = OperationItemStatus.Failed,
+                            Reason = !string.IsNullOrWhiteSpace(res.StdErr) ? res.StdErr.Trim() : "Feature configuration script failed."
+                        };
+                    }
                 }
 
                 feature.IsInstalled = true;
@@ -160,7 +180,17 @@ public sealed class FeatureService : IFeatureService
                 foreach (string fn in feature.FeatureNames)
                 {
                     string script = $"Disable-WindowsOptionalFeature -Online -FeatureName '{fn}' -NoRestart";
-                    await _shell.ExecutePowerShellAsync(script, 180);
+                    var res = await _shell.ExecutePowerShellAsync(script, 180);
+                    if (!res.Success)
+                    {
+                        return new OperationItemResult
+                        {
+                            Id = feature.Key,
+                            Name = feature.Name,
+                            Status = OperationItemStatus.Failed,
+                            Reason = !string.IsNullOrWhiteSpace(res.StdErr) ? res.StdErr.Trim() : $"Failed to disable feature '{fn}'"
+                        };
+                    }
                 }
 
                 feature.IsInstalled = false;
@@ -181,14 +211,14 @@ public sealed class FeatureService : IFeatureService
         if (enable)
         {
             string script = "Add-WindowsCapability -Online -Name OpenSSH.Server~~~~0.0.1.0; Start-Service sshd; Set-Service -Name sshd -StartupType 'Automatic'";
-            string output = await _shell.ExecutePowerShellAsync(script, 180);
-            return !output.Contains("Error", StringComparison.OrdinalIgnoreCase);
+            var res = await _shell.ExecutePowerShellAsync(script, 180);
+            return res.Success;
         }
         else
         {
             string script = "Stop-Service sshd -ErrorAction SilentlyContinue; Set-Service -Name sshd -StartupType 'Disabled'; Remove-WindowsCapability -Online -Name OpenSSH.Server~~~~0.0.1.0";
-            string output = await _shell.ExecutePowerShellAsync(script, 180);
-            return !output.Contains("Error", StringComparison.OrdinalIgnoreCase);
+            var res = await _shell.ExecutePowerShellAsync(script, 180);
+            return res.Success;
         }
     }
 }

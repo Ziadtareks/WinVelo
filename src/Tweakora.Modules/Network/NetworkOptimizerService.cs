@@ -155,15 +155,15 @@ public sealed class NetworkOptimizerService : INetworkOptimizerService
             script = $"Get-NetAdapter | Where-Object Status -eq 'Up' | Set-DnsClientServerAddress -ServerAddresses '{primaryDns}', '{secondaryDns}'";
         }
 
-        string output = await _shell.ExecutePowerShellAsync(script, 30);
-        return !output.Contains("Error", StringComparison.OrdinalIgnoreCase);
+        var res = await _shell.ExecutePowerShellAsync(script, 30);
+        return res.Success;
     }
 
     public async Task<bool> ResetDnsToDhcpAsync(CancellationToken cancellationToken = default)
     {
         string script = "Get-NetAdapter | Where-Object Status -eq 'Up' | Set-DnsClientServerAddress -ResetServerAddresses";
-        string output = await _shell.ExecutePowerShellAsync(script, 30);
-        return !output.Contains("Error", StringComparison.OrdinalIgnoreCase);
+        var res = await _shell.ExecutePowerShellAsync(script, 30);
+        return res.Success;
     }
 
     public Task<IReadOnlyList<string>> GetActiveNetworkAdapterGuidsAsync()

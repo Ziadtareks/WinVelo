@@ -180,15 +180,18 @@ public sealed class FixService : IFixService
             new[] { targetFix },
             async (fix, ct) =>
             {
-                string output = await _shell.ExecutePowerShellAsync(fix.Script, 300);
-                bool success = !output.Contains("Error", StringComparison.OrdinalIgnoreCase);
+                var res = await _shell.ExecutePowerShellAsync(fix.Script, 300);
+                bool success = res.Success;
+                string reason = success
+                    ? "Fix executed successfully."
+                    : (!string.IsNullOrWhiteSpace(res.StdErr) ? res.StdErr.Trim() : (!string.IsNullOrWhiteSpace(res.StdOut) ? res.StdOut.Trim() : "Fix execution failed."));
 
                 return new OperationItemResult
                 {
                     Id = fix.Id,
                     Name = fix.Title,
                     Status = success ? OperationItemStatus.Succeeded : OperationItemStatus.Failed,
-                    Reason = success ? "Fix executed successfully." : output.Trim()
+                    Reason = reason
                 };
             },
             cancellationToken);

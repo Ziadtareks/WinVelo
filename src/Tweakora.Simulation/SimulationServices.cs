@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Tweakora.Core.Interfaces;
+using Tweakora.Core.Models;
 
 namespace Tweakora.Simulation;
 
@@ -329,14 +330,27 @@ public sealed class FakeShellService : IShellService
     public List<string> ExecutedScripts { get; } = new();
     public List<string> OpenedUrls { get; } = new();
     public List<string> LaunchedApplets { get; } = new();
+    public Func<string, int, PowerShellResult>? ScriptResultFactory { get; set; }
 
     public void RestartExplorer() => ExplorerRestarted = true;
     public void RefreshShellEnvironment() => EnvironmentRefreshed = true;
 
-    public Task<string> ExecutePowerShellAsync(string script, int timeoutSeconds = 60)
+    public Task<PowerShellResult> ExecutePowerShellAsync(string script, int timeoutSeconds = 60)
     {
         ExecutedScripts.Add(script);
-        return Task.FromResult($"Simulated execution of script ({script.Length} chars)");
+        if (ScriptResultFactory != null)
+        {
+            return Task.FromResult(ScriptResultFactory(script, timeoutSeconds));
+        }
+
+        return Task.FromResult(new PowerShellResult
+        {
+            ExitCode = 0,
+            StdOut = $"Simulated execution of script ({script.Length} chars)",
+            StdErr = string.Empty,
+            TimedOut = false,
+            Duration = TimeSpan.FromMilliseconds(10)
+        });
     }
 
     public void OpenUrl(string url)

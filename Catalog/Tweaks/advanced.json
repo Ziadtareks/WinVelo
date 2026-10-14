@@ -622,7 +622,7 @@
         "type": "PowerShell",
         "operation": "Execute",
         "script": "$Path = Resolve-Path -Path \"$Env:ProgramFiles (x86)\\Microsoft\\Edge\\Application\\*\\Installer\\setup.exe\" -ErrorAction SilentlyContinue | Select-Object -Last 1\n\n      if ($Path -and (Test-Path $Path)) {\n          Start-Process -FilePath $Path -ArgumentList \"--uninstall --system-level --force-uninstall --delete-profile\" -Wait\n      }",
-        "timeoutSeconds": 60
+        "timeoutSeconds": 300
       },
       {
         "type": "Registry",
@@ -639,7 +639,7 @@
         "type": "PowerShell",
         "operation": "Execute",
         "script": "winget install Microsoft.Edge --source winget --accept-package-agreements --accept-source-agreements",
-        "timeoutSeconds": 60
+        "timeoutSeconds": 600
       },
       {
         "type": "Registry",
@@ -794,8 +794,8 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "Start-Process -FilePath (Join-Path $Env:SystemRoot \"System32\\OneDriveSetup.exe\") -ArgumentList '/uninstall' -Wait -ErrorAction SilentlyContinue\n      Stop-Process -Name FileCoAuth,OneDrive -Force -ErrorAction SilentlyContinue",
-        "timeoutSeconds": 60
+        "script": "$setup = Join-Path $Env:SystemRoot \"System32\\OneDriveSetup.exe\"\n      if (Test-Path $setup) { Start-Process -FilePath $setup -ArgumentList '/uninstall' -Wait -ErrorAction SilentlyContinue }\n      Stop-Process -Name FileCoAuth,OneDrive -Force -ErrorAction SilentlyContinue",
+        "timeoutSeconds": 300
       },
       {
         "type": "Registry",
@@ -812,7 +812,7 @@
         "type": "PowerShell",
         "operation": "Execute",
         "script": "winget install Microsoft.OneDrive --source winget --accept-package-agreements --accept-source-agreements",
-        "timeoutSeconds": 60
+        "timeoutSeconds": 600
       },
       {
         "type": "Registry",
@@ -1159,7 +1159,7 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "Remove-ItemProperty -Path \"HKCU:\\Control Panel\\Desktop\" -Name \"UserPreferencesMask\"",
+        "script": "Remove-ItemProperty -Path \"HKCU:\\Control Panel\\Desktop\" -Name \"UserPreferencesMask\" -ErrorAction SilentlyContinue",
         "timeoutSeconds": 60
       }
     ],
@@ -1195,7 +1195,7 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "DISM /Online /Set-ReservedStorageState /State:Disabled -ErrorAction SilentlyContinue",
+        "script": "DISM /Online /Set-ReservedStorageState /State:Disabled",
         "timeoutSeconds": 60
       },
       {
@@ -1212,7 +1212,7 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "DISM /Online /Set-ReservedStorageState /State:Enabled -ErrorAction SilentlyContinue",
+        "script": "DISM /Online /Set-ReservedStorageState /State:Enabled",
         "timeoutSeconds": 60
       },
       {
@@ -1326,8 +1326,8 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "$Appx = (Get-AppxPackage MicrosoftWindows.Client.CoreAI).PackageFullName\n      $Sid = (Get-LocalUser $Env:UserName).Sid.Value\n\n      New-Item \"HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Appx\\AppxAllUserStore\\EndOfLife\\$Sid\\$Appx\" -Force\n\n      Get-AppxPackage -AllUsers \"*Copilot*\" | Remove-AppxPackage -AllUsers\n      winget uninstall -e --name \"Copilot\" --silent --force --accept-source-agreements 2>$null\n      Get-AppxPackage -AllUsers Microsoft.MicrosoftOfficeHub | Remove-AppxPackage -AllUsers\n\n      if ($Appx) {\n          Remove-AppxPackage $Appx\n      }\n\n      Set-Service -Name WSAIFabricSvc -StartupType Disabled\n      Disable-WindowsOptionalFeature -FeatureName Recall -Online -NoRestart\n\n      Write-Host \"Windows AI Disabled\"",
-        "timeoutSeconds": 60
+        "script": "$AppxPackage = Get-AppxPackage MicrosoftWindows.Client.CoreAI -ErrorAction SilentlyContinue\n      $Appx = if ($AppxPackage) { $AppxPackage.PackageFullName } else { $null }\n\n      $user = Get-LocalUser $Env:UserName -ErrorAction SilentlyContinue\n      if ($user -and $Appx) {\n          $Sid = $user.Sid.Value\n          New-Item \"HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Appx\\AppxAllUserStore\\EndOfLife\\$Sid\\$Appx\" -Force -ErrorAction SilentlyContinue | Out-Null\n      }\n\n      Get-AppxPackage -AllUsers \"*Copilot*\" -ErrorAction SilentlyContinue | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue\n      winget uninstall -e --name \"Copilot\" --silent --force --accept-source-agreements 2>$null\n      Get-AppxPackage -AllUsers Microsoft.MicrosoftOfficeHub -ErrorAction SilentlyContinue | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue\n\n      if ($Appx) {\n          Remove-AppxPackage $Appx -ErrorAction SilentlyContinue\n      }\n\n      if (Get-Service -Name WSAIFabricSvc -ErrorAction SilentlyContinue) {\n          Set-Service -Name WSAIFabricSvc -StartupType Disabled -ErrorAction SilentlyContinue\n      }\n      Disable-WindowsOptionalFeature -FeatureName Recall -Online -NoRestart -ErrorAction SilentlyContinue\n\n      Write-Host \"Windows AI Disabled\"",
+        "timeoutSeconds": 300
       }
     ],
     "undo": [
