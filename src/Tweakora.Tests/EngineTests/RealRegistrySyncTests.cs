@@ -244,16 +244,49 @@ public sealed class RealRegistrySyncTests
     {
         var tweak = GetTweak("essential.telemetry");
 
-        // 1. Disabling telemetry in policy
+        // 1. Setting only 1 policy key -> reports Partial, NOT Applied (engine honesty)
         _registry.SetValue("HKLM", "SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection", "AllowTelemetry", 0, "DWord");
-        bool active = await _detector.IsTweakActiveAsync(tweak, useCache: false);
-        Assert.True(active);
+        var state1 = await _detector.DetectTweakStateAsync(tweak, useCache: false);
+        Assert.Equal(TweakState.Partial, state1);
+        bool active1 = await _detector.IsTweakActiveAsync(tweak, useCache: false);
+        Assert.False(active1);
 
-        // 2. Default state: telemetry allowed
+        // 2. Setting all verifiable keys -> reports Applied
+        _registry.SetValue("HKCU", "Software\\Microsoft\\Windows\\CurrentVersion\\AdvertisingInfo", "Enabled", 0, "DWord");
+        _registry.SetValue("HKCU", "Software\\Microsoft\\Windows\\CurrentVersion\\Privacy", "TailoredExperiencesWithDiagnosticDataEnabled", 0, "DWord");
+        _registry.SetValue("HKCU", "Software\\Microsoft\\Speech_OneCore\\Settings\\OnlineSpeechPrivacy", "HasAccepted", 0, "DWord");
+        _registry.SetValue("HKCU", "Software\\Microsoft\\Input\\TIPC", "Enabled", 0, "DWord");
+        _registry.SetValue("HKCU", "Software\\Microsoft\\InputPersonalization", "RestrictImplicitInkCollection", 1, "DWord");
+        _registry.SetValue("HKCU", "Software\\Microsoft\\InputPersonalization", "RestrictImplicitTextCollection", 1, "DWord");
+        _registry.SetValue("HKCU", "Software\\Microsoft\\InputPersonalization\\TrainedDataStore", "HarvestContacts", 0, "DWord");
+        _registry.SetValue("HKCU", "Software\\Microsoft\\Personalization\\Settings", "AcceptedPrivacyPolicy", 0, "DWord");
+        _registry.SetValue("HKCU", "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced", "Start_TrackProgs", 0, "DWord");
+        _registry.SetValue("HKLM", "SOFTWARE\\Policies\\Microsoft\\Windows\\System", "PublishUserActivities", 0, "DWord");
+        _registry.SetValue("HKCU", "Software\\Microsoft\\Siuf\\Rules", "NumberOfSIUFInPeriod", 0, "DWord");
+
+        var state2 = await _detector.DetectTweakStateAsync(tweak, useCache: false);
+        Assert.Equal(TweakState.Applied, state2);
+        bool active2 = await _detector.IsTweakActiveAsync(tweak, useCache: false);
+        Assert.True(active2);
+
+        // 3. Default / unapplied state
         _registry.SetValue("HKLM", "SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection", "AllowTelemetry", 1, "DWord");
         _registry.SetValue("HKLM", "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\DataCollection", "AllowTelemetry", 1, "DWord");
         _registry.SetValue("HKCU", "Software\\Microsoft\\Windows\\CurrentVersion\\AdvertisingInfo", "Enabled", 1, "DWord");
-        active = await _detector.IsTweakActiveAsync(tweak, useCache: false);
-        Assert.False(active);
+        _registry.SetValue("HKCU", "Software\\Microsoft\\Windows\\CurrentVersion\\Privacy", "TailoredExperiencesWithDiagnosticDataEnabled", 1, "DWord");
+        _registry.SetValue("HKCU", "Software\\Microsoft\\Speech_OneCore\\Settings\\OnlineSpeechPrivacy", "HasAccepted", 1, "DWord");
+        _registry.SetValue("HKCU", "Software\\Microsoft\\Input\\TIPC", "Enabled", 1, "DWord");
+        _registry.SetValue("HKCU", "Software\\Microsoft\\InputPersonalization", "RestrictImplicitInkCollection", 0, "DWord");
+        _registry.SetValue("HKCU", "Software\\Microsoft\\InputPersonalization", "RestrictImplicitTextCollection", 0, "DWord");
+        _registry.SetValue("HKCU", "Software\\Microsoft\\InputPersonalization\\TrainedDataStore", "HarvestContacts", 1, "DWord");
+        _registry.SetValue("HKCU", "Software\\Microsoft\\Personalization\\Settings", "AcceptedPrivacyPolicy", 1, "DWord");
+        _registry.SetValue("HKCU", "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced", "Start_TrackProgs", 1, "DWord");
+        _registry.SetValue("HKLM", "SOFTWARE\\Policies\\Microsoft\\Windows\\System", "PublishUserActivities", 1, "DWord");
+        _registry.SetValue("HKCU", "Software\\Microsoft\\Siuf\\Rules", "NumberOfSIUFInPeriod", 1, "DWord");
+
+        var state3 = await _detector.DetectTweakStateAsync(tweak, useCache: false);
+        Assert.Equal(TweakState.NotApplied, state3);
+        bool active3 = await _detector.IsTweakActiveAsync(tweak, useCache: false);
+        Assert.False(active3);
     }
 }

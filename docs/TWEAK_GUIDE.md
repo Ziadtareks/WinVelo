@@ -15,8 +15,13 @@ Every tweak in WinVelo is data-driven, defined as a JSON document in the `Catalo
 3. **Edition Accuracy**:
    - Specify `windows.minBuild`, `windows.maxBuild`, and supported `windows.editions` (e.g. `Home`, `Pro`, `Enterprise`, `Education`).
    - If a tweak only takes effect on Enterprise/Education (e.g., Telemetry Level 0), explain this clearly in `effectNote`.
-4. **Reliable Detection**:
-   - Specify a `detect` rule (`matchType`: `Equals`, `NotEquals`, `Exists`, `NotExists`) so the UI toggle accurately reflects system state.
+4. **Reliable Detection & Engine Honesty**:
+   - Detection evaluates all verifiable `apply` actions (registry keys, system services, scheduled tasks).
+   - A tweak reports `Applied` only if **all** of its verifiable actions are satisfied.
+   - If only some verifiable actions are configured, the engine reports `Partial` (tri-state indeterminate toggle, `PARTIAL ⚠` badge), never falsely claiming full application.
+   - Tweaks with pure PowerShell actions and no inspectable state report `Unknown` (`CAN'T VERIFY`).
+   - Use `detect.any` **only** to define mutually exclusive alternatives for the same setting (e.g. GPO policy key vs user/system policy key for `AllowTelemetry`, or build-specific keys like `DisableSearchBoxSuggestions` vs `BingSearchEnabled` in `pref.bingsearch`).
+   - `detect.any` must never be used to short-circuit stateful verification of composite tweaks where multiple distinct settings must all be applied.
 5. **No Dangerous Operations**:
    - Do not delete critical system files, disable Windows Defender, or break core networking dependencies.
 

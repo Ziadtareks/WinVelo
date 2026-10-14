@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Tweakora.App.ViewModels;
 using Tweakora.Core.Engine;
+using Tweakora.Core.Interfaces;
 using Tweakora.Core.Models;
 using Tweakora.Simulation;
 using Xunit;
@@ -170,5 +171,130 @@ public sealed class CompositeStateDetectionTests
         Assert.False(card.IsActive);
         Assert.False(card.ToggleCheckedState);
         Assert.Equal("CAN'T VERIFY", card.StatusBadgeText);
+    }
+
+    [Fact]
+    public async Task DetectAny_AllApplyActionsAreAlternatives_AnyMatchReportsApplied()
+    {
+        // Replicating pref.bingsearch pattern: 2 alternative registry keys for the same setting
+        var tweak = new TweakDefinition
+        {
+            Id = "test.alt.tweak",
+            Name = "Alternative Setting Tweak",
+            Category = "preferences",
+            Risk = "Safe",
+            Detect = new DetectStructure
+            {
+                Any = new List<DetectRule>
+                {
+                    new() { Type = "Registry", Hive = "HKCU", Key = @"Software\Policies\Test", ValueName = "SettingAlt1", ExpectedValue = JsonSerializer.SerializeToElement(1), MatchType = "Equals" },
+                    new() { Type = "Registry", Hive = "HKCU", Key = @"Software\App\Test", ValueName = "SettingAlt2", ExpectedValue = JsonSerializer.SerializeToElement(0), MatchType = "Equals" }
+                }
+            },
+            Apply = new List<ActionItem>
+            {
+                new() { Type = "Registry", Hive = "HKCU", Key = @"Software\Policies\Test", ValueName = "SettingAlt1", Operation = "Set", Data = JsonSerializer.SerializeToElement(1) },
+                new() { Type = "Registry", Hive = "HKCU", Key = @"Software\App\Test", ValueName = "SettingAlt2", Operation = "Set", Data = JsonSerializer.SerializeToElement(0) }
+            }
+        };
+
+        // Neither set -> NotApplied
+        var state0 = await _detector.DetectTweakStateAsync(tweak, useCache: false);
+        Assert.Equal(TweakState.NotApplied, state0);
+
+        // Setting only Alt1 -> Applied (because all actions are mutually alternative keys for the same setting)
+        _registry.SetValue("HKCU", @"Software\Policies\Test", "SettingAlt1", 1, "DWord");
+        var state1 = await _detector.DetectTweakStateAsync(tweak, useCache: false);
+        Assert.Equal(TweakState.Applied, state1);
+
+        // Reverting Alt1 and setting Alt2 -> Applied
+        _registry.SetValue("HKCU", @"Software\Policies\Test", "SettingAlt1", 0, "DWord");
+        _registry.SetValue("HKCU", @"Software\App\Test", "SettingAlt2", 0, "DWord");
+        var state2 = await _detector.DetectTweakStateAsync(tweak, useCache: false);
+        Assert.Equal(TweakState.Applied, state2);
+    }
+
+    [Fact]
+    public async Task CompositeTweak_WithDetectAny_OnePolicyKeySet_ReportsPartialNotApplied()
+    {
+        // Replicating essential.telemetry pattern: 3 actions, but detect.any has alternative rules for only 1 action
+        var tweak = new TweakDefinition
+        {
+            Id = "test.composite.telemetry",
+            Name = "Composite Telemetry Tweak",
+            Category = "privacy",
+            Risk = "Safe",
+            Detect = new DetectStructure
+            {
+                Any = new List<DetectRule>
+                {
+                    // GPO key alternative for AllowTelemetry
+                    new() { Type = "Registry", Hive = "HKLM", Key = @"SOFTWARE\Policies\DataCollection", ValueName = "AllowTelemetry", ExpectedValue = JsonSerializer.SerializeToElement(0), MatchType = "Equals" },
+                    // Standard policy key for AllowTelemetry
+                    new() { Type = "Registry", Hive = "HKLM", Key = @"SOFTWARE\Microsoft\Policies\DataCollection", ValueName = "AllowTelemetry", ExpectedValue = JsonSerializer.SerializeToElement(0), MatchType = "Equals" }
+                }
+            },
+            Apply = new List<ActionItem>
+            {
+                new() { Type = "Registry", Hive = "HKCU", Key = @"Software\Advertising", ValueName = "Enabled", Operation = "Set", Data = JsonSerializer.SerializeToElement(0) },
+                new() { Type = "Registry", Hive = "HKCU", Key = @"Software\Privacy", ValueName = "Tailored", Operation = "Set", Data = JsonSerializer.SerializeToElement(0) },
+                new() { Type = "Registry", Hive = "HKLM", Key = @"SOFTWARE\Microsoft\Policies\DataCollection", ValueName = "AllowTelemetry", Operation = "Set", Data = JsonSerializer.SerializeToElement(0) }
+            }
+        };
+
+        // Neither set -> NotApplied
+        var state0 = await _detector.DetectTweakStateAsync(tweak, useCache: false);
+        Assert.Equal(TweakState.NotApplied, state0);
+
+        // Setting ONLY the GPO key for AllowTelemetry -> must report Partial (honest engine!), NEVER Applied
+        _registry.SetValue("HKLM", @"SOFTWARE\Policies\DataCollection", "AllowTelemetry", 0, "DWord");
+        var state1 = await _detector.DetectTweakStateAsync(tweak, useCache: false);
+        Assert.Equal(TweakState.Partial, state1);
+        Assert.False(await _detector.IsTweakActiveAsync(tweak, useCache: false));
+
+        // Setting all 3 values (AllowTelemetry via GPO, plus Advertising and Tailored) -> Applied
+        _registry.SetValue("HKCU", @"Software\Advertising", "Enabled", 0, "DWord");
+        _registry.SetValue("HKCU", @"Software\Privacy", "Tailored", 0, "DWord");
+        var state2 = await _detector.DetectTweakStateAsync(tweak, useCache: false);
+        Assert.Equal(TweakState.Applied, state2);
+        Assert.True(await _detector.IsTweakActiveAsync(tweak, useCache: false));
+    }
+
+    [Fact]
+    public async Task DetectTweakStateAsync_ThrowsException_ReturnsUnknown()
+    {
+        // When registry service throws unexpected exception, detection fails safe to Unknown
+        var throwingRegistry = new ThrowingRegistryService();
+        var detector = new StateDetector(throwingRegistry, _services, _tasks);
+
+        var tweak = new TweakDefinition
+        {
+            Id = "test.throwing",
+            Name = "Throwing Tweak",
+            Category = "system",
+            Risk = "Safe",
+            Apply = new List<ActionItem>
+            {
+                new() { Type = "Registry", Hive = "HKCU", Key = @"Software\Crash", ValueName = "Val", Operation = "Set", Data = JsonSerializer.SerializeToElement(1) }
+            }
+        };
+
+        var state = await detector.DetectTweakStateAsync(tweak, useCache: false);
+        Assert.Equal(TweakState.Unknown, state);
+    }
+
+    private sealed class ThrowingRegistryService : IRegistryService
+    {
+        public bool KeyExists(string hive, string key) => throw new InvalidOperationException("Registry error");
+        public bool ValueExists(string hive, string key, string valueName) => throw new InvalidOperationException("Registry error");
+        public object? GetValue(string hive, string key, string valueName) => throw new InvalidOperationException("Registry error");
+        public string? GetValueKind(string hive, string key, string valueName) => throw new InvalidOperationException("Registry error");
+        public void SetValue(string hive, string key, string valueName, object data, string valueKind) => throw new InvalidOperationException("Registry error");
+        public void DeleteValue(string hive, string key, string valueName) => throw new InvalidOperationException("Registry error");
+        public void DeleteKey(string hive, string key) => throw new InvalidOperationException("Registry error");
+        public void CreateKey(string hive, string key) => throw new InvalidOperationException("Registry error");
+        public string ExportRegBackup(string hive, string key, string backupFolder) => throw new InvalidOperationException("Registry error");
+        public IEnumerable<string> GetValueNames(string hive, string key) => throw new InvalidOperationException("Registry error");
+        public IEnumerable<string> GetSubKeyNames(string hive, string key) => throw new InvalidOperationException("Registry error");
     }
 }

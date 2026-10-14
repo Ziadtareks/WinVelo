@@ -188,3 +188,20 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
   3. In stateful undo restoration, immediately marked each restored record reverted via `_context.Journal.MarkRecordsReverted(new[] { record })` so that retrying an undo after a subsequent step failure never replays stale records.
   4. Added `HasActiveSession` property to `RollbackJournalManager` and ensured any active session is safely completed at the end of `UndoTweakAsync`.
   5. Added regression tests in `UndoEngineTests.cs` for pre-applied fallback lifecycle, retry without replaying stale records, and session completion cleanliness.
+
+---
+
+## BUG-015: Detection detect.any Short-Circuited Stateful Verification of Composite Tweaks
+- **Component**: `Tweakora.Core` (`StateDetector.cs`), `Tweakora.Tests` (`RealRegistrySyncTests.cs`, `CompositeStateDetectionTests.cs`), `docs/TWEAK_GUIDE.md`
+- **Finding**:
+  1. `StateDetector.EvaluateTweakState` checked `tweak.Detect?.Any` first and returned `Applied` as soon as any single rule matched (`tweak.Detect.Any.Any(EvaluateRule)`).
+  2. For composite tweaks like `essential.telemetry` (which modifies 12 distinct registry values and services), having just one policy key set caused the engine to report `Applied`, completely bypassing verification of the other 11 apply actions.
+  3. `DetectTweakStateAsync` catch block failed safe to `NotApplied` instead of `Unknown` when an unhandled exception occurred during detection.
+- **Root Cause**: `StateDetector` prioritized top-level `detect.any` rules over verifiable `apply` actions, conflating alternative keys for a single setting with multi-setting composite tweaks.
+- **Fix**:
+  1. Refactored `StateDetector.EvaluateTweakState`: if a tweak has verifiable `apply` actions, the engine always evaluates them.
+  2. For single-setting tweaks where 100% of verifiable actions are declared mutually exclusive alternatives in `detect.any` (e.g. `pref.bingsearch` with `DisableSearchBoxSuggestions` vs `BingSearchEnabled`), matching any alternative reports `Applied`.
+  3. For composite tweaks (e.g. `essential.telemetry`), each verifiable action must be satisfied (either directly or via an alternative rule in `detect.any` targeting the same setting/valueName, such as GPO vs system policy for `AllowTelemetry`). If only some actions match, it reports `Partial`; if all match, it reports `Applied`.
+  4. Updated `DetectTweakStateAsync` catch block to fail safe to `Unknown`.
+  5. Updated `RealRegistrySyncTests.cs` (`DisableTelemetry_ExternalRegistrySync_DetectsChangeImmediately`) to assert `Partial` when only 1 policy key is set and `Applied` when all keys are set.
+  6. Added regression tests in `CompositeStateDetectionTests.cs` and documented the rule in `docs/TWEAK_GUIDE.md`.

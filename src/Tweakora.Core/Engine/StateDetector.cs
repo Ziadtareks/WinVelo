@@ -59,8 +59,8 @@ public sealed class StateDetector
             }
             catch
             {
-                // Detection must fail safe to NotApplied, NEVER throw an error
-                state = TweakState.NotApplied;
+                // Detection must fail safe to Unknown, NEVER throw an error
+                state = TweakState.Unknown;
             }
 
             _cache[tweak.Id] = (state, DateTime.UtcNow);
@@ -78,23 +78,33 @@ public sealed class StateDetector
     {
         if (tweak == null) return TweakState.Unknown;
 
-        // 1. Explicit alternative conditions: if detect.any is specified, ANY match indicates active state
-        // (e.g. Bing Search or Telemetry disabled via GPO vs user settings)
-        if (tweak.Detect?.Any != null && tweak.Detect.Any.Count > 0)
-        {
-            bool anyPassed = tweak.Detect.Any.Any(EvaluateRule);
-            return anyPassed ? TweakState.Applied : TweakState.NotApplied;
-        }
-
-        // 2. Derive detection directly from Apply actions if verifiable actions exist
+        // 1. Derive detection directly from Apply actions if verifiable actions exist
         var verifiableActions = tweak.Apply?.Where(IsVerifiableAction).ToList() ?? new List<ActionItem>();
 
         if (verifiableActions.Count > 0)
         {
+            // Case A: If ALL verifiable actions are mutually alternative implementations for a single setting
+            // declared in detect.any (e.g. pref.bingsearch setting DisableSearchBoxSuggestions vs BingSearchEnabled),
+            // then any matching rule confirms the setting is Applied.
+            if (tweak.Detect?.Any != null && tweak.Detect.Any.Count > 0 &&
+                verifiableActions.All(a => tweak.Detect.Any.Any(r => IsRuleForAction(r, a))))
+            {
+                bool anyPassed = tweak.Detect.Any.Any(EvaluateRule);
+                return anyPassed ? TweakState.Applied : TweakState.NotApplied;
+            }
+
+            // Case B: Composite tweak or tweak with discrete settings (e.g. essential.telemetry).
+            // Each verifiable action must be evaluated. An action is satisfied if its primary key matches,
+            // OR if an alternative rule in detect.any for the SAME setting (e.g. GPO key vs user/policy key
+            // for the same valueName) is satisfied.
             int passedCount = 0;
             foreach (var action in verifiableActions)
             {
                 if (EvaluateActionItem(action))
+                {
+                    passedCount++;
+                }
+                else if (tweak.Detect?.Any != null && tweak.Detect.Any.Any(r => IsAlternativeRuleForAction(r, action) && EvaluateRule(r)))
                 {
                     passedCount++;
                 }
@@ -111,13 +121,13 @@ public sealed class StateDetector
             return TweakState.NotApplied;
         }
 
-        // 3. If no verifiable Apply actions, check if explicit Detect block is defined
+        // 2. If no verifiable Apply actions, check if explicit Detect block is defined
         if (HasDetectRules(tweak.Detect))
         {
             return EvaluateStructureToState(tweak.Detect);
         }
 
-        // 4. For tweaks that cannot be verified (e.g. pure PowerShell with no inspectable state): return Unknown
+        // 3. For tweaks that cannot be verified (e.g. pure PowerShell with no inspectable state): return Unknown
         return TweakState.Unknown;
     }
 
@@ -491,5 +501,111 @@ public sealed class StateDetector
             return long.TryParse(s.Substring(2), System.Globalization.NumberStyles.HexNumber, null, out result);
         }
         return long.TryParse(s, out result);
+    }
+
+    private static bool IsRuleForAction(DetectRule rule, ActionItem action)
+    {
+        if (rule == null || action == null) return false;
+
+        string actionType = action.Type ?? string.Empty;
+        string ruleType = rule.Type ?? string.Empty;
+
+        bool isActionReg = string.Equals(actionType, "registry", StringComparison.OrdinalIgnoreCase) ||
+                           string.Equals(actionType, "policy", StringComparison.OrdinalIgnoreCase);
+        bool isRuleReg = string.Equals(ruleType, "registry", StringComparison.OrdinalIgnoreCase) ||
+                         string.Equals(ruleType, "policy", StringComparison.OrdinalIgnoreCase);
+
+        if (isActionReg && isRuleReg)
+        {
+            string actVal = action.ValueName ?? string.Empty;
+            string ruleVal = rule.ValueName ?? string.Empty;
+
+            // Direct match on Hive, Key, and ValueName
+            if (!string.IsNullOrEmpty(action.Hive) && !string.IsNullOrEmpty(rule.Hive) &&
+                !string.IsNullOrEmpty(action.Key) && !string.IsNullOrEmpty(rule.Key))
+            {
+                var (actHive, actKey) = RegistryPathHelper.Normalize(action.Hive, action.Key);
+                var (ruleHive, ruleKey) = RegistryPathHelper.Normalize(rule.Hive, rule.Key);
+                if (string.Equals(actHive, ruleHive, StringComparison.OrdinalIgnoreCase) &&
+                    string.Equals(actKey, ruleKey, StringComparison.OrdinalIgnoreCase) &&
+                    string.Equals(actVal, ruleVal, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+
+            // Same value name and target value (alternative location for the same setting)
+            if (!string.IsNullOrEmpty(actVal) &&
+                string.Equals(actVal, ruleVal, StringComparison.OrdinalIgnoreCase) &&
+                ValuesMatch(action.Data, rule.ExpectedValue))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        if (string.Equals(actionType, "service", StringComparison.OrdinalIgnoreCase) &&
+            string.Equals(ruleType, "service", StringComparison.OrdinalIgnoreCase))
+        {
+            return !string.IsNullOrEmpty(action.ServiceName) &&
+                   string.Equals(action.ServiceName, rule.ServiceName, StringComparison.OrdinalIgnoreCase);
+        }
+
+        if ((string.Equals(actionType, "task", StringComparison.OrdinalIgnoreCase) ||
+             string.Equals(actionType, "scheduledtask", StringComparison.OrdinalIgnoreCase)) &&
+            (string.Equals(ruleType, "task", StringComparison.OrdinalIgnoreCase) ||
+             string.Equals(ruleType, "scheduledtask", StringComparison.OrdinalIgnoreCase)))
+        {
+            return !string.IsNullOrEmpty(action.TaskName) &&
+                   string.Equals(action.TaskName, rule.TaskName, StringComparison.OrdinalIgnoreCase);
+        }
+
+        return false;
+    }
+
+    private static bool IsAlternativeRuleForAction(DetectRule rule, ActionItem action)
+    {
+        if (rule == null || action == null) return false;
+
+        string actionType = action.Type ?? string.Empty;
+        string ruleType = rule.Type ?? string.Empty;
+
+        bool isActionReg = string.Equals(actionType, "registry", StringComparison.OrdinalIgnoreCase) ||
+                           string.Equals(actionType, "policy", StringComparison.OrdinalIgnoreCase);
+        bool isRuleReg = string.Equals(ruleType, "registry", StringComparison.OrdinalIgnoreCase) ||
+                         string.Equals(ruleType, "policy", StringComparison.OrdinalIgnoreCase);
+
+        if (isActionReg && isRuleReg)
+        {
+            string actVal = action.ValueName ?? string.Empty;
+            string ruleVal = rule.ValueName ?? string.Empty;
+
+            // An alternative rule for a registry action is one that targets the same ValueName and target value
+            // in an alternative location (e.g. GPO key vs user/system policies for AllowTelemetry)
+            if (!string.IsNullOrEmpty(actVal) &&
+                string.Equals(actVal, ruleVal, StringComparison.OrdinalIgnoreCase) &&
+                ValuesMatch(action.Data, rule.ExpectedValue))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool ValuesMatch(JsonElement? actionData, JsonElement? ruleExpected)
+    {
+        if (!actionData.HasValue && !ruleExpected.HasValue) return true;
+        if (!actionData.HasValue || !ruleExpected.HasValue) return false;
+
+        if (TryExtractInt64(actionData.Value, out long aNum) && TryExtractInt64(ruleExpected.Value, out long rNum))
+        {
+            return aNum == rNum;
+        }
+
+        string? aStr = actionData.Value.ValueKind == JsonValueKind.String ? actionData.Value.GetString() : actionData.Value.GetRawText();
+        string? rStr = ruleExpected.Value.ValueKind == JsonValueKind.String ? ruleExpected.Value.GetString() : ruleExpected.Value.GetRawText();
+        return string.Equals(aStr, rStr, StringComparison.OrdinalIgnoreCase);
     }
 }
