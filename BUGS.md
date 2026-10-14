@@ -270,3 +270,22 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
   5. Updated `SmartAnalyzeAndOptimize` to only recommend tweaks and open the preview dialog without auto-applying.
   6. Enforced in `CatalogValidator` and unit tests that every preset references existing IDs only, contains zero High-risk tweaks, zero irreversible tweaks, and zero tweaks marked `needsReview`.
 
+---
+
+## BUG-020: Windows Servicing Components Left Unprotected Against Destructive Tweaks and Lacking Health Integrity Verification
+- **Component**: `Tweakora.Core` (`ServicingProtection.cs`), `tools/CatalogValidator` (`Program.cs`), `Catalog/Tweaks` (`essential.json`), `Catalog/schema` (`tweak.schema.json`), `Tweakora.Modules` (`TweakService.cs`), `Tweakora.Cli` (`Program.cs`), `Tweakora.App` (`DashboardViewModel.cs`), `Tweakora.Tests` (`ServicingProtectionTests.cs`)
+- **Finding**:
+  1. The catalog validator allowed tweaks to disable or alter critical Windows servicing components (such as Windows Update, BITS, Store InstallService, TrustedInstaller, Defender, etc.) without safety gating.
+  2. `essential.disablestoresearch` denied permissions to the Store database (`store.db`) using `icacls ... /deny *S-1-1-0:F`, which broke Microsoft Store operations and app updates, yet was categorized as "Safe" without any side-effects disclosure.
+  3. No post-apply servicing verification existed in either GUI or CLI to ensure system servicing remained operational after applying tweaks or presets.
+  4. The CLI had no command to inspect or repair servicing component health.
+- **Root Cause**: Absence of a protected servicing inventory in the catalog schema and engine safety layer, allowing servicing-destructive tweaks to pass validation without health checks.
+- **Fix**:
+  1. Defined `ServicingProtectionConstants` listing the 15 critical protected services (`wuauserv`, `BITS`, `UsoSvc`, `WaaSMedicSvc`, `DoSvc`, `TrustedInstaller`, `CryptSvc`, `AppXSvc`, `ClipSVC`, `LicenseManager`, `InstallService`, `WinDefend`, `SecurityHealthService`, `wscsvc`, `mpssvc`) and protected Windows Update / Store blocking policies.
+  2. Updated `CatalogValidator` to strictly enforce that any tweak modifying protected services or policies must be classified as risk `High`, must contain a non-empty `sideEffects` explanation, and is strictly barred from all presets.
+  3. Re-evaluated `essential.disablestoresearch`, elevating its risk to `High` and documenting its side effects on Microsoft Store package management.
+  4. Added `ServicingProtectionHelper.CheckServicingHealthAsync` and `RestoreServicingComponentsAsync` to check and repair servicing health.
+  5. Integrated post-apply servicing health check into `DashboardViewModel` and CLI `ExecutePresetAsync`.
+  6. Added CLI command `--health-check [--restore]`.
+  7. Added unit tests in `ServicingProtectionTests.cs`.
+

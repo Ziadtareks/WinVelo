@@ -272,6 +272,12 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
     [ObservableProperty]
     private bool _isProfilePreviewLoading;
 
+    [ObservableProperty]
+    private string? _servicingHealthSummary;
+
+    [ObservableProperty]
+    private ServicingHealthReport? _lastServicingHealthReport;
+
     public ObservableCollection<ProfilePreviewItemModel> ProfilePreviewItems { get; } = new();
 
     private ProfileCardModel? _activePreviewCard;
@@ -339,6 +345,28 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
                     ? $"Restored {report.SucceededCount} of {report.TotalRequested} changes."
                     : $"Applied {report.SucceededCount} of {report.TotalRequested} optimizations.";
             }
+
+            try
+            {
+                var healthReport = await _tweakService.CheckServicingHealthAsync();
+                LastServicingHealthReport = healthReport;
+                ServicingHealthSummary = healthReport.SummaryText;
+
+                if (!healthReport.IsHealthy)
+                {
+                    GlobalStatusMessage += $" | Servicing Alert: {string.Join("; ", healthReport.Warnings)}";
+                    if (card != null)
+                    {
+                        card.StatusMessage += " (Servicing issues detected)";
+                        card.HasFailures = true;
+                    }
+                }
+                else if (card != null && !card.HasFailures)
+                {
+                    card.StatusMessage += " | Servicing: Healthy";
+                }
+            }
+            catch { }
 
             await RefreshAllToggleStatesAsync();
             _ = RecalculateOptimizationScoreAsync();

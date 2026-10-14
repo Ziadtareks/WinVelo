@@ -1,6 +1,8 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Text.RegularExpressions;
 using Json.Schema;
+using Tweakora.Core.Safety;
 
 namespace CatalogValidator;
 
@@ -127,6 +129,8 @@ public static class Program
                             Console.ResetColor();
                         }
 
+                        ValidateServicingProtection(item, id, ref errorCount);
+
                         if (!result.IsValid)
                         {
                             errorCount++;
@@ -176,6 +180,8 @@ public static class Program
                         Console.WriteLine($"  [FAIL] Tweak '{id}' has reversible=false but missing or empty irreversibleReason.");
                         Console.ResetColor();
                     }
+
+                    ValidateServicingProtection(single, id, ref errorCount);
 
                     if (!result.IsValid)
                     {
@@ -343,6 +349,15 @@ public static class Program
                             errorCount++;
                             presetOk = false;
                         }
+
+                        if (TouchesServicing(tweakNode, out string sReason))
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine($"  [FAIL] {fileName} ({pId}): Contains tweak '{tid}' which impacts Windows servicing ({sReason}). Presets must protect Windows servicing and cannot contain servicing-impacting tweaks.");
+                            Console.ResetColor();
+                            errorCount++;
+                            presetOk = false;
+                        }
                     }
 
                     if (presetOk)
@@ -367,5 +382,86 @@ public static class Program
         Console.WriteLine("----------------------------------------");
 
         return errorCount == 0 ? 0 : 1;
+    }
+
+    private static bool TouchesServicing(JsonNode item, out string servicingReason)
+    {
+        servicingReason = string.Empty;
+        var applyArray = item["apply"]?.AsArray();
+        if (applyArray == null) return false;
+
+        foreach (var action in applyArray)
+        {
+            if (action == null) continue;
+            string type = action["type"]?.ToString() ?? "";
+
+            if (string.Equals(type, "Service", StringComparison.OrdinalIgnoreCase))
+            {
+                string svc = action["serviceName"]?.ToString() ?? "";
+                string startup = action["startupType"]?.ToString() ?? "";
+                if (ServicingProtectionHelper.IsProtectedService(svc))
+                {
+                    if (string.Equals(startup, "Disabled", StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(startup, "Manual", StringComparison.OrdinalIgnoreCase))
+                    {
+                        servicingReason = $"Modifies protected servicing service '{svc}' to '{startup}'";
+                        return true;
+                    }
+                }
+            }
+            else if (string.Equals(type, "Registry", StringComparison.OrdinalIgnoreCase))
+            {
+                string key = action["key"]?.ToString() ?? "";
+                string val = action["valueName"]?.ToString() ?? "";
+                if (ServicingProtectionHelper.IsProtectedPolicy(key, val))
+                {
+                    servicingReason = $"Modifies protected servicing policy '{key}\\{val}'";
+                    return true;
+                }
+            }
+            else if (string.Equals(type, "PowerShell", StringComparison.OrdinalIgnoreCase))
+            {
+                string script = action["script"]?.ToString() ?? "";
+                foreach (var svc in ServicingProtectionConstants.ProtectedServices)
+                {
+                    if (Regex.IsMatch(script, $@"\b(Set-Service|sc\.exe|Stop-Service)\b.*?\b{svc}\b", RegexOptions.IgnoreCase))
+                    {
+                        servicingReason = $"Script targets protected service '{svc}'";
+                        return true;
+                    }
+                }
+                if (script.Contains("store.db", StringComparison.OrdinalIgnoreCase) && script.Contains("/deny", StringComparison.OrdinalIgnoreCase))
+                {
+                    servicingReason = "Script denies access to Microsoft Store database (store.db)";
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private static void ValidateServicingProtection(JsonNode item, string id, ref int errorCount)
+    {
+        if (TouchesServicing(item, out string reason))
+        {
+            string? risk = item["risk"]?.ToString();
+            string? sideEffects = item["sideEffects"]?.ToString();
+
+            if (!string.Equals(risk, "High", StringComparison.OrdinalIgnoreCase))
+            {
+                errorCount++;
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"  [FAIL] Tweak '{id}' impacts Windows servicing ({reason}) but risk is '{risk}' instead of 'High'.");
+                Console.ResetColor();
+            }
+
+            if (string.IsNullOrWhiteSpace(sideEffects))
+            {
+                errorCount++;
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"  [FAIL] Tweak '{id}' impacts Windows servicing ({reason}) but is missing required 'sideEffects' explanation.");
+                Console.ResetColor();
+            }
+        }
     }
 }

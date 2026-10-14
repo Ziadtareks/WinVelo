@@ -125,6 +125,23 @@
     "irreversibleReason": {
       "type": "string",
       "minLength": 5
+    },
+    "needsReview": {
+      "type": "boolean"
+    },
+    "evidence": {
+      "type": "string",
+      "enum": ["documented", "situational", "anecdotal"]
+    },
+    "whatItDoes": {
+      "type": "string"
+    },
+    "sideEffects": {
+      "type": "string"
+    },
+    "sources": {
+      "type": "array",
+      "items": { "type": "string" }
     }
   },
   "allOf": [

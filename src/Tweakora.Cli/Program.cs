@@ -272,6 +272,14 @@ public static class Program
         }
 
         // ---------------------------------------------------------------------
+        // CLI COMMAND: --health-check [--restore]
+        // ---------------------------------------------------------------------
+        if (args.Contains("--health-check"))
+        {
+            return await ExecuteHealthCheckAsync(services, registry, args.Contains("--restore"));
+        }
+
+        // ---------------------------------------------------------------------
         // CLI COMMAND: --preset <name> [--dry-run | --run]
         // ---------------------------------------------------------------------
         int presetIdx = Array.FindIndex(args, a => string.Equals(a, "--preset", StringComparison.OrdinalIgnoreCase) || string.Equals(a, "-p", StringComparison.OrdinalIgnoreCase));
@@ -1007,6 +1015,11 @@ public static class Program
                 }
             }
             Console.WriteLine($"Applied {report.AppliedCount} of {report.TotalRequested} — {report.FailedCount} failed");
+
+            Console.WriteLine("\n[HEALTH CHECK] Verifying Windows servicing integrity...");
+            var healthReport = await ServicingProtectionHelper.CheckServicingHealthAsync(context.Services, context.Registry);
+            PrintHealthReport(healthReport);
+
             return report.FailedCount == 0 ? 0 : 1;
         }
 
@@ -1117,11 +1130,98 @@ public static class Program
         return false;
     }
 
+    private static void PrintHealthReport(ServicingHealthReport report)
+    {
+        Console.WriteLine("========================================");
+        Console.WriteLine("     Windows Servicing Health Check     ");
+        Console.WriteLine("========================================");
+
+        var wu = report.Components.FirstOrDefault(c => c.Name.Equals("wuauserv", StringComparison.OrdinalIgnoreCase));
+        var bits = report.Components.FirstOrDefault(c => c.Name.Equals("BITS", StringComparison.OrdinalIgnoreCase));
+        var store = report.Components.FirstOrDefault(c => c.Name.Equals("InstallService", StringComparison.OrdinalIgnoreCase));
+        var defender = report.Components.FirstOrDefault(c => c.Name.Equals("WinDefend", StringComparison.OrdinalIgnoreCase));
+        var search = report.Components.FirstOrDefault(c => c.Name.Equals("WSearch", StringComparison.OrdinalIgnoreCase));
+
+        Console.WriteLine($"• Windows Update Service (wuauserv):    {wu?.ActualState ?? "Unknown"} [{(wu != null && !wu.IsCompromised ? "PASS - Startable" : "FAIL - Disabled")}]");
+        Console.WriteLine($"• BITS Service:                         {bits?.ActualState ?? "Unknown"} [{(bits != null && !bits.IsCompromised ? "PASS - Not Disabled" : "FAIL - Disabled")}]");
+        Console.WriteLine($"• Store Install Service:                {store?.ActualState ?? "Unknown"} [{(store != null && !store.IsCompromised ? "PASS - Not Disabled" : "FAIL - Disabled")}]");
+        Console.WriteLine($"• Windows Defender Antivirus:           {defender?.ActualState ?? "Unknown"} [{(defender != null && !defender.IsCompromised ? "PASS - Healthy" : "FAIL - Disabled")}]");
+        Console.WriteLine($"• Windows Search State:                 {search?.ActualState ?? "Unknown"} [INFO]");
+
+        Console.WriteLine("\nAll Monitored Components:");
+        foreach (var c in report.Components)
+        {
+            string statusTag = c.IsCompromised ? "[COMPROMISED]" : "[HEALTHY]";
+            Console.ForegroundColor = c.IsCompromised ? ConsoleColor.Red : ConsoleColor.Green;
+            Console.Write($"  {statusTag,-14}");
+            Console.ResetColor();
+            Console.WriteLine($" {c.Name,-22} | {c.Category,-16} | State: {c.ActualState}");
+            if (!string.IsNullOrWhiteSpace(c.IssueDescription))
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine($"    └─ {c.IssueDescription}");
+                Console.ResetColor();
+            }
+        }
+
+        if (report.Warnings.Count > 0)
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine($"\n[WARNING] Found {report.Warnings.Count} servicing integrity issue(s):");
+            foreach (var w in report.Warnings)
+            {
+                Console.WriteLine($"  - {w}");
+            }
+            Console.ResetColor();
+        }
+        else
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("\n[PASS] All Windows servicing components and policies are healthy.");
+            Console.ResetColor();
+        }
+    }
+
+    private static async Task<int> ExecuteHealthCheckAsync(ISystemServicesService services, IRegistryService registry, bool restore)
+    {
+        Console.WriteLine("[INFO] Running Windows Servicing Health Check...");
+        var report = await ServicingProtectionHelper.CheckServicingHealthAsync(services, registry);
+        PrintHealthReport(report);
+
+        if (!report.IsHealthy)
+        {
+            if (restore)
+            {
+                Console.WriteLine("\n[REPAIR] Restoring compromised servicing components and policies...");
+                var restored = await ServicingProtectionHelper.RestoreServicingComponentsAsync(services, registry);
+                foreach (var item in restored)
+                {
+                    Console.WriteLine($"  ✔ {item}");
+                }
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("[PASS] Repair completed. Re-running health check...");
+                Console.ResetColor();
+
+                var postReport = await ServicingProtectionHelper.CheckServicingHealthAsync(services, registry);
+                PrintHealthReport(postReport);
+                return postReport.IsHealthy ? 0 : 1;
+            }
+            else
+            {
+                Console.WriteLine("\nTo restore compromised components, re-run with: winvelo-cli --health-check --restore");
+                return 1;
+            }
+        }
+
+        return 0;
+    }
+
     private static void PrintUsage()
     {
         Console.WriteLine("Usage:");
         Console.WriteLine("  winvelo-cli --self-test --level 1        Run automated safe HKCU self-test with restore point");
         Console.WriteLine("  winvelo-cli --detect-all                 Non-destructive read-only detection across all tweaks");
+        Console.WriteLine("  winvelo-cli --health-check [--restore]   Verify Windows Update, Store, and servicing integrity");
         Console.WriteLine("  winvelo-cli --preset <name> [--dry-run]  Inspect or apply preset (Standard, Minimal, Advanced)");
         Console.WriteLine("  winvelo-cli --list                       List all catalog tweaks");
         Console.WriteLine("  winvelo-cli --dry-run                    Preview all catalog tweaks without modifying system");

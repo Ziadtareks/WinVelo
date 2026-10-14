@@ -11,6 +11,7 @@ using Tweakora.Core.Engine.Runners;
 using Tweakora.Core.Interfaces;
 using Tweakora.Core.Models;
 using Tweakora.Core.Operations;
+using Tweakora.Core.Safety;
 using Tweakora.Platform;
 
 namespace Tweakora.Modules.Tweaks;
@@ -20,6 +21,8 @@ public interface ITweakService
     IReadOnlyList<TweakDefinition> LoadCatalog();
     IReadOnlyList<PresetDefinition> LoadPresets() => Array.Empty<PresetDefinition>();
     IReadOnlyList<TweakDefinition> GetActiveJournalTweaks() => Array.Empty<TweakDefinition>();
+    Task<ServicingHealthReport> CheckServicingHealthAsync() => Task.FromResult(new ServicingHealthReport());
+    Task<List<string>> RestoreServicingHealthAsync() => Task.FromResult(new List<string>());
     bool DetectState(TweakDefinition tweak);
     Task<string> GenerateDryRunDiffAsync(IEnumerable<TweakDefinition> tweaks);
     Task<OperationExecutionReport> ApplyTweaksAsync(
@@ -140,6 +143,16 @@ public sealed class TweakService : ITweakService
         }
 
         return list;
+    }
+
+    public Task<ServicingHealthReport> CheckServicingHealthAsync()
+    {
+        return ServicingProtectionHelper.CheckServicingHealthAsync(_services, _registry);
+    }
+
+    public Task<List<string>> RestoreServicingHealthAsync()
+    {
+        return ServicingProtectionHelper.RestoreServicingComponentsAsync(_services, _registry);
     }
 
     public IReadOnlyList<PresetDefinition> LoadPresets()
