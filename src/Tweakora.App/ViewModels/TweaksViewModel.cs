@@ -198,6 +198,51 @@ public sealed partial class TweakCardModel : ObservableObject
         _ => "#334155"
     };
 
+    public string WhatItDoes => !string.IsNullOrWhiteSpace(Tweak.WhatItDoes) ? Tweak.WhatItDoes : Tweak.Description;
+
+    public string SideEffects => !string.IsNullOrWhiteSpace(Tweak.SideEffects)
+        ? Tweak.SideEffects
+        : (string.Equals(Risk, "Safe", StringComparison.OrdinalIgnoreCase) ? "None known." : "See documentation for potential impacts.");
+
+    public IReadOnlyList<string> Sources
+    {
+        get
+        {
+            if (Tweak.Sources != null && Tweak.Sources.Count > 0)
+                return Tweak.Sources;
+
+            if (Tweak.Source.ValueKind == JsonValueKind.String && !string.IsNullOrWhiteSpace(Tweak.Source.GetString()))
+                return new List<string> { Tweak.Source.GetString()! };
+
+            return Array.Empty<string>();
+        }
+    }
+
+    public bool HasSources => Sources.Count > 0;
+    public bool NeedsReview => Tweak.NeedsReview;
+
+    [ObservableProperty]
+    private bool _isExpanded;
+
+    [RelayCommand]
+    public void ToggleExpand()
+    {
+        IsExpanded = !IsExpanded;
+    }
+
+    [RelayCommand]
+    public void OpenUrl(string? url)
+    {
+        if (string.IsNullOrWhiteSpace(url) || !url.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+            return;
+
+        try
+        {
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(url) { UseShellExecute = true });
+        }
+        catch { }
+    }
+
     public TweakCardModel(TweakDefinition tweak)
     {
         Tweak = tweak;
@@ -553,6 +598,9 @@ public sealed partial class TweaksViewModel : ObservableObject
     [ObservableProperty]
     private bool _showExperimentalTweaks = false;
 
+    [ObservableProperty]
+    private bool _isRecommendedOnly = false;
+
     public void SetSearchQuery(string query)
     {
         SearchQuery = query;
@@ -562,6 +610,13 @@ public sealed partial class TweaksViewModel : ObservableObject
     partial void OnSelectedCategoryChanged(string value) => ApplyFilter();
     partial void OnIsBeginnerModeChanged(bool value) => ApplyFilter();
     partial void OnShowExperimentalTweaksChanged(bool value) => ApplyFilter();
+    partial void OnIsRecommendedOnlyChanged(bool value) => ApplyFilter();
+
+    [RelayCommand]
+    public void ToggleRecommendedOnly()
+    {
+        IsRecommendedOnly = !IsRecommendedOnly;
+    }
 
     [RelayCommand]
     public void SetMode(string mode)
@@ -594,6 +649,20 @@ public sealed partial class TweaksViewModel : ObservableObject
             if (isExperimental && !ShowExperimentalTweaks)
             {
                 continue;
+            }
+
+            // Recommended only filter: show only conservative, documented, non-needsReview, reversible tweaks (Safe and Low risk)
+            if (IsRecommendedOnly)
+            {
+                bool isRecommended = (string.Equals(card.Risk, "Safe", StringComparison.OrdinalIgnoreCase) ||
+                                      string.Equals(card.Risk, "Low", StringComparison.OrdinalIgnoreCase)) &&
+                                     string.Equals(card.Evidence, "documented", StringComparison.OrdinalIgnoreCase) &&
+                                     !card.NeedsReview &&
+                                     card.Tweak.Reversible;
+                if (!isRecommended)
+                {
+                    continue;
+                }
             }
 
             // Beginner mode filter: hide caution / high-risk tweaks

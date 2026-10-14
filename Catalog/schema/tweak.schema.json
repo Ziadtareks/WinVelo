@@ -155,6 +155,17 @@
       "then": {
         "required": ["irreversibleReason"]
       }
+    },
+    {
+      "if": {
+        "properties": {
+          "risk": { "enum": ["Low", "Medium", "High"] }
+        },
+        "required": ["risk"]
+      },
+      "then": {
+        "required": ["whatItDoes", "sideEffects", "sources"]
+      }
     }
   ],
   "definitions": {

@@ -9,7 +9,7 @@
     "subcategory": "Gaming & CPU",
     "risk": "Medium",
     "evidence": "situational",
-    "sideEffects": "Can degrade multi-threaded game performance and increase latency or stuttering for background audio, streaming (OBS), or recording tasks.",
+    "sideEffects": "May slightly reduce throughput for heavy background processing, video encoding, or continuous background rendering.",
     "impacts": [
       "performance",
       "gaming"
@@ -50,7 +50,13 @@
       }
     ],
     "source": "https://github.com/hellzerg/optimizer",
-    "verifiedOnBuild": "22631"
+    "verifiedOnBuild": "22631",
+    "whatItDoes": "Sets Win32PrioritySeparation to 38 (0x26), optimizing processor thread quantum duration for foreground interactive applications.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows/win32/procthread/priority-classes",
+      "https://learn.microsoft.com/en-us/windows-server/administration/performance-tuning/subsystem/processor"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -62,7 +68,7 @@
     "subcategory": "Gaming & CPU",
     "risk": "Medium",
     "evidence": "documented",
-    "sideEffects": "Giving games extreme CPU priority via MMCSS can cause background audio, Discord voice, or OBS streaming encoders to stutter or glitch.",
+    "sideEffects": "Background system tasks may experience CPU starvation during gaming; in rare hardware setups, this may introduce audio latency or streaming capture frame drops.",
     "impacts": [
       "gaming",
       "network",
@@ -194,7 +200,12 @@
       }
     ],
     "source": "https://github.com/hellzerg/optimizer",
-    "verifiedOnBuild": "22631"
+    "verifiedOnBuild": "22631",
+    "whatItDoes": "Configures Multimedia Class Scheduler Service (MMCSS) SystemResponsiveness to 0, granting up to 100% of CPU time to multimedia and game threads.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows/win32/procthread/multimedia-class-scheduler-service"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -246,7 +257,13 @@
       }
     ],
     "source": "https://github.com/hellzerg/optimizer",
-    "verifiedOnBuild": "22631"
+    "verifiedOnBuild": "22631",
+    "whatItDoes": "Enables Hardware-Accelerated GPU Scheduling (HagsEnabled = 2) in the DirectX Graphics Kernel to allow the GPU to manage its own video memory scheduling.",
+    "sideEffects": "Requires a system restart; may cause instability, stuttering, or frame drops in select older games or video capture/streaming applications with certain GPU drivers.",
+    "sources": [
+      "https://devblogs.microsoft.com/directx/hardware-accelerated-gpu-scheduling/"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -258,7 +275,7 @@
     "subcategory": "Gaming & GPU",
     "risk": "Medium",
     "evidence": "situational",
-    "sideEffects": "Increases GPU and display power consumption; disables independent hardware composition planes for windowed applications and video playback.",
+    "sideEffects": "Workaround for screen flickering or black screens on multi-monitor setups; increases GPU power consumption and may disable windowed HDR/G-Sync optimizations.",
     "impacts": [
       "gaming",
       "performance"
@@ -297,7 +314,12 @@
       }
     ],
     "source": "https://github.com/hellzerg/optimizer",
-    "verifiedOnBuild": "22631"
+    "verifiedOnBuild": "22631",
+    "whatItDoes": "Sets OverlayTestMode to 5 to disable Multi-Plane Overlay (MPO) in Desktop Window Manager (DWM).",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows-hardware/drivers/display/multiplane-overlay-support"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -385,7 +407,13 @@
       }
     ],
     "source": "https://github.com/hellzerg/optimizer",
-    "verifiedOnBuild": "22631"
+    "verifiedOnBuild": "22631",
+    "whatItDoes": "Disables Windows pointer precision acceleration curve in HKCU and HKLM, ensuring 1:1 physical-to-virtual mouse cursor movement.",
+    "sideEffects": "Mouse cursor movement speed will feel different and will not accelerate when moving the mouse quickly across high-resolution displays.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-systemparametersinfow"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -397,7 +425,7 @@
     "subcategory": "Gaming & Input",
     "risk": "Medium",
     "evidence": "anecdotal",
-    "sideEffects": "Can cause dropped keyboard or mouse inputs if the CPU is heavily loaded and the buffer fills before being read.",
+    "sideEffects": "If mouse input events exceed the reduced buffer during heavy system load, mouse clicks or cursor movements will be dropped. Unverified community claim.",
     "impacts": [
       "gaming",
       "performance"
@@ -456,7 +484,12 @@
       }
     ],
     "source": "https://github.com/hellzerg/optimizer",
-    "verifiedOnBuild": "22631"
+    "verifiedOnBuild": "22631",
+    "whatItDoes": "Sets MouseDataQueueSize to 16 in the Mouclass driver service parameters to minimize queued mouse input packets.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows-hardware/drivers/hid/keyboard-and-mouse-class-drivers"
+    ],
+    "needsReview": true
   },
   {
     "schemaVersion": "1.0.0",
@@ -468,7 +501,7 @@
     "subcategory": "Gaming & CPU",
     "risk": "Medium",
     "evidence": "anecdotal",
-    "sideEffects": "Increases idle power draw and battery drain, especially on mobile/laptop processors.",
+    "sideEffects": "Keeps all CPU logical cores unparked at all times, preventing deeper C-states and increasing power consumption and heat output, particularly on laptops. Unverified benefit on modern schedulers.",
     "impacts": [
       "performance",
       "gaming"
@@ -509,7 +542,12 @@
       }
     ],
     "source": "https://github.com/hellzerg/optimizer",
-    "verifiedOnBuild": "22631"
+    "verifiedOnBuild": "22631",
+    "whatItDoes": "Sets the processor performance core parking minimum cores unparked percentage (ValueMax) to 100% in system power settings.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows-server/administration/performance-tuning/hardware/power/"
+    ],
+    "needsReview": true
   },
   {
     "schemaVersion": "1.0.0",
@@ -521,7 +559,7 @@
     "subcategory": "Gaming & Power",
     "risk": "Medium",
     "evidence": "situational",
-    "sideEffects": "Reduces laptop battery life and increases system thermal load.",
+    "sideEffects": "Noticeably reduces battery runtime and increases thermal output on mobile and battery-powered devices.",
     "impacts": [
       "performance",
       "gaming"
@@ -560,6 +598,11 @@
       }
     ],
     "source": "https://github.com/hellzerg/optimizer",
-    "verifiedOnBuild": "22631"
+    "verifiedOnBuild": "22631",
+    "whatItDoes": "Sets PowerThrottlingOff to 1 under system power policies, preventing Windows from reducing background execution frequency on idle threads.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows/win32/power/power-throttling"
+    ],
+    "needsReview": false
   }
 ]

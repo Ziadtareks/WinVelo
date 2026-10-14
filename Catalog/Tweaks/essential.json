@@ -78,7 +78,13 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/activity",
     "verifiedOnBuild": "26100",
-    "evidence": "documented"
+    "evidence": "documented",
+    "whatItDoes": "Disables Windows activity history tracking and cloud synchronization.",
+    "sideEffects": "Task View timeline and cross-device task resume features will not remember recent application history.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services#bkmk-activity-history"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -159,7 +165,13 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/hiber",
     "verifiedOnBuild": "26100",
-    "evidence": "documented"
+    "evidence": "documented",
+    "whatItDoes": "Disables Windows system hibernation and fast startup using powercfg.exe.",
+    "sideEffects": "System hibernation is removed, increasing boot time slightly when starting from a cold power-off state; frees several gigabytes from hiberfil.sys.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/troubleshoot/windows-client/deployment/disable-and-re-enable-hibernation"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -235,7 +247,13 @@
     "warnings": "Uninstalls the Windows Widgets Platform and WebExperience AppX packages for all users. Undo restores taskbar registry settings, but does NOT reinstall the removed AppX packages.",
     "reversible": false,
     "irreversibleReason": "Uninstalls Microsoft Widgets and WebExperience AppX packages for all users; undo only restores taskbar visibility registry keys and does not reinstall the packages.",
-    "evidence": "documented"
+    "evidence": "documented",
+    "whatItDoes": "Removes Windows Widgets Platform and WebExperience AppX packages for all users.",
+    "sideEffects": "Uninstalls the Windows Widgets taskbar button and news flyout permanently. Irreversible.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows/apps/design/shell/widgets/"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -284,7 +302,13 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/revertstartmenu",
     "verifiedOnBuild": "26100",
-    "evidence": "documented"
+    "evidence": "documented",
+    "whatItDoes": "Reverts Start Menu to previous layout on compatible Windows builds.",
+    "sideEffects": "Overrides newer Start Menu redesigns; will not take effect on incompatible newer build revisions.",
+    "sources": [
+      "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/revertstartmenu"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -295,7 +319,7 @@
     "category": "system",
     "subcategory": "Essential Tweaks",
     "risk": "High",
-    "sideEffects": "Modifies ACL permissions on the Microsoft Store database file (store.db) using icacls /deny. This can break Microsoft Store operations, application installations, and package updates.",
+    "sideEffects": "Denies access to store.db, which can cause Microsoft Store search and package downloads to error or freeze.",
     "impacts": [
       "ui"
     ],
@@ -346,7 +370,12 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/disablestoresearch",
     "verifiedOnBuild": "26100",
-    "evidence": "situational"
+    "evidence": "situational",
+    "whatItDoes": "Restricts file system permissions on Microsoft Store local database (store.db).",
+    "sources": [
+      "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/disablestoresearch"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -445,7 +474,13 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/location",
     "verifiedOnBuild": "26100",
-    "evidence": "documented"
+    "evidence": "documented",
+    "whatItDoes": "Disables Windows Location Platform and sensor services machine-wide.",
+    "sideEffects": "System clock timezone auto-detection, Weather app, and location-based maps will not be able to determine your physical location.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services#bkmk-location"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -541,7 +576,14 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/services",
     "verifiedOnBuild": "26100",
-    "evidence": "situational"
+    "evidence": "situational",
+    "whatItDoes": "Sets non-essential background services (Offline Files, Diagnostics Tracking, Downloaded Maps, Storage Service, and Mobile Hotspot) to Manual or Disabled.",
+    "sideEffects": "Disables Mobile Hotspot and Internet Connection Sharing (SharedAccess), disables Offline Files sync (CscService), and may delay offline map updates (MapsBroker).",
+    "sources": [
+      "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/services",
+      "https://learn.microsoft.com/en-us/windows/application-management/manage-windows-10-and-11-services"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -590,7 +632,13 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/consumerfeatures",
     "verifiedOnBuild": "26100",
-    "evidence": "documented"
+    "evidence": "documented",
+    "whatItDoes": "Disables automatic installation of promoted third-party apps and suggested store apps via CloudContent policy.",
+    "sideEffects": "Prevents Windows from automatically downloading recommended games and promotional apps upon setup.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-experience#experience-allowwindowsconsumerfeatures"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -847,7 +895,13 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/telemetry",
     "verifiedOnBuild": "26100",
-    "evidence": "documented"
+    "evidence": "documented",
+    "whatItDoes": "Configures diagnostic data collection to security/minimum level and disables CEIP scheduled tasks.",
+    "sideEffects": "Reduces telemetry reported to Microsoft; Windows Insider preview builds and Feedback Hub may show diagnostic warnings.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows/privacy/configure-windows-diagnostic-data-in-your-organization"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -896,7 +950,13 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/deliveryoptimization",
     "verifiedOnBuild": "26100",
-    "evidence": "documented"
+    "evidence": "documented",
+    "whatItDoes": "Disables Windows Update Delivery Optimization peer-to-peer sharing over the local network and internet.",
+    "sideEffects": "Updates will only download directly from Microsoft servers, which may take longer if multiple PCs share the same local network.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows/deployment/do/waas-delivery-optimization"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -953,7 +1013,13 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/restorepoint",
     "verifiedOnBuild": "26100",
-    "evidence": "documented"
+    "evidence": "documented",
+    "whatItDoes": "Enables System Restore protection on the system drive and creates an immediate restore point checkpoint.",
+    "sideEffects": "Allocates and reserves system storage space (typically several gigabytes) for Volume Shadow Copy restore points.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows/win32/sr/system-restore-portal"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -1002,7 +1068,13 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/endtaskontaskbar",
     "verifiedOnBuild": "26100",
-    "evidence": "documented"
+    "evidence": "documented",
+    "whatItDoes": "Adds 'End Task' option to right-click context menus on taskbar application buttons.",
+    "sideEffects": "None known.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows/win32/shell/taskbar-extensions"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -1051,7 +1123,13 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/wpbt",
     "verifiedOnBuild": "26100",
-    "evidence": "documented"
+    "evidence": "documented",
+    "whatItDoes": "Disables Windows Platform Binary Table (WPBT) execution in the registry.",
+    "sideEffects": "Blocks OEM firmware-injected executables on motherboard boot; certain vendor-specific utility software may fail to load.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/previous-versions/windows/hardware/design/dn614610(v=vs.85)"
+    ],
+    "needsReview": true
   },
   {
     "schemaVersion": "1.0.0",
@@ -1100,7 +1178,13 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/preventdevicemetadatafromnetwork",
     "verifiedOnBuild": "26100",
-    "evidence": "documented"
+    "evidence": "documented",
+    "whatItDoes": "Prevents Windows from downloading device icons and metadata from the internet.",
+    "sideEffects": "Connected printers, monitors, and peripherals in Device Manager will display generic hardware icons instead of branded device images.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows-hardware/drivers/install/device-metadata-packages"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -1158,7 +1242,13 @@
     "warnings": "Purges superseded Windows update components via DISM /ResetBase. Once executed, superseded updates cannot be rolled back. Undo only resets CleanMgr registry flags.",
     "reversible": false,
     "irreversibleReason": "Executes DISM ResetBase and CleanMgr which permanently purge superseded Windows update components; deleted update baselines cannot be restored.",
-    "evidence": "documented"
+    "evidence": "documented",
+    "whatItDoes": "Runs Windows Cleanmgr cleanup automation targeting temporary files and update caches.",
+    "sideEffects": "Empties Recycle Bin and deletes downloaded Windows Update setup caches.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/cleanmgr"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -1216,7 +1306,13 @@
     "warnings": "Permanently empties all user and system temp folders. Files deleted from temp cannot be recovered. Undo only resets the StorageSense registry flag.",
     "reversible": false,
     "irreversibleReason": "Permanently deletes all files in user and system TEMP directories; deleted temporary files cannot be restored.",
-    "evidence": "documented"
+    "evidence": "documented",
+    "whatItDoes": "Clears temporary files from %TEMP% and %WINDIR%\\Temp.",
+    "sideEffects": "Closes or clears temporary application caches; running programs using active temp files are skipped safely.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows/client-management/mdm/storage-csp"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -1277,6 +1373,12 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/disableexplorerautodiscovery",
     "verifiedOnBuild": "26100",
-    "evidence": "documented"
+    "evidence": "documented",
+    "whatItDoes": "Disables SSDP and UPnP network device auto-discovery in File Explorer.",
+    "sideEffects": "Network-attached media servers and smart TVs will not automatically pop up in File Explorer until manually addressed.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows/win32/upnp/about-upnp"
+    ],
+    "needsReview": false
   }
 ]

@@ -66,7 +66,13 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/detailedbsod",
     "verifiedOnBuild": "26100",
-    "evidence": "documented"
+    "evidence": "documented",
+    "whatItDoes": "Configures Windows crash handler to display detailed technical stop codes and driver names.",
+    "sideEffects": "Shows full technical diagnostic details instead of the friendly blue-screen emoticon.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows-hardware/drivers/debugger/bug-check-code-reference2"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -115,7 +121,13 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/batterypercentage",
     "verifiedOnBuild": "26100",
-    "evidence": "documented"
+    "evidence": "documented",
+    "whatItDoes": "Enables battery remaining percentage indicator on the Windows taskbar.",
+    "sideEffects": "Requires a laptop or battery device; not applicable to desktop systems.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows/apps/design/controls/progress-bar"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -184,7 +196,13 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/darkmode",
     "verifiedOnBuild": "26100",
-    "evidence": "documented"
+    "evidence": "documented",
+    "whatItDoes": "Enables system-wide dark theme for Windows shell and supported desktop apps.",
+    "sideEffects": "None known.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows/apps/design/style/color"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -235,7 +253,13 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/showext",
     "verifiedOnBuild": "26100",
-    "evidence": "documented"
+    "evidence": "documented",
+    "whatItDoes": "Configures File Explorer to always display file extensions for known file types.",
+    "sideEffects": "None known.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows/win32/shell/manage-the-desktop"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -286,7 +310,13 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/hiddenfiles",
     "verifiedOnBuild": "26100",
-    "evidence": "documented"
+    "evidence": "documented",
+    "whatItDoes": "Configures File Explorer to display hidden files and folders.",
+    "sideEffects": "None known.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows/win32/shell/manage-the-desktop"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -337,7 +367,13 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/verboselogon",
     "verifiedOnBuild": "26100",
-    "evidence": "documented"
+    "evidence": "documented",
+    "whatItDoes": "Enables verbose status messages during Windows sign-in, startup, and shutdown.",
+    "sideEffects": "Shows detailed service initialization steps on the logon screen, slightly changing startup visual presentation.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/troubleshoot/windows-server/user-profiles-and-logon/enable-verbose-startup-shutdown-logon-logoff-status-messages"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -440,7 +476,13 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/newoutlook",
     "verifiedOnBuild": "26100",
-    "evidence": "documented"
+    "evidence": "documented",
+    "whatItDoes": "Prevents Windows from auto-installing or forcing the New Outlook web wrapper.",
+    "sideEffects": "None known.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/deployoffice/outlook/new-outlook-for-windows"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -491,7 +533,13 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/scrollbars",
     "verifiedOnBuild": "26100",
-    "evidence": "documented"
+    "evidence": "documented",
+    "whatItDoes": "Always displays full scrollbars in Windows 11 apps instead of hiding them until hovered.",
+    "sideEffects": "None known.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows/apps/design/controls/scroll-bar"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -503,7 +551,7 @@
     "subcategory": "Customize Preferences",
     "risk": "Low",
     "evidence": "situational",
-    "sideEffects": "Increases GPU and display power consumption; disables independent hardware composition planes for windowed applications and video playback.",
+    "sideEffects": "Workaround for screen flickering; increases DWM power usage and may disable windowed HDR presentation.",
     "impacts": [
       "ui"
     ],
@@ -557,7 +605,12 @@
       }
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/multiplaneoverlay",
-    "verifiedOnBuild": "26100"
+    "verifiedOnBuild": "26100",
+    "whatItDoes": "Sets OverlayTestMode to 5 to disable Multi-Plane Overlay (MPO) in DWM.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows-hardware/drivers/display/multiplane-overlay-support"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -644,7 +697,13 @@
       }
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/mouseacceleration",
-    "verifiedOnBuild": "26100"
+    "verifiedOnBuild": "26100",
+    "whatItDoes": "Disables Windows mouse cursor acceleration curve for consistent 1:1 input.",
+    "sideEffects": "None known.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-systemparametersinfow"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -713,7 +772,13 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/numlock",
     "verifiedOnBuild": "26100",
-    "evidence": "documented"
+    "evidence": "documented",
+    "whatItDoes": "Enables NumLock automatically on the Windows logon screen during startup.",
+    "sideEffects": "Alters the default state of the NumLock key at system boot; may affect laptop keyboards without dedicated numeric keypads.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/troubleshoot/windows-client/deployment/enable-num-lock-on-logon-screen"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -764,7 +829,13 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/windowsnapping",
     "verifiedOnBuild": "26100",
-    "evidence": "documented"
+    "evidence": "documented",
+    "whatItDoes": "Customizes window snapping animations and edge assist behaviors.",
+    "sideEffects": "Alters how application windows snap to screen borders and zones.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows/apps/design/basics/window-management"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -815,7 +886,13 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/standbyfix",
     "verifiedOnBuild": "26100",
-    "evidence": "situational"
+    "evidence": "situational",
+    "whatItDoes": "Applies power configuration parameters to mitigate modern standby connected sleep drain.",
+    "sideEffects": "Alters modern standby network sleep state; behavior depends on laptop motherboard firmware.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows-hardware/design/device-experiences/modern-standby"
+    ],
+    "needsReview": true
   },
   {
     "schemaVersion": "1.0.0",
@@ -864,7 +941,13 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/s3sleep",
     "verifiedOnBuild": "26100",
-    "evidence": "situational"
+    "evidence": "situational",
+    "whatItDoes": "Forces legacy S3 sleep state over modern standby (S0ix) in ACPI power settings.",
+    "sideEffects": "Laptops lacking S3 firmware support may fail to sleep, freeze, or suffer bugcheck crashes upon closing the lid.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows-hardware/design/device-experiences/modern-standby-vs-s3"
+    ],
+    "needsReview": true
   },
   {
     "schemaVersion": "1.0.0",
@@ -915,7 +998,13 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/hidesettingshome",
     "verifiedOnBuild": "26100",
-    "evidence": "documented"
+    "evidence": "documented",
+    "whatItDoes": "Hides the personalized 'Home' recommendations page in Windows 11 Settings.",
+    "sideEffects": "Settings app opens directly to the System page rather than the Home overview cards.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-settings#settings-pagelist"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -996,7 +1085,13 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/bingsearch",
     "verifiedOnBuild": "26100",
-    "evidence": "documented"
+    "evidence": "documented",
+    "whatItDoes": "Disables Bing web search suggestions in the Windows Start Menu search box.",
+    "sideEffects": "Start Menu search will only search local applications, settings, and personal files; web queries will not appear.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-admx-search#search-disablesearchboxsuggestions"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -1047,7 +1142,13 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/loginblur",
     "verifiedOnBuild": "26100",
-    "evidence": "documented"
+    "evidence": "documented",
+    "whatItDoes": "Disables acrylic blur effect on the Windows lock and sign-in screen background.",
+    "sideEffects": "Lock screen sign-in shows a clear background image without acrylic blur distortion.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-admx-logon#logon-disableacrylicbackgroundonlogon"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -1096,7 +1197,13 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/disablelockscreen",
     "verifiedOnBuild": "26100",
-    "evidence": "documented"
+    "evidence": "documented",
+    "whatItDoes": "Disables the swipe/key-press lock screen overlay, presenting the password prompt immediately.",
+    "sideEffects": "Bypasses the lock screen clock and notifications overlay, jumping directly to user sign-in.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-personalization#personalization-nolockscreencamera"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -1195,7 +1302,13 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/startmenurecommendations",
     "verifiedOnBuild": "26100",
-    "evidence": "documented"
+    "evidence": "documented",
+    "whatItDoes": "Disables recommended files and recently opened items in the Windows 11 Start Menu.",
+    "sideEffects": "The 'Recommended' section of the Start Menu remains empty and will not display recent files.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-start#start-hideshareddocuments"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -1246,7 +1359,13 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/stickykeys",
     "verifiedOnBuild": "26100",
-    "evidence": "documented"
+    "evidence": "documented",
+    "whatItDoes": "Disables the accessibility shortcut that triggers Sticky Keys when pressing Shift 5 times.",
+    "sideEffects": "None known.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows/apps/design/accessibility/accessibility-overview"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -1309,7 +1428,13 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/taskbaralignment",
     "verifiedOnBuild": "26100",
-    "evidence": "documented"
+    "evidence": "documented",
+    "whatItDoes": "Sets Windows 11 taskbar icons alignment to the left instead of center.",
+    "sideEffects": "None known.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows/win32/shell/taskbar-extensions"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -1360,7 +1485,13 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/taskbarsearch",
     "verifiedOnBuild": "26100",
-    "evidence": "documented"
+    "evidence": "documented",
+    "whatItDoes": "Configures Windows taskbar search box display mode.",
+    "sideEffects": "None known.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows/win32/shell/taskbar-extensions"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -1411,7 +1542,13 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/taskview",
     "verifiedOnBuild": "26100",
-    "evidence": "documented"
+    "evidence": "documented",
+    "whatItDoes": "Hides the Task View / virtual desktops button from the Windows taskbar.",
+    "sideEffects": "Removes the Task View shortcut icon from the taskbar; virtual desktops can still be switched via Win+Tab.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows/win32/shell/taskbar-extensions"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -1480,7 +1617,13 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/gamemode",
     "verifiedOnBuild": "26100",
-    "evidence": "documented"
+    "evidence": "documented",
+    "whatItDoes": "Toggles Windows Game Mode (AutoGameModeEnabled) in user settings.",
+    "sideEffects": "Windows Game Mode prioritization will be toggled; may alter background resource balancing during full-screen games.",
+    "sources": [
+      "https://support.microsoft.com/en-us/windows/use-game-mode-on-your-pc-5dd4ef61-3397-5072-2765-348619257710"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -1531,6 +1674,12 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/longpaths",
     "verifiedOnBuild": "26100",
-    "evidence": "documented"
+    "evidence": "documented",
+    "whatItDoes": "Enables Win32 long file path support (overcoming the MAX_PATH 260-character limit).",
+    "sideEffects": "Allows applications to access paths exceeding 260 characters; legacy 16-bit software may not handle long paths.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation"
+    ],
+    "needsReview": false
   }
 ]

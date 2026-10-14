@@ -132,6 +132,7 @@ public static class Program
                         ValidateServicingProtection(item, id, ref errorCount);
                         ValidateEvidenceField(item, id, ref errorCount);
                         ValidateRiskFloors(item, id, ref errorCount);
+                        ValidateExplanations(item, id, ref errorCount);
 
                         if (!result.IsValid)
                         {
@@ -186,6 +187,7 @@ public static class Program
                     ValidateServicingProtection(single, id, ref errorCount);
                     ValidateEvidenceField(single, id, ref errorCount);
                     ValidateRiskFloors(single, id, ref errorCount);
+                    ValidateExplanations(single, id, ref errorCount);
 
                     if (!result.IsValid)
                     {
@@ -567,4 +569,68 @@ public static class Program
             Console.ResetColor();
         }
     }
+
+    private static void ValidateExplanations(JsonNode item, string id, ref int errorCount)
+    {
+        string? risk = item["risk"]?.ToString();
+        string? whatItDoes = item["whatItDoes"]?.ToString();
+        string? sideEffects = item["sideEffects"]?.ToString();
+        var sourcesArray = item["sources"]?.AsArray();
+
+        bool isSafe = string.Equals(risk, "Safe", StringComparison.OrdinalIgnoreCase);
+
+        if (!isSafe)
+        {
+            if (string.IsNullOrWhiteSpace(whatItDoes))
+            {
+                errorCount++;
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"  [FAIL] Tweak '{id}' (risk: {risk}) is missing required 'whatItDoes' explanation.");
+                Console.ResetColor();
+            }
+
+            if (string.IsNullOrWhiteSpace(sideEffects))
+            {
+                errorCount++;
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"  [FAIL] Tweak '{id}' (risk: {risk}) is missing required 'sideEffects' note.");
+                Console.ResetColor();
+            }
+            else
+            {
+                string trimmed = sideEffects.Trim().TrimEnd('.');
+                if (string.Equals(trimmed, "None known", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(trimmed, "None", StringComparison.OrdinalIgnoreCase))
+                {
+                    errorCount++;
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"  [FAIL] Tweak '{id}' (risk: {risk}) has forbidden '{sideEffects}' sideEffects. 'None known' is allowed only for Safe tweaks.");
+                    Console.ResetColor();
+                }
+            }
+
+            if (sourcesArray == null || sourcesArray.Count == 0)
+            {
+                errorCount++;
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"  [FAIL] Tweak '{id}' (risk: {risk}) is missing required 'sources' list.");
+                Console.ResetColor();
+            }
+            else
+            {
+                foreach (var srcNode in sourcesArray)
+                {
+                    string src = srcNode?.ToString() ?? "";
+                    if (string.IsNullOrWhiteSpace(src) || !src.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+                    {
+                        errorCount++;
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine($"  [FAIL] Tweak '{id}' has invalid source URI in sources: '{src}'.");
+                        Console.ResetColor();
+                    }
+                }
+            }
+        }
+    }
 }
+

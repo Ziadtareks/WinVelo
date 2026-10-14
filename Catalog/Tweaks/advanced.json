@@ -222,7 +222,13 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/bravedebloat",
     "verifiedOnBuild": "26100",
-    "evidence": "documented"
+    "evidence": "documented",
+    "whatItDoes": "Stops and removes Brave browser background telemetry, update services, and scheduled tasks.",
+    "sideEffects": "Brave browser automatic background updates and promotional notifications will stop functioning.",
+    "sources": [
+      "https://winutil.christitus.com/code-reference/tweaks/advanced-tweaks/bravedebloat"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -287,7 +293,13 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/disablewarningforunsignedrdp",
     "verifiedOnBuild": "26100",
-    "evidence": "documented"
+    "evidence": "documented",
+    "whatItDoes": "Sets RemoteDesktop WarnUnsignedConnection to 0 in HKLM terminal server client policies.",
+    "sideEffects": "Suppresses security warning dialogs when connecting to untrusted or self-signed Remote Desktop endpoints.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/welcome-to-rds"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -592,7 +604,13 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/edgedebloat",
     "verifiedOnBuild": "26100",
-    "evidence": "documented"
+    "evidence": "documented",
+    "whatItDoes": "Disables background services, startup tasks, and promotional telemetry associated with Microsoft Edge.",
+    "sideEffects": "Disables Edge automatic background updates and may impact WebView2-dependent system widgets.",
+    "sources": [
+      "https://winutil.christitus.com/code-reference/tweaks/advanced-tweaks/edgedebloat"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -657,7 +675,13 @@
     "warnings": "Removes Microsoft Edge from the system. Some Windows components, widgets, or web-authentication dialogs may be affected. Undo reinstalls Edge via WinGet, but does NOT restore deleted user profile data or browsing history.",
     "reversible": false,
     "irreversibleReason": "Uninstalls Microsoft Edge system binaries and deletes user profiles; undo reinstalls a blank Edge browser via winget but cannot restore deleted history, cookies, or user profile data.",
-    "evidence": "documented"
+    "evidence": "documented",
+    "whatItDoes": "Uninstalls Microsoft Edge using winget and package removal scripts.",
+    "sideEffects": "Microsoft Edge browser is permanently removed; system features relying on Edge or embedded WebViews may fail to open external links. Irreversible.",
+    "sources": [
+      "https://winutil.christitus.com/code-reference/tweaks/advanced-tweaks/removeedge"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -719,7 +743,13 @@
     "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/disablebitlocker",
     "verifiedOnBuild": "26100",
     "warnings": "Disabling BitLocker removes disk encryption and leaves drive data completely unprotected against unauthorized physical access.",
-    "evidence": "situational"
+    "evidence": "situational",
+    "whatItDoes": "Decrypts and disables BitLocker drive encryption across all detected system volumes.",
+    "sideEffects": "Completely decrypts storage volumes, removing hardware-level data protection against offline physical access or theft.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows/security/operating-system-security/data-protection/bitlocker/"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -770,7 +800,13 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/utc",
     "verifiedOnBuild": "26100",
-    "evidence": "situational"
+    "evidence": "situational",
+    "whatItDoes": "Sets RealTimeIsUniversal to 1 in HKLM system parameters, configuring the hardware RTC clock to UTC.",
+    "sideEffects": "Configures Windows hardware clock to UTC (ideal for Linux dual-boot); may cause incorrect local time display if timezone is misconfigured in firmware.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/set-the-time-zone-on-a-running-pc-in-windows-pe"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -835,7 +871,13 @@
     "warnings": "Completely uninstalls OneDrive and stops file synchronization. Ensure all cloud documents are backed up locally. Undo reinstalls OneDrive via WinGet, but does NOT restore unsynced files or cached sync state.",
     "reversible": false,
     "irreversibleReason": "Uninstalls Microsoft OneDrive client and stops synchronization; undo reinstalls OneDrive via winget and restores sync policies, but un-synced local changes and offline file cache are not restored.",
-    "evidence": "documented"
+    "evidence": "documented",
+    "whatItDoes": "Terminates OneDrive processes and uninstalls the Microsoft OneDrive client from the system.",
+    "sideEffects": "Removes OneDrive file synchronization and integration from File Explorer; local files stored only in the cloud will become inaccessible.",
+    "sources": [
+      "https://winutil.christitus.com/code-reference/tweaks/advanced-tweaks/removeonedrive"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -916,7 +958,13 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/removehomeandgallery",
     "verifiedOnBuild": "26100",
-    "evidence": "documented"
+    "evidence": "documented",
+    "whatItDoes": "Hides the Home and Gallery nodes from the File Explorer navigation pane.",
+    "sideEffects": "None known.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows/win32/shell/manage-the-desktop"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -1177,7 +1225,13 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/display",
     "verifiedOnBuild": "26100",
-    "evidence": "documented"
+    "evidence": "documented",
+    "whatItDoes": "Adjusts graphics driver timeout detection recovery (TdrLevel, TdrDelay) in system graphics drivers.",
+    "sideEffects": "Modifies display driver recovery timeouts; display driver crashes may freeze the entire operating system instead of recovering dynamically.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows-hardware/drivers/display/timeout-detection-and-recovery"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -1240,7 +1294,13 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/reservedstorage",
     "verifiedOnBuild": "26100",
-    "evidence": "documented"
+    "evidence": "documented",
+    "whatItDoes": "Disables Windows Reserved Storage (7GB reserved for Windows Update staging) using fsutil.",
+    "sideEffects": "Windows Update may fail during major feature updates if the primary storage drive runs low on free disk space.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/configure-reserved-storage"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -1291,7 +1351,13 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/storage",
     "verifiedOnBuild": "26100",
-    "evidence": "documented"
+    "evidence": "documented",
+    "whatItDoes": "Configures Windows Storage Sense automated cleanup parameters and temporary file deletion policies.",
+    "sideEffects": "Automatically deletes files in Downloads or Recycle Bin that have remained untouched longer than configured retention limits.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows/client-management/mdm/storage-csp"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -1366,7 +1432,13 @@
     "warnings": "Removes and disables Windows AI, Recall, and Copilot packages system-wide. Undo only restores registry policies; removed AppX and Windows features are NOT reinstalled.",
     "reversible": false,
     "irreversibleReason": "Permanently uninstalls Windows Copilot, Recall, and AI Appx packages; undo only reverts policy registry keys and does not reinstall the removed Appx or system features.",
-    "evidence": "documented"
+    "evidence": "documented",
+    "whatItDoes": "Disables Windows Copilot and Recall features machine-wide through Group Policy registry keys.",
+    "sideEffects": "Copilot taskbar button, Copilot sidebar, and AI-assisted Windows features will become unavailable.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows/client-management/manage-windows-copilot"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -1447,7 +1519,13 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/razerblock",
     "verifiedOnBuild": "26100",
-    "evidence": "situational"
+    "evidence": "situational",
+    "whatItDoes": "Blocks Razer Synapse automatic hardware plug-and-play installer prompts in system software policies.",
+    "sideEffects": "Razer peripheral setup and RGB configuration software must be downloaded and installed manually from the manufacturer's website.",
+    "sources": [
+      "https://winutil.christitus.com/code-reference/tweaks/advanced-tweaks/razerblock"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -1507,7 +1585,13 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/logiblock",
     "verifiedOnBuild": "26100",
-    "evidence": "situational"
+    "evidence": "situational",
+    "whatItDoes": "Blocks Logitech G-Hub and Options auto-install prompts when connecting hardware peripherals.",
+    "sideEffects": "Logitech mouse and keyboard management software will not automatically install upon plugging in the device.",
+    "sources": [
+      "https://winutil.christitus.com/code-reference/tweaks/advanced-tweaks/logiblock"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -1574,7 +1658,13 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/disablenotifications",
     "verifiedOnBuild": "26100",
-    "evidence": "documented"
+    "evidence": "documented",
+    "whatItDoes": "Globally disables the Windows notification platform and Action Center alerts via system policies.",
+    "sideEffects": "All application notifications, system security alerts, and Action Center banners will be suppressed.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows/apps/design/shell/tiles-and-notifications/"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -1620,7 +1710,13 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/rightclickmenu",
     "verifiedOnBuild": "26100",
-    "evidence": "documented"
+    "evidence": "documented",
+    "whatItDoes": "Restores the classic Windows 10 style right-click context menu in Windows 11 File Explorer.",
+    "sideEffects": "None known.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows/win32/shell/context-menu-handlers"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -1671,7 +1767,13 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/ipv46",
     "verifiedOnBuild": "26100",
-    "evidence": "situational"
+    "evidence": "situational",
+    "whatItDoes": "Configures IPv4 as the preferred protocol over IPv6 in the Windows TCP/IP prefix policy table.",
+    "sideEffects": "Changes network routing preference; may break connectivity on modern IPv6-only networks or cellular hotspots.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/troubleshoot/windows-server/networking/configure-ipv6-in-windows"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -1734,7 +1836,13 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/teredo",
     "verifiedOnBuild": "26100",
-    "evidence": "situational"
+    "evidence": "situational",
+    "whatItDoes": "Disables the Teredo tunneling transition protocol in the network stack.",
+    "sideEffects": "Disables IPv6-over-IPv4 tunneling; legacy multiplayer games or Xbox Live services that require Teredo NAT traversal may fail to connect.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2008-R2-and-2008/cc731518(v=ws.10)"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -1798,7 +1906,13 @@
     "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/disableipv6",
     "verifiedOnBuild": "26100",
     "warnings": "Disables IPv6 on all network adapters. Some modern networks and services requiring IPv6 may lose connectivity.",
-    "evidence": "situational"
+    "evidence": "situational",
+    "whatItDoes": "Disables the IPv6 protocol stack across all active network interfaces.",
+    "sideEffects": "Completely prevents communication over IPv6; can break connectivity with modern IPv6 services, corporate VPNs, and home networks.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/troubleshoot/windows-server/networking/configure-ipv6-in-windows"
+    ],
+    "needsReview": false
   },
   {
     "schemaVersion": "1.0.0",
@@ -1849,6 +1963,12 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/disablebgapps",
     "verifiedOnBuild": "26100",
-    "evidence": "documented"
+    "evidence": "documented",
+    "whatItDoes": "Sets LetAppsRunInBackground to 2 under AppPrivacy policies, preventing background execution.",
+    "sideEffects": "Prevents Windows Store and UWP applications from running or updating in the background when minimized.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-privacy#privacy-letappsruninbackground"
+    ],
+    "needsReview": false
   }
 ]

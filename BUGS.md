@@ -326,3 +326,24 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
   4. Enforced minimum risk floors in `CatalogValidator`: irreversible $\implies$ High; protected servicing $\implies$ High; HKLM $\implies$ at least Low (cannot be Safe).
   5. Added unit test suite in `RiskRubricTests.cs`.
 
+---
+
+## BUG-023: Missing Tweak Explanations, Side Effects Disclosures, Source Citations, and Recommended-Only View Filter
+- **Component**: `Catalog/Tweaks`, `Catalog/schema/tweak.schema.json`, `tools/CatalogValidator/Program.cs`, `src/Tweakora.App/ViewModels/TweaksViewModel.cs`, `src/Tweakora.App/Views/TweaksTabView.xaml`, `src/Tweakora.Tests/TweakExplanationTests.cs`
+- **Finding**:
+  1. Tweaks lacked granular explanations of their exact system behavior (`whatItDoes`), side effects/potential trade-offs (`sideEffects`), and authoritative documentation citations (`sources`).
+  2. Users had no O&O ShutUp10++-style expandable drawer on tweak cards to inspect what a tweak does, what it might break, or view documentation before toggling.
+  3. No "Recommended only" view filter existed to isolate conservative, well-tested, documented tweaks (Safe & Low risk, fully reversible, non-needsReview) from aggressive or advanced settings.
+  4. Non-Safe tweaks previously had no schema enforcement requiring explicit side-effects disclosure (allowing "None known" even on machine-altering tweaks).
+  5. Tweaks with unverified or conflicting community claims (`performance.input.buffer-queue`, `performance.cpu.unpark-cores`, `essential.wpbt`, `pref.standbyfix`, `pref.s3sleep`) lacked a structured `needsReview: true` flag to quarantine them from presets and warn users.
+- **Root Cause**: Omission of explanatory metadata fields and absence of validator enforcement requiring citations and non-trivial side effect disclosures for non-Safe tweaks.
+- **Fix**:
+  1. Added schema properties `whatItDoes`, `sideEffects`, `sources`, and `needsReview` to `Catalog/schema/tweak.schema.json` and `TweakDefinition.cs`.
+  2. Populated all 149 tweaks with accurate, non-speculative explanations, explicit side effects (strictly forbidding "None known" on non-Safe tweaks), and verified Microsoft Learn / upstream documentation source URLs.
+  3. Flagged 5 uncertain tweaks as `needsReview: true` (`performance.input.buffer-queue`, `performance.cpu.unpark-cores`, `essential.wpbt`, `pref.standbyfix`, `pref.s3sleep`), ensuring exclusion from presets and displaying warning banners in the UI.
+  4. Added `ValidateExplanations` in `CatalogValidator` enforcing that all non-Safe tweaks provide `whatItDoes`, `sources` ($\ge 1$ valid HTTP URLs), and non-empty `sideEffects` that cannot be "None known".
+  5. Implemented expandable info drawer on tweak cards in `TweaksTabView.xaml` and `TweakCardModel` with "Details ▾" toggle, showing "WHAT IT DOES", "SIDE EFFECTS / POTENTIAL IMPACT", `NeedsReview` warning alert, and clickable documentation source links.
+  6. Added "Recommended only" view filter to `TweaksViewModel` and `TweaksTabView.xaml` allowing users to focus exclusively on conservative, well-documented, reversible settings.
+  7. Added unit test suite in `TweakExplanationTests.cs` validating explanations, source URLs, side effects rubric, `needsReview` preset quarantine, and the recommended-only filter.
+
+
