@@ -27,8 +27,17 @@ public sealed partial class InstallViewModel : ObservableObject
     [ObservableProperty]
     private string _selectedCategory = "All";
 
+    public ObservableCollection<string> AvailablePackageManagers { get; } = new()
+    {
+        "WinGet",
+        "Chocolatey"
+    };
+
     [ObservableProperty]
     private string _packageManager = "WinGet"; // "WinGet" or "Chocolatey"
+
+    [ObservableProperty]
+    private string _packageManagerStatus = "WinGet (Auto-Selected)";
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(InstallSelectedCommand))]
@@ -69,6 +78,22 @@ public sealed partial class InstallViewModel : ObservableObject
         };
 
         LoadApps();
+        _ = DetectAndSelectBestPackageManagerAsync();
+    }
+
+    public async Task DetectAndSelectBestPackageManagerAsync()
+    {
+        try
+        {
+            string best = await _installService.DetectBestPackageManagerAsync();
+            PackageManager = best;
+            PackageManagerStatus = $"{best} (Auto-Selected)";
+        }
+        catch
+        {
+            PackageManager = "WinGet";
+            PackageManagerStatus = "WinGet (Default)";
+        }
     }
 
     public void LoadApps()
@@ -98,7 +123,216 @@ public sealed partial class InstallViewModel : ObservableObject
         ApplyFilter();
         UpdateSelectedCount();
 
-        _ = Task.Run(() => _installService.DetectInstalledStatusAsync(_allApps));
+        _ = Task.Run(async () =>
+        {
+            await _installService.DetectInstalledStatusAsync(_allApps);
+            ExtractInstalledAppIcons();
+        });
+    }
+
+    private void ExtractInstalledAppIcons()
+    {
+        foreach (var app in _allApps)
+        {
+            try
+            {
+                string? exe = ResolveAppExePath(app.Key);
+                if (!string.IsNullOrEmpty(exe))
+                {
+                    var icon = Tweakora.App.Services.AppIconExtractor.ExtractIcon(exe);
+                    if (icon != null)
+                    {
+                        System.Windows.Application.Current?.Dispatcher?.Invoke(() =>
+                        {
+                            app.IconImage = icon;
+                        });
+                    }
+                }
+            }
+            catch { }
+        }
+    }
+
+    private static string? ResolveAppExePath(string key)
+    {
+        string pf = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+        string pf86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
+        string local = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        string appdata = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+
+        string[] candidates = key.ToLowerInvariant() switch
+        {
+            "chrome" or "googlechrome" => new[]
+            {
+                System.IO.Path.Combine(pf, @"Google\Chrome\Application\chrome.exe"),
+                System.IO.Path.Combine(pf86, @"Google\Chrome\Application\chrome.exe"),
+                System.IO.Path.Combine(local, @"Google\Chrome\Application\chrome.exe")
+            },
+            "brave" => new[]
+            {
+                System.IO.Path.Combine(pf, @"BraveSoftware\Brave-Browser\Application\brave.exe"),
+                System.IO.Path.Combine(local, @"BraveSoftware\Brave-Browser\Application\brave.exe")
+            },
+            "firefox" or "mozillafirefox" => new[]
+            {
+                System.IO.Path.Combine(pf, @"Mozilla Firefox\firefox.exe"),
+                System.IO.Path.Combine(pf86, @"Mozilla Firefox\firefox.exe")
+            },
+            "edge" or "microsoftedge" => new[]
+            {
+                System.IO.Path.Combine(pf86, @"Microsoft\Edge\Application\msedge.exe"),
+                System.IO.Path.Combine(pf, @"Microsoft\Edge\Application\msedge.exe")
+            },
+            "discord" => new[]
+            {
+                System.IO.Path.Combine(local, @"Discord\Update.exe")
+            },
+            "telegram" => new[]
+            {
+                System.IO.Path.Combine(appdata, @"Telegram Desktop\Telegram.exe")
+            },
+            "whatsapp" => new[]
+            {
+                System.IO.Path.Combine(local, @"WhatsApp\WhatsApp.exe")
+            },
+            "zoom" => new[]
+            {
+                System.IO.Path.Combine(appdata, @"Zoom\bin\Zoom.exe")
+            },
+            "vlc" => new[]
+            {
+                System.IO.Path.Combine(pf, @"VideoLAN\VLC\vlc.exe"),
+                System.IO.Path.Combine(pf86, @"VideoLAN\VLC\vlc.exe")
+            },
+            "spotify" => new[]
+            {
+                System.IO.Path.Combine(appdata, @"Spotify\Spotify.exe")
+            },
+            "obs" or "obsstudio" => new[]
+            {
+                System.IO.Path.Combine(pf, @"obs-studio\bin\64bit\obs64.exe")
+            },
+            "handbrake" => new[]
+            {
+                System.IO.Path.Combine(pf, @"HandBrake\HandBrake.exe")
+            },
+            "audacity" => new[]
+            {
+                System.IO.Path.Combine(pf, @"Audacity\Audacity.exe"),
+                System.IO.Path.Combine(pf86, @"Audacity\Audacity.exe")
+            },
+            "paintnet" => new[]
+            {
+                System.IO.Path.Combine(pf, @"paint.net\paintdotnet.exe")
+            },
+            "sharex" => new[]
+            {
+                System.IO.Path.Combine(pf, @"ShareX\ShareX.exe")
+            },
+            "7zip" => new[]
+            {
+                System.IO.Path.Combine(pf, @"7-Zip\7zFM.exe"),
+                System.IO.Path.Combine(pf86, @"7-Zip\7zFM.exe")
+            },
+            "winrar" => new[]
+            {
+                System.IO.Path.Combine(pf, @"WinRAR\WinRAR.exe")
+            },
+            "powertoys" => new[]
+            {
+                System.IO.Path.Combine(local, @"PowerToys\PowerToys.exe"),
+                System.IO.Path.Combine(pf, @"PowerToys\PowerToys.exe")
+            },
+            "everything" => new[]
+            {
+                System.IO.Path.Combine(pf, @"Everything\Everything.exe"),
+                System.IO.Path.Combine(pf86, @"Everything\Everything.exe")
+            },
+            "wiztree" => new[]
+            {
+                System.IO.Path.Combine(pf, @"WizTree\WizTree64.exe")
+            },
+            "qbittorrent" => new[]
+            {
+                System.IO.Path.Combine(pf, @"qBittorrent\qbittorrent.exe")
+            },
+            "anydesk" => new[]
+            {
+                System.IO.Path.Combine(pf86, @"AnyDesk\AnyDesk.exe")
+            },
+            "bitwarden" => new[]
+            {
+                System.IO.Path.Combine(local, @"Programs\Bitwarden\Bitwarden.exe")
+            },
+            "bleachbit" => new[]
+            {
+                System.IO.Path.Combine(pf86, @"BleachBit\bleachbit.exe")
+            },
+            "rufus" => new[]
+            {
+                System.IO.Path.Combine(pf, @"Rufus\rufus.exe")
+            },
+            "steam" => new[]
+            {
+                System.IO.Path.Combine(pf86, @"Steam\steam.exe")
+            },
+            "epicgames" => new[]
+            {
+                System.IO.Path.Combine(pf86, @"Epic Games\Launcher\Portal\Binaries\Win64\EpicGamesLauncher.exe")
+            },
+            "goggalaxy" => new[]
+            {
+                System.IO.Path.Combine(pf86, @"GOG Galaxy\GalaxyClient.exe")
+            },
+            "battlenet" => new[]
+            {
+                System.IO.Path.Combine(pf86, @"Battle.net\Battle.net.exe")
+            },
+            "vscode" => new[]
+            {
+                System.IO.Path.Combine(local, @"Programs\Microsoft VS Code\Code.exe"),
+                System.IO.Path.Combine(pf, @"Microsoft VS Code\Code.exe")
+            },
+            "notepadplusplus" or "notepad++" => new[]
+            {
+                System.IO.Path.Combine(pf, @"Notepad++\notepad++.exe"),
+                System.IO.Path.Combine(pf86, @"Notepad++\notepad++.exe")
+            },
+            "git" => new[]
+            {
+                System.IO.Path.Combine(pf, @"Git\cmd\git.exe"),
+                System.IO.Path.Combine(pf, @"Git\git-bash.exe")
+            },
+            "terminal" or "windowsterminal" => new[]
+            {
+                System.IO.Path.Combine(local, @"Microsoft\WindowsApps\wt.exe")
+            },
+            "python" or "python3" => new[]
+            {
+                System.IO.Path.Combine(local, @"Programs\Python\Python312\python.exe"),
+                System.IO.Path.Combine(local, @"Programs\Python\Python311\python.exe")
+            },
+            "nodejs" or "node" => new[]
+            {
+                System.IO.Path.Combine(pf, @"nodejs\node.exe")
+            },
+            "githubdesktop" => new[]
+            {
+                System.IO.Path.Combine(local, @"GitHubDesktop\GitHubDesktop.exe")
+            },
+            _ => Array.Empty<string>()
+        };
+
+        foreach (var c in candidates)
+        {
+            try
+            {
+                if (System.IO.File.Exists(c)) return c;
+            }
+            catch { }
+        }
+
+        return null;
     }
 
     public void SetSearchQuery(string query)

@@ -23,12 +23,19 @@
                 BorderThickness="1" CornerRadius="8" Padding="14,10" Margin="0,0,0,12">
             <DockPanel LastChildFill="False">
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" VerticalAlignment="Center">
-                    <!-- Package Manager Selector -->
-                    <TextBlock Text="Package Manager:" VerticalAlignment="Center" Margin="0,0,8,0" FontWeight="SemiBold" FontSize="13" Foreground="{DynamicResource TextPrimaryBrush}" />
-                    <ComboBox SelectedValue="{Binding PackageManager, Mode=TwoWay}" Width="130" Margin="0,0,16,0" VerticalAlignment="Center">
-                        <ComboBoxItem Content="WinGet" IsSelected="True" />
-                        <ComboBoxItem Content="Chocolatey" />
-                    </ComboBox>
+                    <!-- Package Manager Selector with Automatic Detection -->
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,16,0">
+                        <TextBlock Text="Package Manager:" VerticalAlignment="Center" Margin="0,0,8,0" FontWeight="SemiBold" FontSize="13" Foreground="{DynamicResource TextPrimaryBrush}" />
+                        <ComboBox ItemsSource="{Binding AvailablePackageManagers}"
+                                  SelectedItem="{Binding PackageManager, Mode=TwoWay}"
+                                  Width="130" Margin="0,0,8,0" VerticalAlignment="Center" />
+                        <Border Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="6" Padding="8,3" VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal">
+                                <ui:SymbolIcon Symbol="CheckmarkCircle24" Foreground="#38BDF8" FontSize="12" Margin="0,0,4,0" VerticalAlignment="Center" />
+                                <TextBlock Text="{Binding PackageManagerStatus}" FontSize="11" Foreground="#38BDF8" FontWeight="SemiBold" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
 
                     <!-- Action Buttons -->
                     <ui:Button AutomationProperties.AutomationId="InstallSelectedButton"
@@ -106,14 +113,26 @@
                                           AutomationProperties.AutomationId="{Binding Key, StringFormat='AppCheck_{0}'}"
                                           VerticalAlignment="Center" Margin="0,0,10,0" />
 
-                                <!-- Colorful Branded 42x42 Icon Tile -->
-                                <Border Grid.Column="1" Background="{Binding BrandColor}"
+                                <!-- 3-Tier Real Program Icon Tile -->
+                                <Border Grid.Column="1" Background="{Binding IconBackground}"
+                                        BorderBrush="{Binding IconBorder}" BorderThickness="1"
                                         CornerRadius="10" Width="42" Height="42" Margin="0,0,12,0"
-                                        VerticalAlignment="Center">
+                                        VerticalAlignment="Center" ClipToBounds="True">
                                     <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
-                                        <!-- Vector Symbol Icon -->
+                                        <!-- Tier 1: Real Extracted Windows Exe Icon from Disk -->
+                                        <Image Source="{Binding IconImage}" Width="30" Height="30"
+                                               RenderOptions.BitmapScalingMode="HighQuality"
+                                               Visibility="{Binding HasIconImage, Converter={StaticResource BoolToVis}}" />
+
+                                        <!-- Tier 2: Authentic Branded SVG Vector Logo -->
+                                        <Viewbox Width="24" Height="24"
+                                                 Visibility="{Binding HasSvgIcon, Converter={StaticResource BoolToVis}}">
+                                            <Path Data="{Binding SvgIconPath}" Fill="White" Stretch="Uniform" />
+                                        </Viewbox>
+
+                                        <!-- Tier 3: Vector Symbol Icon Fallback -->
                                         <ui:SymbolIcon Symbol="{Binding IconSymbol}" Foreground="White" FontSize="20"
-                                                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                       Visibility="{Binding HasSymbolIcon, Converter={StaticResource BoolToVis}}" />
                                     </Grid>
                                 </Border>
 

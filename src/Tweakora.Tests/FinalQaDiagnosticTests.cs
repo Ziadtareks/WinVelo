@@ -260,7 +260,21 @@ public sealed class FinalQaDiagnosticTests
             Assert.StartsWith("#", color);
             Assert.False(string.IsNullOrWhiteSpace(icon));
             Assert.False(string.IsNullOrWhiteSpace(code));
+
+            // Verify GetBrandSvg maps an authentic SVG vector logo for all catalog apps
+            string? svg = AppInstallService.GetBrandSvg(key);
+            Assert.False(string.IsNullOrWhiteSpace(svg), $"App '{key}' is missing an authentic SVG vector logo.");
         }
+    }
+
+    [Fact]
+    public async Task AppInstallService_DetectBestPackageManager_ReturnsWinGetOrChoco()
+    {
+        var fakeShell = new FakeShellService();
+        var service = new AppInstallService(fakeShell);
+
+        string best = await service.DetectBestPackageManagerAsync();
+        Assert.True(best == "WinGet" || best == "Chocolatey", $"Expected WinGet or Chocolatey, got '{best}'");
     }
 
     [Fact]
