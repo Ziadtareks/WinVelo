@@ -77,8 +77,8 @@ Real-time hardware metrics (Physical RAM usage, CPU model, Windows build), 4 one
 
 | Package | Type | Size | SHA256 Checksum |
 |---|---|---|---|
-| **[WinVelo-v1.0.0-win-x64-portable.zip](dist/WinVelo-v1.0.0-win-x64-portable.zip)** | Standalone Portable (Includes .NET Runtime) | ~95 MB | `A747C881B457C2BFBCE8F8565E147C495656940C7C6ECBF289BCFA9F1143F02D` |
-| **[WinVelo-v1.0.0-win-x64-small.zip](dist/WinVelo-v1.0.0-win-x64-small.zip)** | Framework Dependent (Requires .NET 10) | ~4 MB | `6FF99DF64E5309854856F1C3CDE9E0DF0328E24668FB7FE247F4F18E2AF7A3F0` |
+| **[WinVelo-v1.0.0-win-x64-portable.zip](dist/WinVelo-v1.0.0-win-x64-portable.zip)** | Standalone Portable (Includes .NET Runtime) | ~95 MB | `E7C7A5B03C1B468EBBEED3EC8D4C4D8B2307F5F898E21B44338081C781A7B141` |
+| **[WinVelo-v1.0.0-win-x64-small.zip](dist/WinVelo-v1.0.0-win-x64-small.zip)** | Framework Dependent (Requires .NET 10) | ~3.6 MB | `3BD3C82964CD695FDF90133705D3CA2E00495683BCFFEAB33505B3E2195A46A3` |
 
 ---
 

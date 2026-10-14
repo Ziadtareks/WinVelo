@@ -102,8 +102,8 @@ Upstream Reference: [ChrisTitusTech/winutil](https://github.com/ChrisTitusTech/w
 - **63/63 CLI Self-Test Checks PASSED** (100% roundtrip pass rate).
 - **All 10 Screenshots Refreshed & Visually Inspected** in `docs/screenshots/` (dashboard, startup, toolbox, tweaks, backups, config, command-palette, diff-preview, install, updates).
 - **Release Packages (`dist/`)**:
-  - `dist/WinVelo-v1.0.0-win-x64-portable.zip` (SHA-256: `DB7B1969A3427390D451DD4264CB9FE70585535E5736E1A440C77C72FD50817A`)
-  - `dist/WinVelo-v1.0.0-win-x64-small.zip` (SHA-256: `00D7FC05E6D7DA63C5D36650D274DD08A5505465B9EA18F0338F1304645AFDBA`)
+  - `dist/WinVelo-v1.0.0-win-x64-portable.zip` (SHA-256: `E7C7A5B03C1B468EBBEED3EC8D4C4D8B2307F5F898E21B44338081C781A7B141`)
+  - `dist/WinVelo-v1.0.0-win-x64-small.zip` (SHA-256: `3BD3C82964CD695FDF90133705D3CA2E00495683BCFFEAB33505B3E2195A46A3`)
   - `dist/SHA256SUMS.txt` updated.
 
 ---
