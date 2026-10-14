@@ -342,6 +342,194 @@ public sealed class UndoEngineTests : IDisposable
         Assert.Contains("Rollback incomplete", res.Message);
     }
 
+    [Fact]
+    public async Task FallbackUndo_PreAppliedWithoutJournal_ApplyAndUndoRestoresOriginalDefault()
+    {
+        // (a) tweak pre-applied with no journal -> fallback undo -> apply -> undo: final state must equal original default
+        const string hive = "HKCU";
+        const string key = @"Software\Test\FallbackTweak";
+        const string valName = "Setting";
+
+        var tweak = new TweakDefinition
+        {
+            Id = "test.fallback.lifecycle",
+            Name = "Fallback Lifecycle Tweak",
+            Category = "system",
+            Risk = "Safe",
+            Apply = new List<ActionItem>
+            {
+                new()
+                {
+                    Type = "Registry",
+                    Hive = hive,
+                    Key = key,
+                    ValueName = valName,
+                    Operation = "Set",
+                    ValueKind = "DWord",
+                    Data = JsonSerializer.SerializeToElement(1)
+                }
+            },
+            Undo = new List<ActionItem>
+            {
+                new()
+                {
+                    Type = "Registry",
+                    Hive = hive,
+                    Key = key,
+                    ValueName = valName,
+                    Operation = "Set",
+                    ValueKind = "DWord",
+                    Data = JsonSerializer.SerializeToElement(0)
+                }
+            }
+        };
+
+        // 1. Tweak is pre-applied with no journal
+        _fakeRegistry.SetValue(hive, key, valName, 1, "DWord");
+        Assert.Empty(_journal.GetAllSessions());
+
+        // 2. Fallback undo runs without creating baseline records or open sessions
+        var undo1 = await _runner.UndoTweakAsync(tweak);
+        Assert.True(undo1.Success);
+        Assert.Equal(0, _fakeRegistry.GetValue(hive, key, valName));
+        Assert.Empty(_journal.GetUnfinishedSessions());
+        // Verify no baseline records were created
+        Assert.Null(_journal.FindExistingBaselineRecord(tweak.Id, $"{hive}\\{key}\\{valName}"));
+
+        // 3. User applies tweak -> should capture fresh baseline (0)
+        var applyReport = await _runner.ApplyBatchAsync(new[] { tweak });
+        Assert.Equal(1, applyReport.AppliedCount);
+        Assert.Equal(1, _fakeRegistry.GetValue(hive, key, valName));
+
+        // 4. User undos tweak -> must restore true baseline (0), NOT 1
+        var undo2 = await _runner.UndoTweakAsync(tweak);
+        Assert.True(undo2.Success);
+        Assert.Equal(0, _fakeRegistry.GetValue(hive, key, valName));
+    }
+
+    [Fact]
+    public async Task Undo_WithFailingPowerShellStep_RetryDoesNotReplayStaleRecords()
+    {
+        // (b) apply -> undo with a failing PowerShell step -> retry the undo: no stale records are replayed
+        const string hive = "HKCU";
+        const string key = @"Software\Test\StaleRetry";
+        const string valName = "Config";
+
+        var tweak = new TweakDefinition
+        {
+            Id = "test.stale.retry",
+            Name = "Stale Retry Tweak",
+            Category = "system",
+            Risk = "Safe",
+            Apply = new List<ActionItem>
+            {
+                new()
+                {
+                    Type = "Registry",
+                    Hive = hive,
+                    Key = key,
+                    ValueName = valName,
+                    Operation = "Set",
+                    ValueKind = "DWord",
+                    Data = JsonSerializer.SerializeToElement(1)
+                }
+            },
+            Undo = new List<ActionItem>
+            {
+                new()
+                {
+                    Type = "PowerShell",
+                    Script = "Exit 1"
+                }
+            }
+        };
+
+        // Initial default is 0
+        _fakeRegistry.SetValue(hive, key, valName, 0, "DWord");
+
+        // 1. Apply tweak
+        var applyReport = await _runner.ApplyBatchAsync(new[] { tweak });
+        Assert.Equal(1, applyReport.AppliedCount);
+        Assert.Equal(1, _fakeRegistry.GetValue(hive, key, valName));
+
+        // 2. Undo with failing PowerShell step
+        _fakeShell.ScriptResultFactory = (_, _) => new PowerShellResult
+        {
+            ExitCode = 1,
+            StdOut = string.Empty,
+            StdErr = "Simulated PS failure",
+            TimedOut = false,
+            Duration = TimeSpan.FromMilliseconds(5)
+        };
+
+        var undo1 = await _runner.UndoTweakAsync(tweak);
+        Assert.False(undo1.Success);
+
+        // Registry action was restored to baseline (0) and marked reverted
+        Assert.Equal(0, _fakeRegistry.GetValue(hive, key, valName));
+
+        // 3. User modifies registry externally to 999
+        _fakeRegistry.SetValue(hive, key, valName, 999, "DWord");
+
+        // 4. Configure PowerShell to succeed and retry the undo
+        _fakeShell.ScriptResultFactory = null;
+        var undo2 = await _runner.UndoTweakAsync(tweak);
+        Assert.True(undo2.Success);
+
+        // Registry value must still be 999 because the already-reverted stateful record was NOT replayed
+        Assert.Equal(999, _fakeRegistry.GetValue(hive, key, valName));
+    }
+
+    [Fact]
+    public async Task Undo_LeavesNoUnfinishedSessions()
+    {
+        // (c) the journal has no unfinished sessions after any undo
+        var tweak = new TweakDefinition
+        {
+            Id = "test.undo.clean.session",
+            Name = "Clean Session Tweak",
+            Category = "system",
+            Risk = "Safe",
+            Apply = new List<ActionItem>
+            {
+                new()
+                {
+                    Type = "Registry",
+                    Hive = "HKCU",
+                    Key = @"Software\Test\Session",
+                    ValueName = "Val",
+                    Operation = "Set",
+                    ValueKind = "DWord",
+                    Data = JsonSerializer.SerializeToElement(1)
+                }
+            },
+            Undo = new List<ActionItem>
+            {
+                new()
+                {
+                    Type = "Registry",
+                    Hive = "HKCU",
+                    Key = @"Software\Test\Session",
+                    ValueName = "Val",
+                    Operation = "Set",
+                    ValueKind = "DWord",
+                    Data = JsonSerializer.SerializeToElement(0)
+                }
+            }
+        };
+
+        // Fallback undo
+        await _runner.UndoTweakAsync(tweak);
+        Assert.Empty(_journal.GetUnfinishedSessions());
+
+        // Apply then undo
+        await _runner.ApplyBatchAsync(new[] { tweak });
+        Assert.Empty(_journal.GetUnfinishedSessions());
+
+        await _runner.UndoTweakAsync(tweak);
+        Assert.Empty(_journal.GetUnfinishedSessions());
+    }
+
     private sealed class FaultyHandler : IActionHandler
     {
         private readonly bool _failOnExecute;

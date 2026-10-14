@@ -11,6 +11,7 @@ public sealed class ExecutionContext
     public required IShellService Shell { get; init; }
     public required RollbackJournalManager Journal { get; set; }
     public bool IsDryRun { get; init; }
+    public bool IsUndoOperation { get; set; }
     public string BackupDirectory { get; init; } = string.Empty;
 }
 

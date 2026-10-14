@@ -31,9 +31,13 @@ public sealed class PowerShellActionHandler : IActionHandler
             AppliedAtUtc = DateTime.UtcNow
         };
 
-        if (!context.IsDryRun)
+        if (!context.IsDryRun && !context.IsUndoOperation)
         {
             context.Journal.RecordActionWriteAhead(journalRecord);
+        }
+
+        if (!context.IsDryRun)
+        {
             try
             {
                 int timeout = action.TimeoutSeconds.HasValue && action.TimeoutSeconds.Value > 0 ? action.TimeoutSeconds.Value : 60;
@@ -49,7 +53,7 @@ public sealed class PowerShellActionHandler : IActionHandler
                     {
                         Success = false,
                         Message = $"PowerShell execution failed: {errorDetail}",
-                        JournalRecord = journalRecord
+                        JournalRecord = context.IsUndoOperation ? null : journalRecord
                     };
                 }
 
@@ -57,7 +61,7 @@ public sealed class PowerShellActionHandler : IActionHandler
                 {
                     Success = true,
                     Message = !string.IsNullOrWhiteSpace(result.StdOut) ? result.StdOut.Trim() : "PowerShell script completed successfully.",
-                    JournalRecord = journalRecord
+                    JournalRecord = context.IsUndoOperation ? null : journalRecord
                 };
             }
             catch (Exception ex)
@@ -66,7 +70,7 @@ public sealed class PowerShellActionHandler : IActionHandler
                 {
                     Success = false,
                     Message = $"PowerShell execution failed: {ex.Message}",
-                    JournalRecord = journalRecord
+                    JournalRecord = context.IsUndoOperation ? null : journalRecord
                 };
             }
         }

@@ -171,3 +171,20 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
   4. Updated `TweakCardModel` with nullable `bool? ToggleCheckedState` (tri-state indeterminate for `Partial`), `State` property, and distinct visual badges (`PARTIAL ⚠` in amber/yellow outline, `CAN'T VERIFY` in subtle gray, `APPLIED ✓` in green).
   5. Updated CLI `winvelo-cli --detect-all` to count and report `Applied`, `Partial`, `Default`, and `Unknown` states across the catalog.
   6. Added comprehensive unit tests in `CompositeStateDetectionTests.cs`.
+
+---
+
+## BUG-014: Fallback Undo Created Corrupt Journal Baseline and Left Unfinished Sessions
+- **Component**: `Tweakora.Core` (`TweakRunner.cs`, `RollbackJournalManager.cs`, `IActionHandler.cs`, `RegistryActionHandler.cs`, `ServiceActionHandler.cs`, `TaskActionHandler.cs`, `PowerShellActionHandler.cs`)
+- **Finding**:
+  1. When no active journal records existed for a tweak, the fallback undo executed catalog actions through `handler.ExecuteAsync`. Because `handler.ExecuteAsync` unconditionally performed write-ahead journaling, it captured the tweak's APPLIED value as a new baseline record and left an uncompleted journal session on disk.
+  2. Because those newly created fallback records were never marked reverted, a subsequent `apply` found the wrong baseline via `FindExistingBaselineRecord`, corrupting all future rollbacks (restoring the applied value instead of default).
+  3. When an undo failed during a later step (e.g. PowerShell failure), already restored stateful records were not marked reverted, causing retries to replay stale records.
+  4. Undo operations could leave open/unfinished journal sessions.
+- **Root Cause**: Action handlers lacked an execution context flag to suppress write-ahead journaling during undo operations, and `UndoTweakAsync` did not mark restored stateful records reverted upon successful restoration nor ensure session completion.
+- **Fix**:
+  1. Added `IsUndoOperation` flag to `ExecutionContext`. Handlers (`RegistryActionHandler`, `ServiceActionHandler`, `TaskActionHandler`, `PowerShellActionHandler`) skip `RecordActionWriteAhead` and return null `JournalRecord` when `IsUndoOperation` is true.
+  2. Wrapped `UndoTweakAsync` execution with `IsUndoOperation = true` in a try/finally block to guarantee no baseline records are created during any undo.
+  3. In stateful undo restoration, immediately marked each restored record reverted via `_context.Journal.MarkRecordsReverted(new[] { record })` so that retrying an undo after a subsequent step failure never replays stale records.
+  4. Added `HasActiveSession` property to `RollbackJournalManager` and ensured any active session is safely completed at the end of `UndoTweakAsync`.
+  5. Added regression tests in `UndoEngineTests.cs` for pre-applied fallback lifecycle, retry without replaying stale records, and session completion cleanliness.

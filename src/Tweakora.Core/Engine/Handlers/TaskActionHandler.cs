@@ -50,10 +50,13 @@ public sealed class TaskActionHandler : IActionHandler
             AppliedAtUtc = DateTime.UtcNow
         };
 
-        if (!context.IsDryRun)
+        if (!context.IsDryRun && !context.IsUndoOperation)
         {
             context.Journal.RecordActionWriteAhead(journalRecord);
+        }
 
+        if (!context.IsDryRun)
+        {
             try
             {
                 switch (action.Operation)
@@ -84,7 +87,7 @@ public sealed class TaskActionHandler : IActionHandler
         return Task.FromResult(new ActionResult
         {
             Success = true,
-            JournalRecord = journalRecord
+            JournalRecord = context.IsUndoOperation ? null : journalRecord
         });
     }
 

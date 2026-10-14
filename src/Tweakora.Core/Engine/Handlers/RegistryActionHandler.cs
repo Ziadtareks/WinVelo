@@ -47,11 +47,14 @@ public sealed class RegistryActionHandler : IActionHandler
             AppliedAtUtc = DateTime.UtcNow
         };
 
-        // Write-Ahead Journaling: MUST flush before applying!
-        if (!context.IsDryRun)
+        // Write-Ahead Journaling: MUST flush before applying! Skip journaling on undo operations
+        if (!context.IsDryRun && !context.IsUndoOperation)
         {
             context.Journal.RecordActionWriteAhead(journalRecord);
+        }
 
+        if (!context.IsDryRun)
+        {
             // Automatic .reg backup if not already dry run
             if (!string.IsNullOrEmpty(context.BackupDirectory) && keyExisted)
             {
@@ -125,7 +128,7 @@ public sealed class RegistryActionHandler : IActionHandler
         return Task.FromResult(new ActionResult
         {
             Success = true,
-            JournalRecord = journalRecord
+            JournalRecord = context.IsUndoOperation ? null : journalRecord
         });
     }
 

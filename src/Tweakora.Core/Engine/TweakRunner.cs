@@ -259,54 +259,90 @@ public sealed class TweakRunner
         var executedSteps = new List<string>();
         var failedSteps = new List<string>();
 
-        // 1. Check for active (non-reverted) journal records for this tweak
-        List<RollbackJournalSession> sessions = _context.Journal.GetAllSessions();
-        List<JournalActionRecord> activeRecordsForTweak = sessions
-            .SelectMany(s => s.Records)
-            .Where(r => r.TweakId == tweak.Id && !r.IsReverted)
-            .OrderByDescending(r => r.AppliedAtUtc)
-            .ThenByDescending(r => r.ActionIndex)
-            .ToList();
+        bool prevIsUndo = _context.IsUndoOperation;
+        _context.IsUndoOperation = true;
 
-        if (activeRecordsForTweak.Count > 0)
+        try
         {
-            // A. Stateful actions: restore from the journal baseline, in reverse order
-            // Exclude PowerShell/Script which don't store baseline data
-            var statefulRecords = activeRecordsForTweak
-                .Where(r => !IsStatelessType(r.ActionType))
+            // 1. Check for active (non-reverted) journal records for this tweak
+            List<RollbackJournalSession> sessions = _context.Journal.GetAllSessions();
+            List<JournalActionRecord> activeRecordsForTweak = sessions
+                .SelectMany(s => s.Records)
+                .Where(r => r.TweakId == tweak.Id && !r.IsReverted)
+                .OrderByDescending(r => r.AppliedAtUtc)
+                .ThenByDescending(r => r.ActionIndex)
                 .ToList();
 
-            foreach (JournalActionRecord record in statefulRecords)
+            if (activeRecordsForTweak.Count > 0)
             {
-                IActionHandler? handler = _handlers.FirstOrDefault(h => h.CanHandle(record.ActionType));
-                if (handler != null)
+                // A. Stateful actions: restore from the journal baseline, in reverse order
+                // Exclude PowerShell/Script which don't store baseline data
+                var statefulRecords = activeRecordsForTweak
+                    .Where(r => !IsStatelessType(r.ActionType))
+                    .ToList();
+
+                foreach (JournalActionRecord record in statefulRecords)
                 {
-                    try
+                    IActionHandler? handler = _handlers.FirstOrDefault(h => h.CanHandle(record.ActionType));
+                    if (handler != null)
                     {
-                        var res = await handler.UndoAsync(record, _context);
-                        if (res.Success)
+                        try
                         {
-                            executedSteps.Add($"Restored {record.ActionType} ({record.TargetIdentifier}) from journal");
+                            var res = await handler.UndoAsync(record, _context);
+                            if (res.Success)
+                            {
+                                executedSteps.Add($"Restored {record.ActionType} ({record.TargetIdentifier}) from journal");
+                                // Mark this stateful record reverted immediately so retry after subsequent failure doesn't replay it
+                                _context.Journal.MarkRecordsReverted(new[] { record });
+                            }
+                            else
+                            {
+                                failedSteps.Add($"Failed to restore {record.ActionType} ({record.TargetIdentifier}): {res.Message}");
+                            }
                         }
-                        else
+                        catch (Exception ex)
                         {
-                            failedSteps.Add($"Failed to restore {record.ActionType} ({record.TargetIdentifier}): {res.Message}");
+                            failedSteps.Add($"Exception restoring {record.ActionType} ({record.TargetIdentifier}): {ex.Message}");
                         }
                     }
-                    catch (Exception ex)
+                }
+
+                // B. Stateless actions: run matching catalog undo actions of type PowerShell/Script
+                // Do NOT run catalog registry/service undo items (the journal already restored their baseline!)
+                for (int i = 0; i < tweak.Undo.Count; i++)
+                {
+                    ActionItem action = tweak.Undo[i];
+                    if (IsStatelessType(action.Type))
                     {
-                        failedSteps.Add($"Exception restoring {record.ActionType} ({record.TargetIdentifier}): {ex.Message}");
+                        IActionHandler? handler = _handlers.FirstOrDefault(h => h.CanHandle(action.Type));
+                        if (handler != null)
+                        {
+                            try
+                            {
+                                var res = await handler.ExecuteAsync(action, tweak.Id, i, _context);
+                                if (res.Success)
+                                {
+                                    executedSteps.Add($"Executed catalog undo script: {action.Type} (index {i})");
+                                }
+                                else
+                                {
+                                    failedSteps.Add($"Catalog undo script failed: {action.Type} (index {i}): {res.Message}");
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                failedSteps.Add($"Catalog undo script exception: {action.Type} (index {i}): {ex.Message}");
+                            }
+                        }
                     }
                 }
             }
-
-            // B. Stateless actions: run matching catalog undo actions of type PowerShell/Script
-            // Do NOT run catalog registry/service undo items (the journal already restored their baseline!)
-            for (int i = 0; i < tweak.Undo.Count; i++)
+            else
             {
-                ActionItem action = tweak.Undo[i];
-                if (IsStatelessType(action.Type))
+                // 2. Fallback to full catalog undo actions if journal has no active records
+                for (int i = 0; i < tweak.Undo.Count; i++)
                 {
+                    ActionItem action = tweak.Undo[i];
                     IActionHandler? handler = _handlers.FirstOrDefault(h => h.CanHandle(action.Type));
                     if (handler != null)
                     {
@@ -315,71 +351,53 @@ public sealed class TweakRunner
                             var res = await handler.ExecuteAsync(action, tweak.Id, i, _context);
                             if (res.Success)
                             {
-                                executedSteps.Add($"Executed catalog undo script: {action.Type} (index {i})");
+                                executedSteps.Add($"Executed catalog fallback undo: {action.Type} ({action.Operation})");
                             }
                             else
                             {
-                                failedSteps.Add($"Catalog undo script failed: {action.Type} (index {i}): {res.Message}");
+                                failedSteps.Add($"Catalog fallback undo failed: {action.Type} ({action.Operation}): {res.Message}");
                             }
                         }
                         catch (Exception ex)
                         {
-                            failedSteps.Add($"Catalog undo script exception: {action.Type} (index {i}): {ex.Message}");
+                            failedSteps.Add($"Catalog fallback undo exception: {action.Type} ({action.Operation}): {ex.Message}");
                         }
                     }
                 }
             }
-        }
-        else
-        {
-            // 2. Fallback to full catalog undo actions if journal has no active records
-            for (int i = 0; i < tweak.Undo.Count; i++)
+
+            _detector.InvalidateCache(tweak.Id);
+
+            bool success = failedSteps.Count == 0;
+            if (success && activeRecordsForTweak.Count > 0)
             {
-                ActionItem action = tweak.Undo[i];
-                IActionHandler? handler = _handlers.FirstOrDefault(h => h.CanHandle(action.Type));
-                if (handler != null)
-                {
-                    try
-                    {
-                        var res = await handler.ExecuteAsync(action, tweak.Id, i, _context);
-                        if (res.Success)
-                        {
-                            executedSteps.Add($"Executed catalog fallback undo: {action.Type} ({action.Operation})");
-                        }
-                        else
-                        {
-                            failedSteps.Add($"Catalog fallback undo failed: {action.Type} ({action.Operation}): {res.Message}");
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        failedSteps.Add($"Catalog fallback undo exception: {action.Type} ({action.Operation}): {ex.Message}");
-                    }
-                }
+                _context.Journal.MarkTweakRecordsReverted(tweak.Id);
             }
+
+            // Fallback undo or failed undo must never leave active records or open sessions
+            if (_context.Journal.HasActiveSession)
+            {
+                _context.Journal.CompleteSession();
+            }
+
+            string message = success
+                ? (activeRecordsForTweak.Count > 0
+                    ? $"Restored state from journal ({executedSteps.Count} action(s))."
+                    : $"Applied catalog undo fallback ({executedSteps.Count} action(s)).")
+                : $"Undo failed with {failedSteps.Count} error(s): {string.Join("; ", failedSteps)}";
+
+            return new ActionResult
+            {
+                Success = success,
+                Message = message,
+                ExecutedSteps = executedSteps,
+                FailedSteps = failedSteps
+            };
         }
-
-        _detector.InvalidateCache(tweak.Id);
-
-        bool success = failedSteps.Count == 0;
-        if (success && activeRecordsForTweak.Count > 0)
+        finally
         {
-            _context.Journal.MarkTweakRecordsReverted(tweak.Id);
+            _context.IsUndoOperation = prevIsUndo;
         }
-
-        string message = success
-            ? (activeRecordsForTweak.Count > 0
-                ? $"Restored state from journal ({executedSteps.Count} action(s))."
-                : $"Applied catalog undo fallback ({executedSteps.Count} action(s)).")
-            : $"Undo failed with {failedSteps.Count} error(s): {string.Join("; ", failedSteps)}";
-
-        return new ActionResult
-        {
-            Success = success,
-            Message = message,
-            ExecutedSteps = executedSteps,
-            FailedSteps = failedSteps
-        };
     }
 
     private static bool IsStatelessType(string? type)

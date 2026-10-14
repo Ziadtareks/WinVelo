@@ -64,6 +64,17 @@ public sealed class RollbackJournalManager
         }
     }
 
+    public bool HasActiveSession
+    {
+        get
+        {
+            lock (_lock)
+            {
+                return _currentSession != null && !_currentSession.IsCompleted;
+            }
+        }
+    }
+
     public List<RollbackJournalSession> GetUnfinishedSessions()
     {
         lock (_lock)
