@@ -1,1854 +1,1854 @@
-﻿[
-    {
-        "schemaVersion":  "1.0.0",
-        "id":  "advanced.bravedebloat",
-        "origin":  "WPFTweaksBraveDebloat",
-        "name":  "Brave Browser - Debloat",
-        "description":  "Disables various annoyances like Brave Rewards, Leo AI, Crypto Wallet and VPN.",
-        "category":  "system",
-        "subcategory":  "z__Advanced Tweaks - CAUTION",
-        "risk":  "Low",
-        "impacts":  [
-                        "ui"
-                    ],
-        "windows":  {
-                        "minBuild":  19041
-                    },
-        "requiresReboot":  false,
-        "requiresExplorerRestart":  false,
-        "detect":  {
-                       "type":  "Registry",
-                       "hive":  "HKLM",
-                       "key":  "SOFTWARE\\Policies\\BraveSoftware\\Brave",
-                       "valueName":  "BraveRewardsDisabled",
-                       "matchType":  "Equals",
-                       "expectedValue":  1
-                   },
-        "apply":  [
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKLM",
-                          "key":  "SOFTWARE\\Policies\\BraveSoftware\\Brave",
-                          "operation":  "Set",
-                          "valueName":  "BraveRewardsDisabled",
-                          "valueKind":  "DWord",
-                          "data":  1
-                      },
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKLM",
-                          "key":  "SOFTWARE\\Policies\\BraveSoftware\\Brave",
-                          "operation":  "Set",
-                          "valueName":  "BraveWalletDisabled",
-                          "valueKind":  "DWord",
-                          "data":  1
-                      },
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKLM",
-                          "key":  "SOFTWARE\\Policies\\BraveSoftware\\Brave",
-                          "operation":  "Set",
-                          "valueName":  "BraveVPNDisabled",
-                          "valueKind":  "DWord",
-                          "data":  1
-                      },
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKLM",
-                          "key":  "SOFTWARE\\Policies\\BraveSoftware\\Brave",
-                          "operation":  "Set",
-                          "valueName":  "BraveAIChatEnabled",
-                          "valueKind":  "DWord",
-                          "data":  0
-                      },
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKLM",
-                          "key":  "SOFTWARE\\Policies\\BraveSoftware\\Brave",
-                          "operation":  "Set",
-                          "valueName":  "BraveStatsPingEnabled",
-                          "valueKind":  "DWord",
-                          "data":  0
-                      },
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKLM",
-                          "key":  "SOFTWARE\\Policies\\BraveSoftware\\Brave",
-                          "operation":  "Set",
-                          "valueName":  "BraveNewsDisabled",
-                          "valueKind":  "DWord",
-                          "data":  1
-                      },
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKLM",
-                          "key":  "SOFTWARE\\Policies\\BraveSoftware\\Brave",
-                          "operation":  "Set",
-                          "valueName":  "BraveTalkDisabled",
-                          "valueKind":  "DWord",
-                          "data":  1
-                      },
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKLM",
-                          "key":  "SOFTWARE\\Policies\\BraveSoftware\\Brave",
-                          "operation":  "Set",
-                          "valueName":  "TorDisabled",
-                          "valueKind":  "DWord",
-                          "data":  1
-                      },
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKLM",
-                          "key":  "SOFTWARE\\Policies\\BraveSoftware\\Brave",
-                          "operation":  "Set",
-                          "valueName":  "BraveP3AEnabled",
-                          "valueKind":  "DWord",
-                          "data":  0
-                      },
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKLM",
-                          "key":  "SOFTWARE\\Policies\\BraveSoftware\\Brave",
-                          "operation":  "Set",
-                          "valueName":  "UrlKeyedAnonymizedDataCollectionEnabled",
-                          "valueKind":  "DWord",
-                          "data":  0
-                      },
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKLM",
-                          "key":  "SOFTWARE\\Policies\\BraveSoftware\\Brave",
-                          "operation":  "Set",
-                          "valueName":  "SafeBrowsingExtendedReportingEnabled",
-                          "valueKind":  "DWord",
-                          "data":  0
-                      },
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKLM",
-                          "key":  "SOFTWARE\\Policies\\BraveSoftware\\Brave",
-                          "operation":  "Set",
-                          "valueName":  "MetricsReportingEnabled",
-                          "valueKind":  "DWord",
-                          "data":  0
-                      }
-                  ],
-        "undo":  [
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKLM",
-                         "key":  "SOFTWARE\\Policies\\BraveSoftware\\Brave",
-                         "operation":  "DeleteValue",
-                         "valueName":  "BraveRewardsDisabled"
-                     },
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKLM",
-                         "key":  "SOFTWARE\\Policies\\BraveSoftware\\Brave",
-                         "operation":  "DeleteValue",
-                         "valueName":  "BraveWalletDisabled"
-                     },
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKLM",
-                         "key":  "SOFTWARE\\Policies\\BraveSoftware\\Brave",
-                         "operation":  "DeleteValue",
-                         "valueName":  "BraveVPNDisabled"
-                     },
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKLM",
-                         "key":  "SOFTWARE\\Policies\\BraveSoftware\\Brave",
-                         "operation":  "DeleteValue",
-                         "valueName":  "BraveAIChatEnabled"
-                     },
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKLM",
-                         "key":  "SOFTWARE\\Policies\\BraveSoftware\\Brave",
-                         "operation":  "DeleteValue",
-                         "valueName":  "BraveStatsPingEnabled"
-                     },
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKLM",
-                         "key":  "SOFTWARE\\Policies\\BraveSoftware\\Brave",
-                         "operation":  "DeleteValue",
-                         "valueName":  "BraveNewsDisabled"
-                     },
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKLM",
-                         "key":  "SOFTWARE\\Policies\\BraveSoftware\\Brave",
-                         "operation":  "DeleteValue",
-                         "valueName":  "BraveTalkDisabled"
-                     },
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKLM",
-                         "key":  "SOFTWARE\\Policies\\BraveSoftware\\Brave",
-                         "operation":  "DeleteValue",
-                         "valueName":  "TorDisabled"
-                     },
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKLM",
-                         "key":  "SOFTWARE\\Policies\\BraveSoftware\\Brave",
-                         "operation":  "DeleteValue",
-                         "valueName":  "BraveP3AEnabled"
-                     },
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKLM",
-                         "key":  "SOFTWARE\\Policies\\BraveSoftware\\Brave",
-                         "operation":  "DeleteValue",
-                         "valueName":  "UrlKeyedAnonymizedDataCollectionEnabled"
-                     },
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKLM",
-                         "key":  "SOFTWARE\\Policies\\BraveSoftware\\Brave",
-                         "operation":  "DeleteValue",
-                         "valueName":  "SafeBrowsingExtendedReportingEnabled"
-                     },
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKLM",
-                         "key":  "SOFTWARE\\Policies\\BraveSoftware\\Brave",
-                         "operation":  "DeleteValue",
-                         "valueName":  "MetricsReportingEnabled"
-                     }
-                 ],
-        "source":  "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/bravedebloat",
-        "verifiedOnBuild":  "26100",
-        "evidence":  "documented"
+[
+  {
+    "schemaVersion": "1.0.0",
+    "id": "advanced.bravedebloat",
+    "origin": "WPFTweaksBraveDebloat",
+    "name": "Brave Browser - Debloat",
+    "description": "Disables various annoyances like Brave Rewards, Leo AI, Crypto Wallet and VPN.",
+    "category": "system",
+    "subcategory": "z__Advanced Tweaks - CAUTION",
+    "risk": "High",
+    "impacts": [
+      "ui"
+    ],
+    "windows": {
+      "minBuild": 19041
     },
-    {
-        "schemaVersion":  "1.0.0",
-        "id":  "advanced.disablewarningforunsignedrdp",
-        "origin":  "WPFTweaksDisableWarningForUnsignedRdp",
-        "name":  "RDP Unsigned File Warnings - Disable",
-        "description":  "Disables warnings shown when launching unsigned RDP files introduced with the latest Windows 10 and 11 updates.",
-        "category":  "system",
-        "subcategory":  "z__Advanced Tweaks - CAUTION",
-        "risk":  "Low",
-        "impacts":  [
-                        "ui"
-                    ],
-        "windows":  {
-                        "minBuild":  19041
-                    },
-        "requiresReboot":  false,
-        "requiresExplorerRestart":  false,
-        "detect":  {
-                       "type":  "Registry",
-                       "hive":  "HKLM",
-                       "key":  "SOFTWARE\\Policies\\Microsoft\\Windows NT\\Terminal Services\\Client",
-                       "valueName":  "RedirectionWarningDialogVersion",
-                       "matchType":  "Equals",
-                       "expectedValue":  1
-                   },
-        "apply":  [
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKLM",
-                          "key":  "SOFTWARE\\Policies\\Microsoft\\Windows NT\\Terminal Services\\Client",
-                          "operation":  "Set",
-                          "valueName":  "RedirectionWarningDialogVersion",
-                          "valueKind":  "DWord",
-                          "data":  1
-                      },
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKCU",
-                          "key":  "SOFTWARE\\Microsoft\\Terminal Server Client",
-                          "operation":  "Set",
-                          "valueName":  "RdpLaunchConsentAccepted",
-                          "valueKind":  "DWord",
-                          "data":  1
-                      }
-                  ],
-        "undo":  [
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKLM",
-                         "key":  "SOFTWARE\\Policies\\Microsoft\\Windows NT\\Terminal Services\\Client",
-                         "operation":  "DeleteValue",
-                         "valueName":  "RedirectionWarningDialogVersion"
-                     },
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKCU",
-                         "key":  "SOFTWARE\\Microsoft\\Terminal Server Client",
-                         "operation":  "DeleteValue",
-                         "valueName":  "RdpLaunchConsentAccepted"
-                     }
-                 ],
-        "source":  "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/disablewarningforunsignedrdp",
-        "verifiedOnBuild":  "26100",
-        "evidence":  "documented"
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SOFTWARE\\Policies\\BraveSoftware\\Brave",
+      "valueName": "BraveRewardsDisabled",
+      "matchType": "Equals",
+      "expectedValue": 1
     },
-    {
-        "schemaVersion":  "1.0.0",
-        "id":  "advanced.edgedebloat",
-        "origin":  "WPFTweaksEdgeDebloat",
-        "name":  "Microsoft Edge - Debloat",
-        "description":  "Disables various telemetry options, popups, and other annoyances in Edge.",
-        "category":  "system",
-        "subcategory":  "z__Advanced Tweaks - CAUTION",
-        "risk":  "Low",
-        "impacts":  [
-                        "ui"
-                    ],
-        "windows":  {
-                        "minBuild":  19041
-                    },
-        "requiresReboot":  false,
-        "requiresExplorerRestart":  false,
-        "detect":  {
-                       "type":  "Registry",
-                       "hive":  "HKLM",
-                       "key":  "SOFTWARE\\Policies\\Microsoft\\EdgeUpdate",
-                       "valueName":  "CreateDesktopShortcutDefault",
-                       "matchType":  "Equals",
-                       "expectedValue":  0
-                   },
-        "apply":  [
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKLM",
-                          "key":  "SOFTWARE\\Policies\\Microsoft\\EdgeUpdate",
-                          "operation":  "Set",
-                          "valueName":  "CreateDesktopShortcutDefault",
-                          "valueKind":  "DWord",
-                          "data":  0
-                      },
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKLM",
-                          "key":  "SOFTWARE\\Policies\\Microsoft\\Edge",
-                          "operation":  "Set",
-                          "valueName":  "PersonalizationReportingEnabled",
-                          "valueKind":  "DWord",
-                          "data":  0
-                      },
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKLM",
-                          "key":  "SOFTWARE\\Policies\\Microsoft\\Edge\\ExtensionInstallBlocklist",
-                          "operation":  "Set",
-                          "valueName":  "1",
-                          "valueKind":  "String",
-                          "data":  "ofefcgjbeghpigppfmkologfjadafddi"
-                      },
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKLM",
-                          "key":  "SOFTWARE\\Policies\\Microsoft\\Edge",
-                          "operation":  "Set",
-                          "valueName":  "ShowRecommendationsEnabled",
-                          "valueKind":  "DWord",
-                          "data":  0
-                      },
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKLM",
-                          "key":  "SOFTWARE\\Policies\\Microsoft\\Edge",
-                          "operation":  "Set",
-                          "valueName":  "HideFirstRunExperience",
-                          "valueKind":  "DWord",
-                          "data":  1
-                      },
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKLM",
-                          "key":  "SOFTWARE\\Policies\\Microsoft\\Edge",
-                          "operation":  "Set",
-                          "valueName":  "UserFeedbackAllowed",
-                          "valueKind":  "DWord",
-                          "data":  0
-                      },
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKLM",
-                          "key":  "SOFTWARE\\Policies\\Microsoft\\Edge",
-                          "operation":  "Set",
-                          "valueName":  "ConfigureDoNotTrack",
-                          "valueKind":  "DWord",
-                          "data":  1
-                      },
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKLM",
-                          "key":  "SOFTWARE\\Policies\\Microsoft\\Edge",
-                          "operation":  "Set",
-                          "valueName":  "AlternateErrorPagesEnabled",
-                          "valueKind":  "DWord",
-                          "data":  0
-                      },
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKLM",
-                          "key":  "SOFTWARE\\Policies\\Microsoft\\Edge",
-                          "operation":  "Set",
-                          "valueName":  "EdgeCollectionsEnabled",
-                          "valueKind":  "DWord",
-                          "data":  0
-                      },
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKLM",
-                          "key":  "SOFTWARE\\Policies\\Microsoft\\Edge",
-                          "operation":  "Set",
-                          "valueName":  "EdgeShoppingAssistantEnabled",
-                          "valueKind":  "DWord",
-                          "data":  0
-                      },
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKLM",
-                          "key":  "SOFTWARE\\Policies\\Microsoft\\Edge",
-                          "operation":  "Set",
-                          "valueName":  "MicrosoftEdgeInsiderPromotionEnabled",
-                          "valueKind":  "DWord",
-                          "data":  0
-                      },
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKLM",
-                          "key":  "SOFTWARE\\Policies\\Microsoft\\Edge",
-                          "operation":  "Set",
-                          "valueName":  "ShowMicrosoftRewards",
-                          "valueKind":  "DWord",
-                          "data":  0
-                      },
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKLM",
-                          "key":  "SOFTWARE\\Policies\\Microsoft\\Edge",
-                          "operation":  "Set",
-                          "valueName":  "WebWidgetAllowed",
-                          "valueKind":  "DWord",
-                          "data":  0
-                      },
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKLM",
-                          "key":  "SOFTWARE\\Policies\\Microsoft\\Edge",
-                          "operation":  "Set",
-                          "valueName":  "DiagnosticData",
-                          "valueKind":  "DWord",
-                          "data":  0
-                      },
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKLM",
-                          "key":  "SOFTWARE\\Policies\\Microsoft\\Edge",
-                          "operation":  "Set",
-                          "valueName":  "EdgeAssetDeliveryServiceEnabled",
-                          "valueKind":  "DWord",
-                          "data":  0
-                      },
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKLM",
-                          "key":  "SOFTWARE\\Policies\\Microsoft\\Edge",
-                          "operation":  "Set",
-                          "valueName":  "WalletDonationEnabled",
-                          "valueKind":  "DWord",
-                          "data":  0
-                      },
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKLM",
-                          "key":  "SOFTWARE\\Policies\\Microsoft\\Edge",
-                          "operation":  "Set",
-                          "valueName":  "DefaultBrowserSettingsCampaignEnabled",
-                          "valueKind":  "DWord",
-                          "data":  0
-                      }
-                  ],
-        "undo":  [
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKLM",
-                         "key":  "SOFTWARE\\Policies\\Microsoft\\EdgeUpdate",
-                         "operation":  "DeleteValue",
-                         "valueName":  "CreateDesktopShortcutDefault"
-                     },
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKLM",
-                         "key":  "SOFTWARE\\Policies\\Microsoft\\Edge",
-                         "operation":  "DeleteValue",
-                         "valueName":  "PersonalizationReportingEnabled"
-                     },
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKLM",
-                         "key":  "SOFTWARE\\Policies\\Microsoft\\Edge\\ExtensionInstallBlocklist",
-                         "operation":  "DeleteValue",
-                         "valueName":  "1"
-                     },
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKLM",
-                         "key":  "SOFTWARE\\Policies\\Microsoft\\Edge",
-                         "operation":  "DeleteValue",
-                         "valueName":  "ShowRecommendationsEnabled"
-                     },
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKLM",
-                         "key":  "SOFTWARE\\Policies\\Microsoft\\Edge",
-                         "operation":  "DeleteValue",
-                         "valueName":  "HideFirstRunExperience"
-                     },
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKLM",
-                         "key":  "SOFTWARE\\Policies\\Microsoft\\Edge",
-                         "operation":  "DeleteValue",
-                         "valueName":  "UserFeedbackAllowed"
-                     },
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKLM",
-                         "key":  "SOFTWARE\\Policies\\Microsoft\\Edge",
-                         "operation":  "DeleteValue",
-                         "valueName":  "ConfigureDoNotTrack"
-                     },
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKLM",
-                         "key":  "SOFTWARE\\Policies\\Microsoft\\Edge",
-                         "operation":  "DeleteValue",
-                         "valueName":  "AlternateErrorPagesEnabled"
-                     },
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKLM",
-                         "key":  "SOFTWARE\\Policies\\Microsoft\\Edge",
-                         "operation":  "DeleteValue",
-                         "valueName":  "EdgeCollectionsEnabled"
-                     },
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKLM",
-                         "key":  "SOFTWARE\\Policies\\Microsoft\\Edge",
-                         "operation":  "DeleteValue",
-                         "valueName":  "EdgeShoppingAssistantEnabled"
-                     },
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKLM",
-                         "key":  "SOFTWARE\\Policies\\Microsoft\\Edge",
-                         "operation":  "DeleteValue",
-                         "valueName":  "MicrosoftEdgeInsiderPromotionEnabled"
-                     },
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKLM",
-                         "key":  "SOFTWARE\\Policies\\Microsoft\\Edge",
-                         "operation":  "DeleteValue",
-                         "valueName":  "ShowMicrosoftRewards"
-                     },
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKLM",
-                         "key":  "SOFTWARE\\Policies\\Microsoft\\Edge",
-                         "operation":  "DeleteValue",
-                         "valueName":  "WebWidgetAllowed"
-                     },
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKLM",
-                         "key":  "SOFTWARE\\Policies\\Microsoft\\Edge",
-                         "operation":  "DeleteValue",
-                         "valueName":  "DiagnosticData"
-                     },
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKLM",
-                         "key":  "SOFTWARE\\Policies\\Microsoft\\Edge",
-                         "operation":  "DeleteValue",
-                         "valueName":  "EdgeAssetDeliveryServiceEnabled"
-                     },
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKLM",
-                         "key":  "SOFTWARE\\Policies\\Microsoft\\Edge",
-                         "operation":  "DeleteValue",
-                         "valueName":  "WalletDonationEnabled"
-                     },
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKLM",
-                         "key":  "SOFTWARE\\Policies\\Microsoft\\Edge",
-                         "operation":  "DeleteValue",
-                         "valueName":  "DefaultBrowserSettingsCampaignEnabled"
-                     }
-                 ],
-        "source":  "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/edgedebloat",
-        "verifiedOnBuild":  "26100",
-        "evidence":  "documented"
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\BraveSoftware\\Brave",
+        "operation": "Set",
+        "valueName": "BraveRewardsDisabled",
+        "valueKind": "DWord",
+        "data": 1
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\BraveSoftware\\Brave",
+        "operation": "Set",
+        "valueName": "BraveWalletDisabled",
+        "valueKind": "DWord",
+        "data": 1
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\BraveSoftware\\Brave",
+        "operation": "Set",
+        "valueName": "BraveVPNDisabled",
+        "valueKind": "DWord",
+        "data": 1
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\BraveSoftware\\Brave",
+        "operation": "Set",
+        "valueName": "BraveAIChatEnabled",
+        "valueKind": "DWord",
+        "data": 0
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\BraveSoftware\\Brave",
+        "operation": "Set",
+        "valueName": "BraveStatsPingEnabled",
+        "valueKind": "DWord",
+        "data": 0
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\BraveSoftware\\Brave",
+        "operation": "Set",
+        "valueName": "BraveNewsDisabled",
+        "valueKind": "DWord",
+        "data": 1
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\BraveSoftware\\Brave",
+        "operation": "Set",
+        "valueName": "BraveTalkDisabled",
+        "valueKind": "DWord",
+        "data": 1
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\BraveSoftware\\Brave",
+        "operation": "Set",
+        "valueName": "TorDisabled",
+        "valueKind": "DWord",
+        "data": 1
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\BraveSoftware\\Brave",
+        "operation": "Set",
+        "valueName": "BraveP3AEnabled",
+        "valueKind": "DWord",
+        "data": 0
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\BraveSoftware\\Brave",
+        "operation": "Set",
+        "valueName": "UrlKeyedAnonymizedDataCollectionEnabled",
+        "valueKind": "DWord",
+        "data": 0
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\BraveSoftware\\Brave",
+        "operation": "Set",
+        "valueName": "SafeBrowsingExtendedReportingEnabled",
+        "valueKind": "DWord",
+        "data": 0
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\BraveSoftware\\Brave",
+        "operation": "Set",
+        "valueName": "MetricsReportingEnabled",
+        "valueKind": "DWord",
+        "data": 0
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\BraveSoftware\\Brave",
+        "operation": "DeleteValue",
+        "valueName": "BraveRewardsDisabled"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\BraveSoftware\\Brave",
+        "operation": "DeleteValue",
+        "valueName": "BraveWalletDisabled"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\BraveSoftware\\Brave",
+        "operation": "DeleteValue",
+        "valueName": "BraveVPNDisabled"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\BraveSoftware\\Brave",
+        "operation": "DeleteValue",
+        "valueName": "BraveAIChatEnabled"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\BraveSoftware\\Brave",
+        "operation": "DeleteValue",
+        "valueName": "BraveStatsPingEnabled"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\BraveSoftware\\Brave",
+        "operation": "DeleteValue",
+        "valueName": "BraveNewsDisabled"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\BraveSoftware\\Brave",
+        "operation": "DeleteValue",
+        "valueName": "BraveTalkDisabled"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\BraveSoftware\\Brave",
+        "operation": "DeleteValue",
+        "valueName": "TorDisabled"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\BraveSoftware\\Brave",
+        "operation": "DeleteValue",
+        "valueName": "BraveP3AEnabled"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\BraveSoftware\\Brave",
+        "operation": "DeleteValue",
+        "valueName": "UrlKeyedAnonymizedDataCollectionEnabled"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\BraveSoftware\\Brave",
+        "operation": "DeleteValue",
+        "valueName": "SafeBrowsingExtendedReportingEnabled"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\BraveSoftware\\Brave",
+        "operation": "DeleteValue",
+        "valueName": "MetricsReportingEnabled"
+      }
+    ],
+    "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/bravedebloat",
+    "verifiedOnBuild": "26100",
+    "evidence": "documented"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "advanced.disablewarningforunsignedrdp",
+    "origin": "WPFTweaksDisableWarningForUnsignedRdp",
+    "name": "RDP Unsigned File Warnings - Disable",
+    "description": "Disables warnings shown when launching unsigned RDP files introduced with the latest Windows 10 and 11 updates.",
+    "category": "system",
+    "subcategory": "z__Advanced Tweaks - CAUTION",
+    "risk": "High",
+    "impacts": [
+      "ui"
+    ],
+    "windows": {
+      "minBuild": 19041
     },
-    {
-        "schemaVersion":  "1.0.0",
-        "id":  "advanced.removeedge",
-        "origin":  "WPFTweaksRemoveEdge",
-        "name":  "Microsoft Edge - Remove",
-        "description":  "Uninstalls Microsoft Edge by creating dummy MicrosoftEdge.exe file in the legacy Edge folder. This tricks Windows into unlocking the official Edge uninstaller allowing for a system-level removal.",
-        "category":  "system",
-        "subcategory":  "z__Advanced Tweaks - CAUTION",
-        "risk":  "High",
-        "impacts":  [
-                        "ui",
-                        "performance"
-                    ],
-        "windows":  {
-                        "minBuild":  19041
-                    },
-        "requiresReboot":  false,
-        "requiresExplorerRestart":  false,
-        "detect":  {
-                       "type":  "Registry",
-                       "hive":  "HKLM",
-                       "key":  "SOFTWARE\\Policies\\Microsoft\\EdgeUpdate",
-                       "valueName":  "DoNotUpdateToEdgeWithChromium",
-                       "matchType":  "Equals",
-                       "expectedValue":  1
-                   },
-        "apply":  [
-                      {
-                          "type":  "PowerShell",
-                          "operation":  "Execute",
-                          "script":  "$Path = Resolve-Path -Path \"$Env:ProgramFiles (x86)\\Microsoft\\Edge\\Application\\*\\Installer\\setup.exe\" -ErrorAction SilentlyContinue | Select-Object -Last 1\n\n      if ($Path -and (Test-Path $Path)) {\n          $proc = Start-Process -FilePath $Path -ArgumentList \"--uninstall --system-level --force-uninstall --delete-profile\" -Wait -PassThru\n          if ($proc.ExitCode -ne 0) { throw \"setup.exe failed with exit code $($proc.ExitCode)\" }\n      }",
-                          "timeoutSeconds":  300
-                      },
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKLM",
-                          "key":  "SOFTWARE\\Policies\\Microsoft\\EdgeUpdate",
-                          "operation":  "Set",
-                          "valueName":  "DoNotUpdateToEdgeWithChromium",
-                          "valueKind":  "DWord",
-                          "data":  1
-                      }
-                  ],
-        "undo":  [
-                     {
-                         "type":  "PowerShell",
-                         "operation":  "Execute",
-                         "script":  "winget install Microsoft.Edge --source winget --accept-package-agreements --accept-source-agreements\n      if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 3010 -and $LASTEXITCODE -ne -1978335135 -and $LASTEXITCODE -ne -1978335189) { throw \"winget failed with exit code $LASTEXITCODE\" }",
-                         "timeoutSeconds":  600
-                     },
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKLM",
-                         "key":  "SOFTWARE\\Policies\\Microsoft\\EdgeUpdate",
-                         "operation":  "DeleteValue",
-                         "valueName":  "DoNotUpdateToEdgeWithChromium"
-                     }
-                 ],
-        "source":  "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/removeedge",
-        "verifiedOnBuild":  "26100",
-        "warnings":  "Removes Microsoft Edge from the system. Some Windows components, widgets, or web-authentication dialogs may be affected. Undo reinstalls Edge via WinGet, but does NOT restore deleted user profile data or browsing history.",
-        "reversible":  false,
-        "irreversibleReason":  "Uninstalls Microsoft Edge system binaries and deletes user profiles; undo reinstalls a blank Edge browser via winget but cannot restore deleted history, cookies, or user profile data.",
-        "evidence":  "documented"
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SOFTWARE\\Policies\\Microsoft\\Windows NT\\Terminal Services\\Client",
+      "valueName": "RedirectionWarningDialogVersion",
+      "matchType": "Equals",
+      "expectedValue": 1
     },
-    {
-        "schemaVersion":  "1.0.0",
-        "id":  "advanced.disablebitlocker",
-        "origin":  "WPFTweaksDisableBitLocker",
-        "name":  "BitLocker - Disable",
-        "description":  "Disables BitLocker.",
-        "category":  "system",
-        "subcategory":  "z__Advanced Tweaks - CAUTION",
-        "risk":  "High",
-        "impacts":  [
-                        "security"
-                    ],
-        "windows":  {
-                        "minBuild":  19041
-                    },
-        "requiresReboot":  false,
-        "requiresExplorerRestart":  false,
-        "detect":  {
-                       "type":  "Registry",
-                       "hive":  "HKLM",
-                       "key":  "SYSTEM\\CurrentControlSet\\Control\\BitLocker",
-                       "valueName":  "PreventDeviceEncryption",
-                       "matchType":  "Equals",
-                       "expectedValue":  1
-                   },
-        "apply":  [
-                      {
-                          "type":  "PowerShell",
-                          "operation":  "Execute",
-                          "script":  "Disable-BitLocker -MountPoint $Env:SystemDrive -ErrorAction SilentlyContinue",
-                          "timeoutSeconds":  60
-                      },
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKLM",
-                          "key":  "SYSTEM\\CurrentControlSet\\Control\\BitLocker",
-                          "operation":  "Set",
-                          "valueName":  "PreventDeviceEncryption",
-                          "valueKind":  "DWord",
-                          "data":  1
-                      }
-                  ],
-        "undo":  [
-                     {
-                         "type":  "PowerShell",
-                         "operation":  "Execute",
-                         "script":  "Enable-BitLocker -MountPoint $Env:SystemDrive -ErrorAction SilentlyContinue",
-                         "timeoutSeconds":  60
-                     },
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKLM",
-                         "key":  "SYSTEM\\CurrentControlSet\\Control\\BitLocker",
-                         "operation":  "DeleteValue",
-                         "valueName":  "PreventDeviceEncryption"
-                     }
-                 ],
-        "source":  "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/disablebitlocker",
-        "verifiedOnBuild":  "26100",
-        "warnings":  "Disabling BitLocker removes disk encryption and leaves drive data completely unprotected against unauthorized physical access.",
-        "evidence":  "situational"
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Windows NT\\Terminal Services\\Client",
+        "operation": "Set",
+        "valueName": "RedirectionWarningDialogVersion",
+        "valueKind": "DWord",
+        "data": 1
+      },
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "SOFTWARE\\Microsoft\\Terminal Server Client",
+        "operation": "Set",
+        "valueName": "RdpLaunchConsentAccepted",
+        "valueKind": "DWord",
+        "data": 1
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Windows NT\\Terminal Services\\Client",
+        "operation": "DeleteValue",
+        "valueName": "RedirectionWarningDialogVersion"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "SOFTWARE\\Microsoft\\Terminal Server Client",
+        "operation": "DeleteValue",
+        "valueName": "RdpLaunchConsentAccepted"
+      }
+    ],
+    "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/disablewarningforunsignedrdp",
+    "verifiedOnBuild": "26100",
+    "evidence": "documented"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "advanced.edgedebloat",
+    "origin": "WPFTweaksEdgeDebloat",
+    "name": "Microsoft Edge - Debloat",
+    "description": "Disables various telemetry options, popups, and other annoyances in Edge.",
+    "category": "system",
+    "subcategory": "z__Advanced Tweaks - CAUTION",
+    "risk": "High",
+    "impacts": [
+      "ui"
+    ],
+    "windows": {
+      "minBuild": 19041
     },
-    {
-        "schemaVersion":  "1.0.0",
-        "id":  "advanced.utc",
-        "origin":  "WPFTweaksUTC",
-        "name":  "Date \u0026 Time - Set Time to UTC",
-        "description":  "Essential for computers that are dual booting. Fixes the time sync with Linux systems.",
-        "category":  "system",
-        "subcategory":  "z__Advanced Tweaks - CAUTION",
-        "risk":  "Low",
-        "impacts":  [
-                        "ui"
-                    ],
-        "windows":  {
-                        "minBuild":  19041
-                    },
-        "requiresReboot":  false,
-        "requiresExplorerRestart":  false,
-        "detect":  {
-                       "type":  "Registry",
-                       "hive":  "HKLM",
-                       "key":  "SYSTEM\\CurrentControlSet\\Control\\TimeZoneInformation",
-                       "valueName":  "RealTimeIsUniversal",
-                       "matchType":  "Equals",
-                       "expectedValue":  1
-                   },
-        "apply":  [
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKLM",
-                          "key":  "SYSTEM\\CurrentControlSet\\Control\\TimeZoneInformation",
-                          "operation":  "Set",
-                          "valueName":  "RealTimeIsUniversal",
-                          "valueKind":  "DWord",
-                          "data":  1
-                      }
-                  ],
-        "undo":  [
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKLM",
-                         "key":  "SYSTEM\\CurrentControlSet\\Control\\TimeZoneInformation",
-                         "operation":  "Set",
-                         "valueName":  "RealTimeIsUniversal",
-                         "valueKind":  "DWord",
-                         "data":  0
-                     }
-                 ],
-        "source":  "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/utc",
-        "verifiedOnBuild":  "26100",
-        "evidence":  "situational"
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SOFTWARE\\Policies\\Microsoft\\EdgeUpdate",
+      "valueName": "CreateDesktopShortcutDefault",
+      "matchType": "Equals",
+      "expectedValue": 0
     },
-    {
-        "schemaVersion":  "1.0.0",
-        "id":  "advanced.removeonedrive",
-        "origin":  "WPFTweaksRemoveOneDrive",
-        "name":  "Microsoft OneDrive - Remove",
-        "description":  "Denies permission to remove OneDrive user files, then uses its own uninstaller to remove it and restores the original permission afterward.",
-        "category":  "system",
-        "subcategory":  "z__Advanced Tweaks - CAUTION",
-        "risk":  "High",
-        "impacts":  [
-                        "storage",
-                        "performance"
-                    ],
-        "windows":  {
-                        "minBuild":  19041
-                    },
-        "requiresReboot":  false,
-        "requiresExplorerRestart":  false,
-        "detect":  {
-                       "type":  "Registry",
-                       "hive":  "HKLM",
-                       "key":  "SOFTWARE\\Policies\\Microsoft\\Windows\\OneDrive",
-                       "valueName":  "DisableFileSyncNGSC",
-                       "matchType":  "Equals",
-                       "expectedValue":  1
-                   },
-        "apply":  [
-                      {
-                          "type":  "PowerShell",
-                          "operation":  "Execute",
-                          "script":  "$setup = Join-Path $Env:SystemRoot \"System32\\OneDriveSetup.exe\"\n      if (Test-Path $setup) {\n          $proc = Start-Process -FilePath $setup -ArgumentList \u0027/uninstall\u0027 -Wait -PassThru\n          if ($proc.ExitCode -ne 0) { throw \"OneDriveSetup.exe failed with exit code $($proc.ExitCode)\" }\n      }\n      Stop-Process -Name FileCoAuth,OneDrive -Force -ErrorAction SilentlyContinue",
-                          "timeoutSeconds":  300
-                      },
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKLM",
-                          "key":  "SOFTWARE\\Policies\\Microsoft\\Windows\\OneDrive",
-                          "operation":  "Set",
-                          "valueName":  "DisableFileSyncNGSC",
-                          "valueKind":  "DWord",
-                          "data":  1
-                      }
-                  ],
-        "undo":  [
-                     {
-                         "type":  "PowerShell",
-                         "operation":  "Execute",
-                         "script":  "winget install Microsoft.OneDrive --source winget --accept-package-agreements --accept-source-agreements\n      if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 3010 -and $LASTEXITCODE -ne -1978335135 -and $LASTEXITCODE -ne -1978335189) { throw \"winget failed with exit code $LASTEXITCODE\" }",
-                         "timeoutSeconds":  600
-                     },
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKLM",
-                         "key":  "SOFTWARE\\Policies\\Microsoft\\Windows\\OneDrive",
-                         "operation":  "DeleteValue",
-                         "valueName":  "DisableFileSyncNGSC"
-                     }
-                 ],
-        "source":  "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/removeonedrive",
-        "verifiedOnBuild":  "26100",
-        "warnings":  "Completely uninstalls OneDrive and stops file synchronization. Ensure all cloud documents are backed up locally. Undo reinstalls OneDrive via WinGet, but does NOT restore unsynced files or cached sync state.",
-        "reversible":  false,
-        "irreversibleReason":  "Uninstalls Microsoft OneDrive client and stops synchronization; undo reinstalls OneDrive via winget and restores sync policies, but un-synced local changes and offline file cache are not restored.",
-        "evidence":  "documented"
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\EdgeUpdate",
+        "operation": "Set",
+        "valueName": "CreateDesktopShortcutDefault",
+        "valueKind": "DWord",
+        "data": 0
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Edge",
+        "operation": "Set",
+        "valueName": "PersonalizationReportingEnabled",
+        "valueKind": "DWord",
+        "data": 0
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Edge\\ExtensionInstallBlocklist",
+        "operation": "Set",
+        "valueName": "1",
+        "valueKind": "String",
+        "data": "ofefcgjbeghpigppfmkologfjadafddi"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Edge",
+        "operation": "Set",
+        "valueName": "ShowRecommendationsEnabled",
+        "valueKind": "DWord",
+        "data": 0
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Edge",
+        "operation": "Set",
+        "valueName": "HideFirstRunExperience",
+        "valueKind": "DWord",
+        "data": 1
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Edge",
+        "operation": "Set",
+        "valueName": "UserFeedbackAllowed",
+        "valueKind": "DWord",
+        "data": 0
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Edge",
+        "operation": "Set",
+        "valueName": "ConfigureDoNotTrack",
+        "valueKind": "DWord",
+        "data": 1
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Edge",
+        "operation": "Set",
+        "valueName": "AlternateErrorPagesEnabled",
+        "valueKind": "DWord",
+        "data": 0
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Edge",
+        "operation": "Set",
+        "valueName": "EdgeCollectionsEnabled",
+        "valueKind": "DWord",
+        "data": 0
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Edge",
+        "operation": "Set",
+        "valueName": "EdgeShoppingAssistantEnabled",
+        "valueKind": "DWord",
+        "data": 0
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Edge",
+        "operation": "Set",
+        "valueName": "MicrosoftEdgeInsiderPromotionEnabled",
+        "valueKind": "DWord",
+        "data": 0
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Edge",
+        "operation": "Set",
+        "valueName": "ShowMicrosoftRewards",
+        "valueKind": "DWord",
+        "data": 0
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Edge",
+        "operation": "Set",
+        "valueName": "WebWidgetAllowed",
+        "valueKind": "DWord",
+        "data": 0
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Edge",
+        "operation": "Set",
+        "valueName": "DiagnosticData",
+        "valueKind": "DWord",
+        "data": 0
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Edge",
+        "operation": "Set",
+        "valueName": "EdgeAssetDeliveryServiceEnabled",
+        "valueKind": "DWord",
+        "data": 0
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Edge",
+        "operation": "Set",
+        "valueName": "WalletDonationEnabled",
+        "valueKind": "DWord",
+        "data": 0
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Edge",
+        "operation": "Set",
+        "valueName": "DefaultBrowserSettingsCampaignEnabled",
+        "valueKind": "DWord",
+        "data": 0
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\EdgeUpdate",
+        "operation": "DeleteValue",
+        "valueName": "CreateDesktopShortcutDefault"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Edge",
+        "operation": "DeleteValue",
+        "valueName": "PersonalizationReportingEnabled"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Edge\\ExtensionInstallBlocklist",
+        "operation": "DeleteValue",
+        "valueName": "1"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Edge",
+        "operation": "DeleteValue",
+        "valueName": "ShowRecommendationsEnabled"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Edge",
+        "operation": "DeleteValue",
+        "valueName": "HideFirstRunExperience"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Edge",
+        "operation": "DeleteValue",
+        "valueName": "UserFeedbackAllowed"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Edge",
+        "operation": "DeleteValue",
+        "valueName": "ConfigureDoNotTrack"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Edge",
+        "operation": "DeleteValue",
+        "valueName": "AlternateErrorPagesEnabled"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Edge",
+        "operation": "DeleteValue",
+        "valueName": "EdgeCollectionsEnabled"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Edge",
+        "operation": "DeleteValue",
+        "valueName": "EdgeShoppingAssistantEnabled"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Edge",
+        "operation": "DeleteValue",
+        "valueName": "MicrosoftEdgeInsiderPromotionEnabled"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Edge",
+        "operation": "DeleteValue",
+        "valueName": "ShowMicrosoftRewards"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Edge",
+        "operation": "DeleteValue",
+        "valueName": "WebWidgetAllowed"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Edge",
+        "operation": "DeleteValue",
+        "valueName": "DiagnosticData"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Edge",
+        "operation": "DeleteValue",
+        "valueName": "EdgeAssetDeliveryServiceEnabled"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Edge",
+        "operation": "DeleteValue",
+        "valueName": "WalletDonationEnabled"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Edge",
+        "operation": "DeleteValue",
+        "valueName": "DefaultBrowserSettingsCampaignEnabled"
+      }
+    ],
+    "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/edgedebloat",
+    "verifiedOnBuild": "26100",
+    "evidence": "documented"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "advanced.removeedge",
+    "origin": "WPFTweaksRemoveEdge",
+    "name": "Microsoft Edge - Remove",
+    "description": "Uninstalls Microsoft Edge by creating dummy MicrosoftEdge.exe file in the legacy Edge folder. This tricks Windows into unlocking the official Edge uninstaller allowing for a system-level removal.",
+    "category": "system",
+    "subcategory": "z__Advanced Tweaks - CAUTION",
+    "risk": "High",
+    "impacts": [
+      "ui",
+      "performance"
+    ],
+    "windows": {
+      "minBuild": 19041
     },
-    {
-        "schemaVersion":  "1.0.0",
-        "id":  "advanced.removehomeandgallery",
-        "origin":  "WPFTweaksRemoveHomeAndGallery",
-        "name":  "File Explorer Home and Gallery - Disable",
-        "description":  "Removes the Home and Gallery from Explorer and sets This PC as default.",
-        "category":  "system",
-        "subcategory":  "z__Advanced Tweaks - CAUTION",
-        "risk":  "Low",
-        "impacts":  [
-                        "ui"
-                    ],
-        "windows":  {
-                        "minBuild":  19041
-                    },
-        "requiresReboot":  false,
-        "requiresExplorerRestart":  false,
-        "detect":  {
-                       "type":  "Registry",
-                       "hive":  "HKCU",
-                       "key":  "Software\\Classes\\CLSID\\{f874310e-b6b7-47dc-bc84-b9e6b38f5903}",
-                       "valueName":  "System.IsPinnedToNameSpaceTree",
-                       "matchType":  "Equals",
-                       "expectedValue":  0
-                   },
-        "apply":  [
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKCU",
-                          "key":  "Software\\Classes\\CLSID\\{f874310e-b6b7-47dc-bc84-b9e6b38f5903}",
-                          "operation":  "Set",
-                          "valueName":  "System.IsPinnedToNameSpaceTree",
-                          "valueKind":  "DWord",
-                          "data":  0
-                      },
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKCU",
-                          "key":  "Software\\Classes\\CLSID\\{e88865ea-0e1c-4e20-9aa6-edcd0212c87c}",
-                          "operation":  "Set",
-                          "valueName":  "System.IsPinnedToNameSpaceTree",
-                          "valueKind":  "DWord",
-                          "data":  0
-                      },
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKCU",
-                          "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-                          "operation":  "Set",
-                          "valueName":  "LaunchTo",
-                          "valueKind":  "DWord",
-                          "data":  1
-                      }
-                  ],
-        "undo":  [
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKCU",
-                         "key":  "Software\\Classes\\CLSID\\{f874310e-b6b7-47dc-bc84-b9e6b38f5903}",
-                         "operation":  "DeleteValue",
-                         "valueName":  "System.IsPinnedToNameSpaceTree"
-                     },
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKCU",
-                         "key":  "Software\\Classes\\CLSID\\{e88865ea-0e1c-4e20-9aa6-edcd0212c87c}",
-                         "operation":  "DeleteValue",
-                         "valueName":  "System.IsPinnedToNameSpaceTree"
-                     },
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKCU",
-                         "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-                         "operation":  "DeleteValue",
-                         "valueName":  "LaunchTo"
-                     }
-                 ],
-        "source":  "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/removehomeandgallery",
-        "verifiedOnBuild":  "26100",
-        "evidence":  "documented"
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SOFTWARE\\Policies\\Microsoft\\EdgeUpdate",
+      "valueName": "DoNotUpdateToEdgeWithChromium",
+      "matchType": "Equals",
+      "expectedValue": 1
     },
-    {
-        "schemaVersion":  "1.0.0",
-        "id":  "advanced.display",
-        "origin":  "WPFTweaksDisplay",
-        "name":  "Visual Effects - Set to Best Performance",
-        "description":  "Sets the system preferences to performance. You can do this manually with sysdm.cpl as well.",
-        "category":  "system",
-        "subcategory":  "z__Advanced Tweaks - CAUTION",
-        "risk":  "Low",
-        "impacts":  [
-                        "ui"
-                    ],
-        "windows":  {
-                        "minBuild":  19041
-                    },
-        "requiresReboot":  false,
-        "requiresExplorerRestart":  false,
-        "detect":  {
-                       "type":  "Registry",
-                       "hive":  "HKCU",
-                       "key":  "Control Panel\\Desktop",
-                       "valueName":  "DragFullWindows",
-                       "matchType":  "Equals",
-                       "expectedValue":  "0"
-                   },
-        "apply":  [
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKCU",
-                          "key":  "Control Panel\\Desktop",
-                          "operation":  "Set",
-                          "valueName":  "DragFullWindows",
-                          "valueKind":  "String",
-                          "data":  "0"
-                      },
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKCU",
-                          "key":  "Control Panel\\Desktop",
-                          "operation":  "Set",
-                          "valueName":  "MenuShowDelay",
-                          "valueKind":  "String",
-                          "data":  "200"
-                      },
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKCU",
-                          "key":  "Control Panel\\Desktop\\WindowMetrics",
-                          "operation":  "Set",
-                          "valueName":  "MinAnimate",
-                          "valueKind":  "String",
-                          "data":  "0"
-                      },
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKCU",
-                          "key":  "Control Panel\\Keyboard",
-                          "operation":  "Set",
-                          "valueName":  "KeyboardDelay",
-                          "valueKind":  "DWord",
-                          "data":  0
-                      },
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKCU",
-                          "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-                          "operation":  "Set",
-                          "valueName":  "ListviewAlphaSelect",
-                          "valueKind":  "DWord",
-                          "data":  0
-                      },
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKCU",
-                          "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-                          "operation":  "Set",
-                          "valueName":  "ListviewShadow",
-                          "valueKind":  "DWord",
-                          "data":  0
-                      },
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKCU",
-                          "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-                          "operation":  "Set",
-                          "valueName":  "TaskbarAnimations",
-                          "valueKind":  "DWord",
-                          "data":  0
-                      },
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKCU",
-                          "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VisualEffects",
-                          "operation":  "Set",
-                          "valueName":  "VisualFXSetting",
-                          "valueKind":  "DWord",
-                          "data":  3
-                      },
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKCU",
-                          "key":  "Software\\Microsoft\\Windows\\DWM",
-                          "operation":  "Set",
-                          "valueName":  "EnableAeroPeek",
-                          "valueKind":  "DWord",
-                          "data":  0
-                      },
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKCU",
-                          "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-                          "operation":  "Set",
-                          "valueName":  "TaskbarMn",
-                          "valueKind":  "DWord",
-                          "data":  0
-                      },
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKCU",
-                          "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-                          "operation":  "Set",
-                          "valueName":  "ShowTaskViewButton",
-                          "valueKind":  "DWord",
-                          "data":  0
-                      },
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKCU",
-                          "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\Search",
-                          "operation":  "Set",
-                          "valueName":  "SearchboxTaskbarMode",
-                          "valueKind":  "DWord",
-                          "data":  0
-                      },
-                      {
-                          "type":  "PowerShell",
-                          "operation":  "Execute",
-                          "script":  "Set-ItemProperty -Path \"HKCU:\\Control Panel\\Desktop\" -Name \"UserPreferencesMask\" -Type Binary -Value ([byte[]](144,18,3,128,16,0,0,0))",
-                          "timeoutSeconds":  60
-                      }
-                  ],
-        "undo":  [
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKCU",
-                         "key":  "Control Panel\\Desktop",
-                         "operation":  "Set",
-                         "valueName":  "DragFullWindows",
-                         "valueKind":  "String",
-                         "data":  "1"
-                     },
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKCU",
-                         "key":  "Control Panel\\Desktop",
-                         "operation":  "Set",
-                         "valueName":  "MenuShowDelay",
-                         "valueKind":  "String",
-                         "data":  "400"
-                     },
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKCU",
-                         "key":  "Control Panel\\Desktop\\WindowMetrics",
-                         "operation":  "Set",
-                         "valueName":  "MinAnimate",
-                         "valueKind":  "String",
-                         "data":  "1"
-                     },
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKCU",
-                         "key":  "Control Panel\\Keyboard",
-                         "operation":  "Set",
-                         "valueName":  "KeyboardDelay",
-                         "valueKind":  "DWord",
-                         "data":  1
-                     },
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKCU",
-                         "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-                         "operation":  "Set",
-                         "valueName":  "ListviewAlphaSelect",
-                         "valueKind":  "DWord",
-                         "data":  1
-                     },
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKCU",
-                         "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-                         "operation":  "Set",
-                         "valueName":  "ListviewShadow",
-                         "valueKind":  "DWord",
-                         "data":  1
-                     },
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKCU",
-                         "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-                         "operation":  "Set",
-                         "valueName":  "TaskbarAnimations",
-                         "valueKind":  "DWord",
-                         "data":  1
-                     },
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKCU",
-                         "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VisualEffects",
-                         "operation":  "Set",
-                         "valueName":  "VisualFXSetting",
-                         "valueKind":  "DWord",
-                         "data":  1
-                     },
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKCU",
-                         "key":  "Software\\Microsoft\\Windows\\DWM",
-                         "operation":  "Set",
-                         "valueName":  "EnableAeroPeek",
-                         "valueKind":  "DWord",
-                         "data":  1
-                     },
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKCU",
-                         "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-                         "operation":  "Set",
-                         "valueName":  "TaskbarMn",
-                         "valueKind":  "DWord",
-                         "data":  1
-                     },
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKCU",
-                         "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-                         "operation":  "Set",
-                         "valueName":  "ShowTaskViewButton",
-                         "valueKind":  "DWord",
-                         "data":  1
-                     },
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKCU",
-                         "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\Search",
-                         "operation":  "Set",
-                         "valueName":  "SearchboxTaskbarMode",
-                         "valueKind":  "DWord",
-                         "data":  1
-                     },
-                     {
-                         "type":  "PowerShell",
-                         "operation":  "Execute",
-                         "script":  "Remove-ItemProperty -Path \"HKCU:\\Control Panel\\Desktop\" -Name \"UserPreferencesMask\" -ErrorAction SilentlyContinue",
-                         "timeoutSeconds":  60
-                     }
-                 ],
-        "source":  "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/display",
-        "verifiedOnBuild":  "26100",
-        "evidence":  "documented"
+    "apply": [
+      {
+        "type": "PowerShell",
+        "operation": "Execute",
+        "script": "$Path = Resolve-Path -Path \"$Env:ProgramFiles (x86)\\Microsoft\\Edge\\Application\\*\\Installer\\setup.exe\" -ErrorAction SilentlyContinue | Select-Object -Last 1\n\n      if ($Path -and (Test-Path $Path)) {\n          $proc = Start-Process -FilePath $Path -ArgumentList \"--uninstall --system-level --force-uninstall --delete-profile\" -Wait -PassThru\n          if ($proc.ExitCode -ne 0) { throw \"setup.exe failed with exit code $($proc.ExitCode)\" }\n      }",
+        "timeoutSeconds": 300
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\EdgeUpdate",
+        "operation": "Set",
+        "valueName": "DoNotUpdateToEdgeWithChromium",
+        "valueKind": "DWord",
+        "data": 1
+      }
+    ],
+    "undo": [
+      {
+        "type": "PowerShell",
+        "operation": "Execute",
+        "script": "winget install Microsoft.Edge --source winget --accept-package-agreements --accept-source-agreements\n      if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 3010 -and $LASTEXITCODE -ne -1978335135 -and $LASTEXITCODE -ne -1978335189) { throw \"winget failed with exit code $LASTEXITCODE\" }",
+        "timeoutSeconds": 600
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\EdgeUpdate",
+        "operation": "DeleteValue",
+        "valueName": "DoNotUpdateToEdgeWithChromium"
+      }
+    ],
+    "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/removeedge",
+    "verifiedOnBuild": "26100",
+    "warnings": "Removes Microsoft Edge from the system. Some Windows components, widgets, or web-authentication dialogs may be affected. Undo reinstalls Edge via WinGet, but does NOT restore deleted user profile data or browsing history.",
+    "reversible": false,
+    "irreversibleReason": "Uninstalls Microsoft Edge system binaries and deletes user profiles; undo reinstalls a blank Edge browser via winget but cannot restore deleted history, cookies, or user profile data.",
+    "evidence": "documented"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "advanced.disablebitlocker",
+    "origin": "WPFTweaksDisableBitLocker",
+    "name": "BitLocker - Disable",
+    "description": "Disables BitLocker.",
+    "category": "system",
+    "subcategory": "z__Advanced Tweaks - CAUTION",
+    "risk": "High",
+    "impacts": [
+      "security"
+    ],
+    "windows": {
+      "minBuild": 19041
     },
-    {
-        "schemaVersion":  "1.0.0",
-        "id":  "advanced.reservedstorage",
-        "origin":  "WPFTweaksReservedStorage",
-        "name":  "Disable Reserved Storage",
-        "description":  "Disables Windows Reserved Storage (7-10 GB held for updates/temp files). Recommended only on small drives. Re-enable before major Windows feature updates to avoid installation failures.",
-        "category":  "system",
-        "subcategory":  "z__Advanced Tweaks - CAUTION",
-        "risk":  "Medium",
-        "impacts":  [
-                        "ui"
-                    ],
-        "windows":  {
-                        "minBuild":  19041
-                    },
-        "requiresReboot":  false,
-        "requiresExplorerRestart":  false,
-        "detect":  {
-                       "type":  "Registry",
-                       "hive":  "HKLM",
-                       "key":  "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\ReserveManager",
-                       "valueName":  "ShippedWithReserves",
-                       "matchType":  "Equals",
-                       "expectedValue":  0
-                   },
-        "apply":  [
-                      {
-                          "type":  "PowerShell",
-                          "operation":  "Execute",
-                          "script":  "DISM /Online /Set-ReservedStorageState /State:Disabled\n      if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 3010) { throw \"DISM failed with exit code $LASTEXITCODE\" }",
-                          "timeoutSeconds":  60
-                      },
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKLM",
-                          "key":  "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\ReserveManager",
-                          "operation":  "Set",
-                          "valueName":  "ShippedWithReserves",
-                          "valueKind":  "DWord",
-                          "data":  0
-                      }
-                  ],
-        "undo":  [
-                     {
-                         "type":  "PowerShell",
-                         "operation":  "Execute",
-                         "script":  "DISM /Online /Set-ReservedStorageState /State:Enabled\n      if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 3010) { throw \"DISM failed with exit code $LASTEXITCODE\" }",
-                         "timeoutSeconds":  60
-                     },
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKLM",
-                         "key":  "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\ReserveManager",
-                         "operation":  "Set",
-                         "valueName":  "ShippedWithReserves",
-                         "valueKind":  "DWord",
-                         "data":  1
-                     }
-                 ],
-        "source":  "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/reservedstorage",
-        "verifiedOnBuild":  "26100",
-        "evidence":  "documented"
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SYSTEM\\CurrentControlSet\\Control\\BitLocker",
+      "valueName": "PreventDeviceEncryption",
+      "matchType": "Equals",
+      "expectedValue": 1
     },
-    {
-        "schemaVersion":  "1.0.0",
-        "id":  "advanced.storage",
-        "origin":  "WPFTweaksStorage",
-        "name":  "Storage Sense - Disable",
-        "description":  "Storage Sense deletes temp files automatically.",
-        "category":  "system",
-        "subcategory":  "z__Advanced Tweaks - CAUTION",
-        "risk":  "Medium",
-        "impacts":  [
-                        "ui"
-                    ],
-        "windows":  {
-                        "minBuild":  19041
-                    },
-        "requiresReboot":  false,
-        "requiresExplorerRestart":  false,
-        "detect":  {
-                       "type":  "Registry",
-                       "hive":  "HKCU",
-                       "key":  "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\StorageSense\\Parameters\\StoragePolicy",
-                       "valueName":  "01",
-                       "matchType":  "Equals",
-                       "expectedValue":  0
-                   },
-        "apply":  [
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKCU",
-                          "key":  "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\StorageSense\\Parameters\\StoragePolicy",
-                          "operation":  "Set",
-                          "valueName":  "01",
-                          "valueKind":  "DWord",
-                          "data":  0
-                      }
-                  ],
-        "undo":  [
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKCU",
-                         "key":  "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\StorageSense\\Parameters\\StoragePolicy",
-                         "operation":  "Set",
-                         "valueName":  "01",
-                         "valueKind":  "DWord",
-                         "data":  1
-                     }
-                 ],
-        "source":  "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/storage",
-        "verifiedOnBuild":  "26100",
-        "evidence":  "documented"
+    "apply": [
+      {
+        "type": "PowerShell",
+        "operation": "Execute",
+        "script": "Disable-BitLocker -MountPoint $Env:SystemDrive -ErrorAction SilentlyContinue",
+        "timeoutSeconds": 60
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SYSTEM\\CurrentControlSet\\Control\\BitLocker",
+        "operation": "Set",
+        "valueName": "PreventDeviceEncryption",
+        "valueKind": "DWord",
+        "data": 1
+      }
+    ],
+    "undo": [
+      {
+        "type": "PowerShell",
+        "operation": "Execute",
+        "script": "Enable-BitLocker -MountPoint $Env:SystemDrive -ErrorAction SilentlyContinue",
+        "timeoutSeconds": 60
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SYSTEM\\CurrentControlSet\\Control\\BitLocker",
+        "operation": "DeleteValue",
+        "valueName": "PreventDeviceEncryption"
+      }
+    ],
+    "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/disablebitlocker",
+    "verifiedOnBuild": "26100",
+    "warnings": "Disabling BitLocker removes disk encryption and leaves drive data completely unprotected against unauthorized physical access.",
+    "evidence": "situational"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "advanced.utc",
+    "origin": "WPFTweaksUTC",
+    "name": "Date & Time - Set Time to UTC",
+    "description": "Essential for computers that are dual booting. Fixes the time sync with Linux systems.",
+    "category": "system",
+    "subcategory": "z__Advanced Tweaks - CAUTION",
+    "risk": "Low",
+    "impacts": [
+      "ui"
+    ],
+    "windows": {
+      "minBuild": 19041
     },
-    {
-        "schemaVersion":  "1.0.0",
-        "id":  "advanced.windowsai",
-        "origin":  "WPFTweaksWindowsAI",
-        "name":  "Windows AI - Disable And Remove",
-        "description":  "Removes and disables all AI features/packages",
-        "category":  "system",
-        "subcategory":  "z__Advanced Tweaks - CAUTION",
-        "risk":  "High",
-        "impacts":  [
-                        "privacy",
-                        "performance"
-                    ],
-        "windows":  {
-                        "minBuild":  19041
-                    },
-        "requiresReboot":  false,
-        "requiresExplorerRestart":  false,
-        "detect":  {
-                       "type":  "Registry",
-                       "hive":  "HKLM",
-                       "key":  "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
-                       "valueName":  "SettingsPageVisibility",
-                       "matchType":  "Equals",
-                       "expectedValue":  "hide:aicomponents"
-                   },
-        "apply":  [
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKLM",
-                          "key":  "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
-                          "operation":  "Set",
-                          "valueName":  "SettingsPageVisibility",
-                          "valueKind":  "String",
-                          "data":  "hide:aicomponents"
-                      },
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKLM",
-                          "key":  "SOFTWARE\\Policies\\WindowsNotepad",
-                          "operation":  "Set",
-                          "valueName":  "DisableAIFeatures",
-                          "valueKind":  "DWord",
-                          "data":  1
-                      },
-                      {
-                          "type":  "PowerShell",
-                          "operation":  "Execute",
-                          "script":  "$AppxPackage = Get-AppxPackage MicrosoftWindows.Client.CoreAI -ErrorAction SilentlyContinue\n      $Appx = if ($AppxPackage) { $AppxPackage.PackageFullName } else { $null }\n\n      $user = Get-LocalUser $Env:UserName -ErrorAction SilentlyContinue\n      if ($user -and $Appx) {\n          $Sid = $user.Sid.Value\n          New-Item \"HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Appx\\AppxAllUserStore\\EndOfLife\\$Sid\\$Appx\" -Force -ErrorAction SilentlyContinue | Out-Null\n      }\n\n      Get-AppxPackage -AllUsers \"*Copilot*\" -ErrorAction SilentlyContinue | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue\n      winget uninstall -e --name \"Copilot\" --silent --force --accept-source-agreements 2\u003e$null\n      if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 3010 -and $LASTEXITCODE -ne -1978335135 -and $LASTEXITCODE -ne -1978335189 -and $LASTEXITCODE -ne -1978335212) { throw \"winget failed with exit code $LASTEXITCODE\" }\n      Get-AppxPackage -AllUsers Microsoft.MicrosoftOfficeHub -ErrorAction SilentlyContinue | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue\n\n      if ($Appx) {\n          Remove-AppxPackage $Appx -ErrorAction SilentlyContinue\n      }\n\n      if (Get-Service -Name WSAIFabricSvc -ErrorAction SilentlyContinue) {\n          Set-Service -Name WSAIFabricSvc -StartupType Disabled -ErrorAction SilentlyContinue\n      }\n      Disable-WindowsOptionalFeature -FeatureName Recall -Online -NoRestart -ErrorAction SilentlyContinue\n\n      Write-Host \"Windows AI Disabled\"",
-                          "timeoutSeconds":  300
-                      }
-                  ],
-        "undo":  [
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKLM",
-                         "key":  "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
-                         "operation":  "DeleteValue",
-                         "valueName":  "SettingsPageVisibility"
-                     },
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKLM",
-                         "key":  "SOFTWARE\\Policies\\WindowsNotepad",
-                         "operation":  "DeleteValue",
-                         "valueName":  "DisableAIFeatures"
-                     }
-                 ],
-        "source":  "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/windowsai",
-        "verifiedOnBuild":  "26100",
-        "warnings":  "Removes and disables Windows AI, Recall, and Copilot packages system-wide. Undo only restores registry policies; removed AppX and Windows features are NOT reinstalled.",
-        "reversible":  false,
-        "irreversibleReason":  "Permanently uninstalls Windows Copilot, Recall, and AI Appx packages; undo only reverts policy registry keys and does not reinstall the removed Appx or system features.",
-        "evidence":  "documented"
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SYSTEM\\CurrentControlSet\\Control\\TimeZoneInformation",
+      "valueName": "RealTimeIsUniversal",
+      "matchType": "Equals",
+      "expectedValue": 1
     },
-    {
-        "schemaVersion":  "1.0.0",
-        "id":  "advanced.razerblock",
-        "origin":  "WPFTweaksRazerBlock",
-        "name":  "Razer Software Auto-Install - Disable",
-        "description":  "Blocks ALL Razer Software installations. The hardware works fine without any software.",
-        "category":  "system",
-        "subcategory":  "z__Advanced Tweaks - CAUTION",
-        "risk":  "Low",
-        "impacts":  [
-                        "ui"
-                    ],
-        "windows":  {
-                        "minBuild":  19041
-                    },
-        "requiresReboot":  false,
-        "requiresExplorerRestart":  false,
-        "detect":  {
-                       "type":  "Registry",
-                       "hive":  "HKLM",
-                       "key":  "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\DriverSearching",
-                       "valueName":  "SearchOrderConfig",
-                       "matchType":  "Equals",
-                       "expectedValue":  0
-                   },
-        "apply":  [
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKLM",
-                          "key":  "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\DriverSearching",
-                          "operation":  "Set",
-                          "valueName":  "SearchOrderConfig",
-                          "valueKind":  "DWord",
-                          "data":  0
-                      },
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKLM",
-                          "key":  "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Device Installer",
-                          "operation":  "Set",
-                          "valueName":  "DisableCoInstallers",
-                          "valueKind":  "DWord",
-                          "data":  1
-                      },
-                      {
-                          "type":  "PowerShell",
-                          "operation":  "Execute",
-                          "script":  "$RazerPath = \"$Env:SystemRoot\\Installer\\Razer\"\n\n      if (Test-Path $RazerPath) {\n        Remove-Item $RazerPath\\* -Recurse -Force\n      } else {\n        New-Item -Path $RazerPath -ItemType Directory\n      }\n\n      icacls $RazerPath /deny \"*S-1-1-0:(W)\"",
-                          "timeoutSeconds":  60
-                      }
-                  ],
-        "undo":  [
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKLM",
-                         "key":  "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\DriverSearching",
-                         "operation":  "Set",
-                         "valueName":  "SearchOrderConfig",
-                         "valueKind":  "DWord",
-                         "data":  1
-                     },
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKLM",
-                         "key":  "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Device Installer",
-                         "operation":  "Set",
-                         "valueName":  "DisableCoInstallers",
-                         "valueKind":  "DWord",
-                         "data":  0
-                     },
-                     {
-                         "type":  "PowerShell",
-                         "operation":  "Execute",
-                         "script":  "icacls \"$Env:SystemRoot\\Installer\\Razer\" /remove:d *S-1-1-0",
-                         "timeoutSeconds":  60
-                     }
-                 ],
-        "source":  "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/razerblock",
-        "verifiedOnBuild":  "26100",
-        "evidence":  "situational"
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SYSTEM\\CurrentControlSet\\Control\\TimeZoneInformation",
+        "operation": "Set",
+        "valueName": "RealTimeIsUniversal",
+        "valueKind": "DWord",
+        "data": 1
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SYSTEM\\CurrentControlSet\\Control\\TimeZoneInformation",
+        "operation": "Set",
+        "valueName": "RealTimeIsUniversal",
+        "valueKind": "DWord",
+        "data": 0
+      }
+    ],
+    "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/utc",
+    "verifiedOnBuild": "26100",
+    "evidence": "situational"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "advanced.removeonedrive",
+    "origin": "WPFTweaksRemoveOneDrive",
+    "name": "Microsoft OneDrive - Remove",
+    "description": "Denies permission to remove OneDrive user files, then uses its own uninstaller to remove it and restores the original permission afterward.",
+    "category": "system",
+    "subcategory": "z__Advanced Tweaks - CAUTION",
+    "risk": "High",
+    "impacts": [
+      "storage",
+      "performance"
+    ],
+    "windows": {
+      "minBuild": 19041
     },
-    {
-        "schemaVersion":  "1.0.0",
-        "id":  "advanced.logiblock",
-        "origin":  "WPFTweaksLogiBlock",
-        "name":  "Logitech Download Assistant Auto-Install - Disable",
-        "description":  "Blocks the Logi Download Assistant that Windows Update keeps reinstalling with Logitech device drivers. Logitech hardware keeps working without it.",
-        "category":  "system",
-        "subcategory":  "z__Advanced Tweaks - CAUTION",
-        "risk":  "Low",
-        "impacts":  [
-                        "ui"
-                    ],
-        "windows":  {
-                        "minBuild":  19041
-                    },
-        "requiresReboot":  false,
-        "requiresExplorerRestart":  false,
-        "detect":  {
-                       "type":  "Registry",
-                       "hive":  "HKLM",
-                       "key":  "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\LogiLDA.exe",
-                       "valueName":  "Debugger",
-                       "matchType":  "Equals",
-                       "expectedValue":  "systray.exe"
-                   },
-        "apply":  [
-                      {
-                          "type":  "PowerShell",
-                          "operation":  "Execute",
-                          "script":  "Stop-Process -Name \"logi_download_assistant\" -Force -ErrorAction SilentlyContinue\n\n      $ProgramFiles64 = if ($Env:ProgramW6432) { $Env:ProgramW6432 } else { $Env:ProgramFiles }\n      $LogiPath = \"$ProgramFiles64\\LogiDownloadAssistant\"\n\n      if (Test-Path $LogiPath) {\n        Remove-Item $LogiPath\\* -Recurse -Force -ErrorAction SilentlyContinue\n      } else {\n        New-Item -Path $LogiPath -ItemType Directory -ErrorAction SilentlyContinue\n      }\n\n      icacls $LogiPath /deny \"*S-1-1-0:(W)\" | Out-Null",
-                          "timeoutSeconds":  60
-                      },
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKLM",
-                          "key":  "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\LogiLDA.exe",
-                          "operation":  "Set",
-                          "valueName":  "Debugger",
-                          "valueKind":  "String",
-                          "data":  "systray.exe"
-                      }
-                  ],
-        "undo":  [
-                     {
-                         "type":  "PowerShell",
-                         "operation":  "Execute",
-                         "script":  "$ProgramFiles64 = if ($Env:ProgramW6432) { $Env:ProgramW6432 } else { $Env:ProgramFiles }\n      $LogiPath = \"$ProgramFiles64\\LogiDownloadAssistant\"\n\n      if (Test-Path $LogiPath) {\n        icacls $LogiPath /remove:d \"*S-1-1-0\" -ErrorAction SilentlyContinue | Out-Null\n      }",
-                         "timeoutSeconds":  60
-                     },
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKLM",
-                         "key":  "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\LogiLDA.exe",
-                         "operation":  "DeleteKey"
-                     }
-                 ],
-        "source":  "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/logiblock",
-        "verifiedOnBuild":  "26100",
-        "evidence":  "situational"
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\OneDrive",
+      "valueName": "DisableFileSyncNGSC",
+      "matchType": "Equals",
+      "expectedValue": 1
     },
-    {
-        "schemaVersion":  "1.0.0",
-        "id":  "advanced.disablenotifications",
-        "origin":  "WPFTweaksDisableNotifications",
-        "name":  "System Tray Notifications \u0026 Calendar - Disable",
-        "description":  "Disables all Notifications INCLUDING Calendar.",
-        "category":  "system",
-        "subcategory":  "z__Advanced Tweaks - CAUTION",
-        "risk":  "Medium",
-        "impacts":  [
-                        "ui"
-                    ],
-        "windows":  {
-                        "minBuild":  19041
-                    },
-        "requiresReboot":  false,
-        "requiresExplorerRestart":  false,
-        "detect":  {
-                       "type":  "Registry",
-                       "hive":  "HKCU",
-                       "key":  "Software\\Policies\\Microsoft\\Windows\\Explorer",
-                       "valueName":  "DisableNotificationCenter",
-                       "matchType":  "Equals",
-                       "expectedValue":  1
-                   },
-        "apply":  [
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKCU",
-                          "key":  "Software\\Policies\\Microsoft\\Windows\\Explorer",
-                          "operation":  "Set",
-                          "valueName":  "DisableNotificationCenter",
-                          "valueKind":  "DWord",
-                          "data":  1
-                      },
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKCU",
-                          "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\PushNotifications",
-                          "operation":  "Set",
-                          "valueName":  "ToastEnabled",
-                          "valueKind":  "DWord",
-                          "data":  0
-                      }
-                  ],
-        "undo":  [
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKCU",
-                         "key":  "Software\\Policies\\Microsoft\\Windows\\Explorer",
-                         "operation":  "DeleteValue",
-                         "valueName":  "DisableNotificationCenter"
-                     },
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKCU",
-                         "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\PushNotifications",
-                         "operation":  "Set",
-                         "valueName":  "ToastEnabled",
-                         "valueKind":  "DWord",
-                         "data":  1
-                     }
-                 ],
-        "source":  "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/disablenotifications",
-        "verifiedOnBuild":  "26100",
-        "evidence":  "documented"
+    "apply": [
+      {
+        "type": "PowerShell",
+        "operation": "Execute",
+        "script": "$setup = Join-Path $Env:SystemRoot \"System32\\OneDriveSetup.exe\"\n      if (Test-Path $setup) {\n          $proc = Start-Process -FilePath $setup -ArgumentList '/uninstall' -Wait -PassThru\n          if ($proc.ExitCode -ne 0) { throw \"OneDriveSetup.exe failed with exit code $($proc.ExitCode)\" }\n      }\n      Stop-Process -Name FileCoAuth,OneDrive -Force -ErrorAction SilentlyContinue",
+        "timeoutSeconds": 300
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\OneDrive",
+        "operation": "Set",
+        "valueName": "DisableFileSyncNGSC",
+        "valueKind": "DWord",
+        "data": 1
+      }
+    ],
+    "undo": [
+      {
+        "type": "PowerShell",
+        "operation": "Execute",
+        "script": "winget install Microsoft.OneDrive --source winget --accept-package-agreements --accept-source-agreements\n      if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 3010 -and $LASTEXITCODE -ne -1978335135 -and $LASTEXITCODE -ne -1978335189) { throw \"winget failed with exit code $LASTEXITCODE\" }",
+        "timeoutSeconds": 600
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\OneDrive",
+        "operation": "DeleteValue",
+        "valueName": "DisableFileSyncNGSC"
+      }
+    ],
+    "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/removeonedrive",
+    "verifiedOnBuild": "26100",
+    "warnings": "Completely uninstalls OneDrive and stops file synchronization. Ensure all cloud documents are backed up locally. Undo reinstalls OneDrive via WinGet, but does NOT restore unsynced files or cached sync state.",
+    "reversible": false,
+    "irreversibleReason": "Uninstalls Microsoft OneDrive client and stops synchronization; undo reinstalls OneDrive via winget and restores sync policies, but un-synced local changes and offline file cache are not restored.",
+    "evidence": "documented"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "advanced.removehomeandgallery",
+    "origin": "WPFTweaksRemoveHomeAndGallery",
+    "name": "File Explorer Home and Gallery - Disable",
+    "description": "Removes the Home and Gallery from Explorer and sets This PC as default.",
+    "category": "system",
+    "subcategory": "z__Advanced Tweaks - CAUTION",
+    "risk": "Safe",
+    "impacts": [
+      "ui"
+    ],
+    "windows": {
+      "minBuild": 19041
     },
-    {
-        "schemaVersion":  "1.0.0",
-        "id":  "advanced.rightclickmenu",
-        "origin":  "WPFTweaksRightClickMenu",
-        "name":  "Right-Click Menu Previous Layout - Enable",
-        "description":  "Restores the classic context menu when right-clicking in File Explorer, replacing the simplified Windows 11 version.",
-        "category":  "system",
-        "subcategory":  "z__Advanced Tweaks - CAUTION",
-        "risk":  "Low",
-        "impacts":  [
-                        "ui"
-                    ],
-        "windows":  {
-                        "minBuild":  19041
-                    },
-        "requiresReboot":  false,
-        "requiresExplorerRestart":  false,
-        "detect":  {
-                       "type":  "Registry",
-                       "hive":  "HKCU",
-                       "key":  "Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\\InprocServer32",
-                       "matchType":  "Exists"
-                   },
-        "apply":  [
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKCU",
-                          "key":  "Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\\InprocServer32",
-                          "operation":  "Set",
-                          "valueName":  "",
-                          "valueKind":  "String",
-                          "data":  ""
-                      }
-                  ],
-        "undo":  [
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKCU",
-                         "key":  "Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}",
-                         "operation":  "DeleteKey"
-                     }
-                 ],
-        "source":  "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/rightclickmenu",
-        "verifiedOnBuild":  "26100",
-        "evidence":  "documented"
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Classes\\CLSID\\{f874310e-b6b7-47dc-bc84-b9e6b38f5903}",
+      "valueName": "System.IsPinnedToNameSpaceTree",
+      "matchType": "Equals",
+      "expectedValue": 0
     },
-    {
-        "schemaVersion":  "1.0.0",
-        "id":  "advanced.ipv46",
-        "origin":  "WPFTweaksIPv46",
-        "name":  "IPv6 - Set IPv4 as Preferred",
-        "description":  "Setting the IPv4 preference can have latency and security benefits on private networks where IPv6 is not configured.",
-        "category":  "network",
-        "subcategory":  "z__Advanced Tweaks - CAUTION",
-        "risk":  "Low",
-        "impacts":  [
-                        "network"
-                    ],
-        "windows":  {
-                        "minBuild":  19041
-                    },
-        "requiresReboot":  false,
-        "requiresExplorerRestart":  false,
-        "detect":  {
-                       "type":  "Registry",
-                       "hive":  "HKLM",
-                       "key":  "SYSTEM\\CurrentControlSet\\Services\\Tcpip6\\Parameters",
-                       "valueName":  "DisabledComponents",
-                       "matchType":  "Equals",
-                       "expectedValue":  32
-                   },
-        "apply":  [
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKLM",
-                          "key":  "SYSTEM\\CurrentControlSet\\Services\\Tcpip6\\Parameters",
-                          "operation":  "Set",
-                          "valueName":  "DisabledComponents",
-                          "valueKind":  "DWord",
-                          "data":  32
-                      }
-                  ],
-        "undo":  [
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKLM",
-                         "key":  "SYSTEM\\CurrentControlSet\\Services\\Tcpip6\\Parameters",
-                         "operation":  "Set",
-                         "valueName":  "DisabledComponents",
-                         "valueKind":  "DWord",
-                         "data":  0
-                     }
-                 ],
-        "source":  "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/ipv46",
-        "verifiedOnBuild":  "26100",
-        "evidence":  "situational"
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Classes\\CLSID\\{f874310e-b6b7-47dc-bc84-b9e6b38f5903}",
+        "operation": "Set",
+        "valueName": "System.IsPinnedToNameSpaceTree",
+        "valueKind": "DWord",
+        "data": 0
+      },
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Classes\\CLSID\\{e88865ea-0e1c-4e20-9aa6-edcd0212c87c}",
+        "operation": "Set",
+        "valueName": "System.IsPinnedToNameSpaceTree",
+        "valueKind": "DWord",
+        "data": 0
+      },
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "operation": "Set",
+        "valueName": "LaunchTo",
+        "valueKind": "DWord",
+        "data": 1
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Classes\\CLSID\\{f874310e-b6b7-47dc-bc84-b9e6b38f5903}",
+        "operation": "DeleteValue",
+        "valueName": "System.IsPinnedToNameSpaceTree"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Classes\\CLSID\\{e88865ea-0e1c-4e20-9aa6-edcd0212c87c}",
+        "operation": "DeleteValue",
+        "valueName": "System.IsPinnedToNameSpaceTree"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "operation": "DeleteValue",
+        "valueName": "LaunchTo"
+      }
+    ],
+    "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/removehomeandgallery",
+    "verifiedOnBuild": "26100",
+    "evidence": "documented"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "advanced.display",
+    "origin": "WPFTweaksDisplay",
+    "name": "Visual Effects - Set to Best Performance",
+    "description": "Sets the system preferences to performance. You can do this manually with sysdm.cpl as well.",
+    "category": "system",
+    "subcategory": "z__Advanced Tweaks - CAUTION",
+    "risk": "Safe",
+    "impacts": [
+      "ui"
+    ],
+    "windows": {
+      "minBuild": 19041
     },
-    {
-        "schemaVersion":  "1.0.0",
-        "id":  "advanced.teredo",
-        "origin":  "WPFTweaksTeredo",
-        "name":  "Teredo - Disable",
-        "description":  "Teredo network tunneling is an IPv6 feature that can cause additional latency, but may cause problems with some games.",
-        "category":  "network",
-        "subcategory":  "z__Advanced Tweaks - CAUTION",
-        "risk":  "Low",
-        "impacts":  [
-                        "network"
-                    ],
-        "windows":  {
-                        "minBuild":  19041
-                    },
-        "requiresReboot":  false,
-        "requiresExplorerRestart":  false,
-        "detect":  {
-                       "type":  "Registry",
-                       "hive":  "HKLM",
-                       "key":  "SYSTEM\\CurrentControlSet\\Services\\Tcpip6\\Parameters",
-                       "valueName":  "DisabledComponents",
-                       "matchType":  "Equals",
-                       "expectedValue":  1
-                   },
-        "apply":  [
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKLM",
-                          "key":  "SYSTEM\\CurrentControlSet\\Services\\Tcpip6\\Parameters",
-                          "operation":  "Set",
-                          "valueName":  "DisabledComponents",
-                          "valueKind":  "DWord",
-                          "data":  1
-                      },
-                      {
-                          "type":  "PowerShell",
-                          "operation":  "Execute",
-                          "script":  "netsh interface teredo set state disabled\n      if ($LASTEXITCODE -ne 0) { throw \"netsh failed with exit code $LASTEXITCODE\" }",
-                          "timeoutSeconds":  60
-                      }
-                  ],
-        "undo":  [
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKLM",
-                         "key":  "SYSTEM\\CurrentControlSet\\Services\\Tcpip6\\Parameters",
-                         "operation":  "Set",
-                         "valueName":  "DisabledComponents",
-                         "valueKind":  "DWord",
-                         "data":  0
-                     },
-                     {
-                         "type":  "PowerShell",
-                         "operation":  "Execute",
-                         "script":  "netsh interface teredo set state default\n      if ($LASTEXITCODE -ne 0) { throw \"netsh failed with exit code $LASTEXITCODE\" }",
-                         "timeoutSeconds":  60
-                     }
-                 ],
-        "source":  "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/teredo",
-        "verifiedOnBuild":  "26100",
-        "evidence":  "situational"
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Control Panel\\Desktop",
+      "valueName": "DragFullWindows",
+      "matchType": "Equals",
+      "expectedValue": "0"
     },
-    {
-        "schemaVersion":  "1.0.0",
-        "id":  "advanced.disableipv6",
-        "origin":  "WPFTweaksDisableIPv6",
-        "name":  "IPv6 - Disable",
-        "description":  "Disables IPv6.",
-        "category":  "network",
-        "subcategory":  "z__Advanced Tweaks - CAUTION",
-        "risk":  "High",
-        "impacts":  [
-                        "network"
-                    ],
-        "windows":  {
-                        "minBuild":  19041
-                    },
-        "requiresReboot":  false,
-        "requiresExplorerRestart":  false,
-        "detect":  {
-                       "type":  "Registry",
-                       "hive":  "HKLM",
-                       "key":  "SYSTEM\\CurrentControlSet\\Services\\Tcpip6\\Parameters",
-                       "valueName":  "DisabledComponents",
-                       "matchType":  "Equals",
-                       "expectedValue":  255
-                   },
-        "apply":  [
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKLM",
-                          "key":  "SYSTEM\\CurrentControlSet\\Services\\Tcpip6\\Parameters",
-                          "operation":  "Set",
-                          "valueName":  "DisabledComponents",
-                          "valueKind":  "DWord",
-                          "data":  255
-                      },
-                      {
-                          "type":  "PowerShell",
-                          "operation":  "Execute",
-                          "script":  "Disable-NetAdapterBinding -Name * -ComponentID ms_tcpip6",
-                          "timeoutSeconds":  60
-                      }
-                  ],
-        "undo":  [
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKLM",
-                         "key":  "SYSTEM\\CurrentControlSet\\Services\\Tcpip6\\Parameters",
-                         "operation":  "Set",
-                         "valueName":  "DisabledComponents",
-                         "valueKind":  "DWord",
-                         "data":  0
-                     },
-                     {
-                         "type":  "PowerShell",
-                         "operation":  "Execute",
-                         "script":  "Enable-NetAdapterBinding -Name * -ComponentID ms_tcpip6",
-                         "timeoutSeconds":  60
-                     }
-                 ],
-        "source":  "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/disableipv6",
-        "verifiedOnBuild":  "26100",
-        "warnings":  "Disables IPv6 on all network adapters. Some modern networks and services requiring IPv6 may lose connectivity.",
-        "evidence":  "situational"
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Control Panel\\Desktop",
+        "operation": "Set",
+        "valueName": "DragFullWindows",
+        "valueKind": "String",
+        "data": "0"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Control Panel\\Desktop",
+        "operation": "Set",
+        "valueName": "MenuShowDelay",
+        "valueKind": "String",
+        "data": "200"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Control Panel\\Desktop\\WindowMetrics",
+        "operation": "Set",
+        "valueName": "MinAnimate",
+        "valueKind": "String",
+        "data": "0"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Control Panel\\Keyboard",
+        "operation": "Set",
+        "valueName": "KeyboardDelay",
+        "valueKind": "DWord",
+        "data": 0
+      },
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "operation": "Set",
+        "valueName": "ListviewAlphaSelect",
+        "valueKind": "DWord",
+        "data": 0
+      },
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "operation": "Set",
+        "valueName": "ListviewShadow",
+        "valueKind": "DWord",
+        "data": 0
+      },
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "operation": "Set",
+        "valueName": "TaskbarAnimations",
+        "valueKind": "DWord",
+        "data": 0
+      },
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VisualEffects",
+        "operation": "Set",
+        "valueName": "VisualFXSetting",
+        "valueKind": "DWord",
+        "data": 3
+      },
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\DWM",
+        "operation": "Set",
+        "valueName": "EnableAeroPeek",
+        "valueKind": "DWord",
+        "data": 0
+      },
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "operation": "Set",
+        "valueName": "TaskbarMn",
+        "valueKind": "DWord",
+        "data": 0
+      },
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "operation": "Set",
+        "valueName": "ShowTaskViewButton",
+        "valueKind": "DWord",
+        "data": 0
+      },
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Search",
+        "operation": "Set",
+        "valueName": "SearchboxTaskbarMode",
+        "valueKind": "DWord",
+        "data": 0
+      },
+      {
+        "type": "PowerShell",
+        "operation": "Execute",
+        "script": "Set-ItemProperty -Path \"HKCU:\\Control Panel\\Desktop\" -Name \"UserPreferencesMask\" -Type Binary -Value ([byte[]](144,18,3,128,16,0,0,0))",
+        "timeoutSeconds": 60
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Control Panel\\Desktop",
+        "operation": "Set",
+        "valueName": "DragFullWindows",
+        "valueKind": "String",
+        "data": "1"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Control Panel\\Desktop",
+        "operation": "Set",
+        "valueName": "MenuShowDelay",
+        "valueKind": "String",
+        "data": "400"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Control Panel\\Desktop\\WindowMetrics",
+        "operation": "Set",
+        "valueName": "MinAnimate",
+        "valueKind": "String",
+        "data": "1"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Control Panel\\Keyboard",
+        "operation": "Set",
+        "valueName": "KeyboardDelay",
+        "valueKind": "DWord",
+        "data": 1
+      },
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "operation": "Set",
+        "valueName": "ListviewAlphaSelect",
+        "valueKind": "DWord",
+        "data": 1
+      },
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "operation": "Set",
+        "valueName": "ListviewShadow",
+        "valueKind": "DWord",
+        "data": 1
+      },
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "operation": "Set",
+        "valueName": "TaskbarAnimations",
+        "valueKind": "DWord",
+        "data": 1
+      },
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VisualEffects",
+        "operation": "Set",
+        "valueName": "VisualFXSetting",
+        "valueKind": "DWord",
+        "data": 1
+      },
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\DWM",
+        "operation": "Set",
+        "valueName": "EnableAeroPeek",
+        "valueKind": "DWord",
+        "data": 1
+      },
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "operation": "Set",
+        "valueName": "TaskbarMn",
+        "valueKind": "DWord",
+        "data": 1
+      },
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "operation": "Set",
+        "valueName": "ShowTaskViewButton",
+        "valueKind": "DWord",
+        "data": 1
+      },
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Search",
+        "operation": "Set",
+        "valueName": "SearchboxTaskbarMode",
+        "valueKind": "DWord",
+        "data": 1
+      },
+      {
+        "type": "PowerShell",
+        "operation": "Execute",
+        "script": "Remove-ItemProperty -Path \"HKCU:\\Control Panel\\Desktop\" -Name \"UserPreferencesMask\" -ErrorAction SilentlyContinue",
+        "timeoutSeconds": 60
+      }
+    ],
+    "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/display",
+    "verifiedOnBuild": "26100",
+    "evidence": "documented"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "advanced.reservedstorage",
+    "origin": "WPFTweaksReservedStorage",
+    "name": "Disable Reserved Storage",
+    "description": "Disables Windows Reserved Storage (7-10 GB held for updates/temp files). Recommended only on small drives. Re-enable before major Windows feature updates to avoid installation failures.",
+    "category": "system",
+    "subcategory": "z__Advanced Tweaks - CAUTION",
+    "risk": "Medium",
+    "impacts": [
+      "ui"
+    ],
+    "windows": {
+      "minBuild": 19041
     },
-    {
-        "schemaVersion":  "1.0.0",
-        "id":  "advanced.disablebgapps",
-        "origin":  "WPFTweaksDisableBGapps",
-        "name":  "Background Apps - Disable",
-        "description":  "Disables all Microsoft Store apps from running in the background, which has to be done individually since Windows 11.",
-        "category":  "system",
-        "subcategory":  "z__Advanced Tweaks - CAUTION",
-        "risk":  "Low",
-        "impacts":  [
-                        "ui"
-                    ],
-        "windows":  {
-                        "minBuild":  19041
-                    },
-        "requiresReboot":  false,
-        "requiresExplorerRestart":  false,
-        "detect":  {
-                       "type":  "Registry",
-                       "hive":  "HKCU",
-                       "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\BackgroundAccessApplications",
-                       "valueName":  "GlobalUserDisabled",
-                       "matchType":  "Equals",
-                       "expectedValue":  1
-                   },
-        "apply":  [
-                      {
-                          "type":  "Registry",
-                          "hive":  "HKCU",
-                          "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\BackgroundAccessApplications",
-                          "operation":  "Set",
-                          "valueName":  "GlobalUserDisabled",
-                          "valueKind":  "DWord",
-                          "data":  1
-                      }
-                  ],
-        "undo":  [
-                     {
-                         "type":  "Registry",
-                         "hive":  "HKCU",
-                         "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\BackgroundAccessApplications",
-                         "operation":  "Set",
-                         "valueName":  "GlobalUserDisabled",
-                         "valueKind":  "DWord",
-                         "data":  0
-                     }
-                 ],
-        "source":  "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/disablebgapps",
-        "verifiedOnBuild":  "26100",
-        "evidence":  "documented"
-    }
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\ReserveManager",
+      "valueName": "ShippedWithReserves",
+      "matchType": "Equals",
+      "expectedValue": 0
+    },
+    "apply": [
+      {
+        "type": "PowerShell",
+        "operation": "Execute",
+        "script": "DISM /Online /Set-ReservedStorageState /State:Disabled\n      if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 3010) { throw \"DISM failed with exit code $LASTEXITCODE\" }",
+        "timeoutSeconds": 60
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\ReserveManager",
+        "operation": "Set",
+        "valueName": "ShippedWithReserves",
+        "valueKind": "DWord",
+        "data": 0
+      }
+    ],
+    "undo": [
+      {
+        "type": "PowerShell",
+        "operation": "Execute",
+        "script": "DISM /Online /Set-ReservedStorageState /State:Enabled\n      if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 3010) { throw \"DISM failed with exit code $LASTEXITCODE\" }",
+        "timeoutSeconds": 60
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\ReserveManager",
+        "operation": "Set",
+        "valueName": "ShippedWithReserves",
+        "valueKind": "DWord",
+        "data": 1
+      }
+    ],
+    "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/reservedstorage",
+    "verifiedOnBuild": "26100",
+    "evidence": "documented"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "advanced.storage",
+    "origin": "WPFTweaksStorage",
+    "name": "Storage Sense - Disable",
+    "description": "Storage Sense deletes temp files automatically.",
+    "category": "system",
+    "subcategory": "z__Advanced Tweaks - CAUTION",
+    "risk": "Medium",
+    "impacts": [
+      "ui"
+    ],
+    "windows": {
+      "minBuild": 19041
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\StorageSense\\Parameters\\StoragePolicy",
+      "valueName": "01",
+      "matchType": "Equals",
+      "expectedValue": 0
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\StorageSense\\Parameters\\StoragePolicy",
+        "operation": "Set",
+        "valueName": "01",
+        "valueKind": "DWord",
+        "data": 0
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\StorageSense\\Parameters\\StoragePolicy",
+        "operation": "Set",
+        "valueName": "01",
+        "valueKind": "DWord",
+        "data": 1
+      }
+    ],
+    "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/storage",
+    "verifiedOnBuild": "26100",
+    "evidence": "documented"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "advanced.windowsai",
+    "origin": "WPFTweaksWindowsAI",
+    "name": "Windows AI - Disable And Remove",
+    "description": "Removes and disables all AI features/packages",
+    "category": "system",
+    "subcategory": "z__Advanced Tweaks - CAUTION",
+    "risk": "High",
+    "impacts": [
+      "privacy",
+      "performance"
+    ],
+    "windows": {
+      "minBuild": 19041
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
+      "valueName": "SettingsPageVisibility",
+      "matchType": "Equals",
+      "expectedValue": "hide:aicomponents"
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
+        "operation": "Set",
+        "valueName": "SettingsPageVisibility",
+        "valueKind": "String",
+        "data": "hide:aicomponents"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\WindowsNotepad",
+        "operation": "Set",
+        "valueName": "DisableAIFeatures",
+        "valueKind": "DWord",
+        "data": 1
+      },
+      {
+        "type": "PowerShell",
+        "operation": "Execute",
+        "script": "$AppxPackage = Get-AppxPackage MicrosoftWindows.Client.CoreAI -ErrorAction SilentlyContinue\n      $Appx = if ($AppxPackage) { $AppxPackage.PackageFullName } else { $null }\n\n      $user = Get-LocalUser $Env:UserName -ErrorAction SilentlyContinue\n      if ($user -and $Appx) {\n          $Sid = $user.Sid.Value\n          New-Item \"HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Appx\\AppxAllUserStore\\EndOfLife\\$Sid\\$Appx\" -Force -ErrorAction SilentlyContinue | Out-Null\n      }\n\n      Get-AppxPackage -AllUsers \"*Copilot*\" -ErrorAction SilentlyContinue | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue\n      winget uninstall -e --name \"Copilot\" --silent --force --accept-source-agreements 2>$null\n      if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 3010 -and $LASTEXITCODE -ne -1978335135 -and $LASTEXITCODE -ne -1978335189 -and $LASTEXITCODE -ne -1978335212) { throw \"winget failed with exit code $LASTEXITCODE\" }\n      Get-AppxPackage -AllUsers Microsoft.MicrosoftOfficeHub -ErrorAction SilentlyContinue | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue\n\n      if ($Appx) {\n          Remove-AppxPackage $Appx -ErrorAction SilentlyContinue\n      }\n\n      if (Get-Service -Name WSAIFabricSvc -ErrorAction SilentlyContinue) {\n          Set-Service -Name WSAIFabricSvc -StartupType Disabled -ErrorAction SilentlyContinue\n      }\n      Disable-WindowsOptionalFeature -FeatureName Recall -Online -NoRestart -ErrorAction SilentlyContinue\n\n      Write-Host \"Windows AI Disabled\"",
+        "timeoutSeconds": 300
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
+        "operation": "DeleteValue",
+        "valueName": "SettingsPageVisibility"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\WindowsNotepad",
+        "operation": "DeleteValue",
+        "valueName": "DisableAIFeatures"
+      }
+    ],
+    "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/windowsai",
+    "verifiedOnBuild": "26100",
+    "warnings": "Removes and disables Windows AI, Recall, and Copilot packages system-wide. Undo only restores registry policies; removed AppX and Windows features are NOT reinstalled.",
+    "reversible": false,
+    "irreversibleReason": "Permanently uninstalls Windows Copilot, Recall, and AI Appx packages; undo only reverts policy registry keys and does not reinstall the removed Appx or system features.",
+    "evidence": "documented"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "advanced.razerblock",
+    "origin": "WPFTweaksRazerBlock",
+    "name": "Razer Software Auto-Install - Disable",
+    "description": "Blocks ALL Razer Software installations. The hardware works fine without any software.",
+    "category": "system",
+    "subcategory": "z__Advanced Tweaks - CAUTION",
+    "risk": "Medium",
+    "impacts": [
+      "ui"
+    ],
+    "windows": {
+      "minBuild": 19041
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\DriverSearching",
+      "valueName": "SearchOrderConfig",
+      "matchType": "Equals",
+      "expectedValue": 0
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\DriverSearching",
+        "operation": "Set",
+        "valueName": "SearchOrderConfig",
+        "valueKind": "DWord",
+        "data": 0
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Device Installer",
+        "operation": "Set",
+        "valueName": "DisableCoInstallers",
+        "valueKind": "DWord",
+        "data": 1
+      },
+      {
+        "type": "PowerShell",
+        "operation": "Execute",
+        "script": "$RazerPath = \"$Env:SystemRoot\\Installer\\Razer\"\n\n      if (Test-Path $RazerPath) {\n        Remove-Item $RazerPath\\* -Recurse -Force\n      } else {\n        New-Item -Path $RazerPath -ItemType Directory\n      }\n\n      icacls $RazerPath /deny \"*S-1-1-0:(W)\"",
+        "timeoutSeconds": 60
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\DriverSearching",
+        "operation": "Set",
+        "valueName": "SearchOrderConfig",
+        "valueKind": "DWord",
+        "data": 1
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Device Installer",
+        "operation": "Set",
+        "valueName": "DisableCoInstallers",
+        "valueKind": "DWord",
+        "data": 0
+      },
+      {
+        "type": "PowerShell",
+        "operation": "Execute",
+        "script": "icacls \"$Env:SystemRoot\\Installer\\Razer\" /remove:d *S-1-1-0",
+        "timeoutSeconds": 60
+      }
+    ],
+    "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/razerblock",
+    "verifiedOnBuild": "26100",
+    "evidence": "situational"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "advanced.logiblock",
+    "origin": "WPFTweaksLogiBlock",
+    "name": "Logitech Download Assistant Auto-Install - Disable",
+    "description": "Blocks the Logi Download Assistant that Windows Update keeps reinstalling with Logitech device drivers. Logitech hardware keeps working without it.",
+    "category": "system",
+    "subcategory": "z__Advanced Tweaks - CAUTION",
+    "risk": "Medium",
+    "impacts": [
+      "ui"
+    ],
+    "windows": {
+      "minBuild": 19041
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\LogiLDA.exe",
+      "valueName": "Debugger",
+      "matchType": "Equals",
+      "expectedValue": "systray.exe"
+    },
+    "apply": [
+      {
+        "type": "PowerShell",
+        "operation": "Execute",
+        "script": "Stop-Process -Name \"logi_download_assistant\" -Force -ErrorAction SilentlyContinue\n\n      $ProgramFiles64 = if ($Env:ProgramW6432) { $Env:ProgramW6432 } else { $Env:ProgramFiles }\n      $LogiPath = \"$ProgramFiles64\\LogiDownloadAssistant\"\n\n      if (Test-Path $LogiPath) {\n        Remove-Item $LogiPath\\* -Recurse -Force -ErrorAction SilentlyContinue\n      } else {\n        New-Item -Path $LogiPath -ItemType Directory -ErrorAction SilentlyContinue\n      }\n\n      icacls $LogiPath /deny \"*S-1-1-0:(W)\" | Out-Null",
+        "timeoutSeconds": 60
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\LogiLDA.exe",
+        "operation": "Set",
+        "valueName": "Debugger",
+        "valueKind": "String",
+        "data": "systray.exe"
+      }
+    ],
+    "undo": [
+      {
+        "type": "PowerShell",
+        "operation": "Execute",
+        "script": "$ProgramFiles64 = if ($Env:ProgramW6432) { $Env:ProgramW6432 } else { $Env:ProgramFiles }\n      $LogiPath = \"$ProgramFiles64\\LogiDownloadAssistant\"\n\n      if (Test-Path $LogiPath) {\n        icacls $LogiPath /remove:d \"*S-1-1-0\" -ErrorAction SilentlyContinue | Out-Null\n      }",
+        "timeoutSeconds": 60
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\LogiLDA.exe",
+        "operation": "DeleteKey"
+      }
+    ],
+    "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/logiblock",
+    "verifiedOnBuild": "26100",
+    "evidence": "situational"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "advanced.disablenotifications",
+    "origin": "WPFTweaksDisableNotifications",
+    "name": "System Tray Notifications & Calendar - Disable",
+    "description": "Disables all Notifications INCLUDING Calendar.",
+    "category": "system",
+    "subcategory": "z__Advanced Tweaks - CAUTION",
+    "risk": "Medium",
+    "impacts": [
+      "ui"
+    ],
+    "windows": {
+      "minBuild": 19041
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Policies\\Microsoft\\Windows\\Explorer",
+      "valueName": "DisableNotificationCenter",
+      "matchType": "Equals",
+      "expectedValue": 1
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Policies\\Microsoft\\Windows\\Explorer",
+        "operation": "Set",
+        "valueName": "DisableNotificationCenter",
+        "valueKind": "DWord",
+        "data": 1
+      },
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\PushNotifications",
+        "operation": "Set",
+        "valueName": "ToastEnabled",
+        "valueKind": "DWord",
+        "data": 0
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Policies\\Microsoft\\Windows\\Explorer",
+        "operation": "DeleteValue",
+        "valueName": "DisableNotificationCenter"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\PushNotifications",
+        "operation": "Set",
+        "valueName": "ToastEnabled",
+        "valueKind": "DWord",
+        "data": 1
+      }
+    ],
+    "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/disablenotifications",
+    "verifiedOnBuild": "26100",
+    "evidence": "documented"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "advanced.rightclickmenu",
+    "origin": "WPFTweaksRightClickMenu",
+    "name": "Right-Click Menu Previous Layout - Enable",
+    "description": "Restores the classic context menu when right-clicking in File Explorer, replacing the simplified Windows 11 version.",
+    "category": "system",
+    "subcategory": "z__Advanced Tweaks - CAUTION",
+    "risk": "Safe",
+    "impacts": [
+      "ui"
+    ],
+    "windows": {
+      "minBuild": 19041
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\\InprocServer32",
+      "matchType": "Exists"
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\\InprocServer32",
+        "operation": "Set",
+        "valueName": "",
+        "valueKind": "String",
+        "data": ""
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}",
+        "operation": "DeleteKey"
+      }
+    ],
+    "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/rightclickmenu",
+    "verifiedOnBuild": "26100",
+    "evidence": "documented"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "advanced.ipv46",
+    "origin": "WPFTweaksIPv46",
+    "name": "IPv6 - Set IPv4 as Preferred",
+    "description": "Setting the IPv4 preference can have latency and security benefits on private networks where IPv6 is not configured.",
+    "category": "network",
+    "subcategory": "z__Advanced Tweaks - CAUTION",
+    "risk": "High",
+    "impacts": [
+      "network"
+    ],
+    "windows": {
+      "minBuild": 19041
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SYSTEM\\CurrentControlSet\\Services\\Tcpip6\\Parameters",
+      "valueName": "DisabledComponents",
+      "matchType": "Equals",
+      "expectedValue": 32
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SYSTEM\\CurrentControlSet\\Services\\Tcpip6\\Parameters",
+        "operation": "Set",
+        "valueName": "DisabledComponents",
+        "valueKind": "DWord",
+        "data": 32
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SYSTEM\\CurrentControlSet\\Services\\Tcpip6\\Parameters",
+        "operation": "Set",
+        "valueName": "DisabledComponents",
+        "valueKind": "DWord",
+        "data": 0
+      }
+    ],
+    "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/ipv46",
+    "verifiedOnBuild": "26100",
+    "evidence": "situational"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "advanced.teredo",
+    "origin": "WPFTweaksTeredo",
+    "name": "Teredo - Disable",
+    "description": "Teredo network tunneling is an IPv6 feature that can cause additional latency, but may cause problems with some games.",
+    "category": "network",
+    "subcategory": "z__Advanced Tweaks - CAUTION",
+    "risk": "High",
+    "impacts": [
+      "network"
+    ],
+    "windows": {
+      "minBuild": 19041
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SYSTEM\\CurrentControlSet\\Services\\Tcpip6\\Parameters",
+      "valueName": "DisabledComponents",
+      "matchType": "Equals",
+      "expectedValue": 1
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SYSTEM\\CurrentControlSet\\Services\\Tcpip6\\Parameters",
+        "operation": "Set",
+        "valueName": "DisabledComponents",
+        "valueKind": "DWord",
+        "data": 1
+      },
+      {
+        "type": "PowerShell",
+        "operation": "Execute",
+        "script": "netsh interface teredo set state disabled\n      if ($LASTEXITCODE -ne 0) { throw \"netsh failed with exit code $LASTEXITCODE\" }",
+        "timeoutSeconds": 60
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SYSTEM\\CurrentControlSet\\Services\\Tcpip6\\Parameters",
+        "operation": "Set",
+        "valueName": "DisabledComponents",
+        "valueKind": "DWord",
+        "data": 0
+      },
+      {
+        "type": "PowerShell",
+        "operation": "Execute",
+        "script": "netsh interface teredo set state default\n      if ($LASTEXITCODE -ne 0) { throw \"netsh failed with exit code $LASTEXITCODE\" }",
+        "timeoutSeconds": 60
+      }
+    ],
+    "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/teredo",
+    "verifiedOnBuild": "26100",
+    "evidence": "situational"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "advanced.disableipv6",
+    "origin": "WPFTweaksDisableIPv6",
+    "name": "IPv6 - Disable",
+    "description": "Disables IPv6.",
+    "category": "network",
+    "subcategory": "z__Advanced Tweaks - CAUTION",
+    "risk": "High",
+    "impacts": [
+      "network"
+    ],
+    "windows": {
+      "minBuild": 19041
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SYSTEM\\CurrentControlSet\\Services\\Tcpip6\\Parameters",
+      "valueName": "DisabledComponents",
+      "matchType": "Equals",
+      "expectedValue": 255
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SYSTEM\\CurrentControlSet\\Services\\Tcpip6\\Parameters",
+        "operation": "Set",
+        "valueName": "DisabledComponents",
+        "valueKind": "DWord",
+        "data": 255
+      },
+      {
+        "type": "PowerShell",
+        "operation": "Execute",
+        "script": "Disable-NetAdapterBinding -Name * -ComponentID ms_tcpip6",
+        "timeoutSeconds": 60
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SYSTEM\\CurrentControlSet\\Services\\Tcpip6\\Parameters",
+        "operation": "Set",
+        "valueName": "DisabledComponents",
+        "valueKind": "DWord",
+        "data": 0
+      },
+      {
+        "type": "PowerShell",
+        "operation": "Execute",
+        "script": "Enable-NetAdapterBinding -Name * -ComponentID ms_tcpip6",
+        "timeoutSeconds": 60
+      }
+    ],
+    "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/disableipv6",
+    "verifiedOnBuild": "26100",
+    "warnings": "Disables IPv6 on all network adapters. Some modern networks and services requiring IPv6 may lose connectivity.",
+    "evidence": "situational"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "advanced.disablebgapps",
+    "origin": "WPFTweaksDisableBGapps",
+    "name": "Background Apps - Disable",
+    "description": "Disables all Microsoft Store apps from running in the background, which has to be done individually since Windows 11.",
+    "category": "system",
+    "subcategory": "z__Advanced Tweaks - CAUTION",
+    "risk": "Medium",
+    "impacts": [
+      "ui"
+    ],
+    "windows": {
+      "minBuild": 19041
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\BackgroundAccessApplications",
+      "valueName": "GlobalUserDisabled",
+      "matchType": "Equals",
+      "expectedValue": 1
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\BackgroundAccessApplications",
+        "operation": "Set",
+        "valueName": "GlobalUserDisabled",
+        "valueKind": "DWord",
+        "data": 1
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\BackgroundAccessApplications",
+        "operation": "Set",
+        "valueName": "GlobalUserDisabled",
+        "valueKind": "DWord",
+        "data": 0
+      }
+    ],
+    "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/disablebgapps",
+    "verifiedOnBuild": "26100",
+    "evidence": "documented"
+  }
 ]

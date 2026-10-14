@@ -310,3 +310,19 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
   8. Documented the real mechanics and limitations of Nagle disabling and standby RAM purging in `NetworkOptimizerService`, `MemoryOptimizerService`, `ToolboxViewModel`, and `ToolboxPage`.
   9. Added comprehensive unit tests in `PlaceboAndClaimScrubTests.cs`.
 
+---
+
+## BUG-022: Uncalibrated Risk Ratings and Absence of Minimum Risk Floors
+- **Component**: `Catalog/Tweaks`, `tools/CatalogValidator`, `docs/TWEAK_GUIDE.md`, `docs/RISK_AUDIT.md`, `src/Tweakora.Tests/RiskRubricTests.cs`
+- **Finding**:
+  1. 116 of 149 tweaks were previously rated as "Safe", despite 77 tweaks modifying machine-wide system policies in `HKLM`, disabling relied-upon features (hibernation, widgets, Copilot, background apps), altering services, or requiring a system reboot.
+  2. Irreversible tweaks and machine-level security and networking changes had arbitrary risk ratings with no formal criteria or minimum floors.
+  3. No written risk rubric existed to govern tweak classification or authoring guidelines.
+- **Root Cause**: Absence of a formalized, objective risk rubric with validator-enforced minimum floors.
+- **Fix**:
+  1. Formulated a written 4-tier risk rubric in `docs/TWEAK_GUIDE.md` (Safe = per-user HKCU UI preference, instantly reversible, no feature lost; Low = machine policy HKLM, reversible, no feature a typical user relies on is lost; Medium = turns off a Windows feature some users rely on or requires reboot; High = services, security, updates, Store, networking stack, or irreversible).
+  2. Re-scored all 149 tweaks against the rubric (Safe: 45, Low: 19, Medium: 48, High: 37).
+  3. Documented every risk change in `docs/RISK_AUDIT.md` (96 tweaks recalibrated with specific one-line rationale).
+  4. Enforced minimum risk floors in `CatalogValidator`: irreversible $\implies$ High; protected servicing $\implies$ High; HKLM $\implies$ at least Low (cannot be Safe).
+  5. Added unit test suite in `RiskRubricTests.cs`.
+

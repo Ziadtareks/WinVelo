@@ -131,6 +131,7 @@ public static class Program
 
                         ValidateServicingProtection(item, id, ref errorCount);
                         ValidateEvidenceField(item, id, ref errorCount);
+                        ValidateRiskFloors(item, id, ref errorCount);
 
                         if (!result.IsValid)
                         {
@@ -184,6 +185,7 @@ public static class Program
 
                     ValidateServicingProtection(single, id, ref errorCount);
                     ValidateEvidenceField(single, id, ref errorCount);
+                    ValidateRiskFloors(single, id, ref errorCount);
 
                     if (!result.IsValid)
                     {
@@ -498,6 +500,70 @@ public static class Program
             errorCount++;
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine($"  [FAIL] Tweak '{id}' is missing a valid 'evidence' field ('documented', 'situational', or 'anecdotal'). Found: '{evidence}'.");
+            Console.ResetColor();
+        }
+    }
+
+    private static void ValidateRiskFloors(JsonNode item, string id, ref int errorCount)
+    {
+        string? risk = item["risk"]?.ToString();
+        bool? isReversible = item["reversible"]?.GetValue<bool>();
+
+        // Floor 1: irreversible => High
+        if (isReversible == false && !string.Equals(risk, "High", StringComparison.OrdinalIgnoreCase))
+        {
+            errorCount++;
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"  [FAIL] Tweak '{id}' has reversible=false but risk is '{risk}'. Irreversible tweaks must have risk 'High'.");
+            Console.ResetColor();
+        }
+
+        // Floor 2: protected service => High
+        if (TouchesServicing(item, out string servicingReason) && !string.Equals(risk, "High", StringComparison.OrdinalIgnoreCase))
+        {
+            errorCount++;
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"  [FAIL] Tweak '{id}' impacts Windows servicing ({servicingReason}) but risk is '{risk}'. Must be risk 'High'.");
+            Console.ResetColor();
+        }
+
+        // Floor 3: HKLM => at least Low (cannot be Safe)
+        bool touchesHklm = false;
+        var applyArray = item["apply"]?.AsArray();
+        if (applyArray != null)
+        {
+            foreach (var action in applyArray)
+            {
+                if (action == null) continue;
+                string hive = action["hive"]?.ToString() ?? "";
+                if (string.Equals(hive, "HKLM", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(hive, "HKEY_LOCAL_MACHINE", StringComparison.OrdinalIgnoreCase))
+                {
+                    touchesHklm = true;
+                    break;
+                }
+            }
+        }
+
+        if (!touchesHklm)
+        {
+            var detect = item["detect"];
+            if (detect != null)
+            {
+                string hive = detect["hive"]?.ToString() ?? "";
+                if (string.Equals(hive, "HKLM", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(hive, "HKEY_LOCAL_MACHINE", StringComparison.OrdinalIgnoreCase))
+                {
+                    touchesHklm = true;
+                }
+            }
+        }
+
+        if (touchesHklm && string.Equals(risk, "Safe", StringComparison.OrdinalIgnoreCase))
+        {
+            errorCount++;
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"  [FAIL] Tweak '{id}' targets HKLM machine policy/configuration but risk is 'Safe'. HKLM machine policy tweaks must be at least risk 'Low'.");
             Console.ResetColor();
         }
     }

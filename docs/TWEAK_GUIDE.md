@@ -27,7 +27,33 @@ Every tweak in WinVelo is data-driven, defined as a JSON document in the `Catalo
 
 ---
 
-## 2. Example Tweak Definition
+## 2. Risk Rating Rubric
+
+Every tweak must be assigned an honest, calibrated risk level based on the following rubric:
+
+- **Safe**:
+  - Per-user (`HKCU`) UI preference, instantly reversible, no feature lost.
+  - Examples: show file extensions, dark mode, classic context menu, left-align taskbar.
+  - *Floor rule*: Safe tweaks MUST be strictly per-user (`HKCU`). Any tweak targeting machine configuration (`HKLM`) cannot be Safe.
+
+- **Low**:
+  - Machine policy (`HKLM`) or benign system preference, reversible, no feature a typical user relies on is lost.
+  - Examples: telemetry level reduction, diagnostic data limits, verbose logon, long path support, detailed BSOD.
+
+- **Medium**:
+  - Turns off a Windows feature some users rely on (such as hibernation, Widgets, Copilot, background apps, location services, lock screen content, Bing search integration), or requires a system reboot (`requiresReboot: true`).
+  - Examples: disabling hibernation, disabling Widgets button, disabling Copilot policy, disabling background app permissions.
+
+- **High**:
+  - Modifies Windows services (`Service` action), security configurations (BitLocker, UAC, SmartScreen, firewall), Windows Update policies/actions, Microsoft Store, core networking protocol stack (IPv6, Teredo, DNS, Nagle), or is irreversible (`reversible: false`).
+  - *Floor rules enforced by validator*:
+    - `reversible === false` $\implies$ **High** (always).
+    - Modifies or disables protected Windows servicing components or policies $\implies$ **High** (always).
+    - Presets cannot contain High-risk tweaks.
+
+---
+
+## 3. Example Tweak Definition
 
 ```json
 [
@@ -80,7 +106,7 @@ Every tweak in WinVelo is data-driven, defined as a JSON document in the `Catalo
 
 ---
 
-## 3. How to Validate Your Changes
+## 4. How to Validate Your Changes
 
 Before submitting a Pull Request, always execute the automated catalog validator:
 

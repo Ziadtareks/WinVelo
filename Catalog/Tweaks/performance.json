@@ -7,7 +7,7 @@
     "description": "Configures thread scheduling quantum length for foreground applications (0x26 = short, variable quantum with high foreground boost). Situational: may improve foreground responsiveness in specific scenarios, but can starve background threads and cause audio dropouts or micro-stutters in multi-threaded modern games.",
     "category": "performance",
     "subcategory": "Gaming & CPU",
-    "risk": "Safe",
+    "risk": "Medium",
     "evidence": "situational",
     "sideEffects": "Can degrade multi-threaded game performance and increase latency or stuttering for background audio, streaming (OBS), or recording tasks.",
     "impacts": [
@@ -60,7 +60,7 @@
     "description": "Disables network throttling index and raises multimedia task scheduling priority for games to grant more CPU time.",
     "category": "gaming",
     "subcategory": "Gaming & CPU",
-    "risk": "Safe",
+    "risk": "Medium",
     "evidence": "documented",
     "sideEffects": "Giving games extreme CPU priority via MMCSS can cause background audio, Discord voice, or OBS streaming encoders to stutter or glitch.",
     "impacts": [
@@ -204,7 +204,7 @@
     "description": "User preference toggle for Windows Display Driver Model (WDDM 2.7+) hardware GPU scheduling. Offloads scheduling from CPU to dedicated GPU scheduling processor.",
     "category": "preferences",
     "subcategory": "Gaming & GPU",
-    "risk": "Safe",
+    "risk": "Medium",
     "evidence": "documented",
     "impacts": [
       "performance",
@@ -256,7 +256,7 @@
     "description": "Workaround for specific display-flicker and black screen bugs on certain older GPU drivers. Note: Disabling MPO is not a general performance optimization; it increases power usage and disables hardware-level windowed presentation optimizations on modern systems.",
     "category": "gaming",
     "subcategory": "Gaming & GPU",
-    "risk": "Safe",
+    "risk": "Medium",
     "evidence": "situational",
     "sideEffects": "Increases GPU and display power consumption; disables independent hardware composition planes for windowed applications and video playback.",
     "impacts": [
@@ -395,7 +395,7 @@
     "description": "Reduces input driver queue sizes from 100 to 20 packets. Community tweak with no empirical evidence of latency reduction; may cause dropped inputs under high interrupt load.",
     "category": "Experimental",
     "subcategory": "Gaming & Input",
-    "risk": "Safe",
+    "risk": "Medium",
     "evidence": "anecdotal",
     "sideEffects": "Can cause dropped keyboard or mouse inputs if the CPU is heavily loaded and the buffer fills before being read.",
     "impacts": [
@@ -466,7 +466,7 @@
     "description": "Forces all CPU cores unparked. On modern Windows, the thread scheduler already unparks cores dynamically within microseconds. Disabling parking wastes significant battery and power on laptops with no measurable gaming performance uplift.",
     "category": "Experimental",
     "subcategory": "Gaming & CPU",
-    "risk": "Low",
+    "risk": "Medium",
     "evidence": "anecdotal",
     "sideEffects": "Increases idle power draw and battery drain, especially on mobile/laptop processors.",
     "impacts": [
@@ -519,7 +519,7 @@
     "description": "Disables Windows Execution Power Throttling for background applications. Useful for background rendering or compute tasks, but significantly increases battery consumption.",
     "category": "performance",
     "subcategory": "Gaming & Power",
-    "risk": "Safe",
+    "risk": "Medium",
     "evidence": "situational",
     "sideEffects": "Reduces laptop battery life and increases system thermal load.",
     "impacts": [
