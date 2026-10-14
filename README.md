@@ -3,7 +3,7 @@
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)]()
 [![.NET Version](https://img.shields.io/badge/.NET-10.0%20LTS-purple.svg)](https://dotnet.microsoft.com/)
 [![Windows Target](https://img.shields.io/badge/Windows-10%20%7C%2011-blue.svg)]()
-[![Verified Tweaks](https://img.shields.io/badge/verified%20tweaks-141-success.svg)]()
+[![Verified Tweaks](https://img.shields.io/badge/verified%20tweaks-149-success.svg)]()
 [![Winget Apps](https://img.shields.io/badge/curated%20apps-36%20essential-blue.svg)]()
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Safety](https://img.shields.io/badge/safety-reversible%20by%20design-blueviolet.svg)](docs/SAFETY.md)
@@ -21,7 +21,7 @@ Real-time hardware metrics (Physical RAM usage, CPU model, Windows build), 4 one
 ![WinVelo Dashboard](docs/screenshots/dashboard.png)
 
 ### All Tweaks & Debloating (Beginner & Pro Modes)
-141 verified system tweaks with 1-click direct toggle switches, Beginner Mode filter, multi-selection, and safety caution cards.
+149 verified system tweaks with 1-click direct toggle switches, Beginner Mode filter, multi-selection, and safety caution cards.
 ![WinVelo Tweaks](docs/screenshots/tweaks.png)
 
 ### Curated Essential Apps Installer (Winget)
@@ -41,8 +41,8 @@ Real-time hardware metrics (Physical RAM usage, CPU model, Windows build), 4 one
   - `Restore Windows Defaults`: 1-click safe rollback to factory Windows behavior.
 - **8 Instant Quick Toggles**: Classic Context Menu, Disable Bing in Search, Show File Extensions, Disable Telemetry, Disable Spotlight Ads, End Task on Taskbar, Disable Background Apps, System Dark Mode.
 
-### 2. ⚡ All Tweaks (141 Tweaks)
-- **Beginner Mode vs Pro Mode**: Switch between recommended safe optimizations or access all 141 granular system tweaks.
+### 2. ⚡ All Tweaks (149 Tweaks)
+- **Beginner Mode vs Pro Mode**: Switch between recommended safe optimizations or access all 149 granular system tweaks.
 - **Direct 1-Click Toggles**: Flip individual settings immediately or select multiple tweaks for batch application.
 - **Dry-Run Diff Preview**: Inspect exact registry keys and services that will change before touching anything.
 - **Safety Cards**: Amber alert badges for caution items (e.g. BitLocker, Edge removal) with explicit confirmation requirements.
@@ -120,7 +120,7 @@ cd winvelo
 # Build solution
 dotnet build Tweakora.sln
 
-# Run unit test suite (66 tests)
+# Run unit test suite (109 tests)
 dotnet test src/Tweakora.Tests/Tweakora.Tests.csproj
 
 # Run UI automation test suite (FlaUI)

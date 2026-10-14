@@ -45,8 +45,8 @@ A comprehensive, line-by-line audit of the entire codebase was conducted across 
 | Category | UI Elements / Actions Count | Current Status | Notes |
 |---|:---:|:---:|---|
 | **Global & Navigation** | 15 | **15 REAL** | Admin check banner + restart elevated, command palette, themes, tabs |
-| **Tab 1 — Install** | 8 actions + 236 apps | **8 REAL** | Real WinGet CLI execution with exact ID and silent switches |
-| **Tab 2 — Tweaks** | 12 actions + 141 tweaks | **12 REAL** | Wired to `ITweakService` & `OperationRunner` with real rollback journal |
+| **Tab 1 — Install** | 8 actions + 36 apps | **8 REAL** | Real WinGet CLI execution with exact ID and silent switches |
+| **Tab 2 — Tweaks** | 12 actions + 149 tweaks | **12 REAL** | Wired to `ITweakService` & `OperationRunner` with real rollback journal |
 | **Tab 3 — Config** | 24 actions + 33 features | **24 REAL** | `FeatureService` (DISM) + `FixService` (SFC/DISM/WINSOCK) |
 | **Tab 4 — Updates** | 6 actions | **6 REAL** | `UpdateModeService` (Registry AU policies & wuauserv service) |
 | **Tab 5 — Toolbox** | 14 actions | **14 REAL** | `CleanerService` (recursive file removal), `DnsService`, `StartupService`, `ServicesManagerService` |
@@ -103,7 +103,7 @@ A comprehensive, line-by-line audit of the entire codebase was conducted across 
 | Preset Button: `Minimal` | `ApplyPresetCommand("Minimal")` | Checks 12 matching tweaks in memory | None (UI selection) | **REAL** | `TweaksTabView.xaml:33`, `TweaksViewModel.cs:382` |
 | Preset Button: `Advanced` | `ApplyPresetCommand("Advanced")` | Checks 34 matching tweaks in memory | None (UI selection) | **REAL** | `TweaksTabView.xaml:37`, `TweaksViewModel.cs:382` |
 | Preset Button: `Clear` | `ApplyPresetCommand("Clear")` | Clears all tweak selections | None (UI selection) | **REAL** | `TweaksTabView.xaml:42`, `TweaksViewModel.cs:382` |
-| 141 Tweak Checkboxes | Binding `card.IsCheckedInUi` | Sets `IsStaged = true`, stages target state | None (UI selection) | **REAL** | `TweaksTabView.xaml:104,145,213,250` |
+| 149 Tweak Checkboxes | Binding `card.IsCheckedInUi` | Sets `IsStaged = true`, stages target state | None (UI selection) | **REAL** | `TweaksTabView.xaml:104,145,213,250` |
 | "Run Tweaks" Button | `OpenDiffPreviewCommand` | Opens the Diff Preview Modal | None (UI state) | **REAL** | `TweaksTabView.xaml:67`, `TweaksViewModel.cs:445` |
 | Diff Preview Close / Cancel | `CloseDiffPreviewCommand` | Sets `IsPreviewDialogOpen = false` | None (UI state) | **REAL** | `TweaksTabView.xaml:294,310` |
 | **"Diff Preview" Button** | `OpenDiffPreviewCommand` | `DryRunEngine.GenerateReportAsync` | **FAKE!** `DryRunEngine` was instantiated with `FakeRegistryService` and `FakeServicesService`. | **FAKE** | `TweaksViewModel.cs:165-180,445` |

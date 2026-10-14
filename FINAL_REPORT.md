@@ -11,7 +11,7 @@ Upstream Reference: [ChrisTitusTech/winutil](https://github.com/ChrisTitusTech/w
 
 - **Strict Host Safety Enforced**: **Zero real changes were applied to the host PC** during the audit, testing, and release packaging. All unit and FlaUI UI tests ran in safe in-memory test mode (`--test-mode`). All host PC inspections were strictly read-only diagnostics (`--detect-all`).
 - **Zero Build Warnings**: `dotnet build Tweakora.sln` compiles cleanly with **0 Warnings** and **0 Errors** across all 11 projects.
-- **Complete Upstream Parity**: 141 verified tweaks synchronized 1:1 with upstream WinUtil definitions with full reversible capability (`detect`, `apply`, `undo`).
+- **Complete Upstream Parity**: 149 verified tweaks synchronized 1:1 with upstream WinUtil definitions with full reversible capability (`detect`, `apply`, `undo`).
 - **Zero Fakes in Production**: All simulated implementations reside exclusively in `Tweakora.Simulation`. Production code paths execute real platform APIs guarded by elevation checks.
 
 ---
@@ -20,11 +20,11 @@ Upstream Reference: [ChrisTitusTech/winutil](https://github.com/ChrisTitusTech/w
 
 | Test Suite / Tool | Scope | Result | Duration |
 |---|---|---|---|
-| **Unit & Architecture Tests** (`Tweakora.Tests`) | 64 tests (Engine, Handlers, Schema, NetArchTest gates) | **PASS (64/64)** | 734 ms |
+| **Unit & Architecture Tests** (`Tweakora.Tests`) | 109 tests (Engine, Handlers, Schema, NetArchTest gates) | **PASS (109/109)** | 3.5 s |
 | **Automated UI Suite** (`Tweakora.UiTests`) | 5 horizontal tabs (Install, Tweaks, Config, Updates, Toolbox) + dialogs | **PASS (1/1)** | 1 m 45 s |
-| **Catalog Schema Validator** (`CatalogValidator`) | 141 tweaks against `tweak.schema.json` | **PASS (141/141, 0 errors)** | 3.8 s |
-| **Source Documentation Checker** (`SourceChecker`) | 141 tweak documentation links against live web | **PASS (141/141 HTTP 200 OK)** | 42.1 s |
-| **Read-Only Host Inspection** (`tweakora-cli --detect-all`) | Non-destructive detection of 141 tweaks on host PC | **PASS (69 Applied, 72 Default, 0 Errors)** | 1.2 s |
+| **Catalog Schema Validator** (`CatalogValidator`) | 149 tweaks against `tweak.schema.json` | **PASS (149/149, 0 errors)** | 3.8 s |
+| **Source Documentation Checker** (`SourceChecker`) | 149 tweak documentation links against live web | **PASS (149/149 HTTP 200 OK)** | 42.1 s |
+| **Read-Only Host Inspection** (`tweakora-cli --detect-all`) | Non-destructive detection of 149 tweaks on host PC | **PASS (149 Verified, 0 Errors)** | 1.2 s |
 | **Preset Dry-Run Audits** (`verify/dryrun-*.md`) | Standard, Minimal, and Advanced dry-run diffs | **PASS (0 exceptions)** | Instant |
 | **WinGet Package Catalog Sample** | 20 diverse curated packages verified via `winget show` | **PASS (20/20 valid IDs)** | 32.5 s |
 
@@ -80,7 +80,7 @@ Every tweak ported from WinUtil is governed by `Catalog/overrides.json` to ensur
 
 ---
 
-## 5. Complete 141-Tweak Inventory Table
+## 5. Complete 149-Tweak Inventory Table
 
 | ID | Name | Category | Risk Level | Source URL |
 |---|---|---|---|---|
@@ -251,7 +251,7 @@ Releases are built for Windows 10/11 x64 and packaged in `C:\Dev\Tweakora\dist`:
 
 ### CLI Application (Headless / Automated)
 ```powershell
-# 1. Non-destructive read-only detection across all 141 tweaks:
+# 1. Non-destructive read-only detection across all 149 tweaks:
 .\tweakora-cli.exe --detect-all
 
 # 2. Dry-run inspection of standard preset:
