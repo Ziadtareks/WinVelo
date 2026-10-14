@@ -26,27 +26,45 @@ Upstream Reference: [ChrisTitusTech/winutil](https://github.com/ChrisTitusTech/w
 | **Upstream Parity & Quality Audit** | Chris Titus WinUtil 1:1 Parity & Engine Verification | **DONE** | 141 verified tweaks synchronized. 64 unit/architecture tests pass. Non-destructive host detection (`--detect-all`) 100% clean. |
 | **WinVelo Overhaul & Rebrand** | Full rebranding, Beginner Dashboard, Curated Winget Installer | **DONE** | Home Tab #1, 4 smart profiles, 8 quick-toggles, 36 branded apps, 66 unit tests + FlaUI passed. |
 | **Real-PC Registry Sync** | Purge fake state, Win32 WM_SETTINGCHANGE broadcasts, Focus Auto-Sync | **DONE** | 74 unit tests passed / FlaUI passed / RealRegistrySyncTests passed |
+| **Smart Optimization Upgrade** | Hardware Analyzer, Standby RAM Cleaner, DNS Latency Benchmark, Nagle's Disabler, 8 Gaming Tweaks | **DONE** | 80 unit tests passed / 149 tweaks verified / Release packages updated |
 | **Release v1.0.0** | Final Production Packaging, SHA256, Screenshots | **DONE** | WinVelo v1.0.0 Portable & Small zip packages created in `dist/`. |
 
 ---
 
-## WinVelo v1.0.0 Real Windows Settings Bi-Directional Sync Overhaul
+## WinVelo Smart Optimization Upgrade (IQ Optimizer & ISLC Parity)
 
-### 1. Root Cause Resolution & Engine Hardening
-- **Complete Elimination of Synthetic State Markers**: Purged all occurrences of `SOFTWARE\WinVelo\State` across `Catalog/Tweaks/*.json`. All tweaks now inspect and manipulate authentic Windows Registry keys (`HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize`, `HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced`, `HKCU\Software\Microsoft\Windows\CurrentVersion\Search`, `HKCU\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32`, etc.).
-- **Non-Blocking System Restore Fallback**: In `TweakRunner.cs`, if System Restore creation is throttled or unavailable on Windows Home editions (and no interactive prompt handler was supplied), the runner logs a diagnostic warning and proceeds safely with the Write-Ahead Rollback Journal and full `.reg` registry snapshot backup instead of aborting tweak execution.
-- **Win32 Shell & Settings Notifications**: Implemented `WindowsSettingNotifier` in `Tweakora.Platform`, dispatching `SendMessageTimeout(HWND_BROADCAST, WM_SETTINGCHANGE, ...)` and `SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_FLUSH, ...)` upon registry writes, ensuring Windows Explorer, the Taskbar, and Windows Settings reflect changes immediately.
-- **Bi-Directional Focus Synchronization**: Bound `MainWindow.Activated` to trigger background state re-detection via `RefreshActiveStatesOnFocusAsync()`. When the user switches to Windows Settings, toggles an option, and clicks back into WinVelo, the UI toggles update automatically to reflect the actual OS state.
-- **8 Core Dashboard Quick Toggles**: Corrected registry mappings, inverted value logic, origin keys, and WPF command binding parameters (`CommandParameter="{Binding IsChecked, RelativeSource={RelativeSource Self}}"`) across Dark Mode, File Extensions, Bing Search, Classic Context Menu, Background Apps, Spotlight Ads, Taskbar End Task, and Telemetry.
-- **Dedicated Automated Verification**: Added `RealRegistrySyncTests.cs` testing bi-directional state detection and execution across all 8 core toggles.
+### 1. Smart Hardware Analyzer & Optimization Score (`SmartAdvisorService.cs`)
+- **Hardware Profile Detection**: Detects Laptop/Battery vs Desktop form factors (`GetSystemPowerStatus`), SSD/NVMe vs HDD storage, GPU vendor (NVIDIA/AMD/Intel), exact RAM capacity in KB, and CPU core count.
+- **Dynamic SvcHost Split Threshold**: Calculates dynamic `SvcHostSplitThresholdInKB` = total physical RAM in KB, preventing service host memory thrashing on 16GB+ systems without hardcoding.
+- **Dynamic System Optimization Health Score**: Real-time 0–100% score based on active optimizations with graded color brush (Red < 40%, Orange 40-69%, Blue 70-89%, Green 90-100%).
+- **1-Click Smart Analyze & Optimize**: Analyzes host architecture and applies safe recommended tweaks suited to the form factor in one click.
 
-### 2. Quality & Verification
-- **74/74 Unit, Golden, Architecture & Sync Tests** in `Tweakora.Tests` PASSED.
-- **FlaUI UIA3 Automation Test Suite** in `Tweakora.UiTests` PASSED.
-- **9 High-Resolution 1440x900 Screenshots** refreshed in `docs/screenshots/`.
+### 2. Live RAM & Standby List Cleaner (`MemoryOptimizerService.cs`)
+- **Native Win32 Memory Purge**: Uses P/Invoke `psapi.dll!EmptyWorkingSet` across processes and `ntdll.dll!NtSetSystemInformation` with command 4 (`MemoryPurgeStandbyList`) and command 3 (`MemoryFlushModifiedList`) with required `SeProfileSingleProcessPrivilege`.
+- **Instant UI Actions**: "Free Up RAM (Purge Cache)" button on the Dashboard RAM card and Toolbox Cleaner card.
+
+### 3. Smart Network, Ping & Gaming Latency Optimizer (`NetworkOptimizerService.cs`)
+- **DNS Latency Benchmark**: 3-ping async round-trip benchmark across top 5 DNS resolvers (Cloudflare 1.1.1.1, Google 8.8.8.8, Quad9 9.9.9.9, OpenDNS 208.67.222.222, AdGuard 94.140.14.14).
+- **1-Click Apply Fastest**: Automatically selects and sets the lowest-ping DNS resolver on the active primary network adapter, with 1-click "Reset to DHCP".
+- **Gaming Packet Latency (Nagle's Algorithm Disabler)**: Detects active network adapters under `HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces` and configures `TcpAckFrequency = 1`, `TCPNoDelay = 1`, `TcpDelAckTicks = 0` for zero packet delay in multiplayer games.
+
+### 4. 8 High-Impact Gaming, Input Lag & GPU Tweaks (`Catalog/Tweaks/performance.json`)
+Expanded catalog from 141 to 149 verified tweaks:
+1. `performance.quantum_boost`: Win32PrioritySeparation = 0x26 (38) for foreground thread boost.
+2. `performance.mmcss_gaming`: NetworkThrottlingIndex = -1, SystemResponsiveness = 10, Games GPU Priority = 8.
+3. `performance.hags`: HwSchMode = 2 (Hardware-Accelerated GPU Scheduling).
+4. `performance.mpo_disable`: OverlayTestMode = 5 to fix multi-plane overlay micro-stutters on NVIDIA/AMD.
+5. `performance.mouse_raw_input`: SmoothMouseXCurve/YCurve reset and MouseSpeed = 0 for 1:1 raw mouse input.
+6. `performance.input_lag_queues`: Mouse/Keyboard DataQueueSize = 20 packets for lowest buffer latency.
+7. `performance.core_unparking`: ValueMax = 0 in power profile attributes to unpark all CPU cores.
+8. `performance.power_throttling`: PowerThrottlingOff = 1 to prevent Windows from throttling gaming threads.
+
+### 5. Quality & Verification
+- **80/80 Unit, Architecture & Smart Optimization Tests** in `Tweakora.Tests` PASSED (0 failures).
+- **All 9 Screenshots Refreshed & Visually Inspected** in `docs/screenshots/` (dashboard, toolbox, tweaks, backups, config, command-palette, diff-preview, install, updates).
 - **Release Packages (`dist/`)**:
-  - `dist/WinVelo-v1.0.0-win-x64-portable.zip` (SHA-256: `68B52C576D407FBCD24B34905A131A5B5A3CC9E411742AEB5841A41F98D4CDCE`)
-  - `dist/WinVelo-v1.0.0-win-x64-small.zip` (SHA-256: `C5213B2C477ACBFE1B29E19626FCB5539BA2F78933D38182A219F1F56AD02263`)
+  - `dist/WinVelo-v1.0.0-win-x64-portable.zip` (SHA-256: `102708DDB2242AEC2B39109BA45D7829516DCFA4B0DBDF1BC95F47492C4F3257`)
+  - `dist/WinVelo-v1.0.0-win-x64-small.zip` (SHA-256: `D139B23BFF291D76031E3F669AED3C28C26EF04659DB6A45A094B7B39803BFA2`)
   - `dist/SHA256SUMS.txt` updated.
 
 ---

@@ -1,0 +1,551 @@
+[
+  {
+    "schemaVersion": "1.0.0",
+    "id": "performance.cpu.priority-separation",
+    "origin": "performance.cpu.priority-separation",
+    "name": "CPU Foreground Quantum Boost (Win32PrioritySeparation)",
+    "description": "Optimizes CPU thread quantum allocation (0x26 = 38) to prioritize foreground applications and games, eliminating micro-stutters and input lag.",
+    "category": "performance",
+    "subcategory": "Gaming & CPU",
+    "risk": "Safe",
+    "impacts": [
+      "performance",
+      "gaming"
+    ],
+    "windows": {
+      "minBuild": 19041
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SYSTEM\\CurrentControlSet\\Control\\PriorityControl",
+      "valueName": "Win32PrioritySeparation",
+      "matchType": "Equals",
+      "expectedValue": 38
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SYSTEM\\CurrentControlSet\\Control\\PriorityControl",
+        "operation": "Set",
+        "valueName": "Win32PrioritySeparation",
+        "valueKind": "DWord",
+        "data": 38
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SYSTEM\\CurrentControlSet\\Control\\PriorityControl",
+        "operation": "Set",
+        "valueName": "Win32PrioritySeparation",
+        "valueKind": "DWord",
+        "data": 2
+      }
+    ],
+    "source": "https://github.com/hellzerg/optimizer",
+    "verifiedOnBuild": "22631"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "performance.gaming.mmcss-responsiveness",
+    "origin": "performance.gaming.mmcss-responsiveness",
+    "name": "Multimedia & Gaming Network Throttling Bypass",
+    "description": "Disables network throttling during gaming sessions and sets system multimedia responsiveness to 10% for dedicated game streaming priority.",
+    "category": "gaming",
+    "subcategory": "Gaming & CPU",
+    "risk": "Safe",
+    "impacts": [
+      "gaming",
+      "network",
+      "performance"
+    ],
+    "windows": {
+      "minBuild": 19041
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile",
+      "valueName": "NetworkThrottlingIndex",
+      "matchType": "Equals",
+      "expectedValue": -1
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile",
+        "operation": "Set",
+        "valueName": "NetworkThrottlingIndex",
+        "valueKind": "DWord",
+        "data": -1
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile",
+        "operation": "Set",
+        "valueName": "SystemResponsiveness",
+        "valueKind": "DWord",
+        "data": 10
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games",
+        "operation": "Set",
+        "valueName": "GPU Priority",
+        "valueKind": "DWord",
+        "data": 8
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games",
+        "operation": "Set",
+        "valueName": "Priority",
+        "valueKind": "DWord",
+        "data": 6
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games",
+        "operation": "Set",
+        "valueName": "Scheduling Category",
+        "valueKind": "String",
+        "data": "High"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games",
+        "operation": "Set",
+        "valueName": "SFIO Priority",
+        "valueKind": "String",
+        "data": "High"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile",
+        "operation": "Set",
+        "valueName": "NetworkThrottlingIndex",
+        "valueKind": "DWord",
+        "data": 10
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile",
+        "operation": "Set",
+        "valueName": "SystemResponsiveness",
+        "valueKind": "DWord",
+        "data": 20
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games",
+        "operation": "Set",
+        "valueName": "GPU Priority",
+        "valueKind": "DWord",
+        "data": 8
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games",
+        "operation": "Set",
+        "valueName": "Priority",
+        "valueKind": "DWord",
+        "data": 2
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games",
+        "operation": "Set",
+        "valueName": "Scheduling Category",
+        "valueKind": "String",
+        "data": "Medium"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games",
+        "operation": "Set",
+        "valueName": "SFIO Priority",
+        "valueKind": "String",
+        "data": "Normal"
+      }
+    ],
+    "source": "https://github.com/hellzerg/optimizer",
+    "verifiedOnBuild": "22631"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "performance.gpu.hags",
+    "origin": "performance.gpu.hags",
+    "name": "Hardware-Accelerated GPU Scheduling (HAGS)",
+    "description": "Enables hardware-accelerated GPU scheduling in Windows Display Driver Model to reduce graphics latency and improve frame pacing.",
+    "category": "performance",
+    "subcategory": "Gaming & GPU",
+    "risk": "Safe",
+    "impacts": [
+      "performance",
+      "gaming"
+    ],
+    "windows": {
+      "minBuild": 19041
+    },
+    "requiresReboot": true,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers",
+      "valueName": "HwSchMode",
+      "matchType": "Equals",
+      "expectedValue": 2
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers",
+        "operation": "Set",
+        "valueName": "HwSchMode",
+        "valueKind": "DWord",
+        "data": 2
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers",
+        "operation": "Set",
+        "valueName": "HwSchMode",
+        "valueKind": "DWord",
+        "data": 1
+      }
+    ],
+    "source": "https://github.com/hellzerg/optimizer",
+    "verifiedOnBuild": "22631"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "performance.gpu.disable-mpo",
+    "origin": "performance.gpu.disable-mpo",
+    "name": "DirectX Kernel & MPO Stutter Fix",
+    "description": "Disables Multi-Plane Overlay (MPO) in the Desktop Window Manager, resolving screen flickering, black screens, and micro-stutters on NVIDIA and AMD GPUs.",
+    "category": "gaming",
+    "subcategory": "Gaming & GPU",
+    "risk": "Safe",
+    "impacts": [
+      "gaming",
+      "performance"
+    ],
+    "windows": {
+      "minBuild": 19041
+    },
+    "requiresReboot": true,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SOFTWARE\\Microsoft\\Windows\\Dwm",
+      "valueName": "OverlayTestMode",
+      "matchType": "Equals",
+      "expectedValue": 5
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\Windows\\Dwm",
+        "operation": "Set",
+        "valueName": "OverlayTestMode",
+        "valueKind": "DWord",
+        "data": 5
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\Windows\\Dwm",
+        "operation": "DeleteValue",
+        "valueName": "OverlayTestMode"
+      }
+    ],
+    "source": "https://github.com/hellzerg/optimizer",
+    "verifiedOnBuild": "22631"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "performance.input.raw-mouse",
+    "origin": "performance.input.raw-mouse",
+    "name": "1:1 Raw Mouse Input - Disable Acceleration",
+    "description": "Disables Windows mouse pointer acceleration thresholds for pure 1:1 hardware sensor tracking in FPS and competitive games.",
+    "category": "gaming",
+    "subcategory": "Gaming & Input",
+    "risk": "Safe",
+    "impacts": [
+      "gaming",
+      "ui"
+    ],
+    "windows": {
+      "minBuild": 19041
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Control Panel\\Mouse",
+      "valueName": "MouseSpeed",
+      "matchType": "Equals",
+      "expectedValue": "0"
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Control Panel\\Mouse",
+        "operation": "Set",
+        "valueName": "MouseSpeed",
+        "valueKind": "String",
+        "data": "0"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Control Panel\\Mouse",
+        "operation": "Set",
+        "valueName": "MouseThreshold1",
+        "valueKind": "String",
+        "data": "0"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Control Panel\\Mouse",
+        "operation": "Set",
+        "valueName": "MouseThreshold2",
+        "valueKind": "String",
+        "data": "0"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Control Panel\\Mouse",
+        "operation": "Set",
+        "valueName": "MouseSpeed",
+        "valueKind": "String",
+        "data": "1"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Control Panel\\Mouse",
+        "operation": "Set",
+        "valueName": "MouseThreshold1",
+        "valueKind": "String",
+        "data": "6"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Control Panel\\Mouse",
+        "operation": "Set",
+        "valueName": "MouseThreshold2",
+        "valueKind": "String",
+        "data": "10"
+      }
+    ],
+    "source": "https://github.com/hellzerg/optimizer",
+    "verifiedOnBuild": "22631"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "performance.input.buffer-queue",
+    "origin": "performance.input.buffer-queue",
+    "name": "Low-Latency Mouse & Keyboard Buffer Queue",
+    "description": "Reduces input driver queue sizes from 100 to 20 packets, minimizing input buffer latency for immediate mouse and keystroke responsiveness.",
+    "category": "gaming",
+    "subcategory": "Gaming & Input",
+    "risk": "Safe",
+    "impacts": [
+      "gaming",
+      "performance"
+    ],
+    "windows": {
+      "minBuild": 19041
+    },
+    "requiresReboot": true,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SYSTEM\\CurrentControlSet\\Services\\mouclass\\Parameters",
+      "valueName": "MouseDataQueueSize",
+      "matchType": "Equals",
+      "expectedValue": 20
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SYSTEM\\CurrentControlSet\\Services\\mouclass\\Parameters",
+        "operation": "Set",
+        "valueName": "MouseDataQueueSize",
+        "valueKind": "DWord",
+        "data": 20
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SYSTEM\\CurrentControlSet\\Services\\kbdclass\\Parameters",
+        "operation": "Set",
+        "valueName": "KeyboardDataQueueSize",
+        "valueKind": "DWord",
+        "data": 20
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SYSTEM\\CurrentControlSet\\Services\\mouclass\\Parameters",
+        "operation": "Set",
+        "valueName": "MouseDataQueueSize",
+        "valueKind": "DWord",
+        "data": 100
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SYSTEM\\CurrentControlSet\\Services\\kbdclass\\Parameters",
+        "operation": "Set",
+        "valueName": "KeyboardDataQueueSize",
+        "valueKind": "DWord",
+        "data": 100
+      }
+    ],
+    "source": "https://github.com/hellzerg/optimizer",
+    "verifiedOnBuild": "22631"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "performance.cpu.unpark-cores",
+    "origin": "performance.cpu.unpark-cores",
+    "name": "Disable CPU Core Parking",
+    "description": "Prevents Windows from putting inactive CPU cores into low-power parked sleep states, ensuring all cores respond instantly to sudden game spikes.",
+    "category": "performance",
+    "subcategory": "Gaming & CPU",
+    "risk": "Low",
+    "impacts": [
+      "performance",
+      "gaming"
+    ],
+    "windows": {
+      "minBuild": 19041
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SYSTEM\\CurrentControlSet\\Control\\Power\\PowerSettings\\54533251-82be-4824-96c1-47b60b740d00\\0cc5b647-c1df-4637-891a-dec35c318583",
+      "valueName": "ValueMax",
+      "matchType": "Equals",
+      "expectedValue": 0
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SYSTEM\\CurrentControlSet\\Control\\Power\\PowerSettings\\54533251-82be-4824-96c1-47b60b740d00\\0cc5b647-c1df-4637-891a-dec35c318583",
+        "operation": "Set",
+        "valueName": "ValueMax",
+        "valueKind": "DWord",
+        "data": 0
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SYSTEM\\CurrentControlSet\\Control\\Power\\PowerSettings\\54533251-82be-4824-96c1-47b60b740d00\\0cc5b647-c1df-4637-891a-dec35c318583",
+        "operation": "Set",
+        "valueName": "ValueMax",
+        "valueKind": "DWord",
+        "data": 100
+      }
+    ],
+    "source": "https://github.com/hellzerg/optimizer",
+    "verifiedOnBuild": "22631"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "performance.power.disable-throttling",
+    "origin": "performance.power.disable-throttling",
+    "name": "Disable Power Throttling",
+    "description": "Disables Windows power throttling on background application execution, preventing CPU frequency downclocking during gaming or intensive workloads.",
+    "category": "performance",
+    "subcategory": "Gaming & Power",
+    "risk": "Safe",
+    "impacts": [
+      "performance",
+      "gaming"
+    ],
+    "windows": {
+      "minBuild": 19041
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SYSTEM\\CurrentControlSet\\Control\\Power\\PowerThrottling",
+      "valueName": "PowerThrottlingOff",
+      "matchType": "Equals",
+      "expectedValue": 1
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SYSTEM\\CurrentControlSet\\Control\\Power\\PowerThrottling",
+        "operation": "Set",
+        "valueName": "PowerThrottlingOff",
+        "valueKind": "DWord",
+        "data": 1
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SYSTEM\\CurrentControlSet\\Control\\Power\\PowerThrottling",
+        "operation": "DeleteValue",
+        "valueName": "PowerThrottlingOff"
+      }
+    ],
+    "source": "https://github.com/hellzerg/optimizer",
+    "verifiedOnBuild": "22631"
+  }
+]

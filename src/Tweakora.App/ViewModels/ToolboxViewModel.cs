@@ -7,6 +7,7 @@ using CommunityToolkit.Mvvm.Input;
 using Tweakora.Core.Operations;
 using Tweakora.Modules.Cleaner;
 using Tweakora.Modules.Config;
+using Tweakora.Modules.Memory;
 using Tweakora.Modules.Network;
 using Tweakora.Modules.Services;
 using Tweakora.Modules.Startup;
@@ -21,6 +22,8 @@ public sealed partial class ToolboxViewModel : ObservableObject
     private readonly IFixService _fixService;
     private readonly IDnsService _dnsService;
     private readonly IOperationRunner _runner;
+    private readonly IMemoryOptimizerService _memoryOptimizer;
+    private readonly INetworkOptimizerService _networkOptimizer;
 
     [ObservableProperty]
     private string _status = "Tools Available";
@@ -35,6 +38,12 @@ public sealed partial class ToolboxViewModel : ObservableObject
     private bool _isCleaning;
 
     [ObservableProperty]
+    private bool _isNagleDisabled;
+
+    [ObservableProperty]
+    private bool _isBenchmarkingDns;
+
+    [ObservableProperty]
     private string _cleanerStatusText = "Ready to scan temporary caches.";
 
     [ObservableProperty]
@@ -42,6 +51,9 @@ public sealed partial class ToolboxViewModel : ObservableObject
 
     [ObservableProperty]
     private string _dnsStatusText = "Select a verified DNS provider to apply.";
+
+    [ObservableProperty]
+    private string _networkStatusText = "Network & Gaming Latency Optimizer ready.";
 
     public ObservableCollection<CleanerCategoryScan> CleanerCategories { get; } = new();
     public ObservableCollection<StartupProgramItem> StartupItems { get; } = new();
@@ -55,7 +67,9 @@ public sealed partial class ToolboxViewModel : ObservableObject
         IServicesManagerService servicesService,
         IFixService fixService,
         IDnsService dnsService,
-        IOperationRunner runner)
+        IOperationRunner runner,
+        IMemoryOptimizerService memoryOptimizer,
+        INetworkOptimizerService networkOptimizer)
     {
         _cleanerService = cleanerService;
         _startupService = startupService;
@@ -63,6 +77,8 @@ public sealed partial class ToolboxViewModel : ObservableObject
         _fixService = fixService;
         _dnsService = dnsService;
         _runner = runner;
+        _memoryOptimizer = memoryOptimizer;
+        _networkOptimizer = networkOptimizer;
 
         LoadToolsData();
     }
@@ -202,6 +218,135 @@ public sealed partial class ToolboxViewModel : ObservableObject
         DnsStatusText = ping >= 0 ? $"{provider.Name} latency: {ping} ms" : $"{provider.Name} ping timed out or unavailable.";
     }
 
+    [RelayCommand]
+    private async Task PurgeRamAsync()
+    {
+        CleanerStatusText = "Purging standby memory and trimming working sets...";
+        try
+        {
+            var result = await _memoryOptimizer.PurgeMemoryAndStandbyListAsync();
+            CleanerStatusText = $"Memory Purge Complete! Freed {result.FormattedFreed} of Standby & Process Cache.";
+        }
+        catch (Exception ex)
+        {
+            CleanerStatusText = $"RAM Purge Error: {ex.Message}";
+        }
+    }
+
+    [RelayCommand]
+    private async Task BenchmarkAllDnsAsync()
+    {
+        IsBenchmarkingDns = true;
+        DnsStatusText = "Benchmarking top 5 DNS providers (3 pings each)...";
+        try
+        {
+            var results = await _networkOptimizer.BenchmarkDnsProvidersAsync();
+            foreach (var res in results)
+            {
+                var existing = DnsProviders.FirstOrDefault(p => p.PrimaryDns == res.PrimaryDns);
+                if (existing != null)
+                {
+                    existing.PingMs = res.AveragePingMs;
+                }
+            }
+
+            var fastest = results.FirstOrDefault(r => r.IsFastest);
+            if (fastest != null)
+            {
+                DnsStatusText = $"Benchmark complete! Fastest DNS: {fastest.Name} ({fastest.AveragePingMs} ms).";
+            }
+            else
+            {
+                DnsStatusText = "DNS Benchmark complete.";
+            }
+        }
+        catch (Exception ex)
+        {
+            DnsStatusText = $"Benchmark error: {ex.Message}";
+        }
+        finally
+        {
+            IsBenchmarkingDns = false;
+        }
+    }
+
+    [RelayCommand]
+    private async Task ApplyFastestDnsAsync()
+    {
+        if (!Tweakora.App.Services.AppAdminGuard.EnsureAdmin("apply DNS settings"))
+        {
+            DnsStatusText = "Administrator privileges required to change DNS.";
+            return;
+        }
+
+        var responsive = DnsProviders.Where(p => p.PingMs > 0).ToList();
+        if (responsive.Count == 0)
+        {
+            await BenchmarkAllDnsAsync();
+            responsive = DnsProviders.Where(p => p.PingMs > 0).ToList();
+        }
+
+        var fastest = responsive.OrderBy(p => p.PingMs).FirstOrDefault();
+        if (fastest != null)
+        {
+            await ApplyDnsAsync(fastest);
+        }
+        else
+        {
+            DnsStatusText = "No responsive DNS providers found. Check internet connection.";
+        }
+    }
+
+    [RelayCommand]
+    private async Task ResetDnsToDhcpAsync()
+    {
+        if (!Tweakora.App.Services.AppAdminGuard.EnsureAdmin("reset DNS settings"))
+        {
+            DnsStatusText = "Administrator privileges required to change DNS.";
+            return;
+        }
+
+        DnsStatusText = "Resetting network adapters to Automatic (DHCP) DNS...";
+        bool ok = await _networkOptimizer.ResetDnsToDhcpAsync();
+        if (ok)
+        {
+            foreach (var p in DnsProviders)
+            {
+                p.IsActive = (p.PrimaryDns == "DHCP");
+            }
+            DnsStatusText = "Successfully reset network adapters to Automatic (DHCP) DNS.";
+        }
+        else
+        {
+            DnsStatusText = "Failed to reset DNS. Ensure network adapter is active.";
+        }
+    }
+
+    [RelayCommand]
+    private async Task ToggleNagleAsync(object? parameter)
+    {
+        if (!Tweakora.App.Services.AppAdminGuard.EnsureAdmin("modify network packet optimization"))
+        {
+            return;
+        }
+
+        bool target = parameter is bool b ? b : !IsNagleDisabled;
+        NetworkStatusText = $"{(target ? "Disabling Nagle's Algorithm (Low Latency Gaming)" : "Enabling default TCP packet batching")}...";
+
+        bool ok = await _networkOptimizer.SetNagleAlgorithmStateAsync(target);
+        if (ok)
+        {
+            IsNagleDisabled = await _networkOptimizer.DetectNagleAlgorithmDisabledAsync();
+            NetworkStatusText = IsNagleDisabled
+                ? "Nagle's Algorithm Disabled: Instant gaming packet transmission active on active NIC(s)."
+                : "Standard TCP packet batching restored.";
+        }
+        else
+        {
+            NetworkStatusText = "Failed to update network adapter TCP parameters.";
+        }
+    }
+
     public async void LoadToolsData()
     {
         // Populate startup items
@@ -232,5 +377,18 @@ public sealed partial class ToolboxViewModel : ObservableObject
         {
             DnsProviders.Add(dns);
         }
+
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                bool nagleDisabled = await _networkOptimizer.DetectNagleAlgorithmDisabledAsync();
+                System.Windows.Application.Current?.Dispatcher?.Invoke(() =>
+                {
+                    IsNagleDisabled = nagleDisabled;
+                });
+            }
+            catch { }
+        });
     }
 }

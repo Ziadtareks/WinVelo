@@ -12,6 +12,8 @@ using Tweakora.Core.Interfaces;
 using Tweakora.Core.Models;
 using Tweakora.Core.Operations;
 using Tweakora.Core.Safety;
+using Tweakora.Modules.Advisor;
+using Tweakora.Modules.Memory;
 using Tweakora.Modules.Tweaks;
 
 namespace Tweakora.App.ViewModels;
@@ -75,14 +77,39 @@ public sealed partial class DashboardViewModel : ObservableObject
     private readonly ITweakService _tweakService;
     private readonly IOperationRunner _runner;
     private readonly ISystemRestoreService _restoreService;
+    private readonly IMemoryOptimizerService _memoryService;
+    private readonly ISmartAdvisorService _advisorService;
     private readonly List<TweakDefinition> _catalog = new();
 
-    public SystemInfoSummary SystemInfo { get; } = SystemInfoHelper.GetSystemInfo();
+    [ObservableProperty]
+    private SystemInfoSummary _systemInfo = SystemInfoHelper.GetSystemInfo();
+
     public bool IsAdmin { get; } = AdminPrivilegeHelper.IsRunningAsAdministrator();
 
     public string AdminBadgeBg => IsAdmin ? "#064E3B" : "#7F1D1D";
     public string AdminBadgeFg => IsAdmin ? "#10B981" : "#F87171";
     public string AdminStatusText => IsAdmin ? "Administrator Active" : "Standard User (Limited)";
+
+    [ObservableProperty]
+    private int _optimizationScore = 65;
+
+    [ObservableProperty]
+    private string _optimizationScoreGrade = "Good";
+
+    [ObservableProperty]
+    private string _optimizationScoreBrush = "#10B981";
+
+    [ObservableProperty]
+    private string _optimizationScoreDetailText = "Scanning hardware...";
+
+    [ObservableProperty]
+    private string _smartAdvisorSummary = "Ready for 1-Click Hardware Optimization.";
+
+    [ObservableProperty]
+    private bool _isSmartOptimizing;
+
+    [ObservableProperty]
+    private bool _isPurgingRam;
 
     [ObservableProperty]
     private string _restorePointStatus = "Restore point ready.";
@@ -99,11 +126,15 @@ public sealed partial class DashboardViewModel : ObservableObject
     public DashboardViewModel(
         ITweakService tweakService,
         IOperationRunner runner,
-        ISystemRestoreService restoreService)
+        ISystemRestoreService restoreService,
+        IMemoryOptimizerService memoryService,
+        ISmartAdvisorService advisorService)
     {
         _tweakService = tweakService;
         _runner = runner;
         _restoreService = restoreService;
+        _memoryService = memoryService;
+        _advisorService = advisorService;
 
         try
         {
@@ -114,7 +145,11 @@ public sealed partial class DashboardViewModel : ObservableObject
         InitializeProfiles();
         InitializeQuickToggles();
 
-        _ = Task.Run(() => RefreshAllToggleStatesAsync());
+        _ = Task.Run(async () =>
+        {
+            await RefreshAllToggleStatesAsync();
+            await RecalculateOptimizationScoreAsync();
+        });
     }
 
     private void InitializeProfiles()
@@ -533,6 +568,7 @@ public sealed partial class DashboardViewModel : ObservableObject
             card.StatusMessage = "Defaults restored!";
             GlobalStatusMessage = "Windows defaults restored successfully.";
             await RefreshAllToggleStatesAsync();
+            _ = RecalculateOptimizationScoreAsync();
         }
         catch (Exception ex)
         {
@@ -543,5 +579,90 @@ public sealed partial class DashboardViewModel : ObservableObject
         {
             card.IsBusy = false;
         }
+    }
+
+    [RelayCommand]
+    private async Task FreeUpRamAsync()
+    {
+        if (IsPurgingRam) return;
+        IsPurgingRam = true;
+        GlobalStatusMessage = "Purging memory cache and trimming process working sets...";
+
+        try
+        {
+            var result = await _memoryService.PurgeMemoryAndStandbyListAsync();
+            SystemInfo = SystemInfoHelper.GetSystemInfo();
+            GlobalStatusMessage = $"RAM Purge Complete: Freed {result.FormattedFreed} of Standby & Working Set Memory.";
+        }
+        catch (Exception ex)
+        {
+            GlobalStatusMessage = $"RAM Purge Notice: {ex.Message}";
+        }
+        finally
+        {
+            IsPurgingRam = false;
+        }
+    }
+
+    [RelayCommand]
+    private async Task SmartAnalyzeAndOptimizeAsync()
+    {
+        if (IsSmartOptimizing) return;
+        IsSmartOptimizing = true;
+        GlobalStatusMessage = "Analyzing hardware profile and applying smart tailored optimizations...";
+
+        try
+        {
+            var report = await _advisorService.ApplySmartTailoredOptimizationsAsync(_catalog, _tweakService, _runner);
+            await RefreshAllToggleStatesAsync();
+            await RecalculateOptimizationScoreAsync();
+            GlobalStatusMessage = $"Smart Boost Applied: {report.SucceededCount} hardware-tailored optimizations active.";
+        }
+        catch (Exception ex)
+        {
+            GlobalStatusMessage = $"Smart Optimization Notice: {ex.Message}";
+        }
+        finally
+        {
+            IsSmartOptimizing = false;
+        }
+    }
+
+    [RelayCommand]
+    public async Task RecalculateOptimizationScoreAsync()
+    {
+        try
+        {
+            var assessment = await _advisorService.CalculateOptimizationScoreAsync(_catalog, _tweakService);
+            OptimizationScore = assessment.ScorePercent;
+            OptimizationScoreDetailText = $"{assessment.AppliedCount} of {assessment.TotalScoredCount} optimizations active";
+
+            if (assessment.ScorePercent >= 80)
+            {
+                OptimizationScoreGrade = "Maximum Velocity";
+                OptimizationScoreBrush = "#10B981";
+            }
+            else if (assessment.ScorePercent >= 60)
+            {
+                OptimizationScoreGrade = "Well Optimized";
+                OptimizationScoreBrush = "#34D399";
+            }
+            else if (assessment.ScorePercent >= 40)
+            {
+                OptimizationScoreGrade = "Moderate";
+                OptimizationScoreBrush = "#FBBF24";
+            }
+            else
+            {
+                OptimizationScoreGrade = "Needs Optimization";
+                OptimizationScoreBrush = "#F87171";
+            }
+
+            if (assessment.TailoredRecommendationNotes.Count > 0)
+            {
+                SmartAdvisorSummary = string.Join(" • ", assessment.TailoredRecommendationNotes);
+            }
+        }
+        catch { }
     }
 }

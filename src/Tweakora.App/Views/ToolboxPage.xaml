@@ -55,6 +55,8 @@
                                 <TextBlock Text="{Binding CleanerStatusText}" FontWeight="Medium" Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}" FontSize="13" />
                             </StackPanel>
                             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                <ui:Button Content="Purge RAM" Icon="{ui:SymbolIcon Broom24}" Margin="0,0,8,0"
+                                           Command="{Binding PurgeRamCommand}" />
                                 <ui:Button Content="Scan Now" Icon="{ui:SymbolIcon Search24}" Margin="0,0,8,0"
                                            Command="{Binding ScanCleanerCommand}" />
                                 <ui:Button Content="Clean Selected" Icon="{ui:SymbolIcon Delete24}" Appearance="Primary"
@@ -265,12 +267,49 @@
                 </Border.Style>
                 <StackPanel>
                     <ui:Card Margin="0,0,0,16" Padding="16">
-                        <StackPanel>
-                            <TextBlock Text="Secure DNS Switcher" FontSize="18" FontWeight="SemiBold" />
-                            <TextBlock Text="Switch between verified high-speed, privacy, and malware-blocking DNS providers."
-                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12" Margin="0,4,0,8" />
-                            <TextBlock Text="{Binding DnsStatusText}" FontWeight="Medium" Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}" FontSize="13" />
-                        </StackPanel>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Secure DNS &amp; Network Latency Optimizer" FontSize="18" FontWeight="SemiBold" />
+                                <TextBlock Text="Benchmark latency across global DNS resolvers and apply the fastest provider in 1 click."
+                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12" Margin="0,4,0,8" />
+                                <TextBlock Text="{Binding DnsStatusText}" FontWeight="Medium" Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}" FontSize="13" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                <ui:Button Content="Benchmark All DNS" Icon="{ui:SymbolIcon Globe24}" Margin="0,0,8,0"
+                                           Command="{Binding BenchmarkAllDnsCommand}" />
+                                <ui:Button Content="Apply Fastest" Icon="{ui:SymbolIcon Sparkle24}" Appearance="Primary" Margin="0,0,8,0"
+                                           Command="{Binding ApplyFastestDnsCommand}" />
+                                <ui:Button Content="Reset to DHCP" Icon="{ui:SymbolIcon ArrowCounterclockwise24}"
+                                           Command="{Binding ResetDnsToDhcpCommand}" />
+                            </StackPanel>
+                        </Grid>
+                    </ui:Card>
+
+                    <!-- Gaming Latency & Nagle's Algorithm Card -->
+                    <ui:Card Margin="0,0,0,16" Padding="16">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                    <ui:SymbolIcon Symbol="Games24" Foreground="#F59E0B" FontSize="16" Margin="0,0,8,0" VerticalAlignment="Center" />
+                                    <TextBlock Text="Low-Latency Gaming Packets (Disable Nagle's Algorithm)" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                </StackPanel>
+                                <TextBlock Text="Disables TCP packet queuing delays (TcpAckFrequency = 1, TCPNoDelay = 1) on active network adapters for immediate packet dispatch in multiplayer games."
+                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,6" />
+                                <TextBlock Text="{Binding NetworkStatusText}" FontWeight="Medium" Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}" FontSize="12" />
+                            </StackPanel>
+                            <ui:ToggleSwitch Grid.Column="1" VerticalAlignment="Center"
+                                             IsChecked="{Binding IsNagleDisabled, Mode=TwoWay}"
+                                             Command="{Binding ToggleNagleCommand}"
+                                             CommandParameter="{Binding IsChecked, RelativeSource={RelativeSource Self}}" />
+                        </Grid>
                     </ui:Card>
 
                     <ItemsControl ItemsSource="{Binding DnsProviders}">
@@ -299,7 +338,7 @@
                                                 <TextBlock Text="{Binding PingMs, StringFormat='Latency: {0} ms'}" FontSize="12" Foreground="#0078D4" FontWeight="Medium" />
                                             </StackPanel>
                                         </StackPanel>
-                                        <ui:Button Grid.Column="1" Content="Ping Test" Icon="{ui:SymbolIcon AntennaBars24}" VerticalAlignment="Center"
+                                        <ui:Button Grid.Column="1" Content="Ping Test" Icon="{ui:SymbolIcon Timer24}" VerticalAlignment="Center"
                                                    Command="{Binding DataContext.TestDnsLatencyCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                    CommandParameter="{Binding}" />
                                         <ui:Button Grid.Column="3" Content="Apply DNS" Icon="{ui:SymbolIcon Checkmark24}" Appearance="Primary" VerticalAlignment="Center"

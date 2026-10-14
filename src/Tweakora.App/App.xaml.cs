@@ -17,9 +17,11 @@ using Tweakora.Core.Engine;
 using Tweakora.Core.Interfaces;
 using Tweakora.Core.Operations;
 using Tweakora.Core.Safety;
+using Tweakora.Modules.Advisor;
 using Tweakora.Modules.Apps;
 using Tweakora.Modules.Cleaner;
 using Tweakora.Modules.Config;
+using Tweakora.Modules.Memory;
 using Tweakora.Modules.Network;
 using Tweakora.Modules.Services;
 using Tweakora.Modules.Startup;
@@ -102,6 +104,9 @@ public partial class App : Application
                 services.AddSingleton<IDnsService, DnsService>();
                 services.AddSingleton<IStartupService, StartupService>();
                 services.AddSingleton<IServicesManagerService, ServicesManagerService>();
+                services.AddSingleton<IMemoryOptimizerService, MemoryOptimizerService>();
+                services.AddSingleton<INetworkOptimizerService, NetworkOptimizerService>();
+                services.AddSingleton<ISmartAdvisorService, SmartAdvisorService>();
 
                 // ViewModels
                 services.AddSingleton<DashboardViewModel>();
