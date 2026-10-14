@@ -1,0 +1,31 @@
+# Auto detect text files and perform normalization
+* text=auto
+
+# Windows source files and configurations
+*.json text eol=crlf
+*.sln text eol=crlf
+*.slnx text eol=crlf
+*.cs text eol=crlf
+*.xaml text eol=crlf
+*.md text eol=crlf
+*.iss text eol=crlf
+*.xml text eol=crlf
+*.props text eol=crlf
+*.targets text eol=crlf
+*.csproj text eol=crlf
+*.manifest text eol=crlf
+
+# Binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.exe binary
+*.dll binary
+*.pdb binary
+*.zip binary
+*.7z binary
+*.tar binary
+*.gz binary
+*.bin binary
