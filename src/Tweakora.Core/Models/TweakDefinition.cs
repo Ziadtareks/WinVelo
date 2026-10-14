@@ -174,4 +174,7 @@ public sealed class TweakDefinition
 
     [JsonPropertyName("sources")]
     public List<string>? Sources { get; set; }
+
+    [JsonPropertyName("sourceQuote")]
+    public string? SourceQuote { get; set; }
 }

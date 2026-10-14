@@ -382,3 +382,22 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
   4. Added `--info <tweakId>` command to `winvelo-cli` displaying metadata, descriptions, side effects, and exact changes specifications.
   5. Added regression test `AllTweaks_RegistryValueNamesAndNumbersInExplanations_MatchCatalogActions` in `TweakExplanationTests.cs` enforcing that every registry value name and setting number mentioned in explanations exists in that tweak's apply/undo actions.
   6. Added tests in `TweakExplanationTests.cs` and `CliConfirmationTests.cs`.
+
+---
+
+## BUG-026: Lenient Evidence Classification, Unverified Documentation Claims, and Gamified Optimization Meter
+- **Component**: `Catalog/Tweaks/*.json`, `Catalog/schema/tweak.schema.json`, `src/Tweakora.Core/Models/TweakDefinition.cs`, `tools/CatalogValidator/Program.cs`, `src/Tweakora.App/ViewModels/DashboardViewModel.cs`, `src/Tweakora.App/Views/DashboardTabView.xaml`, `src/Tweakora.App/ViewModels/TweaksViewModel.cs`, `src/Tweakora.App/Views/TweaksTabView.xaml`, `src/Tweakora.Cli/Program.cs`, `docs/EVIDENCE_AUDIT.md`, `src/Tweakora.Tests/TweakExplanationTests.cs`, `src/Tweakora.Tests/PlaceboAndClaimScrubTests.cs`
+- **Finding**:
+  1. The initial evidence pass defaulted 132 tweaks to "documented", even when the cited source was merely a general discussion of a Windows subsystem rather than vendor documentation explicitly naming the setting (registry value, policy name, or CSP property).
+  2. Tweaks with "documented" evidence lacked verification proof and verbatim source quotes (`sourceQuote`).
+  3. `performance.gaming.mmcss-responsiveness` was classified as "documented", but Microsoft MMCSS documentation documents `SystemResponsiveness` clamping (10-80) and does not document `NetworkThrottlingIndex=-1` or Games task scheduling overrides.
+  4. The dashboard contained a gamified "Configured Settings" percentage meter, progress bar, and grade that encouraged blanket application of tweaks rather than a transparent, neutral count.
+- **Root Cause**: Overly broad definition of "documented" evidence without requiring verbatim vendor quotes explicitly naming the setting, and legacy gamified progress metrics in the dashboard.
+- **Fix**:
+  1. Enforced strict evidence rubric: "documented" requires vendor documentation explicitly naming the registry value name or policy property, verified against live source pages, and stored verbatim in `sourceQuote`.
+  2. Re-audited all 149 tweaks: 16 classified as `documented` with explicit `sourceQuote` extracts, 131 classified as `situational`, and 2 classified as `anecdotal` (`performance.cpu.unpark-cores` and `performance.input.buffer-queue`, quarantined with `needsReview: true`).
+  3. Re-evaluated `performance.gaming.mmcss-responsiveness` against Microsoft MMCSS docs and moved to `category: "Experimental"`, `evidence: "situational"`, and `needsReview: true`.
+  4. Generated complete audit ledger in `docs/EVIDENCE_AUDIT.md`.
+  5. Replaced "Configured Settings" meter and percentage progress bar in `DashboardTabView.xaml` and `DashboardViewModel.cs` with neutral "N tweaks applied by WinVelo" status with no score, percentage, or grade.
+  6. Added `sourceQuote` to `tweak.schema.json`, `TweakDefinition.cs`, `TweakCardModel`, `TweaksTabView.xaml`, and CLI `--info`.
+  7. Updated `CatalogValidator` and unit tests in `TweakExplanationTests.cs` and `PlaceboAndClaimScrubTests.cs` to enforce `sourceQuote` on all documented tweaks and prevent anecdotal/experimental tweaks in presets.

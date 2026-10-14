@@ -81,6 +81,7 @@ public sealed class PresetValidationTests
                 Assert.NotEqual("High", tweak!.Risk);
                 Assert.True(tweak.Reversible, $"Preset '{preset.Id}' contains irreversible tweak '{tweakId}'");
                 Assert.False(tweak.NeedsReview, $"Preset '{preset.Id}' contains needsReview tweak '{tweakId}'");
+                Assert.NotEqual("anecdotal", tweak.Evidence, StringComparer.OrdinalIgnoreCase);
             }
         }
     }

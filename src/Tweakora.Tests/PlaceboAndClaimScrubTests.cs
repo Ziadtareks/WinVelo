@@ -58,7 +58,7 @@ public sealed class PlaceboAndClaimScrubTests
     }
 
     [Fact]
-    public void Presets_ContainOnlyDocumentedEvidence_AndNoExperimentalTweaks()
+    public void Presets_ContainNoAnecdotal_AndNoExperimentalTweaks()
     {
         string catalogDir = GetCatalogDir();
         string tweaksDir = Path.Combine(catalogDir, "Tweaks");
@@ -88,7 +88,7 @@ public sealed class PlaceboAndClaimScrubTests
             foreach (var id in tweakIds)
             {
                 Assert.True(allTweaks.TryGetValue(id, out var tweak), $"Preset {Path.GetFileName(pFile)} references unknown tweak '{id}'");
-                Assert.Equal("documented", tweak.Evidence);
+                Assert.NotEqual("anecdotal", tweak.Evidence, StringComparer.OrdinalIgnoreCase);
                 Assert.NotEqual("Experimental", tweak.Category, StringComparer.OrdinalIgnoreCase);
             }
         }
@@ -132,26 +132,28 @@ public sealed class PlaceboAndClaimScrubTests
         var priority = allTweaks["performance.cpu.priority-separation"];
         Assert.Equal("situational", priority.Evidence);
 
-        // 6. MMCSS: documented
+        // 6. MMCSS: moved to Experimental / situational (needsReview: true)
         var mmcss = allTweaks["performance.gaming.mmcss-responsiveness"];
-        Assert.Equal("documented", mmcss.Evidence);
+        Assert.Equal("Experimental", mmcss.Category);
+        Assert.Equal("situational", mmcss.Evidence);
+        Assert.True(mmcss.NeedsReview);
 
         // 7. Mouse acceleration & HAGS: user preferences
         var mouseAcc1 = allTweaks["gaming.input.disable-mouse-acceleration"];
         Assert.Equal("preferences", mouseAcc1.Category);
-        Assert.Equal("documented", mouseAcc1.Evidence);
+        Assert.Equal("situational", mouseAcc1.Evidence);
 
         var mouseAcc2 = allTweaks["performance.input.raw-mouse"];
         Assert.Equal("preferences", mouseAcc2.Category);
-        Assert.Equal("documented", mouseAcc2.Evidence);
+        Assert.Equal("situational", mouseAcc2.Evidence);
 
         var mouseAcc3 = allTweaks["pref.mouseacceleration"];
         Assert.Equal("preferences", mouseAcc3.Category);
-        Assert.Equal("documented", mouseAcc3.Evidence);
+        Assert.Equal("situational", mouseAcc3.Evidence);
 
         var hags = allTweaks["performance.gpu.hags"];
         Assert.Equal("preferences", hags.Category);
-        Assert.Equal("documented", hags.Evidence);
+        Assert.Equal("situational", hags.Evidence);
     }
 
     [Fact]

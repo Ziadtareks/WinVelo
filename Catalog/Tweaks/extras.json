@@ -57,7 +57,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/client-management/manage-windows-copilot",
     "verifiedOnBuild": "22631.4317",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Hides the Copilot button from the Windows taskbar.",
     "sideEffects": "Removes the quick-access Copilot taskbar icon.",
     "sources": [
@@ -126,7 +126,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/client-management/manage-windows-copilot",
     "verifiedOnBuild": "22631.4317",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Disables Windows Copilot globally through Group Policy registry keys.",
     "sideEffects": "Copilot sidebar and keyboard shortcut (Win+C) become completely disabled.",
     "sources": [
@@ -191,7 +191,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/client-management/manage-recall",
     "verifiedOnBuild": "26100.1742",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Disables Windows Recall automated screen snapshot capture and indexing.",
     "sideEffects": "Windows will not capture or index historical snapshots of user desktop activity.",
     "sources": [
@@ -257,7 +257,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-search",
     "verifiedOnBuild": "22631.4317",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Disables Bing web search suggestions from Start Menu searches.",
     "sideEffects": "Search box queries will only index and display local programs and files.",
     "sources": [
@@ -322,7 +322,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-applicationmanagement#allowgamedvr",
     "verifiedOnBuild": "22631.4317",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Enables Windows Game Mode to prioritize CPU and GPU allocation for active games.",
     "sideEffects": "None known.",
     "sources": [
@@ -386,7 +386,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-applicationmanagement#allowgamedvr",
     "verifiedOnBuild": "22631.4317",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Disables the Xbox Game Bar overlay in Windows gaming settings.",
     "sideEffects": "Pressing Win+G will not open the Xbox Game Bar, audio mixer, or performance widget.",
     "sources": [
@@ -451,7 +451,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-applicationmanagement#allowgamedvr",
     "verifiedOnBuild": "22631.4317",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Disables background gameplay video and audio capture in Game DVR.",
     "sideEffects": "Background gameplay recording is disabled; retrospective gameplay clips cannot be saved.",
     "sources": [
@@ -467,7 +467,7 @@
     "category": "preferences",
     "subcategory": "input",
     "risk": "Safe",
-    "evidence": "documented",
+    "evidence": "situational",
     "impacts": [
       "gaming",
       "ui"
@@ -618,7 +618,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-wifi#allowwifihotspotreporting",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Disables automatic Wi-Fi hotspot reporting and open hotspot connection prompts.",
     "sideEffects": "Windows will not automatically connect to suggested public Wi-Fi hotspots.",
     "sources": [
@@ -682,7 +682,7 @@
     "source": "https://learn.microsoft.com/en-us/windows-server/networking/ncsi/ncsi-overview",
     "verifiedOnBuild": "26100",
     "warnings": "May cause Windows to report 'No Internet' or break captive portal detection on Wi-Fi networks.",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Disables NCSI active internet probing to Microsoft servers.",
     "sideEffects": "Network status icon in the system tray may erroneously show 'No Internet Access' even when connectivity works.",
     "sources": [
@@ -748,7 +748,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-wifi",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Disables Wi-Fi Sense auto-connection to open shared networks.",
     "sideEffects": "Windows will not automatically connect to open Wi-Fi networks discovered in range.",
     "sources": [
@@ -812,7 +812,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/deployment/do/waas-delivery-optimization-reference",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Restricts Windows Update peering strictly to local subnet peers (DODownloadMode = 1).",
     "sideEffects": "Prevents Windows Update from downloading or uploading update bits to computers outside your local area network.",
     "sources": [
@@ -878,7 +878,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows-server/networking/dns/doh-client-support",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Configures DNS-over-HTTPS (DoH) encryption for DNS client queries.",
     "sideEffects": "DNS queries are encrypted; local network DNS filtering or captive portals may fail if DoH cannot reach the upstream resolver.",
     "sources": [
@@ -941,7 +941,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/troubleshoot/windows-server/networking/configure-ipv6-in-windows",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Disables Teredo IPv6-over-IPv4 tunneling transition technology.",
     "sideEffects": "Prevents Teredo tunneling; applications or multiplayer games requiring Teredo NAT traversal may lose connectivity.",
     "sources": [
@@ -1007,7 +1007,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows-hardware/customize/desktop/unattend/microsoft-windows-shell-setup-themes",
     "verifiedOnBuild": "22631.4317",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Disables acrylic transparency effects across Windows taskbar and application windows.",
     "sideEffects": "None known.",
     "sources": [
@@ -1072,7 +1072,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-systemparametersinfoa",
     "verifiedOnBuild": "22631.4317",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Disables window minimize, maximize, and control animations.",
     "sideEffects": "None known.",
     "sources": [
@@ -1136,7 +1136,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-storage#allowstoragesenseglobal",
     "verifiedOnBuild": "22631.4317",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Enables automated Windows Storage Sense to clean temporary files and empty Recycle Bin.",
     "sideEffects": "Automatically purges files older than 30 days from temporary directories and Recycle Bin.",
     "sources": [
@@ -1199,7 +1199,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/deployment/do/waas-delivery-optimization-reference#download-mode",
     "verifiedOnBuild": "22631.4317",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Configures Delivery Optimization to simple HTTP download mode without peer sharing.",
     "sideEffects": "Updates will download solely from Microsoft servers; will not share bandwidth with other PCs on the local network.",
     "sources": [
@@ -1260,7 +1260,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/application-management/svchost-service-refactoring",
     "verifiedOnBuild": "22631.4317",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Sets SvcHostSplitThresholdInKB to match system physical memory, grouping service host processes.",
     "sideEffects": "Groups background services into fewer svchost.exe processes, reducing process overhead on systems with high RAM.",
     "sources": [
@@ -1325,7 +1325,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows-hardware/customize/power-settings/sleep-settings-automatically-wake-for-tasks",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Prevents Windows automatic maintenance from waking the computer from sleep.",
     "sideEffects": "Scheduled system maintenance and disk scans will only execute while the computer is already awake and idle.",
     "sources": [
@@ -1388,7 +1388,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-search",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Prevents Windows Search Indexer from indexing files when running on battery power.",
     "sideEffects": "Newly created or modified files will not be indexed into search results until the laptop is connected to AC power.",
     "sources": [
@@ -1455,7 +1455,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/fsutil-behavior",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Disables NTFS last access timestamp updates on files and directories.",
     "sideEffects": "File access timestamps will not be updated when files are read; backup tools relying on last-access times may need configuration.",
     "sources": [
@@ -1522,7 +1522,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/fsutil-8dot3name",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Disables legacy 8.3 short filename generation on NTFS volumes.",
     "sideEffects": "Older 16-bit or legacy 32-bit software that relies on 8.3 short filename paths may fail to open files.",
     "sources": [
@@ -1585,7 +1585,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/rdc/about-remote-differential-compression",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Disables Remote Differential Compression (RDC) over the network.",
     "sideEffects": "May slightly increase bandwidth usage when copying modified files over slow network links.",
     "sources": [
@@ -1663,7 +1663,8 @@
     "sources": [
       "https://learn.microsoft.com/en-us/windows/privacy/configure-windows-diagnostic-data-in-your-organization"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "sourceQuote": "pply the following MDM policies: System/AllowTelemetry System/LimitDumpCollection System/LimitDiagnosticLogCollection Note The last tw"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1721,7 +1722,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services#1-advertising-id",
     "verifiedOnBuild": "22631.4317",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Disables the unique advertising ID used for cross-app advertising tracking.",
     "sideEffects": "None known.",
     "sources": [
@@ -1785,7 +1786,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services#30-tailored-experiences",
     "verifiedOnBuild": "22631.4317",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Disables tailored experiences, diagnostic-based tips, and personalized recommendations.",
     "sideEffects": "None known.",
     "sources": [
@@ -1853,7 +1854,8 @@
     "sources": [
       "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services#bkmk-activity-history"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "sourceQuote": "eate a REG_DWORD registry setting named PublishUserActivities in HKEY_LOCAL_MACHINE\\Software\\Policies\\Microsoft\\Windows\\System with a value o"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1916,7 +1918,8 @@
     "sources": [
       "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services#bkmk-speech"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "sourceQuote": "eate a REG_DWORD registry setting named HasAccepted in HKEY_CURRENT_USER\\Software\\Microsoft\\Speech_OneCore\\Settings\\OnlineSpeechPri"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1994,7 +1997,8 @@
     "sources": [
       "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services#bkmk-inking-typing"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "sourceQuote": "ization to a value of 1 (one) -and- Set RestrictImplicitInkCollection registry REG_DWORD setting in HKEY_CURRENT_USER\\Software\\Microsoft\\InputPersona"
   },
   {
     "schemaVersion": "1.0.0",
@@ -2058,7 +2062,8 @@
     "sources": [
       "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services#bkmk-app-launch-tracking"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "sourceQuote": "eate a REG_DWORD registry setting named Start_TrackProgs in HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advance"
   },
   {
     "schemaVersion": "1.0.0",
@@ -2121,7 +2126,8 @@
     "sources": [
       "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services#bkmk-feedback"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "sourceQuote": "RENT_USER\\Software\\Microsoft\\Siuf\\Rules\\NumberOfSIUFInPeriod Based on these settings: Setting PeriodInNanoSeconds NumberOfSIUFInPeriod Autom"
   },
   {
     "schemaVersion": "1.0.0",
@@ -2177,7 +2183,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/win32/wer/wer-settings",
     "verifiedOnBuild": "22631.4317",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Disables Windows Error Reporting (WER) automated crash dump collection and uploading.",
     "sideEffects": "Application crash reports will not be sent to Microsoft or software vendors for diagnosis.",
     "sources": [
@@ -2239,7 +2245,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services#4-customer-experience-improvement-program",
     "verifiedOnBuild": "22631.4317",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Disables the Customer Experience Improvement Program (CEIP) scheduled collection tasks.",
     "sideEffects": "System telemetry and usage quality metrics will not be compiled for diagnostic reporting.",
     "sources": [
@@ -2301,7 +2307,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-system#allowcrossdeviceclipboard",
     "verifiedOnBuild": "22631.4317",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Disables cloud clipboard synchronization across signed-in Windows devices.",
     "sideEffects": "Copied clipboard text and images will not sync to your other Windows devices.",
     "sources": [
@@ -2365,7 +2371,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services#32-search",
     "verifiedOnBuild": "22631.4317",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Disables local device search history collection.",
     "sideEffects": "Search box will not remember or suggest previously entered search queries on this PC.",
     "sources": [
@@ -2431,7 +2437,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/configuration/windows-spotlight",
     "verifiedOnBuild": "22631.4317",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Disables suggested content, tips, and promotional ads on the Windows lock screen.",
     "sideEffects": "Lock screen will only show standard wallpapers without interactive tips or suggested links.",
     "sources": [
@@ -2497,7 +2503,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/configuration/windows-spotlight",
     "verifiedOnBuild": "22631.4317",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Disables suggested apps and promotional app recommendations in the Start Menu.",
     "sideEffects": "Promoted third-party apps will not be recommended in the Start Menu.",
     "sources": [
@@ -2562,7 +2568,7 @@
     "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-system#system-allowlocation",
     "verifiedOnBuild": "26100",
     "warnings": "Disables location sensor for apps like Maps, Weather, and Time Zone sync.",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Disables the Windows sensor platform and master location service.",
     "sideEffects": "Desktop applications and Windows features cannot access physical GPS or network-triangulated location sensors.",
     "sources": [
@@ -2626,7 +2632,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/uwp/packaging/app-capability-declarations",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Denies Windows Store and desktop apps default permission to access location.",
     "sideEffects": "Apps will be blocked from accessing your current geographic location until explicitly granted in Settings.",
     "sources": [
@@ -2690,7 +2696,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/uwp/packaging/app-capability-declarations",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Denies default application access to system microphone devices.",
     "sideEffects": "Applications will be blocked from capturing audio until explicitly granted permission in Windows Settings.",
     "sources": [
@@ -2754,7 +2760,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/uwp/packaging/app-capability-declarations",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Denies default application access to camera and webcam hardware.",
     "sideEffects": "Applications will be blocked from accessing webcam video streams until explicitly granted in Settings.",
     "sources": [
@@ -2817,7 +2823,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/uwp/packaging/app-capability-declarations",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Denies default application permission to display user notifications.",
     "sideEffects": "Applications will not be permitted to show push notifications on the desktop.",
     "sources": [
@@ -2881,7 +2887,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/uwp/packaging/app-capability-declarations",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Denies application permission to access user account name and profile picture.",
     "sideEffects": "Apps cannot query Windows user account information.",
     "sources": [
@@ -2945,7 +2951,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/uwp/packaging/app-capability-declarations",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Denies application permission to access Windows Contacts and address book.",
     "sideEffects": "Apps cannot read your local Windows contacts list.",
     "sources": [
@@ -3008,7 +3014,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/uwp/packaging/app-capability-declarations",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Denies application permission to access Windows Calendar appointments.",
     "sideEffects": "Apps cannot read or add appointments to your Windows calendar.",
     "sources": [
@@ -3072,7 +3078,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/uwp/packaging/app-capability-declarations",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Denies application permission to query diagnostic information from other apps.",
     "sideEffects": "Apps cannot inspect diagnostic data from third-party applications.",
     "sources": [
@@ -3137,7 +3143,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-remoteassistance",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Disables Windows Remote Assistance (fAllowToGetHelp = 0).",
     "sideEffects": "Support technicians cannot connect to this computer using the built-in Windows Remote Assistance helper.",
     "sources": [
@@ -3202,7 +3208,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/win32/shell/autoplay-reg",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Disables AutoRun and AutoPlay execution on optical and removable USB media.",
     "sideEffects": "Removable drives and CDs will not automatically launch executable media installers upon insertion.",
     "sources": [
@@ -3266,7 +3272,7 @@
     "source": "https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/wscript",
     "verifiedOnBuild": "26100",
     "warnings": "Can break software installers and administrative scripts relying on VBScript or JScript.",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Disables Windows Script Host (WSH) execution for .vbs and .js scripts.",
     "sideEffects": "Legacy VBScript and JScript administrative scripts will be blocked from executing.",
     "sources": [
@@ -3329,7 +3335,7 @@
     "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-smartscreen",
     "verifiedOnBuild": "26100",
     "warnings": "This setting is enforced by policy and locks the SmartScreen toggle in Windows Security settings.",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Enforces Windows Defender SmartScreen protection for Microsoft Edge and downloaded executables.",
     "sideEffects": "Blocks execution of unrecognized or untrusted downloaded programs until explicitly overridden.",
     "sources": [
@@ -3392,7 +3398,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2008-R2-and-2008/cc753928(v=ws.10)",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Disables Link-Local Multicast Name Resolution (LLMNR) on the local network.",
     "sideEffects": "Prevents LLMNR broadcast name resolution; legacy systems on the local network without DNS may fail to resolve hostnames.",
     "sources": [
@@ -3457,7 +3463,7 @@
     "source": "https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/clients/remote-desktop-allow-access",
     "verifiedOnBuild": "26100",
     "warnings": "Remote Desktop to this PC will stop working.",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Disables automatic Remote Desktop service activation and denies inbound RDP connections.",
     "sideEffects": "Inbound Remote Desktop connections to this computer will be rejected.",
     "sources": [
@@ -3522,7 +3528,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-devicelock#preventenablinglockscreencamera",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Disables camera access from the Windows lock screen without signing in.",
     "sideEffects": "Camera app shortcut will not appear on the lock screen while the device is locked.",
     "sources": [
@@ -3583,7 +3589,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/win32/shell/context-menu-handlers",
     "verifiedOnBuild": "22631.4317",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Restores classic Windows 10 full context menu in Windows 11 File Explorer.",
     "sideEffects": "None known.",
     "sources": [
@@ -3648,7 +3654,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows-hardware/customize/desktop/unattend/microsoft-windows-shell-setup",
     "verifiedOnBuild": "22631.4317",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Configures File Explorer to show extensions for all file types.",
     "sideEffects": "None known.",
     "sources": [
@@ -3711,7 +3717,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows-hardware/customize/desktop/unattend/microsoft-windows-shell-setup",
     "verifiedOnBuild": "22631.4317",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Configures File Explorer to show hidden files and folders.",
     "sideEffects": "None known.",
     "sources": [
@@ -3775,7 +3781,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows-hardware/customize/desktop/unattend/microsoft-windows-shell-setup",
     "verifiedOnBuild": "22631.4317",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Sets File Explorer to open to 'This PC' instead of 'Home'.",
     "sideEffects": "None known.",
     "sources": [
@@ -3840,7 +3846,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/apps/get-started/enable-your-device-for-development",
     "verifiedOnBuild": "22631.4317",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Adds 'End Task' directly to the right-click menu on taskbar application icons.",
     "sideEffects": "None known.",
     "sources": [
@@ -3903,7 +3909,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-experience",
     "verifiedOnBuild": "22631.4317",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Displays seconds on the taskbar system tray clock.",
     "sideEffects": "None known.",
     "sources": [
@@ -3972,7 +3978,8 @@
     "sources": [
       "https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "sourceQuote": "EM\\CurrentControlSet\\Control\\FileSystem LongPathsEnabled (Type: REG_DWORD) must exist and be set to 1 . The registry value will be cache"
   },
   {
     "schemaVersion": "1.0.0",
@@ -4029,7 +4036,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-experience#experience-taskbaralignment",
     "verifiedOnBuild": "22631.4317",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Aligns Windows 11 taskbar icons to the left.",
     "sideEffects": "None known.",
     "sources": [
@@ -4092,7 +4099,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/win32/shell/nse-works",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Hides the Gallery icon and entry from the File Explorer sidebar navigation.",
     "sideEffects": "None known.",
     "sources": [
@@ -4159,7 +4166,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-admx-windowsexplorer#windowsexplorer_showrecent",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Hides recent files from Quick Access / Home in File Explorer.",
     "sideEffects": "None known.",
     "sources": [
@@ -4226,7 +4233,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-admx-windowsexplorer",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Hides frequently used folders from Quick Access / Home in File Explorer.",
     "sideEffects": "None known.",
     "sources": [
@@ -4290,7 +4297,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows-hardware/customize/desktop/unattend/microsoft-windows-shell-setup",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Displays the full directory path in the File Explorer title bar.",
     "sideEffects": "None known.",
     "sources": [
@@ -4357,7 +4364,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-search#allowsearchhighlights",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Disables colorful search highlights and daily doodles in the Windows search box.",
     "sideEffects": "None known.",
     "sources": [
@@ -4423,7 +4430,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-newsandinterests#allownewsandinterests",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Hides the Widgets icon from the Windows 11 taskbar.",
     "sideEffects": "Removes the Widgets weather button from the taskbar.",
     "sources": [
@@ -4488,7 +4495,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-experience#experience-configurechaticon",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Hides the Microsoft Teams Chat button from the Windows 11 taskbar.",
     "sideEffects": "Removes the Teams Chat icon from the taskbar.",
     "sources": [
@@ -4552,7 +4559,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows-hardware/customize/desktop/unattend/microsoft-windows-shell-setup-taskbarlinks",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Hides the Task View button from the Windows 11 taskbar.",
     "sideEffects": "Removes the Task View icon from the taskbar; virtual desktops can still be switched using Win+Tab.",
     "sources": [
@@ -4617,7 +4624,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/configuration/windows-spotlight",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Disables the Windows Welcome Experience post-update configuration screen.",
     "sideEffects": "None known.",
     "sources": [
@@ -4682,7 +4689,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/configuration/windows-spotlight",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Disables tips, tricks, and feature suggestions in Windows notifications.",
     "sideEffects": "None known.",
     "sources": [
@@ -4745,7 +4752,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-windowslogon#hidefastuserswitching",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Hides the Fast User Switching button from the sign-in screen and Start menu.",
     "sideEffects": "Users must sign out completely before another user can log into the computer.",
     "sources": [
@@ -4808,7 +4815,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/deployment/update/waas-wu-settings#do-not-include-drivers-with-windows-updates",
     "verifiedOnBuild": "22631.4317",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Excludes hardware driver updates from standard Windows Update scans.",
     "sideEffects": "Windows Update will not update GPU, chipset, or peripheral drivers; drivers must be updated manually.",
     "sources": [
@@ -4875,7 +4882,8 @@
     "sources": [
       "https://learn.microsoft.com/en-us/windows/deployment/update/waas-restart#no-auto-restart-with-logged-on-users-for-scheduled-automatic-updates-installations"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "sourceQuote": "date\\AU , set AuOptions to 4 and enable NoAutoRebootWithLoggedOnUsers . As with group policy, if a user schedules the restart in the update notificat"
   },
   {
     "schemaVersion": "1.0.0",
@@ -4937,7 +4945,8 @@
     "sources": [
       "https://learn.microsoft.com/en-us/windows/deployment/update/waas-wu-policies#configure-automatic-updates"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "sourceQuote": "icrosoft\\Windows\\WindowsUpdate\\AU , set AuOptions to 4 and set the install time with ScheduledInstallTime . Enable AlwaysAutoRebo"
   },
   {
     "schemaVersion": "1.0.0",
@@ -4994,7 +5003,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/deployment/do/waas-delivery-optimization-reference",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Disables Windows Update downloads over metered or cellular network connections.",
     "sideEffects": "Updates will not download while the active internet connection is marked as metered.",
     "sources": [
@@ -5062,7 +5071,8 @@
     "sources": [
       "https://learn.microsoft.com/en-us/windows/deployment/update/waas-restart#active-hours"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "sourceQuote": "ies\\Microsoft\\Windows\\WindowsUpdate use SetActiveHours to enable or disable active hours and ActiveHoursStart and ActiveHoursEnd to sp"
   },
   {
     "schemaVersion": "1.0.0",
@@ -5118,7 +5128,7 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/deployment/update/waas-wu-settings#enable-optional-updates",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Disables automatic installation of preview and optional non-security update content.",
     "sideEffects": "Windows Update will only install cumulative monthly security updates, ignoring preview feature rollouts.",
     "sources": [

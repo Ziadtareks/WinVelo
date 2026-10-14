@@ -220,6 +220,8 @@ public sealed partial class TweakCardModel : ObservableObject
     }
 
     public bool HasSources => Sources.Count > 0;
+    public string? SourceQuote => Tweak.SourceQuote;
+    public bool HasSourceQuote => !string.IsNullOrWhiteSpace(SourceQuote);
     public bool NeedsReview => Tweak.NeedsReview;
 
     public IReadOnlyList<string> ExactChanges => TweakActionFormatter.FormatExactChanges(Tweak);

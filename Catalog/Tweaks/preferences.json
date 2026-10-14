@@ -66,7 +66,7 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/detailedbsod",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Configures Windows crash handler to display detailed technical stop codes and driver names.",
     "sideEffects": "Shows full technical diagnostic details instead of the friendly blue-screen emoticon.",
     "sources": [
@@ -121,7 +121,7 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/batterypercentage",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Enables battery remaining percentage indicator on the Windows taskbar.",
     "sideEffects": "Requires a laptop or battery device; not applicable to desktop systems.",
     "sources": [
@@ -196,7 +196,7 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/darkmode",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Enables system-wide dark theme for Windows shell and supported desktop apps.",
     "sideEffects": "None known.",
     "sources": [
@@ -253,7 +253,7 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/showext",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Configures File Explorer to always display file extensions for known file types.",
     "sideEffects": "None known.",
     "sources": [
@@ -310,7 +310,7 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/hiddenfiles",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Configures File Explorer to display hidden files and folders.",
     "sideEffects": "None known.",
     "sources": [
@@ -367,7 +367,7 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/verboselogon",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Enables verbose status messages during Windows sign-in, startup, and shutdown.",
     "sideEffects": "Shows detailed service initialization steps on the logon screen, slightly changing startup visual presentation.",
     "sources": [
@@ -476,7 +476,7 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/newoutlook",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Prevents Windows from auto-installing or forcing the New Outlook web wrapper.",
     "sideEffects": "None known.",
     "sources": [
@@ -533,7 +533,7 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/scrollbars",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Always displays full scrollbars in Windows 11 apps instead of hiding them until hovered.",
     "sideEffects": "None known.",
     "sources": [
@@ -621,7 +621,7 @@
     "category": "preferences",
     "subcategory": "Customize Preferences",
     "risk": "Safe",
-    "evidence": "documented",
+    "evidence": "situational",
     "impacts": [
       "ui"
     ],
@@ -772,7 +772,7 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/numlock",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Enables NumLock automatically on the Windows logon screen during startup.",
     "sideEffects": "Alters the default state of the NumLock key at system boot; may affect laptop keyboards without dedicated numeric keypads.",
     "sources": [
@@ -829,7 +829,7 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/windowsnapping",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Customizes window snapping animations and edge assist behaviors.",
     "sideEffects": "Alters how application windows snap to screen borders and zones.",
     "sources": [
@@ -998,7 +998,7 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/hidesettingshome",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Hides the personalized 'Home' recommendations page in Windows 11 Settings.",
     "sideEffects": "Settings app opens directly to the System page rather than the Home overview cards.",
     "sources": [
@@ -1085,7 +1085,7 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/bingsearch",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Disables Bing web search suggestions in the Windows Start Menu search box.",
     "sideEffects": "Start Menu search will only search local applications, settings, and personal files; web queries will not appear.",
     "sources": [
@@ -1142,7 +1142,7 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/loginblur",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Disables acrylic blur effect on the Windows lock and sign-in screen background.",
     "sideEffects": "Lock screen sign-in shows a clear background image without acrylic blur distortion.",
     "sources": [
@@ -1197,7 +1197,7 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/disablelockscreen",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Disables the swipe/key-press lock screen overlay, presenting the password prompt immediately.",
     "sideEffects": "Bypasses the lock screen clock and notifications overlay, jumping directly to user sign-in.",
     "sources": [
@@ -1302,7 +1302,7 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/startmenurecommendations",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Disables recommended files and recently opened items in the Windows 11 Start Menu.",
     "sideEffects": "The 'Recommended' section of the Start Menu remains empty and will not display recent files.",
     "sources": [
@@ -1359,7 +1359,7 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/stickykeys",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Disables the accessibility shortcut that triggers Sticky Keys when pressing Shift 5 times.",
     "sideEffects": "None known.",
     "sources": [
@@ -1428,7 +1428,7 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/taskbaralignment",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Sets Windows 11 taskbar icons alignment to the left instead of center.",
     "sideEffects": "None known.",
     "sources": [
@@ -1485,7 +1485,7 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/taskbarsearch",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Configures Windows taskbar search box display mode.",
     "sideEffects": "None known.",
     "sources": [
@@ -1542,7 +1542,7 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/taskview",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Hides the Task View / virtual desktops button from the Windows taskbar.",
     "sideEffects": "Removes the Task View shortcut icon from the taskbar; virtual desktops can still be switched via Win+Tab.",
     "sources": [
@@ -1617,7 +1617,7 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/gamemode",
     "verifiedOnBuild": "26100",
-    "evidence": "documented",
+    "evidence": "situational",
     "whatItDoes": "Toggles Windows Game Mode (AutoGameModeEnabled) in user settings.",
     "sideEffects": "Windows Game Mode prioritization will be toggled; may alter background resource balancing during full-screen games.",
     "sources": [
@@ -1680,6 +1680,7 @@
     "sources": [
       "https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "sourceQuote": "EM\\CurrentControlSet\\Control\\FileSystem LongPathsEnabled (Type: REG_DWORD) must exist and be set to 1 . The registry value will be cache"
   }
 ]

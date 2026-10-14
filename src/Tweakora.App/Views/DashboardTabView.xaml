@@ -66,24 +66,17 @@
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
 
-                            <!-- Settings Meter -->
+                            <!-- Neutral Applied Tweaks Status -->
                             <Border Grid.Column="0" Background="#1E293B" CornerRadius="8" Width="56" Height="56" Margin="0,0,14,0" VerticalAlignment="Center">
                                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                                    <TextBlock Text="{Binding ConfiguredSettingsPercentage, StringFormat='{}{0}%'}" FontSize="17" FontWeight="ExtraBold" Foreground="{Binding ConfiguredSettingsBrush}" HorizontalAlignment="Center" />
-                                    <TextBlock Text="SETTINGS" FontSize="9" FontWeight="Bold" Foreground="#94A3B8" HorizontalAlignment="Center" />
+                                    <ui:SymbolIcon Symbol="CheckmarkStarburst24" FontSize="22" Foreground="#38BDF8" HorizontalAlignment="Center" />
+                                    <TextBlock Text="WINVELO" FontSize="8" FontWeight="Bold" Foreground="#94A3B8" HorizontalAlignment="Center" Margin="0,2,0,0" />
                                 </StackPanel>
                             </Border>
 
-                            <!-- Advisor Details & Progress Bar -->
+                            <!-- Neutral Applied Tweaks Summary -->
                             <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                <DockPanel LastChildFill="False" Margin="0,0,0,4">
-                                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
-                                        <TextBlock Text="Configured System Settings: " FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" />
-                                        <TextBlock Text="{Binding ConfiguredSettingsStatusText}" FontSize="13" FontWeight="Bold" Foreground="{Binding ConfiguredSettingsBrush}" Margin="4,0,0,0" />
-                                    </StackPanel>
-                                    <TextBlock DockPanel.Dock="Right" Text="{Binding ConfiguredSettingsDetailText}" FontSize="11" Foreground="#94A3B8" />
-                                </DockPanel>
-                                <ProgressBar Value="{Binding ConfiguredSettingsPercentage}" Maximum="100" Height="6" Margin="0,2,0,5" Foreground="{Binding ConfiguredSettingsBrush}" Background="#1E293B" BorderThickness="0" />
+                                <TextBlock Text="{Binding AppliedTweaksSummaryText}" FontSize="14" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,3" />
                                 <TextBlock Text="{Binding SmartAdvisorSummary}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" TextTrimming="CharacterEllipsis" />
                             </StackPanel>
 

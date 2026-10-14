@@ -113,7 +113,7 @@ public sealed class TweakExplanationTests
     {
         var tweaks = LoadAllTweaks();
         var needsReview = tweaks.Where(t => t.NeedsReview).ToList();
-        Assert.Equal(5, needsReview.Count);
+        Assert.Equal(6, needsReview.Count);
 
         string presetsDir = Path.Combine(GetRepoRoot(), "Catalog", "Presets");
         var presetFiles = Directory.GetFiles(presetsDir, "*.json");
@@ -368,5 +368,23 @@ public sealed class TweakExplanationTests
         Assert.Equal(@"HKLM\SYSTEM\CurrentControlSet\Control\PriorityControl\Win32PrioritySeparation = 38 (DWord)", changes[0]);
         Assert.Equal("Service 'DiagTrack' → StartupType: Disabled", changes[1]);
         Assert.Equal("PowerShell: Disable Defender Auto Sample Submission", changes[2]);
+    }
+
+    [Fact]
+    public void DocumentedTweaks_HaveExplicitSourceQuotes()
+    {
+        var tweaks = LoadAllTweaks();
+        var documentedTweaks = tweaks.Where(t => string.Equals(t.Evidence, "documented", StringComparison.OrdinalIgnoreCase)).ToList();
+
+        Assert.NotEmpty(documentedTweaks);
+        Assert.Equal(16, documentedTweaks.Count);
+
+        foreach (var t in documentedTweaks)
+        {
+            Assert.False(string.IsNullOrWhiteSpace(t.SourceQuote),
+                $"Tweak '{t.Id}' has evidence='documented' but missing or empty 'sourceQuote'.");
+            Assert.True(t.SourceQuote!.Trim().Length >= 10,
+                $"Tweak '{t.Id}' sourceQuote is too short (< 10 chars): '{t.SourceQuote}'.");
+        }
     }
 }

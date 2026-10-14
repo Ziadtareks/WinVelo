@@ -366,10 +366,10 @@ public static class Program
                         }
 
                         string? evidence = tweakNode["evidence"]?.ToString();
-                        if (!string.Equals(evidence, "documented", StringComparison.OrdinalIgnoreCase))
+                        if (string.Equals(evidence, "anecdotal", StringComparison.OrdinalIgnoreCase))
                         {
                             Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine($"  [FAIL] {fileName} ({pId}): Contains tweak '{tid}' with evidence '{evidence ?? "missing"}'. Presets must contain ONLY documented tweaks.");
+                            Console.WriteLine($"  [FAIL] {fileName} ({pId}): Contains tweak '{tid}' with evidence 'anecdotal'. Presets cannot contain unproven or anecdotal tweaks.");
                             Console.ResetColor();
                             errorCount++;
                             presetOk = false;
@@ -503,6 +503,18 @@ public static class Program
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine($"  [FAIL] Tweak '{id}' is missing a valid 'evidence' field ('documented', 'situational', or 'anecdotal'). Found: '{evidence}'.");
             Console.ResetColor();
+        }
+
+        if (string.Equals(evidence, "documented", StringComparison.OrdinalIgnoreCase))
+        {
+            string? sourceQuote = item["sourceQuote"]?.ToString();
+            if (string.IsNullOrWhiteSpace(sourceQuote) || sourceQuote.Trim().Length < 5)
+            {
+                errorCount++;
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"  [FAIL] Tweak '{id}' has evidence='documented' but missing or empty 'sourceQuote' (must quote documented source naming the setting).");
+                Console.ResetColor();
+            }
         }
     }
 

@@ -290,6 +290,12 @@
                                         <!-- Sources / Documentation Links -->
                                         <StackPanel Visibility="{Binding HasSources, Converter={StaticResource BoolToVis}}">
                                             <TextBlock Text="DOCUMENTATION &amp; SOURCES" FontSize="10" FontWeight="Bold" Foreground="#94A3B8" Margin="0,0,0,4" />
+                                            <!-- Verified Source Quote (if documented) -->
+                                            <Border Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="4" Padding="8,6" Margin="0,0,0,6"
+                                                    Visibility="{Binding HasSourceQuote, Converter={StaticResource BoolToVis}}">
+                                                <TextBlock Text="{Binding SourceQuote, StringFormat='&quot;{0}&quot;'}"
+                                                           FontSize="11" FontStyle="Italic" Foreground="#94A3B8" LineHeight="16" TextWrapping="Wrap" />
+                                            </Border>
                                             <ItemsControl ItemsSource="{Binding Sources}">
                                                 <ItemsControl.ItemTemplate>
                                                     <DataTemplate>

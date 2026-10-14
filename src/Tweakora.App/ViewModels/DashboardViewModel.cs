@@ -151,6 +151,9 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
     [ObservableProperty]
     private string _configuredSettingsDetailText = "Scanning settings...";
 
+    [ObservableProperty]
+    private string _appliedTweaksSummaryText = "0 tweaks applied by WinVelo";
+
     // Backward-compatibility aliases
     public int OptimizationScore
     {
@@ -1127,6 +1130,7 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
             ConfiguredSettingsDetailText = $"{assessment.AppliedCount} of {assessment.TotalScoredCount} settings configured";
             ConfiguredSettingsStatusText = $"{assessment.AppliedCount} active";
             ConfiguredSettingsBrush = "#10B981";
+            AppliedTweaksSummaryText = $"{assessment.AppliedCount} tweaks applied by WinVelo";
 
             if (assessment.TailoredRecommendationNotes.Count > 0)
             {

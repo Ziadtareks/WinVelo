@@ -142,6 +142,9 @@
     "sources": {
       "type": "array",
       "items": { "type": "string" }
+    },
+    "sourceQuote": {
+      "type": "string"
     }
   },
   "allOf": [
@@ -165,6 +168,17 @@
       },
       "then": {
         "required": ["whatItDoes", "sideEffects", "sources"]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "evidence": { "const": "documented" }
+        },
+        "required": ["evidence"]
+      },
+      "then": {
+        "required": ["sourceQuote"]
       }
     }
   ],

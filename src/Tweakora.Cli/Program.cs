@@ -1370,6 +1370,11 @@ public static class Program
         {
             Console.WriteLine("  (No sources documented)");
         }
+
+        if (!string.IsNullOrWhiteSpace(tweak.SourceQuote))
+        {
+            Console.WriteLine($"\nVERIFIED SOURCE QUOTE:\n  \"{tweak.SourceQuote}\"");
+        }
         Console.WriteLine("============================================================\n");
     }
 

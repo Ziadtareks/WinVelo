@@ -64,10 +64,10 @@
     "origin": "performance.gaming.mmcss-responsiveness",
     "name": "Multimedia Class Scheduler Service (MMCSS) Gaming Priority",
     "description": "Disables network throttling index and raises multimedia task scheduling priority for games to grant more CPU time.",
-    "category": "gaming",
+    "category": "Experimental",
     "subcategory": "Gaming & CPU",
     "risk": "Medium",
-    "evidence": "documented",
+    "evidence": "situational",
     "sideEffects": "Background system tasks may experience CPU starvation during gaming; in rare hardware setups, this may introduce audio latency or streaming capture frame drops.",
     "impacts": [
       "gaming",
@@ -205,7 +205,7 @@
     "sources": [
       "https://learn.microsoft.com/en-us/windows/win32/procthread/multimedia-class-scheduler-service"
     ],
-    "needsReview": false
+    "needsReview": true
   },
   {
     "schemaVersion": "1.0.0",
@@ -216,7 +216,7 @@
     "category": "preferences",
     "subcategory": "Gaming & GPU",
     "risk": "Medium",
-    "evidence": "documented",
+    "evidence": "situational",
     "impacts": [
       "performance",
       "gaming"
@@ -330,7 +330,7 @@
     "category": "preferences",
     "subcategory": "Gaming & Input",
     "risk": "Safe",
-    "evidence": "documented",
+    "evidence": "situational",
     "impacts": [
       "gaming",
       "ui"
