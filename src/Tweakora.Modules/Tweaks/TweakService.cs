@@ -38,6 +38,7 @@ public interface ITweakService
     Task<bool> DetectStateAsync(TweakDefinition tweak, CancellationToken cancellationToken = default);
     Task<TweakState> DetectTweakStateAsync(TweakDefinition tweak, CancellationToken cancellationToken = default);
     BackupManager BackupManager { get; }
+    IReadOnlyList<RollbackJournalSession> GetAllSessions() => Array.Empty<RollbackJournalSession>();
     IReadOnlyList<RollbackJournalSession> GetUnfinishedSessions() => Array.Empty<RollbackJournalSession>();
     Task<ActionResult> RollbackSessionAsync(RollbackJournalSession session) => Task.FromResult(new ActionResult { Success = true });
     Task<ActionResult> RollbackAllUnfinishedSessionsAsync() => Task.FromResult(new ActionResult { Success = true });
@@ -377,6 +378,7 @@ public sealed class TweakService : ITweakService
         return res.Success;
     }
 
+    public IReadOnlyList<RollbackJournalSession> GetAllSessions() => _journal.GetAllSessions();
     public IReadOnlyList<RollbackJournalSession> GetUnfinishedSessions() => _journal.GetUnfinishedSessions();
     public Task<ActionResult> RollbackSessionAsync(RollbackJournalSession session) => _runner.RollbackSessionAsync(session);
     public Task<ActionResult> RollbackAllUnfinishedSessionsAsync() => _runner.RollbackAllUnfinishedSessionsAsync();

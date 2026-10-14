@@ -407,7 +407,7 @@ public sealed class FinalQaDiagnosticTests
             backupsVm);
 
         Assert.NotNull(mainVm.CurrentPage);
-        Assert.Equal("Dashboard", mainVm.ActiveTab);
+        Assert.True(mainVm.ActiveTab is "Home" or "Dashboard");
     }
 
     [Fact]

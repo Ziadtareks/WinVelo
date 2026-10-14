@@ -418,3 +418,20 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
   4. Updated "Recommended only" filter criteria: `(Risk is Safe or Low) && (Evidence is documented or ui-equivalent) && Reversible && !NeedsReview && (Category != "Experimental")`.
   5. Added "⚙️ WHERE TO FIND THIS IN WINDOWS:" disclosure banner to expanded cards in `TweaksTabView.xaml` and CLI `--info`.
   6. Updated `docs/EVIDENCE_AUDIT.md`, schema validator, and regression tests (`UiEquivalentTweaks_HaveNonEmptyUiLocation`, `TweaksViewModel_RecommendedOnlyFilter_ShowsOnlySafeAndLowDocumentedReversible`).
+
+---
+
+## BUG-028: Navigation Tab Bloat and Fragmented System Utilities Architecture
+- **Component**: `src/Tweakora.App/Views/MainWindow.xaml`, `src/Tweakora.App/ViewModels/MainViewModel.cs`, `src/Tweakora.App/ViewModels/ToolsViewModel.cs`, `src/Tweakora.App/Views/ToolsTabView.xaml`, `src/Tweakora.App/ViewModels/HistoryViewModel.cs`, `src/Tweakora.App/Views/HistoryTabView.xaml`, `src/Tweakora.App/App.xaml.cs`
+- **Finding**:
+  1. The application shell exposed 8 disparate top-level navigation tabs (`Dashboard`, `Tweaks`, `Install`, `Config`, `Updates`, `Toolbox`, `Startup`, `Backups`), leading to cognitive clutter, duplicated entry points, and inconsistent categorization.
+  2. System configuration utilities (Startup apps, Services, Cleaner, DNS, Windows Fixes, Windows Update Mode, Optional Features, and Restore Points) were fragmented across multiple tabs and side drawers.
+  3. Rollback journal inspection and backup restoration were split between separate views rather than unified under a single chronological History surface.
+- **Root Cause**: Uncoordinated growth of feature tabs without an integrated information hierarchy or consolidated navigation shell.
+- **Fix**:
+  1. Consolidated top-level navigation from 8 tabs down to 5: `Home` (Dashboard), `Tweaks`, `Apps` (Install), `Tools`, and `History`.
+  2. Implemented `ToolsViewModel` and `ToolsTabView` housing 8 sub-tools with a clean pill toolbar: Startup apps, Services, System Cleaner, DNS switcher, Windows Fixes, Windows Updates mode, Optional Features, and Restore Points.
+  3. Implemented `HistoryViewModel` and `HistoryTabView` merging journal tracking, session history (newest first), individual tweak rollbacks, session rollbacks, "Undo all WinVelo changes", session log `.txt` exports, and restore point indicators.
+  4. Updated `MainViewModel` to support 5 primary tabs while preserving backward-compatible routing for legacy command links and updating the Ctrl+K command palette.
+  5. Added DI registrations and updated architecture integrity and UI diagnostic tests.
+

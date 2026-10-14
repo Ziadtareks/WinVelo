@@ -28,6 +28,12 @@
         <DataTemplate DataType="{x:Type vm:InstallViewModel}">
             <views:InstallTabView />
         </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ToolsViewModel}">
+            <views:ToolsTabView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:HistoryViewModel}">
+            <views:HistoryTabView />
+        </DataTemplate>
         <DataTemplate DataType="{x:Type vm:ConfigViewModel}">
             <views:ConfigTabView />
         </DataTemplate>
@@ -160,40 +166,35 @@
                         </Border>
                     </DockPanel>
 
-                    <!-- Scrollable Navigation Items -->
+                    <!-- Scrollable Navigation Items (5 Core Tabs) -->
                     <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
                         <StackPanel>
-                            <!-- OVERVIEW / QUICK START -->
-                            <TextBlock Text="OVERVIEW" FontSize="11" FontWeight="Bold"
-                                       Foreground="{DynamicResource TextMutedBrush}" Margin="8,4,0,6" />
+                            <!-- MAIN NAVIGATION -->
+                            <TextBlock Text="NAVIGATION" FontSize="11" FontWeight="Bold"
+                                       Foreground="{DynamicResource TextMutedBrush}" Margin="8,4,0,8" />
 
-                            <!-- Dashboard -->
+                            <!-- 1. Home -->
                             <Button AutomationProperties.AutomationId="Tab_Dashboard"
+                                    AutomationProperties.Name="Home"
                                     Style="{DynamicResource SidebarNavBtn}"
-                                    Command="{Binding SwitchTabCommand}" CommandParameter="Dashboard" Margin="0,0,0,8">
+                                    Command="{Binding SwitchTabCommand}" CommandParameter="Home" Margin="0,0,0,6">
                                 <DockPanel LastChildFill="False">
                                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
-                                        <ui:SymbolIcon Symbol="Home24" FontSize="16" Margin="0,0,8,0" Foreground="{DynamicResource AccentPrimaryBrush}" VerticalAlignment="Center" />
-                                        <TextBlock Text="Dashboard" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                        <ui:SymbolIcon Symbol="Home24" FontSize="16" Margin="0,0,10,0" Foreground="{DynamicResource AccentPrimaryBrush}" VerticalAlignment="Center" />
+                                        <TextBlock Text="Home" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" />
                                     </StackPanel>
-                                    <Border DockPanel.Dock="Right" Background="{DynamicResource AccentPrimaryBrush}" CornerRadius="6" Padding="6,1" VerticalAlignment="Center">
-                                        <TextBlock Text="HOME" FontSize="9" FontWeight="Bold" Foreground="White" />
-                                    </Border>
                                 </DockPanel>
                             </Button>
 
-                            <!-- CATEGORIES SECTION -->
-                            <TextBlock Text="CATEGORIES" FontSize="11" FontWeight="Bold"
-                                       Foreground="{DynamicResource TextMutedBrush}" Margin="8,4,0,6" />
-
-                            <!-- All Tweaks -->
+                            <!-- 2. Tweaks -->
                             <Button AutomationProperties.AutomationId="Tab_Tweaks"
+                                    AutomationProperties.Name="Tweaks"
                                     Style="{DynamicResource SidebarNavBtn}"
-                                    Command="{Binding NavigateCategoryCommand}" CommandParameter="All">
+                                    Command="{Binding SwitchTabCommand}" CommandParameter="Tweaks" Margin="0,0,0,6">
                                 <DockPanel LastChildFill="False">
                                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
-                                        <ui:SymbolIcon Symbol="Apps24" FontSize="16" Margin="0,0,8,0" Foreground="{DynamicResource AccentPrimaryBrush}" VerticalAlignment="Center" />
-                                        <TextBlock Text="All Tweaks" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                        <ui:SymbolIcon Symbol="Apps24" FontSize="16" Margin="0,0,10,0" Foreground="{DynamicResource AccentPrimaryBrush}" VerticalAlignment="Center" />
+                                        <TextBlock Text="Tweaks" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" />
                                     </StackPanel>
                                     <Border DockPanel.Dock="Right" Background="{DynamicResource StatusDefaultBgBrush}" CornerRadius="8" Padding="6,1" VerticalAlignment="Center">
                                         <TextBlock Text="{Binding TweaksVM.AllCount}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" />
@@ -201,147 +202,52 @@
                                 </DockPanel>
                             </Button>
 
-                            <!-- Essential Tweaks -->
-                            <Button Style="{DynamicResource SidebarNavBtn}"
-                                    Command="{Binding NavigateCategoryCommand}" CommandParameter="Essential">
-                                <DockPanel LastChildFill="False">
-                                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
-                                        <ui:SymbolIcon Symbol="CheckmarkCircle24" FontSize="16" Margin="0,0,8,0" Foreground="{DynamicResource SuccessGreenBrush}" VerticalAlignment="Center" />
-                                        <TextBlock Text="Essential Tweaks" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" />
-                                    </StackPanel>
-                                    <Border DockPanel.Dock="Right" Background="{DynamicResource StatusDefaultBgBrush}" CornerRadius="8" Padding="6,1" VerticalAlignment="Center">
-                                        <TextBlock Text="{Binding TweaksVM.EssentialCount}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" />
-                                    </Border>
-                                </DockPanel>
-                            </Button>
-
-                            <!-- Privacy & Telemetry -->
-                            <Button Style="{DynamicResource SidebarNavBtn}"
-                                    Command="{Binding NavigateCategoryCommand}" CommandParameter="Privacy">
-                                <DockPanel LastChildFill="False">
-                                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
-                                        <ui:SymbolIcon Symbol="EyeOff24" FontSize="16" Margin="0,0,8,0" Foreground="#38BDF8" VerticalAlignment="Center" />
-                                        <TextBlock Text="Privacy &amp; Telemetry" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" />
-                                    </StackPanel>
-                                    <Border DockPanel.Dock="Right" Background="{DynamicResource StatusDefaultBgBrush}" CornerRadius="8" Padding="6,1" VerticalAlignment="Center">
-                                        <TextBlock Text="{Binding TweaksVM.PrivacyCount}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" />
-                                    </Border>
-                                </DockPanel>
-                            </Button>
-
-                            <!-- Performance -->
-                            <Button Style="{DynamicResource SidebarNavBtn}"
-                                    Command="{Binding NavigateCategoryCommand}" CommandParameter="Performance">
-                                <DockPanel LastChildFill="False">
-                                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
-                                        <ui:SymbolIcon Symbol="Flash24" FontSize="16" Margin="0,0,8,0" Foreground="{DynamicResource WarningAmberBrush}" VerticalAlignment="Center" />
-                                        <TextBlock Text="Performance" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" />
-                                    </StackPanel>
-                                    <Border DockPanel.Dock="Right" Background="{DynamicResource StatusDefaultBgBrush}" CornerRadius="8" Padding="6,1" VerticalAlignment="Center">
-                                        <TextBlock Text="{Binding TweaksVM.PerformanceCount}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" />
-                                    </Border>
-                                </DockPanel>
-                            </Button>
-
-                            <!-- Windows UI & Customization -->
-                            <Button Style="{DynamicResource SidebarNavBtn}"
-                                    Command="{Binding NavigateCategoryCommand}" CommandParameter="Customize UI">
-                                <DockPanel LastChildFill="False">
-                                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
-                                        <ui:SymbolIcon Symbol="Color24" FontSize="16" Margin="0,0,8,0" Foreground="#A78BFA" VerticalAlignment="Center" />
-                                        <TextBlock Text="Windows UI &amp; Style" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" />
-                                    </StackPanel>
-                                    <Border DockPanel.Dock="Right" Background="{DynamicResource StatusDefaultBgBrush}" CornerRadius="8" Padding="6,1" VerticalAlignment="Center">
-                                        <TextBlock Text="{Binding TweaksVM.CustomizeUiCount}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" />
-                                    </Border>
-                                </DockPanel>
-                            </Button>
-
-                            <!-- Advanced / Caution -->
-                            <Button Style="{DynamicResource SidebarNavBtn}"
-                                    Command="{Binding NavigateCategoryCommand}" CommandParameter="Advanced">
-                                <DockPanel LastChildFill="False">
-                                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
-                                        <ui:SymbolIcon Symbol="Warning24" FontSize="16" Margin="0,0,8,0" Foreground="{DynamicResource CautionRedBrush}" VerticalAlignment="Center" />
-                                        <TextBlock Text="Advanced / Caution" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" />
-                                    </StackPanel>
-                                    <Border DockPanel.Dock="Right" Background="{DynamicResource StatusDefaultBgBrush}" CornerRadius="8" Padding="6,1" VerticalAlignment="Center">
-                                        <TextBlock Text="{Binding TweaksVM.AdvancedCount}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" />
-                                    </Border>
-                                </DockPanel>
-                            </Button>
-
-                            <!-- SYSTEM TOOLS SECTION -->
-                            <TextBlock Text="SYSTEM TOOLS" FontSize="11" FontWeight="Bold"
-                                       Foreground="{DynamicResource TextMutedBrush}" Margin="8,16,0,6" />
-
-                            <!-- Startup Apps -->
-                            <Button AutomationProperties.AutomationId="Tab_Startup"
-                                    Style="{DynamicResource SidebarNavBtn}"
-                                    Command="{Binding SwitchTabCommand}" CommandParameter="Startup">
-                                <DockPanel LastChildFill="False">
-                                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
-                                        <ui:SymbolIcon Symbol="Rocket24" FontSize="16" Margin="0,0,8,0" Foreground="{DynamicResource AccentPrimaryBrush}" VerticalAlignment="Center" />
-                                        <TextBlock Text="Startup Apps" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" />
-                                    </StackPanel>
-                                    <Border DockPanel.Dock="Right" Background="{DynamicResource AccentPrimaryBrush}" CornerRadius="8" Padding="6,1" VerticalAlignment="Center">
-                                        <TextBlock Text="{Binding StartupVM.EnabledCount}" FontSize="11" FontWeight="Bold" Foreground="White" />
-                                    </Border>
-                                </DockPanel>
-                            </Button>
-
-                            <!-- Install Apps (WinGet) -->
+                            <!-- 3. Apps -->
                             <Button AutomationProperties.AutomationId="Tab_Install"
+                                    AutomationProperties.Name="Apps"
                                     Style="{DynamicResource SidebarNavBtn}"
-                                    Command="{Binding SwitchTabCommand}" CommandParameter="Install">
-                                <StackPanel Orientation="Horizontal">
-                                    <ui:SymbolIcon Symbol="ArrowDownload24" FontSize="16" Margin="0,0,8,0" Foreground="{DynamicResource AccentPrimaryBrush}" VerticalAlignment="Center" />
-                                    <TextBlock Text="Install Apps" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" />
-                                </StackPanel>
+                                    Command="{Binding SwitchTabCommand}" CommandParameter="Apps" Margin="0,0,0,6">
+                                <DockPanel LastChildFill="False">
+                                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                                        <ui:SymbolIcon Symbol="ArrowDownload24" FontSize="16" Margin="0,0,10,0" Foreground="{DynamicResource AccentPrimaryBrush}" VerticalAlignment="Center" />
+                                        <TextBlock Text="Apps" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </DockPanel>
                             </Button>
 
-                            <!-- System Config -->
-                            <Button AutomationProperties.AutomationId="Tab_Config"
-                                    Style="{DynamicResource SidebarNavBtn}"
-                                    Command="{Binding SwitchTabCommand}" CommandParameter="Config">
-                                <StackPanel Orientation="Horizontal">
-                                    <ui:SymbolIcon Symbol="Settings24" FontSize="16" Margin="0,0,8,0" Foreground="{DynamicResource AccentPrimaryBrush}" VerticalAlignment="Center" />
-                                    <TextBlock Text="System Config &amp; Fixes" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" />
-                                </StackPanel>
-                            </Button>
-
-                            <!-- Windows Updates -->
-                            <Button AutomationProperties.AutomationId="Tab_Updates"
-                                    Style="{DynamicResource SidebarNavBtn}"
-                                    Command="{Binding SwitchTabCommand}" CommandParameter="Updates">
-                                <StackPanel Orientation="Horizontal">
-                                    <ui:SymbolIcon Symbol="ArrowSync24" FontSize="16" Margin="0,0,8,0" Foreground="{DynamicResource AccentPrimaryBrush}" VerticalAlignment="Center" />
-                                    <TextBlock Text="Windows Updates" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" />
-                                </StackPanel>
-                            </Button>
-
-                            <!-- Toolbox & Cleaner -->
+                            <!-- 4. Tools -->
                             <Button AutomationProperties.AutomationId="Tab_Toolbox"
+                                    AutomationProperties.Name="Tools"
                                     Style="{DynamicResource SidebarNavBtn}"
-                                    Command="{Binding SwitchTabCommand}" CommandParameter="Toolbox">
-                                <StackPanel Orientation="Horizontal">
-                                    <ui:SymbolIcon Symbol="Toolbox24" FontSize="16" Margin="0,0,8,0" Foreground="{DynamicResource AccentPrimaryBrush}" VerticalAlignment="Center" />
-                                    <TextBlock Text="Toolbox &amp; Cleaner" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" />
-                                </StackPanel>
+                                    Command="{Binding SwitchTabCommand}" CommandParameter="Tools" Margin="0,0,0,6">
+                                <DockPanel LastChildFill="False">
+                                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                                        <ui:SymbolIcon Symbol="Toolbox24" FontSize="16" Margin="0,0,10,0" Foreground="{DynamicResource AccentPrimaryBrush}" VerticalAlignment="Center" />
+                                        <TextBlock Text="Tools" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </DockPanel>
+                            </Button>
+
+                            <!-- 5. History -->
+                            <Button AutomationProperties.AutomationId="Tab_Backups"
+                                    AutomationProperties.Name="History"
+                                    Style="{DynamicResource SidebarNavBtn}"
+                                    Command="{Binding SwitchTabCommand}" CommandParameter="History" Margin="0,0,0,6">
+                                <DockPanel LastChildFill="False">
+                                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                                        <ui:SymbolIcon Symbol="Clock24" FontSize="16" Margin="0,0,10,0" Foreground="{DynamicResource AccentPrimaryBrush}" VerticalAlignment="Center" />
+                                        <TextBlock Text="History" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <Border DockPanel.Dock="Right" Background="{DynamicResource StatusDefaultBgBrush}" CornerRadius="8" Padding="6,1" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding HistoryVM.Sessions.Count}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" />
+                                    </Border>
+                                </DockPanel>
                             </Button>
                         </StackPanel>
                     </ScrollViewer>
 
-                    <!-- Sidebar Footer: Backups, Mode Switch & System Info -->
+                    <!-- Sidebar Footer: Mode Switch & System Info -->
                     <StackPanel Grid.Row="2" Margin="0,10,0,0">
-                        <!-- Backups & Restore Navigation -->
-                        <Button Style="{DynamicResource SidebarNavBtn}"
-                                Command="{Binding SwitchTabCommand}" CommandParameter="Backups" Margin="0,0,0,6">
-                            <StackPanel Orientation="Horizontal">
-                                <ui:SymbolIcon Symbol="Save24" FontSize="16" Margin="0,0,8,0" Foreground="{DynamicResource SuccessGreenBrush}" VerticalAlignment="Center" />
-                                <TextBlock Text="Backups &amp; Snapshots" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" />
-                            </StackPanel>
-                        </Button>
 
                         <!-- Dry-Run / Live Mode Switch -->
                         <Border Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"

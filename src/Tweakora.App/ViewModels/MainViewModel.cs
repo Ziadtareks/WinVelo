@@ -96,6 +96,8 @@ public sealed partial class MainViewModel : ObservableObject
     public ToolboxViewModel ToolboxVM { get; }
     public StartupViewModel StartupVM { get; }
     public BackupsViewModel BackupsVM { get; }
+    public ToolsViewModel ToolsVM { get; }
+    public HistoryViewModel HistoryVM { get; }
 
     private readonly List<PaletteItem> _allPaletteItems = new();
     public ObservableCollection<PaletteItem> PaletteResults { get; } = new();
@@ -114,6 +116,8 @@ public sealed partial class MainViewModel : ObservableObject
         ToolboxViewModel toolboxVM,
         StartupViewModel startupVM,
         BackupsViewModel backupsVM,
+        ToolsViewModel? toolsVM = null,
+        HistoryViewModel? historyVM = null,
         IActivityTracker? activityTracker = null,
         ITweakService? tweakService = null)
     {
@@ -128,8 +132,11 @@ public sealed partial class MainViewModel : ObservableObject
         _activityTracker = activityTracker;
         _tweakService = tweakService;
 
+        ToolsVM = toolsVM ?? new ToolsViewModel(startupVM, updatesVM, configVM, toolboxVM, null);
+        HistoryVM = historyVM ?? new HistoryViewModel(tweakService, null);
+
         _currentPage = DashboardVM;
-        _activeTab = "Dashboard";
+        _activeTab = "Home";
 
         if (_activityTracker != null)
         {
@@ -207,36 +214,83 @@ public sealed partial class MainViewModel : ObservableObject
     [RelayCommand]
     public void SwitchTab(string tabName)
     {
-        ActiveTab = tabName;
-        CurrentPage = tabName switch
+        switch (tabName)
         {
-            "Dashboard" or "Home" => DashboardVM,
-            "Install" => InstallVM,
-            "Tweaks" => TweaksVM,
-            "Config" => ConfigVM,
-            "Updates" => UpdatesVM,
-            "Toolbox" => ToolboxVM,
-            "Startup" => StartupVM,
-            "Backups" => BackupsVM,
-            _ => DashboardVM
-        };
+            case "Home" or "Dashboard":
+                ActiveTab = "Home";
+                CurrentPage = DashboardVM;
+                _ = DashboardVM.RefreshAllToggleStatesAsync();
+                break;
+            case "Tweaks":
+                ActiveTab = "Tweaks";
+                CurrentPage = TweaksVM;
+                _ = TweaksVM.RefreshActiveStatesAsync();
+                break;
+            case "Apps" or "Install":
+                ActiveTab = "Apps";
+                CurrentPage = InstallVM;
+                break;
+            case "Tools" or "Toolbox":
+                ActiveTab = "Tools";
+                CurrentPage = ToolsVM;
+                break;
+            case "History" or "Backups":
+                ActiveTab = "History";
+                CurrentPage = HistoryVM;
+                HistoryVM.RefreshHistory();
+                break;
+
+            // Direct routes to sub-tools inside Tools:
+            case "Startup":
+                ActiveTab = "Tools";
+                ToolsVM.SelectTool("Startup");
+                CurrentPage = ToolsVM;
+                _ = StartupVM.RefreshStatesSilentAsync();
+                break;
+            case "Services":
+                ActiveTab = "Tools";
+                ToolsVM.SelectTool("Services");
+                CurrentPage = ToolsVM;
+                break;
+            case "Cleaner":
+                ActiveTab = "Tools";
+                ToolsVM.SelectTool("Cleaner");
+                CurrentPage = ToolsVM;
+                break;
+            case "DNS" or "Network":
+                ActiveTab = "Tools";
+                ToolsVM.SelectTool("DNS");
+                CurrentPage = ToolsVM;
+                break;
+            case "Config" or "Fixes":
+                ActiveTab = "Tools";
+                ToolsVM.SelectTool("Fixes");
+                CurrentPage = ToolsVM;
+                break;
+            case "Updates":
+                ActiveTab = "Tools";
+                ToolsVM.SelectTool("Updates");
+                CurrentPage = ToolsVM;
+                break;
+            case "Features":
+                ActiveTab = "Tools";
+                ToolsVM.SelectTool("Features");
+                CurrentPage = ToolsVM;
+                break;
+            case "RestorePoints":
+                ActiveTab = "Tools";
+                ToolsVM.SelectTool("RestorePoints");
+                CurrentPage = ToolsVM;
+                break;
+            default:
+                ActiveTab = "Home";
+                CurrentPage = DashboardVM;
+                break;
+        }
 
         if (!string.IsNullOrEmpty(TopSearchText))
         {
             OnTopSearchTextChanged(TopSearchText);
-        }
-
-        if (tabName is "Dashboard" or "Home")
-        {
-            _ = DashboardVM.RefreshAllToggleStatesAsync();
-        }
-        else if (tabName == "Tweaks")
-        {
-            _ = TweaksVM.RefreshActiveStatesAsync();
-        }
-        else if (tabName == "Startup")
-        {
-            _ = StartupVM.RefreshStatesSilentAsync();
         }
     }
 
@@ -343,24 +397,33 @@ public sealed partial class MainViewModel : ObservableObject
     {
         _allPaletteItems.Clear();
 
-        // Tabs
-        _allPaletteItems.Add(new PaletteItem { Title = "All Tweaks", Subtitle = "View and apply all system tweaks", Category = "Category", ActionToExecute = () => NavigateCategory("All") });
+        // 5 Core Navigation Pages
+        _allPaletteItems.Add(new PaletteItem { Title = "Home", Subtitle = "System status overview, admin rights, and presets", Category = "Page", IconSymbol = "Home24", ActionToExecute = () => SwitchTab("Home") });
+        _allPaletteItems.Add(new PaletteItem { Title = "Tweaks", Subtitle = "View, filter, and apply Windows tweaks", Category = "Page", IconSymbol = "Apps24", ActionToExecute = () => SwitchTab("Tweaks") });
+        _allPaletteItems.Add(new PaletteItem { Title = "Apps", Subtitle = "WinGet software installer and package manager", Category = "Page", IconSymbol = "ArrowDownload24", ActionToExecute = () => SwitchTab("Apps") });
+        _allPaletteItems.Add(new PaletteItem { Title = "Tools", Subtitle = "System maintenance, diagnostic repairs, and service manager", Category = "Page", IconSymbol = "Toolbox24", ActionToExecute = () => SwitchTab("Tools") });
+        _allPaletteItems.Add(new PaletteItem { Title = "History", Subtitle = "Review journal sessions, rollback tweaks, and restore points", Category = "Page", IconSymbol = "Clock24", ActionToExecute = () => SwitchTab("History") });
+
+        // 8 Integrated Tools
+        _allPaletteItems.Add(new PaletteItem { Title = "Startup Apps Manager", Subtitle = "Control Windows boot applications and startup impact", Category = "Tool", IconSymbol = "Rocket24", ActionToExecute = () => SwitchTab("Startup") });
+        _allPaletteItems.Add(new PaletteItem { Title = "Windows Services", Subtitle = "Inspect and manage background services safely", Category = "Tool", IconSymbol = "Settings24", ActionToExecute = () => SwitchTab("Services") });
+        _allPaletteItems.Add(new PaletteItem { Title = "Safe Cache Cleaner", Subtitle = "Clean safe temporary folders and update caches", Category = "Tool", IconSymbol = "Broom24", ActionToExecute = () => SwitchTab("Cleaner") });
+        _allPaletteItems.Add(new PaletteItem { Title = "DNS Switcher", Subtitle = "Benchmark DNS resolvers and apply lowest latency", Category = "Tool", IconSymbol = "Globe24", ActionToExecute = () => SwitchTab("DNS") });
+        _allPaletteItems.Add(new PaletteItem { Title = "Fixes & Repairs", Subtitle = "One-click repairs for Windows components and network", Category = "Tool", IconSymbol = "Wrench24", ActionToExecute = () => SwitchTab("Fixes") });
+        _allPaletteItems.Add(new PaletteItem { Title = "Windows Updates Modes", Subtitle = "Configure Default, Recommended, or Suspended updates", Category = "Tool", IconSymbol = "ArrowSync24", ActionToExecute = () => SwitchTab("Updates") });
+        _allPaletteItems.Add(new PaletteItem { Title = "Optional Features", Subtitle = "Enable or disable optional system components (WSL, Hyper-V)", Category = "Tool", IconSymbol = "AppsListDetail24", ActionToExecute = () => SwitchTab("Features") });
+        _allPaletteItems.Add(new PaletteItem { Title = "Restore Points", Subtitle = "Windows System Protection checkpoints", Category = "Tool", IconSymbol = "ShieldCheckmark24", ActionToExecute = () => SwitchTab("RestorePoints") });
+
+        // Tweak Categories
+        _allPaletteItems.Add(new PaletteItem { Title = "All Tweaks", Subtitle = "View all system tweaks", Category = "Category", ActionToExecute = () => NavigateCategory("All") });
         _allPaletteItems.Add(new PaletteItem { Title = "Essential Tweaks", Subtitle = "Core safe optimizations", Category = "Category", ActionToExecute = () => NavigateCategory("Essential") });
         _allPaletteItems.Add(new PaletteItem { Title = "Privacy & Telemetry", Subtitle = "Disable telemetry and tracking", Category = "Category", ActionToExecute = () => NavigateCategory("Privacy") });
         _allPaletteItems.Add(new PaletteItem { Title = "Performance Tweaks", Subtitle = "System speed and memory optimizations", Category = "Category", ActionToExecute = () => NavigateCategory("Performance") });
         _allPaletteItems.Add(new PaletteItem { Title = "Customize UI", Subtitle = "Taskbar, Explorer and desktop style", Category = "Category", ActionToExecute = () => NavigateCategory("Customize UI") });
         _allPaletteItems.Add(new PaletteItem { Title = "Advanced / Caution", Subtitle = "Deep optimizations and power user tweaks", Category = "Category", ActionToExecute = () => NavigateCategory("Advanced") });
 
-        // Tools
-        _allPaletteItems.Add(new PaletteItem { Title = "Startup Apps Manager", Subtitle = "Control Windows boot programs and impact", Category = "Tool", ActionToExecute = () => SwitchTab("Startup") });
-        _allPaletteItems.Add(new PaletteItem { Title = "Install Apps", Subtitle = "WinGet software package manager", Category = "Tool", ActionToExecute = () => SwitchTab("Install") });
-        _allPaletteItems.Add(new PaletteItem { Title = "System Config", Subtitle = "Windows features and system repairs", Category = "Tool", ActionToExecute = () => SwitchTab("Config") });
-        _allPaletteItems.Add(new PaletteItem { Title = "Windows Updates", Subtitle = "Manage update modes and policies", Category = "Tool", ActionToExecute = () => SwitchTab("Updates") });
-        _allPaletteItems.Add(new PaletteItem { Title = "Toolbox & Cleaner", Subtitle = "Disk cleanup and maintenance tools", Category = "Tool", ActionToExecute = () => SwitchTab("Toolbox") });
-        _allPaletteItems.Add(new PaletteItem { Title = "Backups & Restore", Subtitle = "Inspect and restore system snapshots", Category = "Tool", ActionToExecute = () => SwitchTab("Backups") });
-
-        // Actions
-        _allPaletteItems.Add(new PaletteItem { Title = "1-Click Optimize Startup", Subtitle = "Disable heavy non-essential startup apps", Category = "Action", ActionToExecute = () => _ = StartupVM.OptimizeStartupAsync() });
+        // Quick Actions
+        _allPaletteItems.Add(new PaletteItem { Title = "Undo All WinVelo Changes", Subtitle = "Revert all active changes recorded in the journal", Category = "Action", ActionToExecute = () => _ = HistoryVM.UndoAllChangesAsync() });
         _allPaletteItems.Add(new PaletteItem { Title = "Standard Preset", Subtitle = "Select recommended desktop tweaks", Category = "Action", ActionToExecute = () => TweaksVM.ApplyPreset("Standard") });
         _allPaletteItems.Add(new PaletteItem { Title = "Minimal Preset", Subtitle = "Select essential telemetry reductions", Category = "Action", ActionToExecute = () => TweaksVM.ApplyPreset("Minimal") });
         _allPaletteItems.Add(new PaletteItem { Title = "Clear Selection", Subtitle = "Deselect all tweaks", Category = "Action", ActionToExecute = () => TweaksVM.ClearSelection() });

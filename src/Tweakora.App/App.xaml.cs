@@ -123,6 +123,8 @@ public partial class App : Application
                 services.AddSingleton<ToolboxViewModel>();
                 services.AddSingleton<StartupViewModel>();
                 services.AddSingleton<BackupsViewModel>();
+                services.AddSingleton<ToolsViewModel>();
+                services.AddSingleton<HistoryViewModel>();
                 services.AddSingleton<MainViewModel>();
 
                 // Views
@@ -233,6 +235,18 @@ public partial class App : Application
             FlushUi(window);
             SaveVisualToPng(GetWindowVisual(window), 1440, 900, Path.Combine(targetDir, "backups.png"));
             Log.Information("Captured backups.png");
+
+            // 8. Tools Tab
+            vm.SwitchTabCommand.Execute("Tools");
+            FlushUi(window);
+            SaveVisualToPng(GetWindowVisual(window), 1440, 900, Path.Combine(targetDir, "tools.png"));
+            Log.Information("Captured tools.png");
+
+            // 9. History Tab
+            vm.SwitchTabCommand.Execute("History");
+            FlushUi(window);
+            SaveVisualToPng(GetWindowVisual(window), 1440, 900, Path.Combine(targetDir, "history.png"));
+            Log.Information("Captured history.png");
 
             // 7. Diff Preview Overlay
             vm.SwitchTabCommand.Execute("Tweaks");
