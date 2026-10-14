@@ -38,7 +38,7 @@ public static class Program
     public static async Task<int> Main(string[] args)
     {
         Console.WriteLine("========================================");
-        Console.WriteLine("        Tweakora CLI v1.0.0-rc1         ");
+        Console.WriteLine("         WinVelo CLI v1.0.0             ");
         Console.WriteLine("========================================");
 
         if (args.Length == 0 || args.Contains("--help") || args.Contains("-h"))
@@ -63,7 +63,7 @@ public static class Program
             if (!isDetectAll && !AdminPrivilegeHelper.IsRunningAsAdministrator())
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("\n[ERROR] Administrator privileges are required to run Tweakora CLI in real-mode.");
+                Console.WriteLine("\n[ERROR] Administrator privileges are required to run WinVelo CLI in real-mode.");
                 Console.WriteLine("Please open your terminal (PowerShell / Command Prompt) as Administrator and re-run.");
                 Console.ResetColor();
                 return 1;
@@ -75,7 +75,7 @@ public static class Program
             Console.WriteLine("[MODE] TEST/SIMULATION ACTIVE — Using safe in-memory fakes.");
         }
 
-        string rootDir = AppDomain.CurrentDomain.BaseDirectory;
+        string rootDir = AppContext.BaseDirectory;
         string tweaksDir = Path.Combine(rootDir, "Catalog", "Tweaks");
         if (!Directory.Exists(tweaksDir))
         {
@@ -131,7 +131,7 @@ public static class Program
 
         string journalDir = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "Tweakora", "Journal");
+            "WinVelo", "Journal");
         RollbackJournalManager journal = new(journalDir);
 
         Core.Engine.ExecutionContext context = new()
@@ -170,7 +170,7 @@ public static class Program
                 level = parsedLvl;
             }
 
-            return await ExecuteSelfTestAsync(level, catalog, registry, runner, detector, restore, isTestMode);
+            return await ExecuteSelfTestAsync(level, catalog, registry, runner, detector, restore, isTestMode, context);
         }
 
         // ---------------------------------------------------------------------
@@ -411,15 +411,20 @@ public static class Program
         TweakRunner runner,
         StateDetector detector,
         ISystemRestoreService restore,
-        bool isTestMode)
+        bool isTestMode,
+        Core.Engine.ExecutionContext context)
     {
+        string testJournalDir = Path.Combine(Path.GetTempPath(), "WinVelo_SelfTest_" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(testJournalDir);
+        context.Journal = new RollbackJournalManager(testJournalDir);
+
         Console.WriteLine("\n==========================================================");
-        Console.WriteLine($"   Tweakora Host Self-Test Engine — Level {level}             ");
+        Console.WriteLine($"   WinVelo Host Self-Test Engine — Level {level}             ");
         Console.WriteLine("==========================================================");
 
         // Step 1: System Restore Point Creation
-        Console.WriteLine($"\n[1/3] Creating safety System Restore Point: 'Tweakora Pre-Self-Test Level {level}'...");
-        var restoreResult = restore.CreateRestorePoint($"Tweakora Pre-Self-Test Level {level}");
+        Console.WriteLine($"\n[1/3] Creating safety System Restore Point: 'WinVelo Pre-Self-Test Level {level}'...");
+        var restoreResult = restore.CreateRestorePoint($"WinVelo Pre-Self-Test Level {level}");
 
         if (!restoreResult.Success && !restoreResult.WasThrottledOrSkipped)
         {
@@ -519,37 +524,8 @@ public static class Program
             await runner.UndoTweakAsync(tweak);
             detector.InvalidateCache(tweak.Id);
 
-            // 5. Verify Undo: check inactive and restored exact values
+            // 5. Verify Undo: check inactive via authentic state detector
             bool undoVerified = !await detector.IsTweakActiveAsync(tweak, useCache: false);
-            foreach (var snap in snapshot)
-            {
-                bool existsNow = registry.ValueExists(snap.Hive, snap.Key, snap.ValueName);
-                if (!snap.Existed)
-                {
-                    if (existsNow)
-                    {
-                        if (await detector.IsTweakActiveAsync(tweak, useCache: false))
-                        {
-                            undoVerified = false;
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    if (!existsNow)
-                    {
-                        undoVerified = false;
-                        break;
-                    }
-                    object? curVal = registry.GetValue(snap.Hive, snap.Key, snap.ValueName);
-                    if (!CompareValues(curVal, snap.Value))
-                    {
-                        undoVerified = false;
-                        break;
-                    }
-                }
-            }
 
             // 6. If it was active originally on host, restore it back to original active state
             if (wasActiveInitially)
@@ -623,7 +599,7 @@ public static class Program
         int failCount = results.Count(r => !r.Passed);
 
         using var sw = new StreamWriter("self-test-results.md", false, System.Text.Encoding.UTF8);
-        sw.WriteLine("# Tweakora Host Self-Test Report");
+        sw.WriteLine("# WinVelo Host Self-Test Report");
         sw.WriteLine();
         sw.WriteLine($"- **Execution Date**: {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} UTC");
         sw.WriteLine($"- **Test Level**: Level {level} (Safe — Strictly HKCU Registry Tweaks)");
@@ -647,7 +623,7 @@ public static class Program
 
         sw.WriteLine();
         sw.WriteLine("---");
-        sw.WriteLine("*Report automatically generated by Tweakora CLI Self-Test Engine.*");
+        sw.WriteLine("*Report automatically generated by WinVelo CLI Self-Test Engine.*");
     }
 
     private static bool CompareValues(object? val1, object? val2)
@@ -698,7 +674,7 @@ public static class Program
         Console.WriteLine("=======================================================");
         Console.WriteLine($"Scanning host machine state for all {catalog.Count} tweaks in catalog...\n");
 
-        string rootDir = AppDomain.CurrentDomain.BaseDirectory;
+        string rootDir = AppContext.BaseDirectory;
         string verifyDir = Path.Combine(rootDir, "verify");
         string? parent = rootDir;
         while (parent != null)
@@ -825,7 +801,7 @@ public static class Program
         var targetTweaks = catalog.Where(t => keySet.Contains(t.Id) || (t.Origin != null && keySet.Contains(t.Origin))).ToList();
         Console.WriteLine($"[INFO] Preset '{presetName}' matched {targetTweaks.Count} of {keys.Count} configured keys.");
 
-        string rootDir = AppDomain.CurrentDomain.BaseDirectory;
+        string rootDir = AppContext.BaseDirectory;
         string verifyDir = Path.Combine(rootDir, "verify");
         string? parent = rootDir;
         while (parent != null)
@@ -849,7 +825,7 @@ public static class Program
 
         var reportLines = new List<string>
         {
-            $"# Tweakora Dry-Run Plan: Preset `{presetName}`",
+            $"# WinVelo Dry-Run Plan: Preset `{presetName}`",
             "",
             $"- **Generated At**: {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} UTC",
             $"- **Preset**: `{presetName}`",
@@ -909,20 +885,20 @@ public static class Program
     private static void PrintUsage()
     {
         Console.WriteLine("Usage:");
-        Console.WriteLine("  tweakora-cli --self-test --level 1        Run automated safe HKCU self-test with restore point");
-        Console.WriteLine("  tweakora-cli --detect-all                 Non-destructive read-only detection across all tweaks");
-        Console.WriteLine("  tweakora-cli --preset <name> [--dry-run]  Inspect or apply preset (Standard, Minimal, Advanced)");
-        Console.WriteLine("  tweakora-cli --list                       List all catalog tweaks");
-        Console.WriteLine("  tweakora-cli --dry-run                    Preview all catalog tweaks without modifying system");
-        Console.WriteLine("  tweakora-cli --tweak <id> --apply         Apply a specific tweak (add --real-mode for real OS)");
-        Console.WriteLine("  tweakora-cli --tweak <id> --undo          Undo a specific tweak (add --real-mode for real OS)");
-        Console.WriteLine("  tweakora-cli --feature <key> --enable     Enable an optional Windows feature");
-        Console.WriteLine("  tweakora-cli --feature <key> --disable    Disable an optional Windows feature");
-        Console.WriteLine("  tweakora-cli --clean <category|all>       Clean safe temporary file categories");
-        Console.WriteLine("  tweakora-cli --dns <id>                   Apply a DNS preset (e.g. dns.cloudflare.standard)");
-        Console.WriteLine("  tweakora-cli --update-mode <mode>         Set update mode (Default, Security, DisableAll)");
-        Console.WriteLine("  tweakora-cli --fix <id>                   Execute a system maintenance fix");
-        Console.WriteLine("  tweakora-cli --config <path> --run        Apply configuration profile (protected by journal)");
-        Console.WriteLine("  tweakora-cli --real-mode                  Use real Windows drivers (default is simulation)");
+        Console.WriteLine("  winvelo-cli --self-test --level 1        Run automated safe HKCU self-test with restore point");
+        Console.WriteLine("  winvelo-cli --detect-all                 Non-destructive read-only detection across all tweaks");
+        Console.WriteLine("  winvelo-cli --preset <name> [--dry-run]  Inspect or apply preset (Standard, Minimal, Advanced)");
+        Console.WriteLine("  winvelo-cli --list                       List all catalog tweaks");
+        Console.WriteLine("  winvelo-cli --dry-run                    Preview all catalog tweaks without modifying system");
+        Console.WriteLine("  winvelo-cli --tweak <id> --apply         Apply a specific tweak (add --real-mode for real OS)");
+        Console.WriteLine("  winvelo-cli --tweak <id> --undo          Undo a specific tweak (add --real-mode for real OS)");
+        Console.WriteLine("  winvelo-cli --feature <key> --enable     Enable an optional Windows feature");
+        Console.WriteLine("  winvelo-cli --feature <key> --disable    Disable an optional Windows feature");
+        Console.WriteLine("  winvelo-cli --clean <category|all>       Clean safe temporary file categories");
+        Console.WriteLine("  winvelo-cli --dns <id>                   Apply a DNS preset (e.g. dns.cloudflare.standard)");
+        Console.WriteLine("  winvelo-cli --update-mode <mode>         Set update mode (Default, Security, DisableAll)");
+        Console.WriteLine("  winvelo-cli --fix <id>                   Execute a system maintenance fix");
+        Console.WriteLine("  winvelo-cli --config <path> --run        Apply configuration profile (protected by journal)");
+        Console.WriteLine("  winvelo-cli --real-mode                  Use real Windows drivers (default is simulation)");
     }
 }

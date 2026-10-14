@@ -11,44 +11,55 @@ public static class StartupPathHelper
     {
         if (string.IsNullOrWhiteSpace(rawCommand)) return string.Empty;
 
-        string expanded = Environment.ExpandEnvironmentVariables(rawCommand.Trim());
-
-        // 1. Quoted path: "C:\path\to\app.exe" --args
-        if (expanded.StartsWith('"'))
+        try
         {
-            int closeQuote = expanded.IndexOf('"', 1);
-            if (closeQuote > 1)
+            string expanded = Environment.ExpandEnvironmentVariables(rawCommand.Trim());
+
+            // 1. Quoted path: "C:\path\to\app.exe" --args
+            if (expanded.StartsWith('"'))
             {
-                return expanded.Substring(1, closeQuote - 1).Trim();
+                int closeQuote = expanded.IndexOf('"', 1);
+                if (closeQuote > 1)
+                {
+                    return expanded.Substring(1, closeQuote - 1).Trim();
+                }
             }
-        }
 
-        // 2. Check if the entire expanded string is an existing file
-        if (File.Exists(expanded))
-        {
-            return expanded;
-        }
-
-        // 3. Search for .exe, .bat, .cmd, .lnk (case-insensitive)
-        string[] extensions = { ".exe", ".bat", ".cmd", ".lnk" };
-        foreach (var ext in extensions)
-        {
-            int extIndex = expanded.IndexOf(ext, StringComparison.OrdinalIgnoreCase);
-            if (extIndex >= 0)
+            // 2. Check if the entire expanded string is an existing file
+            try
             {
-                string candidate = expanded.Substring(0, extIndex + ext.Length).Trim('"', ' ');
-                return candidate;
+                if (File.Exists(expanded))
+                {
+                    return expanded;
+                }
             }
-        }
+            catch { }
 
-        // 4. Fallback: split on first space
-        int spaceIndex = expanded.IndexOf(' ');
-        if (spaceIndex > 0)
+            // 3. Search for .exe, .bat, .cmd, .lnk (case-insensitive)
+            string[] extensions = { ".exe", ".bat", ".cmd", ".lnk" };
+            foreach (var ext in extensions)
+            {
+                int extIndex = expanded.IndexOf(ext, StringComparison.OrdinalIgnoreCase);
+                if (extIndex >= 0)
+                {
+                    string candidate = expanded.Substring(0, extIndex + ext.Length).Trim('"', ' ');
+                    return candidate;
+                }
+            }
+
+            // 4. Fallback: split on first space
+            int spaceIndex = expanded.IndexOf(' ');
+            if (spaceIndex > 0)
+            {
+                return expanded.Substring(0, spaceIndex).Trim('"', ' ');
+            }
+
+            return expanded.Trim('"', ' ');
+        }
+        catch
         {
-            return expanded.Substring(0, spaceIndex).Trim('"', ' ');
+            return rawCommand.Trim('"', ' ');
         }
-
-        return expanded.Trim('"', ' ');
     }
 }
 

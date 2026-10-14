@@ -95,7 +95,7 @@ public sealed class TweakService : ITweakService
 
     public IReadOnlyList<TweakDefinition> LoadCatalog()
     {
-        string rootDir = AppDomain.CurrentDomain.BaseDirectory;
+        string rootDir = AppContext.BaseDirectory;
         string tweaksDir = Path.Combine(rootDir, "Catalog", "Tweaks");
 
         if (!Directory.Exists(tweaksDir))

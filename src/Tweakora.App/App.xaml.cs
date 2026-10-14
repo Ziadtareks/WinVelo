@@ -292,7 +292,7 @@ public partial class App : Application
     {
         try
         {
-            Log.Information("Tweakora is shutting down.");
+            Log.Information("WinVelo is shutting down.");
             await _host.StopAsync();
             _host.Dispose();
         }
@@ -319,7 +319,7 @@ public partial class App : Application
             {
                 MessageBox.Show(
                     $"An unexpected error occurred in the UI:\n\n{e.Exception.Message}\n\nCheck logs for more details.",
-                    "Tweakora Error",
+                    "WinVelo Error",
                     MessageBoxButton.OK,
                     MessageBoxImage.Error
                 );
@@ -346,7 +346,7 @@ public partial class App : Application
                 {
                     MessageBox.Show(
                         $"A critical system error occurred:\n\n{ex.Message}",
-                        "Tweakora Fatal Error",
+                        "WinVelo Fatal Error",
                         MessageBoxButton.OK,
                         MessageBoxImage.Error
                     );

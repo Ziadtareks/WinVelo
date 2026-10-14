@@ -125,7 +125,7 @@ public sealed class AppInstallService : IAppInstallService
 
     public IReadOnlyList<ApplicationItem> LoadApplications()
     {
-        string rootDir = AppDomain.CurrentDomain.BaseDirectory;
+        string rootDir = AppContext.BaseDirectory;
         string appJsonPath = Path.Combine(rootDir, "Catalog", "Apps", "applications.json");
 
         if (!File.Exists(appJsonPath))

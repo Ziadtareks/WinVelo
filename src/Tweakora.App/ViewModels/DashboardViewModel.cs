@@ -101,6 +101,7 @@ public sealed partial class DashboardViewModel : ObservableObject
     private readonly ISmartAdvisorService _advisorService;
     private readonly IActivityTracker? _activityTracker;
     private readonly List<TweakDefinition> _catalog = new();
+    private bool _isRefreshingStates;
 
     [ObservableProperty]
     private SystemInfoSummary _systemInfo = SystemInfoHelper.GetSystemInfo();
@@ -355,32 +356,40 @@ public sealed partial class DashboardViewModel : ObservableObject
     public async Task RefreshAllToggleStatesAsync()
     {
         await Task.Yield();
-        var updates = await Task.Run(async () =>
+        _isRefreshingStates = true;
+        try
         {
-            var list = new List<(QuickToggleCardModel Toggle, bool Active)>();
-            foreach (var toggle in QuickToggles)
+            var updates = await Task.Run(async () =>
             {
-                var tweak = FindTweak(toggle.OriginKey);
-                if (tweak != null)
+                var list = new List<(QuickToggleCardModel Toggle, bool Active)>();
+                foreach (var toggle in QuickToggles)
                 {
-                    try
+                    var tweak = FindTweak(toggle.OriginKey);
+                    if (tweak != null)
                     {
-                        bool active = await _tweakService.DetectStateAsync(tweak);
-                        list.Add((toggle, active));
+                        try
+                        {
+                            bool active = await _tweakService.DetectStateAsync(tweak);
+                            list.Add((toggle, active));
+                        }
+                        catch { }
                     }
-                    catch { }
                 }
-            }
-            return list;
-        });
+                return list;
+            });
 
-        Application.Current?.Dispatcher?.Invoke(() =>
-        {
-            foreach (var (toggle, active) in updates)
+            Application.Current?.Dispatcher?.Invoke(() =>
             {
-                toggle.IsActive = active;
-            }
-        });
+                foreach (var (toggle, active) in updates)
+                {
+                    toggle.IsActive = active;
+                }
+            });
+        }
+        finally
+        {
+            _isRefreshingStates = false;
+        }
     }
 
     private async Task HandleQuickToggleAsync(QuickToggleCardModel model, bool? target = null)
@@ -392,7 +401,7 @@ public sealed partial class DashboardViewModel : ObservableObject
             return;
         }
 
-        if (model.IsBusy || model.IsApplying) return;
+        if (_isRefreshingStates || model.IsBusy || model.IsApplying) return;
         model.IsBusy = true;
         model.IsApplying = true;
         bool targetState = target ?? !model.IsActive;
@@ -548,9 +557,16 @@ public sealed partial class DashboardViewModel : ObservableObject
         {
             var targets = _catalog.Where(t =>
                 string.Equals(t.Origin, "WPFToggleGameMode", StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(t.Origin, "WPFTweaksBackgroundApps", StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(t.Origin, "WPFTweaksUltimatePerformance", StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(t.Origin, "WPFTweaksDVR", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(t.Origin, "WPFTweaksDisableBGapps", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(t.Id, "advanced.disablebgapps", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(t.Id, "gaming.dvr.disable-background-recording", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(t.Id, "gaming.gamebar.disable-broadcast", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(t.Id, "performance.cpu.priority-separation", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(t.Id, "performance.gaming.mmcss-responsiveness", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(t.Id, "performance.gpu.hags", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(t.Id, "performance.input.raw-mouse", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(t.Id, "performance.cpu.unpark-cores", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(t.Id, "performance.power.disable-throttling", StringComparison.OrdinalIgnoreCase) ||
                 (t.Description.Contains("Game", StringComparison.OrdinalIgnoreCase) && !string.Equals(t.Risk, "High", StringComparison.OrdinalIgnoreCase))
             ).Take(14).ToList();
 
@@ -590,7 +606,10 @@ public sealed partial class DashboardViewModel : ObservableObject
                 string.Equals(t.Category, "Privacy", StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(t.Origin, "WPFTweaksTelemetry", StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(t.Origin, "WPFToggleDisableLockscreen", StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(t.Origin, "WPFTweaksActivityHistory", StringComparison.OrdinalIgnoreCase)
+                string.Equals(t.Id, "privacy.activity.activity-history", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(t.Id, "privacy.advertising.advertising-id", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(t.Id, "privacy.experiences.tailored-experiences", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(t.Id, "privacy.spotlight.lockscreen-ads", StringComparison.OrdinalIgnoreCase)
             ).Take(16).ToList();
 
             if (targets.Count > 0)

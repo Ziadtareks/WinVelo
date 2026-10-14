@@ -15,6 +15,7 @@
             <BooleanToVisibilityConverter x:Key="BoolToVisConverter" />
             <conv:StringToVisibilityConverter x:Key="StringToVisConverter" />
             <conv:InverseBooleanConverter x:Key="InverseBoolConverter" />
+            <conv:BoolToControlAppearanceConverter x:Key="BoolToAppearanceConverter" />
 
             <!-- Custom Accent and Font fallbacks -->
             <FontFamily x:Key="AppFontFamily">Segoe UI Variable, Segoe UI, Tahoma, Arial</FontFamily>

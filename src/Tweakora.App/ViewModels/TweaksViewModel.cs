@@ -477,7 +477,7 @@ public sealed partial class TweaksViewModel : ObservableObject
     [RelayCommand]
     public async Task ToggleTweakAsync(TweakCardModel card)
     {
-        if (card == null || card.IsBusy || card.IsApplying) return;
+        if (card == null || card.IsBusy || card.IsApplying || IsScanning) return;
         card.IsBusy = true;
         card.IsApplying = true;
         bool targetState = !card.IsActive;

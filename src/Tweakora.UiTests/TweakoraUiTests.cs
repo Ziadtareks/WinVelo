@@ -79,7 +79,7 @@ public sealed partial class TweakoraUiTests
         foreach (var win in windows)
         {
             string title = win.Title ?? string.Empty;
-            Assert.False(title.Contains("Error", StringComparison.OrdinalIgnoreCase) && !title.Contains("Tweakora Error Handling", StringComparison.OrdinalIgnoreCase),
+            Assert.False(title.Contains("Error", StringComparison.OrdinalIgnoreCase) && !title.Contains("WinVelo Error Handling", StringComparison.OrdinalIgnoreCase) && !title.Contains("Tweakora Error Handling", StringComparison.OrdinalIgnoreCase),
                 $"Unexpected error dialog detected: '{title}'");
             Assert.False(title.Contains("Exception", StringComparison.OrdinalIgnoreCase),
                 $"Unexpected exception dialog detected: '{title}'");
@@ -148,7 +148,7 @@ public sealed partial class TweakoraUiTests
         catch { }
         Thread.Sleep(2000);
 
-        _output.WriteLine("[UI-AUDIT] Tweakora launched successfully in --test-mode");
+        _output.WriteLine("[UI-AUDIT] WinVelo launched successfully in --test-mode");
 
         // 1. Check MainWindowHandle != 0 and Warning Banner
         IntPtr handle = app.MainWindowHandle;

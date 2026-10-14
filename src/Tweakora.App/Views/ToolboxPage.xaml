@@ -133,7 +133,7 @@
                                                 Background="{DynamicResource ControlFillColorSecondaryBrush}">
                                             <TextBlock Text="{Binding Impact, StringFormat='Impact: {0}'}" FontSize="11" FontWeight="Medium" />
                                         </Border>
-                                        <ui:ToggleSwitch Grid.Column="3" IsChecked="{Binding IsEnabled}"
+                                        <ui:ToggleSwitch Grid.Column="3" IsChecked="{Binding IsEnabled, Mode=OneWay}"
                                                          Command="{Binding DataContext.ToggleStartupItemCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                          CommandParameter="{Binding}" VerticalAlignment="Center" />
                                     </Grid>
@@ -306,7 +306,7 @@
                                 <TextBlock Text="{Binding NetworkStatusText}" FontWeight="Medium" Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}" FontSize="12" />
                             </StackPanel>
                             <ui:ToggleSwitch Grid.Column="1" VerticalAlignment="Center"
-                                             IsChecked="{Binding IsNagleDisabled, Mode=TwoWay}"
+                                             IsChecked="{Binding IsNagleDisabled, Mode=OneWay}"
                                              Command="{Binding ToggleNagleCommand}"
                                              CommandParameter="{Binding IsChecked, RelativeSource={RelativeSource Self}}" />
                         </Grid>

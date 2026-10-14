@@ -54,7 +54,7 @@
                                    Appearance="Secondary"
                                    Icon="{ui:SymbolIcon ArrowSync24}"
                                    Content="Refresh"
-                                   Command="{Binding RefreshCommandAsync}"
+                                   Command="{Binding RefreshCommand}"
                                    Padding="10,8" FontSize="12" />
                     </StackPanel>
                 </DockPanel>
@@ -135,19 +135,22 @@
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" VerticalAlignment="Center">
                     <ui:Button Content="All"
                                Command="{Binding SetFilterCommand}" CommandParameter="All"
-                               Appearance="{Binding IsFilterAll, Converter={StaticResource BoolToVisConverter}}"
+                               Appearance="{Binding IsFilterAll, Converter={StaticResource BoolToAppearanceConverter}}"
                                Padding="12,6" FontSize="12" Margin="0,0,6,0" />
 
                     <ui:Button Content="Enabled"
                                Command="{Binding SetFilterCommand}" CommandParameter="Enabled"
+                               Appearance="{Binding IsFilterEnabled, Converter={StaticResource BoolToAppearanceConverter}}"
                                Padding="12,6" FontSize="12" Margin="0,0,6,0" />
 
                     <ui:Button Content="Disabled"
                                Command="{Binding SetFilterCommand}" CommandParameter="Disabled"
+                               Appearance="{Binding IsFilterDisabled, Converter={StaticResource BoolToAppearanceConverter}}"
                                Padding="12,6" FontSize="12" Margin="0,0,6,0" />
 
                     <ui:Button Content="High Impact"
                                Command="{Binding SetFilterCommand}" CommandParameter="HighImpact"
+                               Appearance="{Binding IsFilterHighImpact, Converter={StaticResource BoolToAppearanceConverter}}"
                                Padding="12,6" FontSize="12" Margin="0,0,6,0" />
                 </StackPanel>
 

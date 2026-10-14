@@ -9,7 +9,7 @@ public sealed class ExecutionContext
     public required ISystemServicesService Services { get; init; }
     public required ITaskSchedulerService Tasks { get; init; }
     public required IShellService Shell { get; init; }
-    public required RollbackJournalManager Journal { get; init; }
+    public required RollbackJournalManager Journal { get; set; }
     public bool IsDryRun { get; init; }
     public string BackupDirectory { get; init; } = string.Empty;
 }

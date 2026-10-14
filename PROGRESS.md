@@ -29,6 +29,7 @@ Upstream Reference: [ChrisTitusTech/winutil](https://github.com/ChrisTitusTech/w
 | **Smart Optimization Upgrade** | Hardware Analyzer, Standby RAM Cleaner, DNS Latency Benchmark, Nagle's Disabler, 8 Gaming Tweaks | **DONE** | 80 unit tests passed / 149 tweaks verified / Release packages updated |
 | **UX & Performance Overhaul** | Eliminate UI Freezes, Floating Activity HUD Pill, Card Spinners, Task.Yield Offloading | **DONE** | 80 unit tests passed / 1 FlaUI UI test passed / 0 UI Freezes |
 | **Startup Apps Manager** | Native Windows Task Manager StartupApproved Bi-Directional Sync & Boot Speed Optimizer | **DONE** | 98 unit tests passed / 1 FlaUI UI test passed / 10 Screenshots Inspected |
+| **Final Deep QA Audit** | Toggle loops, Single-file resilience, Startup parsing, 63/63 Self-Test Engine | **DONE** | 106/106 unit tests passed / 63/63 self-test passed / FlaUI passed |
 | **Release v1.0.0** | Final Production Packaging, SHA256, Screenshots | **DONE** | WinVelo v1.0.0 Portable & Small zip packages created in `dist/`. |
 
 ---
@@ -96,12 +97,13 @@ Upstream Reference: [ChrisTitusTech/winutil](https://github.com/ChrisTitusTech/w
   - Direct 1-click toggle switches and preset buttons are cleanly disabled (`IsEnabled="{Binding IsNotToggling}"`) during operations to prevent duplicate race conditions.
 
 ### 3. Quality, Verification & Packaging
-- **98/98 Unit & Architecture Tests PASSED** (0 failures).
+- **106/106 Unit Tests PASSED** (0 failures).
 - **FlaUI UI Automation Test PASSED** across all tabs and overlays.
+- **63/63 CLI Self-Test Checks PASSED** (100% roundtrip pass rate).
 - **All 10 Screenshots Refreshed & Visually Inspected** in `docs/screenshots/` (dashboard, startup, toolbox, tweaks, backups, config, command-palette, diff-preview, install, updates).
 - **Release Packages (`dist/`)**:
-  - `dist/WinVelo-v1.0.0-win-x64-portable.zip` (SHA-256: `FF5B403ABEC6D80CEE18B02D71060EC7413F863156689847A507A0A06624B75C`)
-  - `dist/WinVelo-v1.0.0-win-x64-small.zip` (SHA-256: `000C8F1DC23B7EF239190C3CBA5503B23620EBB1EECEA5091962780B5449EA35`)
+  - `dist/WinVelo-v1.0.0-win-x64-portable.zip` (SHA-256: `DB7B1969A3427390D451DD4264CB9FE70585535E5736E1A440C77C72FD50817A`)
+  - `dist/WinVelo-v1.0.0-win-x64-small.zip` (SHA-256: `00D7FC05E6D7DA63C5D36650D274DD08A5505465B9EA18F0338F1304645AFDBA`)
   - `dist/SHA256SUMS.txt` updated.
 
 ---

@@ -47,7 +47,7 @@ public sealed class FeatureService : IFeatureService
 
     public IReadOnlyList<FeatureDefinition> LoadFeatures()
     {
-        string rootDir = AppDomain.CurrentDomain.BaseDirectory;
+        string rootDir = AppContext.BaseDirectory;
         string configPath = Path.Combine(rootDir, "Catalog", "Config", "feature.json");
 
         if (!File.Exists(configPath))

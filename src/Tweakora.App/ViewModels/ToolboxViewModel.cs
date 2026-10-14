@@ -154,22 +154,23 @@ public sealed partial class ToolboxViewModel : ObservableObject
         }
     }
 
+    private bool _isRefreshingStates;
+
     [RelayCommand]
     private async Task ToggleStartupItemAsync(StartupAppItem item)
     {
+        if (item == null || _isRefreshingStates) return;
         if (!Tweakora.App.Services.AppAdminGuard.EnsureAdmin("modify startup programs"))
         {
-            item.IsEnabled = !item.IsEnabled;
             return;
         }
 
-        bool targetState = item.IsEnabled;
+        bool targetState = !item.IsEnabled;
         await Task.Yield();
         bool ok = await Task.Run(async () => await _startupService.SetEntryStateAsync(item, targetState));
-        if (!ok)
+        if (ok)
         {
-            // Revert UI toggle if state change failed
-            item.IsEnabled = !targetState;
+            item.IsEnabled = targetState;
         }
     }
 
@@ -336,6 +337,7 @@ public sealed partial class ToolboxViewModel : ObservableObject
     [RelayCommand]
     private async Task ToggleNagleAsync(object? parameter)
     {
+        if (_isRefreshingStates) return;
         if (!Tweakora.App.Services.AppAdminGuard.EnsureAdmin("modify network packet optimization"))
         {
             return;
@@ -362,6 +364,7 @@ public sealed partial class ToolboxViewModel : ObservableObject
     public async void LoadToolsData()
     {
         await Task.Yield();
+        _isRefreshingStates = true;
 
         try
         {
@@ -397,5 +400,9 @@ public sealed partial class ToolboxViewModel : ObservableObject
             IsNagleDisabled = nagleDisabled;
         }
         catch { }
+        finally
+        {
+            _isRefreshingStates = false;
+        }
     }
 }

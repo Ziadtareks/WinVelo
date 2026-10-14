@@ -89,16 +89,23 @@ public sealed partial class StartupViewModel : ObservableObject
         ApplyFilter();
     }
 
+    private bool _isRefreshingStates;
+
     [RelayCommand]
-    public async Task RefreshCommandAsync()
+    public async Task RefreshAsync()
     {
         await LoadStartupAppsAsync();
     }
 
+    /// <summary>
+    /// Backward-compatibility method alias for tests and direct callers.
+    /// </summary>
+    public Task RefreshCommandAsync() => RefreshAsync();
+
     [RelayCommand]
     public async Task ToggleAppAsync(StartupAppItem item)
     {
-        if (item == null) return;
+        if (item == null || _isRefreshingStates || item.IsToggling) return;
 
         if (!AppAdminGuard.EnsureAdmin("modify startup applications"))
         {
@@ -219,6 +226,7 @@ public sealed partial class StartupViewModel : ObservableObject
     private async Task LoadStartupAppsAsync(bool silent = false)
     {
         await _loadLock.WaitAsync();
+        _isRefreshingStates = true;
         try
         {
             if (!silent)
@@ -265,6 +273,7 @@ public sealed partial class StartupViewModel : ObservableObject
         }
         finally
         {
+            _isRefreshingStates = false;
             if (!silent)
             {
                 IsLoading = false;
