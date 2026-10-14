@@ -34,6 +34,32 @@ public sealed partial class ConfigViewModel : ObservableObject
     private string _statusMessage = "Select Windows features to install or run system maintenance fixes.";
 
     [ObservableProperty]
+    private bool _hasFailedDetails;
+
+    [ObservableProperty]
+    private bool _isDetailsDialogOpen;
+
+    [ObservableProperty]
+    private string _detailsDialogTitle = "Execution Details";
+
+    public ObservableCollection<OperationItemResult> ExecutionDetailsItems { get; } = new();
+
+    [RelayCommand]
+    public void ShowDetailsDialog()
+    {
+        if (ExecutionDetailsItems.Count > 0)
+        {
+            IsDetailsDialogOpen = true;
+        }
+    }
+
+    [RelayCommand]
+    public void CloseDetailsDialog()
+    {
+        IsDetailsDialogOpen = false;
+    }
+
+    [ObservableProperty]
     private int _selectedFeaturesCount;
 
     [ObservableProperty]
@@ -136,7 +162,20 @@ public sealed partial class ConfigViewModel : ObservableObject
         {
             StatusMessage = $"Enabling {selected.Count} Windows feature(s)...";
             var report = await Task.Run(async () => await _featureService.EnableFeaturesAsync(selected, _runner));
-            StatusMessage = $"Enable features completed: {report.Summary}.";
+            if (report.FailedCount > 0)
+            {
+                StatusMessage = $"Applied {report.SucceededCount} of {report.TotalRequested} — {report.FailedCount} failed (details)";
+                HasFailedDetails = true;
+                DetailsDialogTitle = "Execution Details — Windows Features";
+                ExecutionDetailsItems.Clear();
+                foreach (var f in report.Results.Where(r => r.IsFailure)) ExecutionDetailsItems.Add(f);
+            }
+            else
+            {
+                StatusMessage = $"Enabled all {report.SucceededCount} feature(s) successfully.";
+                HasFailedDetails = false;
+                ExecutionDetailsItems.Clear();
+            }
         }
         catch (Exception ex)
         {
@@ -171,7 +210,20 @@ public sealed partial class ConfigViewModel : ObservableObject
         {
             StatusMessage = $"Disabling {selected.Count} Windows feature(s)...";
             var report = await Task.Run(async () => await _featureService.DisableFeaturesAsync(selected, _runner));
-            StatusMessage = $"Disable features completed: {report.Summary}.";
+            if (report.FailedCount > 0)
+            {
+                StatusMessage = $"Restored {report.SucceededCount} of {report.TotalRequested} — {report.FailedCount} failed (details)";
+                HasFailedDetails = true;
+                DetailsDialogTitle = "Execution Details — Windows Features";
+                ExecutionDetailsItems.Clear();
+                foreach (var f in report.Results.Where(r => r.IsFailure)) ExecutionDetailsItems.Add(f);
+            }
+            else
+            {
+                StatusMessage = $"Disabled all {report.SucceededCount} feature(s) successfully.";
+                HasFailedDetails = false;
+                ExecutionDetailsItems.Clear();
+            }
         }
         catch (Exception ex)
         {
@@ -206,7 +258,20 @@ public sealed partial class ConfigViewModel : ObservableObject
         {
             StatusMessage = $"Running maintenance fix: {fixKey}...";
             var report = await Task.Run(async () => await _fixService.RunFixAsync(fixKey, _runner));
-            StatusMessage = $"Fix completed: {report.Summary}.";
+            if (report.FailedCount > 0)
+            {
+                StatusMessage = $"Fix {fixKey} failed (details)";
+                HasFailedDetails = true;
+                DetailsDialogTitle = $"Execution Details — Fix: {fixKey}";
+                ExecutionDetailsItems.Clear();
+                foreach (var f in report.Results.Where(r => r.IsFailure)) ExecutionDetailsItems.Add(f);
+            }
+            else
+            {
+                StatusMessage = $"Fix {fixKey} completed successfully.";
+                HasFailedDetails = false;
+                ExecutionDetailsItems.Clear();
+            }
         }
         catch (Exception ex)
         {

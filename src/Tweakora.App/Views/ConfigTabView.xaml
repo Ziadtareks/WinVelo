@@ -179,7 +179,17 @@
         <Border Grid.Row="1" Background="{DynamicResource ControlFillColorSecondaryBrush}"
                 BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
                 BorderThickness="1" CornerRadius="6" Padding="10,6">
-            <TextBlock Text="{Binding StatusMessage}" FontSize="12" FontWeight="SemiBold" />
+            <DockPanel LastChildFill="False">
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding StatusMessage}" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center" />
+                    <Button Style="{DynamicResource ModernGhostBtn}"
+                            Padding="4,1" Margin="6,0,0,0"
+                            Visibility="{Binding HasFailedDetails, Converter={StaticResource BoolToVis}}"
+                            Command="{Binding ShowDetailsDialogCommand}">
+                        <TextBlock Text="(details)" FontSize="11" Foreground="#60A5FA" TextDecorations="Underline" />
+                    </Button>
+                </StackPanel>
+            </DockPanel>
         </Border>
 
         <!-- OpenSSH Confirmation Modal -->
@@ -202,6 +212,63 @@
                                    Command="{Binding ConfirmOpenSshCommand}" />
                     </DockPanel>
                 </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- EXECUTION DETAILS DIALOG OVERLAY -->
+        <Grid Grid.Row="0" Grid.RowSpan="2" Background="#80000000"
+              Visibility="{Binding IsDetailsDialogOpen, Converter={StaticResource BoolToVis}}"
+              Panel.ZIndex="2000">
+            <Border Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                    BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                    BorderThickness="1" CornerRadius="10"
+                    Width="700" MaxHeight="520" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Grid Margin="20">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <DockPanel Grid.Row="0" Margin="0,0,0,12">
+                        <TextBlock Text="{Binding DetailsDialogTitle}" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" />
+                        <Button DockPanel.Dock="Right" Content="✕" Style="{DynamicResource ModernGhostBtn}"
+                                Command="{Binding CloseDetailsDialogCommand}" />
+                    </DockPanel>
+
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" MaxHeight="360">
+                        <ItemsControl ItemsSource="{Binding ExecutionDetailsItems}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="#1E2433" BorderBrush="#334155" BorderThickness="1"
+                                            CornerRadius="6" Padding="12,10" Margin="0,0,0,8">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
+                                            <DockPanel Grid.Row="0" LastChildFill="False">
+                                                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                                                    <Border Background="{Binding StatusBgColor}" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
+                                                        <TextBlock Text="{Binding DisplayStatus}" FontSize="10" FontWeight="Bold" Foreground="{Binding StatusFgColor}" />
+                                                    </Border>
+                                                    <TextBlock Text="{Binding Name}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" />
+                                                    <TextBlock Text="{Binding Id, StringFormat=' ({0})'}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" />
+                                                </StackPanel>
+                                            </DockPanel>
+                                            <TextBlock Grid.Row="1" Text="{Binding Reason}" FontSize="11" Foreground="#EF4444"
+                                                       TextWrapping="Wrap" Margin="0,6,0,0" FontFamily="Consolas, Cascadia Code, Courier New" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+
+                    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,14,0,0">
+                        <ui:Button Content="Close" Appearance="Secondary"
+                                   Command="{Binding CloseDetailsDialogCommand}" />
+                    </StackPanel>
+                </Grid>
             </Border>
         </Grid>
     </Grid>

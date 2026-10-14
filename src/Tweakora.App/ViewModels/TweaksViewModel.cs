@@ -244,6 +244,32 @@ public sealed partial class TweaksViewModel : ObservableObject
     private string _statusMessage = "Select tweaks or choose a preset to begin.";
 
     [ObservableProperty]
+    private bool _hasFailedDetails;
+
+    [ObservableProperty]
+    private bool _isDetailsDialogOpen;
+
+    [ObservableProperty]
+    private string _detailsDialogTitle = "Execution Details";
+
+    public ObservableCollection<OperationItemResult> ExecutionDetailsItems { get; } = new();
+
+    [RelayCommand]
+    public void ShowDetailsDialog()
+    {
+        if (ExecutionDetailsItems.Count > 0)
+        {
+            IsDetailsDialogOpen = true;
+        }
+    }
+
+    [RelayCommand]
+    public void CloseDetailsDialog()
+    {
+        IsDetailsDialogOpen = false;
+    }
+
+    [ObservableProperty]
     private bool _isPreviewDialogOpen;
 
     [ObservableProperty]
@@ -508,13 +534,14 @@ public sealed partial class TweaksViewModel : ObservableObject
             AppliedCount = _allTweaks.Count(t => t.IsActive);
 
             var res = report.Results.FirstOrDefault();
-            if (res != null && (res.Status == OperationItemStatus.Succeeded || actualActive == targetState))
+            bool opSucceeded = res != null && (res.Status is OperationItemStatus.Succeeded or OperationItemStatus.Applied or OperationItemStatus.Restored);
+            if (opSucceeded)
             {
                 AddLog("OK", $"Successfully {(actualActive ? "applied" : "reverted")}: {card.Title}");
             }
             else
             {
-                AddLog("ERR", $"Notice for {card.Title}: {res?.Reason ?? "System policy updated"}");
+                AddLog("ERR", $"Failed {card.Title}: {res?.Reason ?? "System policy updated"}");
             }
             UpdateCounts();
         }
@@ -669,14 +696,47 @@ public sealed partial class TweaksViewModel : ObservableObject
                 AddLog(level, $"{item.Name}: {item.Reason}");
             }
 
-            // Update state
+            // Update state: ONLY set IsActive for cards that actually succeeded!
+            var succeededIds = new HashSet<string>(
+                report.Results.Where(r => r.Status is OperationItemStatus.Succeeded or OperationItemStatus.Applied)
+                              .Select(r => r.Id),
+                StringComparer.OrdinalIgnoreCase);
+
             foreach (var card in selected)
             {
-                card.IsActive = true;
+                if (succeededIds.Contains(card.Id) || succeededIds.Contains(card.Tweak.Id) || (card.Tweak.Origin != null && succeededIds.Contains(card.Tweak.Origin)))
+                {
+                    card.IsActive = true;
+                }
+                else
+                {
+                    card.IsActive = false;
+                }
             }
 
             UpdateCounts();
-            StatusMessage = $"Applied {report.SucceededCount} tweak(s), {report.SkippedCount} skipped, {report.FailedCount} failed.";
+
+            if (report.FailedCount > 0)
+            {
+                StatusMessage = $"Applied {report.SucceededCount} of {report.TotalRequested} — {report.FailedCount} failed (details)";
+                HasFailedDetails = true;
+                DetailsDialogTitle = "Execution Details — Apply Tweaks";
+                ExecutionDetailsItems.Clear();
+                foreach (var f in report.Results.Where(r => r.IsFailure)) ExecutionDetailsItems.Add(f);
+                IsLogDrawerOpen = true;
+            }
+            else if (report.SkippedCount > 0)
+            {
+                StatusMessage = $"Applied {report.SucceededCount} of {report.TotalRequested} ({report.SkippedCount} skipped).";
+                HasFailedDetails = false;
+                ExecutionDetailsItems.Clear();
+            }
+            else
+            {
+                StatusMessage = $"Applied all {report.SucceededCount} tweak(s) successfully.";
+                HasFailedDetails = false;
+                ExecutionDetailsItems.Clear();
+            }
             AddLog("OK", $"Execution completed: {StatusMessage}");
         }
         catch (Exception ex)
@@ -747,17 +807,40 @@ public sealed partial class TweaksViewModel : ObservableObject
 
             foreach (var item in report.Results)
             {
-                string level = item.Status == OperationItemStatus.Succeeded ? "OK" : "ERR";
+                string level = item.Status is OperationItemStatus.Succeeded or OperationItemStatus.Restored ? "OK" : "ERR";
                 AddLog(level, $"Revert {item.Name}: {item.Reason}");
             }
 
+            var restoredIds = new HashSet<string>(
+                report.Results.Where(r => r.Status is OperationItemStatus.Succeeded or OperationItemStatus.Restored)
+                              .Select(r => r.Id),
+                StringComparer.OrdinalIgnoreCase);
+
             foreach (var card in selected)
             {
-                card.IsActive = false;
+                if (restoredIds.Contains(card.Id) || restoredIds.Contains(card.Tweak.Id) || (card.Tweak.Origin != null && restoredIds.Contains(card.Tweak.Origin)))
+                {
+                    card.IsActive = false;
+                }
             }
 
             UpdateCounts();
-            StatusMessage = $"Reverted {report.SucceededCount} tweak(s), {report.FailedCount} failed.";
+
+            if (report.FailedCount > 0)
+            {
+                StatusMessage = $"Restored {report.SucceededCount} of {report.TotalRequested} — {report.FailedCount} failed (details)";
+                HasFailedDetails = true;
+                DetailsDialogTitle = "Execution Details — Revert Tweaks";
+                ExecutionDetailsItems.Clear();
+                foreach (var f in report.Results.Where(r => r.IsFailure)) ExecutionDetailsItems.Add(f);
+                IsLogDrawerOpen = true;
+            }
+            else
+            {
+                StatusMessage = $"Restored all {report.SucceededCount} tweak(s) successfully.";
+                HasFailedDetails = false;
+                ExecutionDetailsItems.Clear();
+            }
             AddLog("OK", $"Undo completed: {StatusMessage}");
         }
         catch (Exception ex)

@@ -102,3 +102,20 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
   3. Created `PowerShellResult` model with explicit `ExitCode`, `StdOut`, `StdErr`, `TimedOut`, `Duration`, and `Success` fields.
   4. Replaced `Invoke-WinUtilExplorerUpdate` with standard `Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue`.
   5. Sanitized native CLI invocations (DISM, cleanmgr), guarded service calls (`diagtrack`, `WerSvc`), raised timeouts (300s/600s), and added AST syntax parse testing in `CatalogPowerShellSyntaxTests.cs`.
+
+---
+
+## BUG-010: Dishonest Result Reporting on Batch Operations in UI and CLI
+- **Component**: `Tweakora.App` (`DashboardViewModel`, `TweaksViewModel`, `ConfigViewModel`), `Tweakora.Cli` (`Program.cs`), `Tweakora.Core` (`OperationRunner`, `TweakRunner`)
+- **Finding**:
+  1. In `DashboardViewModel`, applying profiles (Everyday, Gaming, Privacy, Restore Defaults) unconditionally reported success ("Profile applied!" / "Restore Defaults applied!") and returned success colors even when tweaks failed or the process ran without administrative rights.
+  2. In `TweaksViewModel`, batch execution set cards to `IsActive = true` indiscriminately across all selected items without verifying which specific tweaks succeeded, and reported "Applied all tweaks successfully." on partial failures.
+  3. In `ConfigViewModel`, features and fixes reported unconditional success without reflecting failure counts or details.
+  4. In `Tweakora.Cli`, running `--tweaks`, `--config`, or `--preset` with partial failures printed success logs, returned exit code 0, and omitted structured failure information.
+- **Root Cause**: Batch operation handlers relied on monolithic execution flags rather than itemized result verification, lacking failure aggregation and granular status mapping.
+- **Fix**:
+  1. Updated `OperationRunner` and `TweakRunner` with `Applied`, `Restored`, `Failed`, `FailedRolledBack`, and `FailedRollbackIncomplete` statuses, explicit `IsFailure` checks, and `TotalRequested` metrics.
+  2. Enforced strict honest string formatting: `"Applied {succ} of {total} — {fail} failed (details)"` and `"Restored {succ} of {total} — {fail} failed (details)"`.
+  3. Populated detailed execution failure dialogs in `DashboardTabView`, `TweaksTabView`, and `ConfigTabView` with error reasons.
+  4. In `TweaksViewModel`, guaranteed that only succeeded items have `IsActive = true`; failed items retain their pre-operation state.
+  5. In `Tweakora.Cli`, printed `[Failed] <id>: <reason>` for each failure, formatted `"Applied {succ} of {total} — {fail} failed"`, and exited with non-zero exit code (`1`) on any failure.

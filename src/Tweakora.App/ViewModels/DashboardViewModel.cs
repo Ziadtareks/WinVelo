@@ -82,6 +82,20 @@ public sealed partial class ProfileCardModel : ObservableObject
     [ObservableProperty]
     private string _statusMessage = string.Empty;
 
+    [ObservableProperty]
+    private bool _hasFailures;
+
+    [ObservableProperty]
+    private string _statusColor = "#34D399";
+
+    public Action? OnShowDetails { get; set; }
+
+    [RelayCommand]
+    private void ShowDetails()
+    {
+        OnShowDetails?.Invoke();
+    }
+
     public Func<ProfileCardModel, Task>? OnApplyAsync { get; set; }
 
     [RelayCommand]
@@ -160,6 +174,32 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
 
     [ObservableProperty]
     private string _globalStatusMessage = "Ready. Select a 1-Click Profile or toggle individual optimizations below.";
+
+    [ObservableProperty]
+    private bool _isDetailsDialogOpen;
+
+    [ObservableProperty]
+    private string _detailsDialogTitle = "Execution Details";
+
+    [ObservableProperty]
+    private bool _hasFailedDetails;
+
+    public ObservableCollection<OperationItemResult> ExecutionDetailsItems { get; } = new();
+
+    [RelayCommand]
+    public void ShowDetailsDialog()
+    {
+        if (ExecutionDetailsItems.Count > 0)
+        {
+            IsDetailsDialogOpen = true;
+        }
+    }
+
+    [RelayCommand]
+    public void CloseDetailsDialog()
+    {
+        IsDetailsDialogOpen = false;
+    }
 
     public ObservableCollection<ProfileCardModel> Profiles { get; } = new();
     public ObservableCollection<QuickToggleCardModel> QuickToggles { get; } = new();
@@ -321,6 +361,11 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
             IconSymbol = "ArrowCounterclockwise24",
             OnApplyAsync = ApplyProfileRestoreDefaultsAsync
         });
+
+        foreach (var p in Profiles)
+        {
+            p.OnShowDetails = ShowDetailsDialog;
+        }
     }
 
     private void InitializeQuickToggles()
@@ -509,13 +554,22 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
             });
 
             var res = report.Results.FirstOrDefault();
-            if (res != null && (res.Status == OperationItemStatus.Succeeded || actualActive == targetState))
+            bool succeeded = res != null && (res.Status is OperationItemStatus.Succeeded or OperationItemStatus.Applied or OperationItemStatus.Restored);
+            if (succeeded)
             {
                 GlobalStatusMessage = $"{model.Title} is now {(actualActive ? "enabled" : "reverted to default")}.";
+                HasFailedDetails = false;
             }
             else
             {
                 GlobalStatusMessage = $"Status for {model.Title}: {res?.Reason ?? "System policy updated."}";
+                if (res != null && res.IsFailure)
+                {
+                    DetailsDialogTitle = $"Execution Details — {model.Title}";
+                    ExecutionDetailsItems.Clear();
+                    ExecutionDetailsItems.Add(res);
+                    HasFailedDetails = true;
+                }
             }
         }
         catch (Exception ex)
@@ -575,6 +629,47 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
         }
     }
 
+    private void HandleProfileReport(ProfileCardModel card, OperationExecutionReport report, bool isRestore = false)
+    {
+        int total = report.TotalRequested;
+        int succ = report.SucceededCount;
+        int fail = report.FailedCount;
+        string actionVerb = isRestore ? "Restored" : "Applied";
+
+        if (fail > 0)
+        {
+            card.HasFailures = true;
+            card.StatusColor = "#EF4444";
+            card.StatusMessage = $"{actionVerb} {succ} of {total} — {fail} failed (details)";
+            GlobalStatusMessage = $"{actionVerb} {succ} of {total} — {fail} failed (details)";
+            DetailsDialogTitle = $"Execution Details — {card.Title}";
+            ExecutionDetailsItems.Clear();
+            foreach (var item in report.Results.Where(r => r.IsFailure))
+            {
+                ExecutionDetailsItems.Add(item);
+            }
+            HasFailedDetails = true;
+        }
+        else if (report.SkippedCount > 0)
+        {
+            card.HasFailures = false;
+            card.StatusColor = "#60A5FA";
+            card.StatusMessage = $"{actionVerb} {succ} of {total} ({report.SkippedCount} skipped)";
+            GlobalStatusMessage = $"{card.Title}: {actionVerb} {succ} of {total} ({report.SkippedCount} skipped).";
+            HasFailedDetails = false;
+            ExecutionDetailsItems.Clear();
+        }
+        else
+        {
+            card.HasFailures = false;
+            card.StatusColor = "#34D399";
+            card.StatusMessage = isRestore ? "Defaults restored!" : "Profile applied successfully!";
+            GlobalStatusMessage = isRestore ? "Windows defaults restored successfully." : $"{card.Title} applied successfully.";
+            HasFailedDetails = false;
+            ExecutionDetailsItems.Clear();
+        }
+    }
+
     private async Task ApplyProfileEverydayAsync(ProfileCardModel card)
     {
         card.IsBusy = true;
@@ -597,16 +692,22 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
 
             if (targets.Count > 0)
             {
-                await Task.Run(() => _tweakService.ApplyTweaksAsync(targets, _runner));
+                var report = await Task.Run(() => _tweakService.ApplyTweaksAsync(targets, _runner));
+                HandleProfileReport(card, report, isRestore: false);
+            }
+            else
+            {
+                card.StatusMessage = "No tweaks matched this profile.";
+                GlobalStatusMessage = "No tweaks matched this profile.";
             }
 
-            card.StatusMessage = "Profile applied successfully!";
-            GlobalStatusMessage = "Everyday Speed & Clean Setup applied successfully.";
             await RefreshAllToggleStatesAsync();
             _ = RecalculateOptimizationScoreAsync();
         }
         catch (Exception ex)
         {
+            card.HasFailures = true;
+            card.StatusColor = "#EF4444";
             card.StatusMessage = $"Error: {ex.Message}";
             GlobalStatusMessage = $"Failed: {ex.Message}";
         }
@@ -644,16 +745,22 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
 
             if (targets.Count > 0)
             {
-                await Task.Run(() => _tweakService.ApplyTweaksAsync(targets, _runner));
+                var report = await Task.Run(() => _tweakService.ApplyTweaksAsync(targets, _runner));
+                HandleProfileReport(card, report, isRestore: false);
+            }
+            else
+            {
+                card.StatusMessage = "No tweaks matched this profile.";
+                GlobalStatusMessage = "No tweaks matched this profile.";
             }
 
-            card.StatusMessage = "Gaming boost active!";
-            GlobalStatusMessage = "Gaming & Max FPS Boost applied successfully.";
             await RefreshAllToggleStatesAsync();
             _ = RecalculateOptimizationScoreAsync();
         }
         catch (Exception ex)
         {
+            card.HasFailures = true;
+            card.StatusColor = "#EF4444";
             card.StatusMessage = $"Error: {ex.Message}";
             GlobalStatusMessage = $"Failed: {ex.Message}";
         }
@@ -686,16 +793,22 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
 
             if (targets.Count > 0)
             {
-                await Task.Run(() => _tweakService.ApplyTweaksAsync(targets, _runner));
+                var report = await Task.Run(() => _tweakService.ApplyTweaksAsync(targets, _runner));
+                HandleProfileReport(card, report, isRestore: false);
+            }
+            else
+            {
+                card.StatusMessage = "No tweaks matched this profile.";
+                GlobalStatusMessage = "No tweaks matched this profile.";
             }
 
-            card.StatusMessage = "Privacy shield enabled!";
-            GlobalStatusMessage = "Privacy & Anti-Spyware Shield applied successfully.";
             await RefreshAllToggleStatesAsync();
             _ = RecalculateOptimizationScoreAsync();
         }
         catch (Exception ex)
         {
+            card.HasFailures = true;
+            card.StatusColor = "#EF4444";
             card.StatusMessage = $"Error: {ex.Message}";
             GlobalStatusMessage = $"Failed: {ex.Message}";
         }
@@ -724,16 +837,24 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
 
             if (activeTweaks.Count > 0)
             {
-                await Task.Run(() => _tweakService.UndoTweaksAsync(activeTweaks, _runner));
+                var report = await Task.Run(() => _tweakService.UndoTweaksAsync(activeTweaks, _runner));
+                HandleProfileReport(card, report, isRestore: true);
+            }
+            else
+            {
+                card.HasFailures = false;
+                card.StatusColor = "#34D399";
+                card.StatusMessage = "Defaults restored!";
+                GlobalStatusMessage = "No active tweaks found to revert.";
             }
 
-            card.StatusMessage = "Defaults restored!";
-            GlobalStatusMessage = "Windows defaults restored successfully.";
             await RefreshAllToggleStatesAsync();
             _ = RecalculateOptimizationScoreAsync();
         }
         catch (Exception ex)
         {
+            card.HasFailures = true;
+            card.StatusColor = "#EF4444";
             card.StatusMessage = $"Error: {ex.Message}";
             GlobalStatusMessage = $"Failed: {ex.Message}";
         }

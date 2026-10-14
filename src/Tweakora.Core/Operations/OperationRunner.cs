@@ -10,8 +10,12 @@ namespace Tweakora.Core.Operations;
 public enum OperationItemStatus
 {
     Succeeded,
+    Applied,
+    Restored,
     Skipped,
-    Failed
+    Failed,
+    FailedRolledBack,
+    FailedRollbackIncomplete
 }
 
 public sealed class OperationItemResult
@@ -20,6 +24,25 @@ public sealed class OperationItemResult
     public required string Name { get; init; }
     public required OperationItemStatus Status { get; init; }
     public string? Reason { get; init; }
+
+    public string DisplayStatus => Status switch
+    {
+        OperationItemStatus.Applied => "Applied",
+        OperationItemStatus.Restored => "Restored",
+        OperationItemStatus.Succeeded => "Applied",
+        OperationItemStatus.Skipped => "Skipped",
+        OperationItemStatus.Failed => "Failed",
+        OperationItemStatus.FailedRolledBack => "Failed-rolled-back",
+        OperationItemStatus.FailedRollbackIncomplete => "Failed-rollback-incomplete",
+        _ => Status.ToString()
+    };
+
+    public bool IsFailure => Status is OperationItemStatus.Failed
+                                   or OperationItemStatus.FailedRolledBack
+                                   or OperationItemStatus.FailedRollbackIncomplete;
+
+    public string StatusBgColor => IsFailure ? "#7F1D1D" : (Status == OperationItemStatus.Skipped ? "#78350F" : "#064E3B");
+    public string StatusFgColor => IsFailure ? "#F87171" : (Status == OperationItemStatus.Skipped ? "#FBBF24" : "#34D399");
 }
 
 public sealed class OperationExecutionReport
@@ -28,9 +51,11 @@ public sealed class OperationExecutionReport
     public required DateTime StartTime { get; init; }
     public required DateTime EndTime { get; init; }
     public required List<OperationItemResult> Results { get; init; }
-    public int SucceededCount => Results.Count(r => r.Status == OperationItemStatus.Succeeded);
+    public int TotalRequested => Results.Count;
+    public int SucceededCount => Results.Count(r => r.Status is OperationItemStatus.Succeeded or OperationItemStatus.Applied or OperationItemStatus.Restored);
     public int SkippedCount => Results.Count(r => r.Status == OperationItemStatus.Skipped);
-    public int FailedCount => Results.Count(r => r.Status == OperationItemStatus.Failed);
+    public int FailedCount => Results.Count(r => r.IsFailure);
+    public bool AllSucceeded => Results.Count > 0 && FailedCount == 0 && SkippedCount == 0;
     public string Summary => $"{SucceededCount} succeeded, {SkippedCount} skipped, {FailedCount} failed";
 }
 
@@ -100,10 +125,11 @@ public sealed class OperationRunner : IOperationRunner
 
                 string statusTag = itemResult.Status switch
                 {
-                    OperationItemStatus.Succeeded => "PASS",
+                    OperationItemStatus.Succeeded or OperationItemStatus.Applied or OperationItemStatus.Restored => "PASS",
                     OperationItemStatus.Skipped => "SKIP",
-                    OperationItemStatus.Failed => "FAIL",
-                    _ => "INFO"
+                    OperationItemStatus.FailedRolledBack => "ROLLBACK",
+                    OperationItemStatus.FailedRollbackIncomplete => "FAIL-INCOMPLETE",
+                    _ => "FAIL"
                 };
 
                 string msg = $"[{statusTag}] {itemResult.Name}" + (!string.IsNullOrWhiteSpace(itemResult.Reason) ? $": {itemResult.Reason}" : "");

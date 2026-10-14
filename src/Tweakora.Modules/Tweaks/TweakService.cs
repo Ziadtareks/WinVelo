@@ -190,15 +190,21 @@ public sealed class TweakService : ITweakService
                 var batchReport = await _runner.ApplyBatchAsync(new[] { tweak }, cancellationToken: ct);
                 var itemResult = batchReport.Results.FirstOrDefault();
 
-                bool succeeded = itemResult?.Status == TweakExecutionStatus.Applied;
-                bool skipped = itemResult?.Status == TweakExecutionStatus.Skipped;
+                OperationItemStatus status = itemResult?.Status switch
+                {
+                    TweakExecutionStatus.Applied => OperationItemStatus.Applied,
+                    TweakExecutionStatus.Skipped => OperationItemStatus.Skipped,
+                    TweakExecutionStatus.FailedRolledBack => OperationItemStatus.FailedRolledBack,
+                    TweakExecutionStatus.FailedRollbackIncomplete => OperationItemStatus.FailedRollbackIncomplete,
+                    _ => OperationItemStatus.Failed
+                };
 
                 return new OperationItemResult
                 {
                     Id = tweak.Id,
                     Name = tweak.Name,
-                    Status = succeeded ? OperationItemStatus.Succeeded : (skipped ? OperationItemStatus.Skipped : OperationItemStatus.Failed),
-                    Reason = itemResult?.Message ?? (succeeded ? "Applied successfully." : "Execution failed.")
+                    Status = status,
+                    Reason = itemResult?.Message ?? (status == OperationItemStatus.Applied ? "Applied successfully." : "Execution failed.")
                 };
             },
             cancellationToken);
@@ -222,8 +228,8 @@ public sealed class TweakService : ITweakService
                 {
                     Id = tweak.Id,
                     Name = tweak.Name,
-                    Status = actionResult.Success ? OperationItemStatus.Succeeded : OperationItemStatus.Failed,
-                    Reason = actionResult.Message
+                    Status = actionResult.Success ? OperationItemStatus.Restored : OperationItemStatus.Failed,
+                    Reason = actionResult.Message ?? (actionResult.Success ? "Restored original state." : "Undo failed.")
                 };
             },
             cancellationToken);

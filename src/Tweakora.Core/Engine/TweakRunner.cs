@@ -6,8 +6,11 @@ namespace Tweakora.Core.Engine;
 public enum TweakExecutionStatus
 {
     Applied,
+    Restored,
     Skipped,
     Failed,
+    FailedRolledBack,
+    FailedRollbackIncomplete,
     Undone
 }
 
@@ -16,15 +19,33 @@ public sealed class TweakExecutionResult
     public required string TweakId { get; init; }
     public required TweakExecutionStatus Status { get; init; }
     public string? Message { get; init; }
+
+    public string DisplayStatus => Status switch
+    {
+        TweakExecutionStatus.Applied => "Applied",
+        TweakExecutionStatus.Restored => "Restored",
+        TweakExecutionStatus.Undone => "Restored",
+        TweakExecutionStatus.Skipped => "Skipped",
+        TweakExecutionStatus.Failed => "Failed",
+        TweakExecutionStatus.FailedRolledBack => "Failed-rolled-back",
+        TweakExecutionStatus.FailedRollbackIncomplete => "Failed-rollback-incomplete",
+        _ => Status.ToString()
+    };
+
+    public bool IsFailure => Status is TweakExecutionStatus.Failed
+                                   or TweakExecutionStatus.FailedRolledBack
+                                   or TweakExecutionStatus.FailedRollbackIncomplete;
 }
 
 public sealed class BatchExecutionReport
 {
     public int TotalRequested => Results.Count;
     public int AppliedCount => Results.Count(r => r.Status == TweakExecutionStatus.Applied);
+    public int RestoredCount => Results.Count(r => r.Status is TweakExecutionStatus.Restored or TweakExecutionStatus.Undone);
     public int SkippedCount => Results.Count(r => r.Status == TweakExecutionStatus.Skipped);
-    public int FailedCount => Results.Count(r => r.Status == TweakExecutionStatus.Failed);
-    public int UndoneCount => Results.Count(r => r.Status == TweakExecutionStatus.Undone);
+    public int FailedCount => Results.Count(r => r.IsFailure);
+    public int UndoneCount => RestoredCount;
+    public bool AllSucceeded => Results.Count > 0 && FailedCount == 0 && SkippedCount == 0;
     public List<TweakExecutionResult> Results { get; } = new();
 }
 
@@ -157,19 +178,40 @@ public sealed class TweakRunner
             {
                 // Transaction rollback for this single tweak
                 progress?.Report($"Rolling back partial changes for failed tweak: {tweak.Id}...");
+                bool rollbackSucceeded = true;
                 foreach (JournalActionRecord record in appliedActionsInThisTweak.AsEnumerable().Reverse())
                 {
                     IActionHandler? handler = _handlers.FirstOrDefault(h => h.CanHandle(record.ActionType));
                     if (handler != null)
                     {
-                        try { await handler.UndoAsync(record, _context); } catch { /* best effort rollback */ }
+                        try
+                        {
+                            var undoRes = await handler.UndoAsync(record, _context);
+                            if (!undoRes.Success) rollbackSucceeded = false;
+                        }
+                        catch
+                        {
+                            rollbackSucceeded = false;
+                        }
                     }
+                }
+
+                TweakExecutionStatus status;
+                if (appliedActionsInThisTweak.Count == 0)
+                {
+                    status = TweakExecutionStatus.Failed;
+                }
+                else
+                {
+                    status = rollbackSucceeded
+                        ? TweakExecutionStatus.FailedRolledBack
+                        : TweakExecutionStatus.FailedRollbackIncomplete;
                 }
 
                 report.Results.Add(new TweakExecutionResult
                 {
                     TweakId = tweak.Id,
-                    Status = TweakExecutionStatus.Failed,
+                    Status = status,
                     Message = failureReason
                 });
             }

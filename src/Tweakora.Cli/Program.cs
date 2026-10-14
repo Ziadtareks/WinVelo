@@ -194,39 +194,84 @@ public static class Program
         if (presetIdx >= 0 && presetIdx < args.Length - 1)
         {
             string presetName = args[presetIdx + 1];
-            return await ExecutePresetAsync(presetName, catalog, dryRun, isDryRun, handlers, context, runner, tweaksDir);
+            return await ExecutePresetAsync(presetName, catalog, dryRun, isDryRun, isRun, handlers, context, runner, tweaksDir);
         }
 
-        // 1. Single Tweak execution: --tweak <id> [--apply | --undo]
-        int tweakIdx = Array.FindIndex(args, a => string.Equals(a, "--tweak", StringComparison.OrdinalIgnoreCase));
+        // 1. Tweak execution: --tweak <id1,id2> / --tweaks <id1,id2> [--apply | --undo]
+        int tweakIdx = Array.FindIndex(args, a => string.Equals(a, "--tweak", StringComparison.OrdinalIgnoreCase) || string.Equals(a, "--tweaks", StringComparison.OrdinalIgnoreCase));
         if (tweakIdx >= 0 && tweakIdx < args.Length - 1)
         {
-            string tweakId = args[tweakIdx + 1];
-            var targetTweak = catalog.FirstOrDefault(t =>
-                string.Equals(t.Id, tweakId, StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(t.Origin, tweakId, StringComparison.OrdinalIgnoreCase));
-
-            if (targetTweak == null)
+            string tweakArg = args[tweakIdx + 1];
+            string[] rawIds = tweakArg.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            var targetTweaks = new List<TweakDefinition>();
+            int missingCount = 0;
+            foreach (var id in rawIds)
             {
-                Console.WriteLine($"[ERROR] Tweak not found in catalog: {tweakId}");
+                var target = catalog.FirstOrDefault(t =>
+                    string.Equals(t.Id, id, StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(t.Origin, id, StringComparison.OrdinalIgnoreCase));
+                if (target != null)
+                {
+                    targetTweaks.Add(target);
+                }
+                else
+                {
+                    missingCount++;
+                    Console.WriteLine($"[Failed] {id}: Tweak not found in catalog");
+                }
+            }
+
+            int totalRequested = targetTweaks.Count + missingCount;
+
+            if (targetTweaks.Count == 0)
+            {
+                Console.WriteLine($"[ERROR] None of the specified tweaks were found in catalog.");
+                Console.WriteLine($"Applied 0 of {totalRequested} — {missingCount} failed");
                 return 1;
             }
 
             if (args.Contains("--undo"))
             {
-                Console.WriteLine($"[EXECUTE] Undoing tweak: {targetTweak.Id} ({targetTweak.Name})...");
-                var result = await runner.UndoTweakAsync(targetTweak);
-                Console.WriteLine($"[RESULT] {(result.Success ? "Success" : "Failed")}: {result.Message}");
-                return result.Success ? 0 : 1;
+                int restored = 0;
+                int failed = missingCount;
+                foreach (var tweak in targetTweaks)
+                {
+                    Console.WriteLine($"[EXECUTE] Undoing tweak: {tweak.Id} ({tweak.Name})...");
+                    var result = await runner.UndoTweakAsync(tweak);
+                    if (result.Success)
+                    {
+                        restored++;
+                        Console.WriteLine($"  [Restored] {tweak.Id} - {result.Message ?? "Restored original state."}");
+                    }
+                    else
+                    {
+                        failed++;
+                        Console.WriteLine($"[Failed] {tweak.Id}: {result.Message ?? "Undo failed."}");
+                    }
+                }
+
+                Console.WriteLine($"Restored {restored} of {totalRequested} — {failed} failed");
+                return failed == 0 ? 0 : 1;
             }
             else
             {
-                Console.WriteLine($"[EXECUTE] Applying tweak: {targetTweak.Id} ({targetTweak.Name})...");
-                var report = await runner.ApplyBatchAsync(new[] { targetTweak });
-                var firstRes = report.Results.FirstOrDefault();
-                bool success = firstRes?.Status == TweakExecutionStatus.Applied;
-                Console.WriteLine($"[RESULT] {(success ? "Success" : "Failed")}: {firstRes?.Message ?? firstRes?.Status.ToString()}");
-                return success ? 0 : 1;
+                Console.WriteLine($"[EXECUTE] Applying {targetTweaks.Count} tweak(s)...");
+                var report = await runner.ApplyBatchAsync(targetTweaks);
+                foreach (var res in report.Results)
+                {
+                    if (!res.IsFailure)
+                    {
+                        Console.WriteLine($"  [{res.DisplayStatus}] {res.TweakId} - {res.Message ?? "Applied successfully."}");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"[Failed] {res.TweakId}: {res.Message ?? "Execution failed."}");
+                    }
+                }
+
+                int totalFailed = report.FailedCount + missingCount;
+                Console.WriteLine($"Applied {report.AppliedCount} of {totalRequested} — {totalFailed} failed");
+                return totalFailed == 0 ? 0 : 1;
             }
         }
 
@@ -376,9 +421,16 @@ public static class Program
                 var report = await runner.ApplyBatchAsync(targetTweaks);
                 foreach (var res in report.Results)
                 {
-                    Console.WriteLine($"  [{res.Status}] {res.TweakId} - {res.Message}");
+                    if (!res.IsFailure)
+                    {
+                        Console.WriteLine($"  [{res.DisplayStatus}] {res.TweakId} - {res.Message ?? "Applied successfully."}");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"[Failed] {res.TweakId}: {res.Message ?? "Execution failed."}");
+                    }
                 }
-                Console.WriteLine($"\n[DONE] Finished executing configuration. Applied: {report.AppliedCount}, Skipped: {report.SkippedCount}, Failed: {report.FailedCount}");
+                Console.WriteLine($"Applied {report.AppliedCount} of {report.TotalRequested} — {report.FailedCount} failed");
                 return report.FailedCount == 0 ? 0 : 1;
             }
         }
@@ -761,12 +813,13 @@ public static class Program
         return 0;
     }
 
-    private static Task<int> ExecutePresetAsync(
+    private static async Task<int> ExecutePresetAsync(
         string presetName,
         List<TweakDefinition> catalog,
         DryRunEngine dryRun,
         bool isDryRun,
-        List<IActionHandler> handlers,
+        bool isRun,
+        IEnumerable<IActionHandler> handlers,
         Core.Engine.ExecutionContext context,
         TweakRunner runner,
         string catalogDir)
@@ -784,7 +837,7 @@ public static class Program
         if (!File.Exists(presetPath))
         {
             Console.WriteLine($"[ERROR] Presets file not found: {presetPath}");
-            return Task.FromResult(1);
+            return 1;
         }
 
         string presetJson = File.ReadAllText(presetPath);
@@ -794,7 +847,7 @@ public static class Program
         {
             Console.WriteLine($"[ERROR] Preset '{presetName}' not found in preset.json.");
             Console.WriteLine("Available presets: " + string.Join(", ", presetDoc.RootElement.EnumerateObject().Select(x => x.Name)));
-            return Task.FromResult(1);
+            return 1;
         }
 
         List<string> keys = presetElem.EnumerateArray().Select(x => x.GetString() ?? "").Where(s => !string.IsNullOrEmpty(s)).ToList();
@@ -802,6 +855,25 @@ public static class Program
 
         var targetTweaks = catalog.Where(t => keySet.Contains(t.Id) || (t.Origin != null && keySet.Contains(t.Origin))).ToList();
         Console.WriteLine($"[INFO] Preset '{presetName}' matched {targetTweaks.Count} of {keys.Count} configured keys.");
+
+        if (isRun)
+        {
+            Console.WriteLine($"\n[EXECUTE] Running preset '{presetName}' ({targetTweaks.Count} tweaks)...");
+            var report = await runner.ApplyBatchAsync(targetTweaks);
+            foreach (var res in report.Results)
+            {
+                if (!res.IsFailure)
+                {
+                    Console.WriteLine($"  [{res.DisplayStatus}] {res.TweakId} - {res.Message ?? "Applied successfully."}");
+                }
+                else
+                {
+                    Console.WriteLine($"[Failed] {res.TweakId}: {res.Message ?? "Execution failed."}");
+                }
+            }
+            Console.WriteLine($"Applied {report.AppliedCount} of {report.TotalRequested} — {report.FailedCount} failed");
+            return report.FailedCount == 0 ? 0 : 1;
+        }
 
         string rootDir = AppContext.BaseDirectory;
         string verifyDir = Path.Combine(rootDir, "verify");
@@ -863,7 +935,7 @@ public static class Program
         }
 
         Console.WriteLine($"\n[INFO] Dry-run plan saved to: {dryRunReportPath}");
-        return Task.FromResult(0);
+        return 0;
     }
 
     private static List<TweakDefinition> LoadCatalog(string tweaksDir)
