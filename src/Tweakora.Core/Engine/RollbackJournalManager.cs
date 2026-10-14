@@ -163,10 +163,22 @@ public sealed class RollbackJournalManager
     {
         Directory.CreateDirectory(_journalDirectory);
         string filePath = Path.Combine(_journalDirectory, $"session-{session.SessionId}.json");
-        string tempPath = filePath + ".tmp";
-
         string json = JsonSerializer.Serialize(session, new JsonSerializerOptions { WriteIndented = true });
-        File.WriteAllText(tempPath, json);
-        File.Move(tempPath, filePath, overwrite: true);
+
+        for (int attempt = 0; attempt < 5; attempt++)
+        {
+            try
+            {
+                using var fs = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite);
+                using var writer = new StreamWriter(fs);
+                writer.Write(json);
+                writer.Flush();
+                return;
+            }
+            catch (Exception) when (attempt < 4)
+            {
+                Thread.Sleep(15);
+            }
+        }
     }
 }

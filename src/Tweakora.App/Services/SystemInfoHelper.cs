@@ -5,6 +5,14 @@ using Microsoft.Win32;
 
 namespace Tweakora.App.Services;
 
+public sealed record RamMetrics(
+    double TotalGb,
+    double UsedGb,
+    double AvailableGb,
+    int UsagePercent,
+    string DisplayText,
+    string AvailableText);
+
 public sealed class SystemInfoSummary
 {
     public string OsName { get; init; } = "Windows";
@@ -15,7 +23,9 @@ public sealed class SystemInfoSummary
     public string ProcessorName { get; init; } = "Multi-Core Processor";
     public double TotalPhysicalRamGb { get; init; } = 16.0;
     public double UsedPhysicalRamGb { get; init; } = 4.0;
+    public double AvailablePhysicalRamGb { get; init; } = 12.0;
     public int MemoryLoadPercent { get; init; } = 25;
+    public string AvailableRamText { get; init; } = "12.0 GB Available";
     public string DisplaySummary => $"{OsName} ({BuildNumber})";
 }
 
@@ -38,6 +48,40 @@ public static class SystemInfoHelper
     [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static extern bool GlobalMemoryStatusEx([In, Out] MEMORYSTATUSEX lpBuffer);
+
+    public static RamMetrics GetRamMetrics()
+    {
+        double totalGb = 16.0;
+        double availGb = 12.0;
+        double usedGb = 4.0;
+        int usagePercent = 25;
+
+        try
+        {
+            var memStatus = new MEMORYSTATUSEX();
+            if (GlobalMemoryStatusEx(memStatus) && memStatus.ullTotalPhys > 0)
+            {
+                totalGb = memStatus.ullTotalPhys / 1073741824.0;
+                availGb = memStatus.ullAvailPhys / 1073741824.0;
+                usedGb = (memStatus.ullTotalPhys - memStatus.ullAvailPhys) / 1073741824.0;
+                usagePercent = (int)Math.Round(((double)(memStatus.ullTotalPhys - memStatus.ullAvailPhys) / memStatus.ullTotalPhys) * 100.0);
+                usagePercent = Math.Clamp(usagePercent, 0, 100);
+            }
+        }
+        catch { }
+
+        string displayText = $"{usedGb:F1} / {totalGb:F1} GB ({usagePercent}%)";
+        string availableText = $"{availGb:F1} GB Available";
+
+        return new RamMetrics(
+            TotalGb: Math.Round(totalGb, 1),
+            UsedGb: Math.Round(usedGb, 1),
+            AvailableGb: Math.Round(availGb, 1),
+            UsagePercent: usagePercent,
+            DisplayText: displayText,
+            AvailableText: availableText
+        );
+    }
 
     public static SystemInfoSummary GetSystemInfo()
     {
@@ -84,36 +128,21 @@ public static class SystemInfoHelper
 
         string arch = Environment.Is64BitOperatingSystem ? "64-bit (x64)" : "32-bit";
 
-        double totalGb = 16.0;
-        double usedGb = 4.0;
-        int loadPercent = 25;
-        string mem = "16.0 GB RAM";
-
-        try
-        {
-            var memStatus = new MEMORYSTATUSEX();
-            if (GlobalMemoryStatusEx(memStatus))
-            {
-                totalGb = memStatus.ullTotalPhys / (1024.0 * 1024 * 1024);
-                double availGb = memStatus.ullAvailPhys / (1024.0 * 1024 * 1024);
-                usedGb = Math.Max(0.1, totalGb - availGb);
-                loadPercent = (int)Math.Clamp(memStatus.dwMemoryLoad, 1, 100);
-                mem = $"{usedGb:F1} GB / {totalGb:F1} GB ({loadPercent}%)";
-            }
-        }
-        catch { }
+        var ram = GetRamMetrics();
 
         return new SystemInfoSummary
         {
             OsName = string.IsNullOrEmpty(displayVersion) ? osName : $"{osName} {displayVersion}",
             BuildNumber = $"Build {build}",
             Architecture = arch,
-            MemoryDisplay = mem,
+            MemoryDisplay = ram.DisplayText,
             Hostname = Environment.MachineName,
             ProcessorName = cpuName,
-            TotalPhysicalRamGb = Math.Round(totalGb, 1),
-            UsedPhysicalRamGb = Math.Round(usedGb, 1),
-            MemoryLoadPercent = loadPercent
+            TotalPhysicalRamGb = ram.TotalGb,
+            UsedPhysicalRamGb = ram.UsedGb,
+            AvailablePhysicalRamGb = ram.AvailableGb,
+            MemoryLoadPercent = ram.UsagePercent,
+            AvailableRamText = ram.AvailableText
         };
     }
 }

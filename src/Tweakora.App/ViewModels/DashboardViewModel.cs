@@ -92,7 +92,7 @@ public sealed partial class ProfileCardModel : ObservableObject
     }
 }
 
-public sealed partial class DashboardViewModel : ObservableObject
+public sealed partial class DashboardViewModel : ObservableObject, IDisposable
 {
     private readonly ITweakService _tweakService;
     private readonly IOperationRunner _runner;
@@ -102,9 +102,22 @@ public sealed partial class DashboardViewModel : ObservableObject
     private readonly IActivityTracker? _activityTracker;
     private readonly List<TweakDefinition> _catalog = new();
     private bool _isRefreshingStates;
+    private System.Windows.Threading.DispatcherTimer? _ramMonitorTimer;
 
     [ObservableProperty]
     private SystemInfoSummary _systemInfo = SystemInfoHelper.GetSystemInfo();
+
+    [ObservableProperty]
+    private string _ramUsageText = string.Empty;
+
+    [ObservableProperty]
+    private int _ramUsagePercentage = 0;
+
+    [ObservableProperty]
+    private string _availableRamText = string.Empty;
+
+    [ObservableProperty]
+    private string _ramBarColor = "#10B981";
 
     public bool IsAdmin { get; } = AdminPrivilegeHelper.IsRunningAsAdministrator();
 
@@ -174,12 +187,71 @@ public sealed partial class DashboardViewModel : ObservableObject
 
         InitializeProfiles();
         InitializeQuickToggles();
+        UpdateRamMetrics();
+        InitializeRamTimer();
 
         _ = Task.Run(async () =>
         {
             await RefreshAllToggleStatesAsync();
             await RecalculateOptimizationScoreAsync();
         });
+    }
+
+    public void UpdateRamMetrics()
+    {
+        var ram = SystemInfoHelper.GetRamMetrics();
+        void Apply()
+        {
+            RamUsageText = ram.DisplayText;
+            RamUsagePercentage = ram.UsagePercent;
+            AvailableRamText = ram.AvailableText;
+
+            if (ram.UsagePercent >= 85)
+            {
+                RamBarColor = "#EF4444";
+            }
+            else if (ram.UsagePercent >= 70)
+            {
+                RamBarColor = "#F59E0B";
+            }
+            else
+            {
+                RamBarColor = "#10B981";
+            }
+        }
+
+        if (Application.Current?.Dispatcher != null && !Application.Current.Dispatcher.CheckAccess())
+        {
+            Application.Current.Dispatcher.Invoke(Apply);
+        }
+        else
+        {
+            Apply();
+        }
+    }
+
+    private void InitializeRamTimer()
+    {
+        if (Application.Current == null) return;
+
+        try
+        {
+            _ramMonitorTimer = new System.Windows.Threading.DispatcherTimer(
+                TimeSpan.FromSeconds(1),
+                System.Windows.Threading.DispatcherPriority.Background,
+                (s, e) => UpdateRamMetrics(),
+                Application.Current.Dispatcher);
+            _ramMonitorTimer.Start();
+        }
+        catch
+        {
+        }
+    }
+
+    public void Dispose()
+    {
+        _ramMonitorTimer?.Stop();
+        _ramMonitorTimer = null;
     }
 
     private void InitializeProfiles()
@@ -686,6 +758,7 @@ public sealed partial class DashboardViewModel : ObservableObject
             var result = await Task.Run(() => _memoryService.PurgeMemoryAndStandbyListAsync());
             var sysInfo = await Task.Run(() => SystemInfoHelper.GetSystemInfo());
             SystemInfo = sysInfo;
+            UpdateRamMetrics();
             GlobalStatusMessage = $"RAM Purge Complete: Freed {result.FormattedFreed} of Standby & Working Set Memory.";
         }
         catch (Exception ex)

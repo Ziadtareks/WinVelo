@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Tweakora.App.Services;
 using Tweakora.App.ViewModels;
 using Tweakora.Core.Engine;
 using Tweakora.Core.Models;
@@ -393,5 +394,48 @@ public sealed class FinalQaDiagnosticTests
 
         Assert.NotNull(mainVm.CurrentPage);
         Assert.Equal("Dashboard", mainVm.ActiveTab);
+    }
+
+    [Fact]
+    public void RamMetrics_TaskManagerParityMath_IsValidAndFormatted()
+    {
+        var ram = SystemInfoHelper.GetRamMetrics();
+        Assert.NotNull(ram);
+        Assert.True(ram.TotalGb > 0, "Total RAM should be greater than 0 GB");
+        Assert.True(ram.UsedGb > 0, "Used RAM should be greater than 0 GB");
+        Assert.True(ram.AvailableGb >= 0, "Available RAM should be >= 0 GB");
+        Assert.InRange(ram.UsagePercent, 0, 100);
+        Assert.Contains(" / ", ram.DisplayText);
+        Assert.Contains(" GB (", ram.DisplayText);
+        Assert.EndsWith("%)", ram.DisplayText);
+        Assert.EndsWith(" GB Available", ram.AvailableText);
+    }
+
+    [Fact]
+    public void DashboardViewModel_RamTelemetryProperties_PopulatedAndDynamic()
+    {
+        var fakeReg = new FakeRegistryService();
+        var fakeSvc = new FakeServicesService();
+        var fakeSched = new FakeTaskSchedulerService();
+        var fakeRestore = new FakeRestoreService();
+        var fakeShell = new FakeShellService();
+        string journalDir = Path.Combine(AppContext.BaseDirectory, "test-journal-ram");
+        Directory.CreateDirectory(journalDir);
+        var journal = new RollbackJournalManager(journalDir);
+        var runner = new OperationRunner();
+
+        var tweakService = new TweakService(fakeReg, fakeSvc, fakeSched, fakeRestore, fakeShell, journal);
+        var memOpt = new MemoryOptimizerService();
+        var advisor = new SmartAdvisorService(fakeReg, fakeShell);
+
+        using var dashboardVm = new DashboardViewModel(tweakService, runner, fakeRestore, memOpt, advisor);
+
+        Assert.False(string.IsNullOrWhiteSpace(dashboardVm.RamUsageText));
+        Assert.False(string.IsNullOrWhiteSpace(dashboardVm.AvailableRamText));
+        Assert.InRange(dashboardVm.RamUsagePercentage, 0, 100);
+        Assert.Contains(dashboardVm.RamBarColor, new[] { "#10B981", "#F59E0B", "#EF4444" });
+
+        dashboardVm.UpdateRamMetrics();
+        Assert.False(string.IsNullOrWhiteSpace(dashboardVm.RamUsageText));
     }
 }
