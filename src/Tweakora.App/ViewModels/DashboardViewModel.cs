@@ -140,19 +140,44 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
     public string AdminStatusText => IsAdmin ? "Administrator Active" : "Standard User (Limited)";
 
     [ObservableProperty]
-    private int _optimizationScore = 65;
+    private int _configuredSettingsPercentage = 0;
 
     [ObservableProperty]
-    private string _optimizationScoreGrade = "Good";
+    private string _configuredSettingsStatusText = "Scanning settings...";
 
     [ObservableProperty]
-    private string _optimizationScoreBrush = "#10B981";
+    private string _configuredSettingsBrush = "#10B981";
 
     [ObservableProperty]
-    private string _optimizationScoreDetailText = "Scanning hardware...";
+    private string _configuredSettingsDetailText = "Scanning settings...";
+
+    // Backward-compatibility aliases
+    public int OptimizationScore
+    {
+        get => ConfiguredSettingsPercentage;
+        set => ConfiguredSettingsPercentage = value;
+    }
+
+    public string OptimizationScoreGrade
+    {
+        get => ConfiguredSettingsStatusText;
+        set => ConfiguredSettingsStatusText = value;
+    }
+
+    public string OptimizationScoreBrush
+    {
+        get => ConfiguredSettingsBrush;
+        set => ConfiguredSettingsBrush = value;
+    }
+
+    public string OptimizationScoreDetailText
+    {
+        get => ConfiguredSettingsDetailText;
+        set => ConfiguredSettingsDetailText = value;
+    }
 
     [ObservableProperty]
-    private string _smartAdvisorSummary = "Ready for 1-Click Hardware Optimization.";
+    private string _smartAdvisorSummary = "Ready to review recommended hardware settings.";
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsNotSmartOptimizing))]
@@ -1098,29 +1123,10 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
         try
         {
             var assessment = await Task.Run(() => _advisorService.CalculateOptimizationScoreAsync(_catalog, _tweakService));
-            OptimizationScore = assessment.ScorePercent;
-            OptimizationScoreDetailText = $"{assessment.AppliedCount} of {assessment.TotalScoredCount} optimizations active";
-
-            if (assessment.ScorePercent >= 80)
-            {
-                OptimizationScoreGrade = "Maximum Velocity";
-                OptimizationScoreBrush = "#10B981";
-            }
-            else if (assessment.ScorePercent >= 60)
-            {
-                OptimizationScoreGrade = "Well Optimized";
-                OptimizationScoreBrush = "#34D399";
-            }
-            else if (assessment.ScorePercent >= 40)
-            {
-                OptimizationScoreGrade = "Moderate";
-                OptimizationScoreBrush = "#FBBF24";
-            }
-            else
-            {
-                OptimizationScoreGrade = "Needs Optimization";
-                OptimizationScoreBrush = "#F87171";
-            }
+            ConfiguredSettingsPercentage = assessment.ScorePercent;
+            ConfiguredSettingsDetailText = $"{assessment.AppliedCount} of {assessment.TotalScoredCount} settings configured";
+            ConfiguredSettingsStatusText = $"{assessment.AppliedCount} active";
+            ConfiguredSettingsBrush = "#10B981";
 
             if (assessment.TailoredRecommendationNotes.Count > 0)
             {

@@ -186,7 +186,7 @@ public partial class App : Application
 
             var vm = (MainViewModel)window.DataContext;
 
-            // 0. Dashboard Tab (Home / Easy Boost)
+            // 0. Dashboard Tab
             vm.SwitchTabCommand.Execute("Dashboard");
             FlushUi(window);
             SaveVisualToPng(GetWindowVisual(window), 1440, 900, Path.Combine(targetDir, "dashboard.png"));

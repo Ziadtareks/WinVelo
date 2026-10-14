@@ -167,14 +167,14 @@
                             <TextBlock Text="OVERVIEW" FontSize="11" FontWeight="Bold"
                                        Foreground="{DynamicResource TextMutedBrush}" Margin="8,4,0,6" />
 
-                            <!-- Home (Easy Boost) -->
+                            <!-- Dashboard -->
                             <Button AutomationProperties.AutomationId="Tab_Dashboard"
                                     Style="{DynamicResource SidebarNavBtn}"
                                     Command="{Binding SwitchTabCommand}" CommandParameter="Dashboard" Margin="0,0,0,8">
                                 <DockPanel LastChildFill="False">
                                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
                                         <ui:SymbolIcon Symbol="Home24" FontSize="16" Margin="0,0,8,0" Foreground="{DynamicResource AccentPrimaryBrush}" VerticalAlignment="Center" />
-                                        <TextBlock Text="Home (Easy Boost)" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                        <TextBlock Text="Dashboard" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" />
                                     </StackPanel>
                                     <Border DockPanel.Dock="Right" Background="{DynamicResource AccentPrimaryBrush}" CornerRadius="6" Padding="6,1" VerticalAlignment="Center">
                                         <TextBlock Text="HOME" FontSize="9" FontWeight="Bold" Foreground="White" />

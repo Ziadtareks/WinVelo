@@ -1,1265 +1,1282 @@
-[
-  {
-    "schemaVersion": "1.0.0",
-    "id": "essential.activity",
-    "origin": "WPFTweaksActivity",
-    "name": "Activity History - Disable",
-    "description": "Stops Windows from publishing or uploading user activities while preserving clipboard history.",
-    "category": "privacy",
-    "subcategory": "Essential Tweaks",
-    "risk": "Safe",
-    "impacts": [
-      "privacy"
-    ],
-    "windows": {
-      "minBuild": 19041
+﻿[
+    {
+        "schemaVersion":  "1.0.0",
+        "id":  "essential.activity",
+        "origin":  "WPFTweaksActivity",
+        "name":  "Activity History - Disable",
+        "description":  "Stops Windows from publishing or uploading user activities while preserving clipboard history.",
+        "category":  "privacy",
+        "subcategory":  "Essential Tweaks",
+        "risk":  "Safe",
+        "impacts":  [
+                        "privacy"
+                    ],
+        "windows":  {
+                        "minBuild":  19041
+                    },
+        "requiresReboot":  false,
+        "requiresExplorerRestart":  false,
+        "detect":  {
+                       "type":  "Registry",
+                       "hive":  "HKLM",
+                       "key":  "SOFTWARE\\Policies\\Microsoft\\Windows\\System",
+                       "valueName":  "EnableActivityFeed",
+                       "matchType":  "Equals",
+                       "expectedValue":  1
+                   },
+        "apply":  [
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKLM",
+                          "key":  "SOFTWARE\\Policies\\Microsoft\\Windows\\System",
+                          "operation":  "Set",
+                          "valueName":  "EnableActivityFeed",
+                          "valueKind":  "DWord",
+                          "data":  1
+                      },
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKLM",
+                          "key":  "SOFTWARE\\Policies\\Microsoft\\Windows\\System",
+                          "operation":  "Set",
+                          "valueName":  "PublishUserActivities",
+                          "valueKind":  "DWord",
+                          "data":  0
+                      },
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKLM",
+                          "key":  "SOFTWARE\\Policies\\Microsoft\\Windows\\System",
+                          "operation":  "Set",
+                          "valueName":  "UploadUserActivities",
+                          "valueKind":  "DWord",
+                          "data":  0
+                      }
+                  ],
+        "undo":  [
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKLM",
+                         "key":  "SOFTWARE\\Policies\\Microsoft\\Windows\\System",
+                         "operation":  "DeleteValue",
+                         "valueName":  "EnableActivityFeed"
+                     },
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKLM",
+                         "key":  "SOFTWARE\\Policies\\Microsoft\\Windows\\System",
+                         "operation":  "DeleteValue",
+                         "valueName":  "PublishUserActivities"
+                     },
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKLM",
+                         "key":  "SOFTWARE\\Policies\\Microsoft\\Windows\\System",
+                         "operation":  "DeleteValue",
+                         "valueName":  "UploadUserActivities"
+                     }
+                 ],
+        "source":  "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/activity",
+        "verifiedOnBuild":  "26100",
+        "evidence":  "documented"
     },
-    "requiresReboot": false,
-    "requiresExplorerRestart": false,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKLM",
-      "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\System",
-      "valueName": "EnableActivityFeed",
-      "matchType": "Equals",
-      "expectedValue": 1
+    {
+        "schemaVersion":  "1.0.0",
+        "id":  "essential.hiber",
+        "origin":  "WPFTweaksHiber",
+        "name":  "Hibernation - Disable",
+        "description":  "Hibernation is really meant for laptops as it saves what\u0027s in memory before turning the PC off. It really should never be used.",
+        "category":  "system",
+        "subcategory":  "Essential Tweaks",
+        "risk":  "Safe",
+        "impacts":  [
+                        "ui"
+                    ],
+        "windows":  {
+                        "minBuild":  19041
+                    },
+        "requiresReboot":  false,
+        "requiresExplorerRestart":  false,
+        "detect":  {
+                       "type":  "Registry",
+                       "hive":  "HKLM",
+                       "key":  "System\\CurrentControlSet\\Control\\Session Manager\\Power",
+                       "valueName":  "HibernateEnabled",
+                       "matchType":  "Equals",
+                       "expectedValue":  0
+                   },
+        "apply":  [
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKLM",
+                          "key":  "System\\CurrentControlSet\\Control\\Session Manager\\Power",
+                          "operation":  "Set",
+                          "valueName":  "HibernateEnabled",
+                          "valueKind":  "DWord",
+                          "data":  0
+                      },
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKLM",
+                          "key":  "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FlyoutMenuSettings",
+                          "operation":  "Set",
+                          "valueName":  "ShowHibernateOption",
+                          "valueKind":  "DWord",
+                          "data":  0
+                      },
+                      {
+                          "type":  "PowerShell",
+                          "operation":  "Execute",
+                          "script":  "powercfg.exe /hibernate off\n      if ($LASTEXITCODE -ne 0) { throw \"powercfg failed with exit code $LASTEXITCODE\" }",
+                          "timeoutSeconds":  60
+                      }
+                  ],
+        "undo":  [
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKLM",
+                         "key":  "System\\CurrentControlSet\\Control\\Session Manager\\Power",
+                         "operation":  "Set",
+                         "valueName":  "HibernateEnabled",
+                         "valueKind":  "DWord",
+                         "data":  1
+                     },
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKLM",
+                         "key":  "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FlyoutMenuSettings",
+                         "operation":  "Set",
+                         "valueName":  "ShowHibernateOption",
+                         "valueKind":  "DWord",
+                         "data":  1
+                     },
+                     {
+                         "type":  "PowerShell",
+                         "operation":  "Execute",
+                         "script":  "powercfg.exe /hibernate on\n      if ($LASTEXITCODE -ne 0) { throw \"powercfg failed with exit code $LASTEXITCODE\" }",
+                         "timeoutSeconds":  60
+                     }
+                 ],
+        "source":  "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/hiber",
+        "verifiedOnBuild":  "26100",
+        "evidence":  "documented"
     },
-    "apply": [
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\System",
-        "operation": "Set",
-        "valueName": "EnableActivityFeed",
-        "valueKind": "DWord",
-        "data": 1
-      },
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\System",
-        "operation": "Set",
-        "valueName": "PublishUserActivities",
-        "valueKind": "DWord",
-        "data": 0
-      },
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\System",
-        "operation": "Set",
-        "valueName": "UploadUserActivities",
-        "valueKind": "DWord",
-        "data": 0
-      }
-    ],
-    "undo": [
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\System",
-        "operation": "DeleteValue",
-        "valueName": "EnableActivityFeed"
-      },
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\System",
-        "operation": "DeleteValue",
-        "valueName": "PublishUserActivities"
-      },
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\System",
-        "operation": "DeleteValue",
-        "valueName": "UploadUserActivities"
-      }
-    ],
-    "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/activity",
-    "verifiedOnBuild": "26100"
-  },
-  {
-    "schemaVersion": "1.0.0",
-    "id": "essential.hiber",
-    "origin": "WPFTweaksHiber",
-    "name": "Hibernation - Disable",
-    "description": "Hibernation is really meant for laptops as it saves what's in memory before turning the PC off. It really should never be used.",
-    "category": "system",
-    "subcategory": "Essential Tweaks",
-    "risk": "Safe",
-    "impacts": [
-      "ui"
-    ],
-    "windows": {
-      "minBuild": 19041
+    {
+        "schemaVersion":  "1.0.0",
+        "id":  "essential.widget",
+        "origin":  "WPFTweaksWidget",
+        "name":  "Widgets - Remove",
+        "description":  "Removes the annoying widgets in the bottom left of the Taskbar.",
+        "category":  "system",
+        "subcategory":  "Essential Tweaks",
+        "risk":  "Safe",
+        "impacts":  [
+                        "ui"
+                    ],
+        "windows":  {
+                        "minBuild":  19041
+                    },
+        "requiresReboot":  false,
+        "requiresExplorerRestart":  false,
+        "detect":  {
+                       "type":  "Registry",
+                       "hive":  "HKLM",
+                       "key":  "SOFTWARE\\Policies\\Microsoft\\Dsh",
+                       "valueName":  "AllowNewsAndInterests",
+                       "matchType":  "Equals",
+                       "expectedValue":  0
+                   },
+        "apply":  [
+                      {
+                          "type":  "PowerShell",
+                          "operation":  "Execute",
+                          "script":  "Get-Process *Widget* -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue\n      Get-AppxPackage Microsoft.WidgetsPlatformRuntime -AllUsers -ErrorAction SilentlyContinue | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue\n      Get-AppxPackage MicrosoftWindows.Client.WebExperience -AllUsers -ErrorAction SilentlyContinue | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue",
+                          "timeoutSeconds":  60
+                      },
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKLM",
+                          "key":  "SOFTWARE\\Policies\\Microsoft\\Dsh",
+                          "operation":  "Set",
+                          "valueName":  "AllowNewsAndInterests",
+                          "valueKind":  "DWord",
+                          "data":  0
+                      },
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKCU",
+                          "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+                          "operation":  "Set",
+                          "valueName":  "TaskbarDa",
+                          "valueKind":  "DWord",
+                          "data":  0
+                      }
+                  ],
+        "undo":  [
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKLM",
+                         "key":  "SOFTWARE\\Policies\\Microsoft\\Dsh",
+                         "operation":  "DeleteValue",
+                         "valueName":  "AllowNewsAndInterests"
+                     },
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKCU",
+                         "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+                         "operation":  "Set",
+                         "valueName":  "TaskbarDa",
+                         "valueKind":  "DWord",
+                         "data":  1
+                     }
+                 ],
+        "source":  "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/widget",
+        "verifiedOnBuild":  "26100",
+        "warnings":  "Uninstalls the Windows Widgets Platform and WebExperience AppX packages for all users. Undo restores taskbar registry settings, but does NOT reinstall the removed AppX packages.",
+        "reversible":  false,
+        "irreversibleReason":  "Uninstalls Microsoft Widgets and WebExperience AppX packages for all users; undo only restores taskbar visibility registry keys and does not reinstall the packages.",
+        "evidence":  "documented"
     },
-    "requiresReboot": false,
-    "requiresExplorerRestart": false,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKLM",
-      "key": "System\\CurrentControlSet\\Control\\Session Manager\\Power",
-      "valueName": "HibernateEnabled",
-      "matchType": "Equals",
-      "expectedValue": 0
+    {
+        "schemaVersion":  "1.0.0",
+        "id":  "essential.revertstartmenu",
+        "origin":  "WPFTweaksRevertStartMenu",
+        "name":  "Start Menu Previous Layout - Enable",
+        "description":  "Bring back the old Start Menu layout from before the gradual rollout of the new one in 25H2. On newer versions of Windows !!THIS TWEAK WILL NOT WORK!!",
+        "category":  "system",
+        "subcategory":  "Essential Tweaks",
+        "risk":  "Safe",
+        "impacts":  [
+                        "ui"
+                    ],
+        "windows":  {
+                        "minBuild":  19041
+                    },
+        "requiresReboot":  false,
+        "requiresExplorerRestart":  true,
+        "detect":  {
+                       "type":  "Registry",
+                       "hive":  "HKLM",
+                       "key":  "SYSTEM\\ControlSet001\\Control\\FeatureManagement\\Overrides\\8\\3036241548",
+                       "valueName":  "EnabledState",
+                       "matchType":  "Equals",
+                       "expectedValue":  1
+                   },
+        "apply":  [
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKLM",
+                          "key":  "SYSTEM\\ControlSet001\\Control\\FeatureManagement\\Overrides\\8\\3036241548",
+                          "operation":  "Set",
+                          "valueName":  "EnabledState",
+                          "valueKind":  "DWord",
+                          "data":  1
+                      }
+                  ],
+        "undo":  [
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKLM",
+                         "key":  "SYSTEM\\ControlSet001\\Control\\FeatureManagement\\Overrides\\8\\3036241548",
+                         "operation":  "DeleteValue",
+                         "valueName":  "EnabledState"
+                     }
+                 ],
+        "source":  "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/revertstartmenu",
+        "verifiedOnBuild":  "26100",
+        "evidence":  "documented"
     },
-    "apply": [
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "System\\CurrentControlSet\\Control\\Session Manager\\Power",
-        "operation": "Set",
-        "valueName": "HibernateEnabled",
-        "valueKind": "DWord",
-        "data": 0
-      },
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FlyoutMenuSettings",
-        "operation": "Set",
-        "valueName": "ShowHibernateOption",
-        "valueKind": "DWord",
-        "data": 0
-      },
-      {
-        "type": "PowerShell",
-        "operation": "Execute",
-        "script": "powercfg.exe /hibernate off\n      if ($LASTEXITCODE -ne 0) { throw \"powercfg failed with exit code $LASTEXITCODE\" }",
-        "timeoutSeconds": 60
-      }
-    ],
-    "undo": [
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "System\\CurrentControlSet\\Control\\Session Manager\\Power",
-        "operation": "Set",
-        "valueName": "HibernateEnabled",
-        "valueKind": "DWord",
-        "data": 1
-      },
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FlyoutMenuSettings",
-        "operation": "Set",
-        "valueName": "ShowHibernateOption",
-        "valueKind": "DWord",
-        "data": 1
-      },
-      {
-        "type": "PowerShell",
-        "operation": "Execute",
-        "script": "powercfg.exe /hibernate on\n      if ($LASTEXITCODE -ne 0) { throw \"powercfg failed with exit code $LASTEXITCODE\" }",
-        "timeoutSeconds": 60
-      }
-    ],
-    "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/hiber",
-    "verifiedOnBuild": "26100"
-  },
-  {
-    "schemaVersion": "1.0.0",
-    "id": "essential.widget",
-    "origin": "WPFTweaksWidget",
-    "name": "Widgets - Remove",
-    "description": "Removes the annoying widgets in the bottom left of the Taskbar.",
-    "category": "system",
-    "subcategory": "Essential Tweaks",
-    "risk": "Safe",
-    "impacts": [
-      "ui"
-    ],
-    "windows": {
-      "minBuild": 19041
+    {
+        "schemaVersion":  "1.0.0",
+        "id":  "essential.disablestoresearch",
+        "origin":  "WPFTweaksDisableStoreSearch",
+        "name":  "Microsoft Store Recommended Search Results - Disable",
+        "description":  "Will not display recommended Microsoft Store apps when searching for apps in the Start menu.",
+        "category":  "system",
+        "subcategory":  "Essential Tweaks",
+        "risk":  "High",
+        "sideEffects":  "Modifies ACL permissions on the Microsoft Store database file (store.db) using icacls /deny. This can break Microsoft Store operations, application installations, and package updates.",
+        "impacts":  [
+                        "ui"
+                    ],
+        "windows":  {
+                        "minBuild":  19041
+                    },
+        "requiresReboot":  false,
+        "requiresExplorerRestart":  false,
+        "detect":  {
+                       "type":  "Registry",
+                       "hive":  "HKCU",
+                       "key":  "Software\\Policies\\Microsoft\\Windows\\CloudContent",
+                       "valueName":  "DisableWindowsConsumerFeatures",
+                       "matchType":  "Equals",
+                       "expectedValue":  1
+                   },
+        "apply":  [
+                      {
+                          "type":  "PowerShell",
+                          "operation":  "Execute",
+                          "script":  "icacls \"$Env:LocalAppData\\Packages\\Microsoft.WindowsStore_8wekyb3d8bbwe\\LocalState\\store.db\" /deny *S-1-1-0:F -ErrorAction SilentlyContinue",
+                          "timeoutSeconds":  60
+                      },
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKCU",
+                          "key":  "Software\\Policies\\Microsoft\\Windows\\CloudContent",
+                          "operation":  "Set",
+                          "valueName":  "DisableWindowsConsumerFeatures",
+                          "valueKind":  "DWord",
+                          "data":  1
+                      }
+                  ],
+        "undo":  [
+                     {
+                         "type":  "PowerShell",
+                         "operation":  "Execute",
+                         "script":  "icacls \"$Env:LocalAppData\\Packages\\Microsoft.WindowsStore_8wekyb3d8bbwe\\LocalState\\store.db\" /grant *S-1-1-0:F -ErrorAction SilentlyContinue",
+                         "timeoutSeconds":  60
+                     },
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKCU",
+                         "key":  "Software\\Policies\\Microsoft\\Windows\\CloudContent",
+                         "operation":  "DeleteValue",
+                         "valueName":  "DisableWindowsConsumerFeatures"
+                     }
+                 ],
+        "source":  "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/disablestoresearch",
+        "verifiedOnBuild":  "26100",
+        "evidence":  "situational"
     },
-    "requiresReboot": false,
-    "requiresExplorerRestart": false,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKLM",
-      "key": "SOFTWARE\\Policies\\Microsoft\\Dsh",
-      "valueName": "AllowNewsAndInterests",
-      "matchType": "Equals",
-      "expectedValue": 0
+    {
+        "schemaVersion":  "1.0.0",
+        "id":  "essential.location",
+        "origin":  "WPFTweaksLocation",
+        "name":  "Location Tracking - Disable",
+        "description":  "Disables Location Tracking.",
+        "category":  "privacy",
+        "subcategory":  "Essential Tweaks",
+        "risk":  "Safe",
+        "impacts":  [
+                        "privacy"
+                    ],
+        "windows":  {
+                        "minBuild":  19041
+                    },
+        "requiresReboot":  false,
+        "requiresExplorerRestart":  false,
+        "detect":  {
+                       "type":  "Registry",
+                       "hive":  "HKLM",
+                       "key":  "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\location",
+                       "valueName":  "Value",
+                       "matchType":  "Equals",
+                       "expectedValue":  "Deny"
+                   },
+        "apply":  [
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKLM",
+                          "key":  "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\location",
+                          "operation":  "Set",
+                          "valueName":  "Value",
+                          "valueKind":  "String",
+                          "data":  "Deny"
+                      },
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKLM",
+                          "key":  "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Sensor\\Overrides\\{BFA794E4-F964-4FDB-90F6-51056BFE4B44}",
+                          "operation":  "Set",
+                          "valueName":  "SensorPermissionState",
+                          "valueKind":  "DWord",
+                          "data":  0
+                      },
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKLM",
+                          "key":  "SYSTEM\\Maps",
+                          "operation":  "Set",
+                          "valueName":  "AutoUpdateEnabled",
+                          "valueKind":  "DWord",
+                          "data":  0
+                      },
+                      {
+                          "type":  "Service",
+                          "operation":  "SetStartup",
+                          "serviceName":  "lfsvc",
+                          "startupType":  "Disabled"
+                      }
+                  ],
+        "undo":  [
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKLM",
+                         "key":  "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\location",
+                         "operation":  "Set",
+                         "valueName":  "Value",
+                         "valueKind":  "String",
+                         "data":  "Allow"
+                     },
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKLM",
+                         "key":  "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Sensor\\Overrides\\{BFA794E4-F964-4FDB-90F6-51056BFE4B44}",
+                         "operation":  "Set",
+                         "valueName":  "SensorPermissionState",
+                         "valueKind":  "DWord",
+                         "data":  1
+                     },
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKLM",
+                         "key":  "SYSTEM\\Maps",
+                         "operation":  "Set",
+                         "valueName":  "AutoUpdateEnabled",
+                         "valueKind":  "DWord",
+                         "data":  1
+                     },
+                     {
+                         "type":  "Service",
+                         "operation":  "SetStartup",
+                         "serviceName":  "lfsvc",
+                         "startupType":  "Manual"
+                     }
+                 ],
+        "source":  "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/location",
+        "verifiedOnBuild":  "26100",
+        "evidence":  "documented"
     },
-    "apply": [
-      {
-        "type": "PowerShell",
-        "operation": "Execute",
-        "script": "Get-Process *Widget* -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue\n      Get-AppxPackage Microsoft.WidgetsPlatformRuntime -AllUsers -ErrorAction SilentlyContinue | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue\n      Get-AppxPackage MicrosoftWindows.Client.WebExperience -AllUsers -ErrorAction SilentlyContinue | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue",
-        "timeoutSeconds": 60
-      },
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Policies\\Microsoft\\Dsh",
-        "operation": "Set",
-        "valueName": "AllowNewsAndInterests",
-        "valueKind": "DWord",
-        "data": 0
-      },
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-        "operation": "Set",
-        "valueName": "TaskbarDa",
-        "valueKind": "DWord",
-        "data": 0
-      }
-    ],
-    "undo": [
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Policies\\Microsoft\\Dsh",
-        "operation": "DeleteValue",
-        "valueName": "AllowNewsAndInterests"
-      },
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-        "operation": "Set",
-        "valueName": "TaskbarDa",
-        "valueKind": "DWord",
-        "data": 1
-      }
-    ],
-    "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/widget",
-    "verifiedOnBuild": "26100",
-    "warnings": "Uninstalls the Windows Widgets Platform and WebExperience AppX packages for all users. Undo restores taskbar registry settings, but does NOT reinstall the removed AppX packages.",
-    "reversible": false,
-    "irreversibleReason": "Uninstalls Microsoft Widgets and WebExperience AppX packages for all users; undo only restores taskbar visibility registry keys and does not reinstall the packages."
-  },
-  {
-    "schemaVersion": "1.0.0",
-    "id": "essential.revertstartmenu",
-    "origin": "WPFTweaksRevertStartMenu",
-    "name": "Start Menu Previous Layout - Enable",
-    "description": "Bring back the old Start Menu layout from before the gradual rollout of the new one in 25H2. On newer versions of Windows !!THIS TWEAK WILL NOT WORK!!",
-    "category": "system",
-    "subcategory": "Essential Tweaks",
-    "risk": "Safe",
-    "impacts": [
-      "ui"
-    ],
-    "windows": {
-      "minBuild": 19041
+    {
+        "schemaVersion":  "1.0.0",
+        "id":  "essential.services",
+        "origin":  "WPFTweaksServices",
+        "name":  "Services - Set to Manual",
+        "description":  "Sets some services to Manual startup and adjusts the SvcHostSplitThresholdInKB registry value to better match system memory, which can significantly reduce the number of svchost.exe processes.",
+        "category":  "performance",
+        "subcategory":  "Essential Tweaks",
+        "risk":  "Safe",
+        "impacts":  [
+                        "performance"
+                    ],
+        "windows":  {
+                        "minBuild":  19041
+                    },
+        "requiresReboot":  false,
+        "requiresExplorerRestart":  false,
+        "detect":  {
+                       "type":  "Service",
+                       "serviceName":  "CscService",
+                       "expectedStartup":  "Disabled"
+                   },
+        "apply":  [
+                      {
+                          "type":  "Service",
+                          "operation":  "SetStartup",
+                          "serviceName":  "CscService",
+                          "startupType":  "Disabled"
+                      },
+                      {
+                          "type":  "Service",
+                          "operation":  "SetStartup",
+                          "serviceName":  "DiagTrack",
+                          "startupType":  "Disabled"
+                      },
+                      {
+                          "type":  "Service",
+                          "operation":  "SetStartup",
+                          "serviceName":  "MapsBroker",
+                          "startupType":  "Manual"
+                      },
+                      {
+                          "type":  "Service",
+                          "operation":  "SetStartup",
+                          "serviceName":  "StorSvc",
+                          "startupType":  "Manual"
+                      },
+                      {
+                          "type":  "Service",
+                          "operation":  "SetStartup",
+                          "serviceName":  "SharedAccess",
+                          "startupType":  "Disabled"
+                      },
+                      {
+                          "type":  "PowerShell",
+                          "operation":  "Execute",
+                          "script":  "$Memory = (Get-CimInstance Win32_PhysicalMemory | Measure-Object Capacity -Sum).Sum / 1KB\n      Set-ItemProperty -Path \"HKLM:\\SYSTEM\\CurrentControlSet\\Control\" -Name SvcHostSplitThresholdInKB -Value $Memory",
+                          "timeoutSeconds":  60
+                      }
+                  ],
+        "undo":  [
+                     {
+                         "type":  "Service",
+                         "operation":  "SetStartup",
+                         "serviceName":  "CscService",
+                         "startupType":  "Manual"
+                     },
+                     {
+                         "type":  "Service",
+                         "operation":  "SetStartup",
+                         "serviceName":  "DiagTrack",
+                         "startupType":  "Automatic"
+                     },
+                     {
+                         "type":  "Service",
+                         "operation":  "SetStartup",
+                         "serviceName":  "MapsBroker",
+                         "startupType":  "Automatic"
+                     },
+                     {
+                         "type":  "Service",
+                         "operation":  "SetStartup",
+                         "serviceName":  "StorSvc",
+                         "startupType":  "Automatic"
+                     },
+                     {
+                         "type":  "Service",
+                         "operation":  "SetStartup",
+                         "serviceName":  "SharedAccess",
+                         "startupType":  "Automatic"
+                     }
+                 ],
+        "source":  "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/services",
+        "verifiedOnBuild":  "26100",
+        "evidence":  "situational"
     },
-    "requiresReboot": false,
-    "requiresExplorerRestart": true,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKLM",
-      "key": "SYSTEM\\ControlSet001\\Control\\FeatureManagement\\Overrides\\8\\3036241548",
-      "valueName": "EnabledState",
-      "matchType": "Equals",
-      "expectedValue": 1
+    {
+        "schemaVersion":  "1.0.0",
+        "id":  "essential.consumerfeatures",
+        "origin":  "WPFTweaksConsumerFeatures",
+        "name":  "ConsumerFeatures - Disable",
+        "description":  "Stops promoted app installs and reduces app suggestions from Microsoft Store content.",
+        "category":  "system",
+        "subcategory":  "Essential Tweaks",
+        "risk":  "Safe",
+        "impacts":  [
+                        "ui"
+                    ],
+        "windows":  {
+                        "minBuild":  19041
+                    },
+        "requiresReboot":  false,
+        "requiresExplorerRestart":  false,
+        "detect":  {
+                       "type":  "Registry",
+                       "hive":  "HKLM",
+                       "key":  "SOFTWARE\\Policies\\Microsoft\\Windows\\CloudContent",
+                       "valueName":  "DisableWindowsConsumerFeatures",
+                       "matchType":  "Equals",
+                       "expectedValue":  1
+                   },
+        "apply":  [
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKLM",
+                          "key":  "SOFTWARE\\Policies\\Microsoft\\Windows\\CloudContent",
+                          "operation":  "Set",
+                          "valueName":  "DisableWindowsConsumerFeatures",
+                          "valueKind":  "DWord",
+                          "data":  1
+                      }
+                  ],
+        "undo":  [
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKLM",
+                         "key":  "SOFTWARE\\Policies\\Microsoft\\Windows\\CloudContent",
+                         "operation":  "DeleteValue",
+                         "valueName":  "DisableWindowsConsumerFeatures"
+                     }
+                 ],
+        "source":  "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/consumerfeatures",
+        "verifiedOnBuild":  "26100",
+        "evidence":  "documented"
     },
-    "apply": [
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SYSTEM\\ControlSet001\\Control\\FeatureManagement\\Overrides\\8\\3036241548",
-        "operation": "Set",
-        "valueName": "EnabledState",
-        "valueKind": "DWord",
-        "data": 1
-      }
-    ],
-    "undo": [
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SYSTEM\\ControlSet001\\Control\\FeatureManagement\\Overrides\\8\\3036241548",
-        "operation": "DeleteValue",
-        "valueName": "EnabledState"
-      }
-    ],
-    "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/revertstartmenu",
-    "verifiedOnBuild": "26100"
-  },
-  {
-    "schemaVersion": "1.0.0",
-    "id": "essential.disablestoresearch",
-    "origin": "WPFTweaksDisableStoreSearch",
-    "name": "Microsoft Store Recommended Search Results - Disable",
-    "description": "Will not display recommended Microsoft Store apps when searching for apps in the Start menu.",
-    "category": "system",
-    "subcategory": "Essential Tweaks",
-    "risk": "High",
-    "sideEffects": "Modifies ACL permissions on the Microsoft Store database file (store.db) using icacls /deny. This can break Microsoft Store operations, application installations, and package updates.",
-    "impacts": [
-      "ui"
-    ],
-    "windows": {
-      "minBuild": 19041
+    {
+        "schemaVersion":  "1.0.0",
+        "id":  "essential.telemetry",
+        "origin":  "WPFTweaksTelemetry",
+        "name":  "Telemetry - Disable",
+        "description":  "Disables Microsoft Telemetry.",
+        "category":  "privacy",
+        "subcategory":  "Essential Tweaks",
+        "risk":  "Safe",
+        "impacts":  [
+                        "privacy"
+                    ],
+        "windows":  {
+                        "minBuild":  19041
+                    },
+        "requiresReboot":  false,
+        "requiresExplorerRestart":  false,
+        "detect":  {
+                       "any":  [
+                                   {
+                                       "type":  "Registry",
+                                       "hive":  "HKLM",
+                                       "key":  "SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection",
+                                       "valueName":  "AllowTelemetry",
+                                       "matchType":  "Equals",
+                                       "expectedValue":  0
+                                   },
+                                   {
+                                       "type":  "Registry",
+                                       "hive":  "HKLM",
+                                       "key":  "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\DataCollection",
+                                       "valueName":  "AllowTelemetry",
+                                       "matchType":  "Equals",
+                                       "expectedValue":  0
+                                   },
+                                   {
+                                       "type":  "Registry",
+                                       "hive":  "HKCU",
+                                       "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\AdvertisingInfo",
+                                       "valueName":  "Enabled",
+                                       "matchType":  "Equals",
+                                       "expectedValue":  0
+                                   }
+                               ]
+                   },
+        "apply":  [
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKCU",
+                          "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\AdvertisingInfo",
+                          "operation":  "Set",
+                          "valueName":  "Enabled",
+                          "valueKind":  "DWord",
+                          "data":  0
+                      },
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKCU",
+                          "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\Privacy",
+                          "operation":  "Set",
+                          "valueName":  "TailoredExperiencesWithDiagnosticDataEnabled",
+                          "valueKind":  "DWord",
+                          "data":  0
+                      },
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKCU",
+                          "key":  "Software\\Microsoft\\Speech_OneCore\\Settings\\OnlineSpeechPrivacy",
+                          "operation":  "Set",
+                          "valueName":  "HasAccepted",
+                          "valueKind":  "DWord",
+                          "data":  0
+                      },
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKCU",
+                          "key":  "Software\\Microsoft\\Input\\TIPC",
+                          "operation":  "Set",
+                          "valueName":  "Enabled",
+                          "valueKind":  "DWord",
+                          "data":  0
+                      },
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKCU",
+                          "key":  "Software\\Microsoft\\InputPersonalization",
+                          "operation":  "Set",
+                          "valueName":  "RestrictImplicitInkCollection",
+                          "valueKind":  "DWord",
+                          "data":  1
+                      },
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKCU",
+                          "key":  "Software\\Microsoft\\InputPersonalization",
+                          "operation":  "Set",
+                          "valueName":  "RestrictImplicitTextCollection",
+                          "valueKind":  "DWord",
+                          "data":  1
+                      },
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKCU",
+                          "key":  "Software\\Microsoft\\InputPersonalization\\TrainedDataStore",
+                          "operation":  "Set",
+                          "valueName":  "HarvestContacts",
+                          "valueKind":  "DWord",
+                          "data":  0
+                      },
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKCU",
+                          "key":  "Software\\Microsoft\\Personalization\\Settings",
+                          "operation":  "Set",
+                          "valueName":  "AcceptedPrivacyPolicy",
+                          "valueKind":  "DWord",
+                          "data":  0
+                      },
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKLM",
+                          "key":  "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\DataCollection",
+                          "operation":  "Set",
+                          "valueName":  "AllowTelemetry",
+                          "valueKind":  "DWord",
+                          "data":  0
+                      },
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKCU",
+                          "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+                          "operation":  "Set",
+                          "valueName":  "Start_TrackProgs",
+                          "valueKind":  "DWord",
+                          "data":  0
+                      },
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKLM",
+                          "key":  "SOFTWARE\\Policies\\Microsoft\\Windows\\System",
+                          "operation":  "Set",
+                          "valueName":  "PublishUserActivities",
+                          "valueKind":  "DWord",
+                          "data":  0
+                      },
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKCU",
+                          "key":  "Software\\Microsoft\\Siuf\\Rules",
+                          "operation":  "Set",
+                          "valueName":  "NumberOfSIUFInPeriod",
+                          "valueKind":  "DWord",
+                          "data":  0
+                      },
+                      {
+                          "type":  "PowerShell",
+                          "operation":  "Execute",
+                          "script":  "# Disable Defender Auto Sample Submission\n      if (Get-Command Set-MpPreference -ErrorAction SilentlyContinue) {\n          Set-MpPreference -SubmitSamplesConsent 2 -ErrorAction SilentlyContinue\n      }\n\n      # Disable (Connected User Experiences and Telemetry) Service\n      if (Get-Service -Name diagtrack -ErrorAction SilentlyContinue) {\n          Set-Service -Name diagtrack -StartupType Disabled -ErrorAction SilentlyContinue\n      }\n\n      # Disable (Windows Error Reporting Service)\n      if (Get-Service -Name WerSvc -ErrorAction SilentlyContinue) {\n          Set-Service -Name WerSvc -StartupType Disabled -ErrorAction SilentlyContinue\n      }\n\n      # Disable PowerShell 7 telemetry\n      [Environment]::SetEnvironmentVariable(\u0027POWERSHELL_TELEMETRY_OPTOUT\u0027, \u00271\u0027, \u0027Machine\u0027)\n\n      Remove-ItemProperty -Path \"HKCU:\\Software\\Microsoft\\Siuf\\Rules\" -Name PeriodInNanoSeconds -ErrorAction SilentlyContinue",
+                          "timeoutSeconds":  60
+                      }
+                  ],
+        "undo":  [
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKCU",
+                         "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\AdvertisingInfo",
+                         "operation":  "DeleteValue",
+                         "valueName":  "Enabled"
+                     },
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKCU",
+                         "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\Privacy",
+                         "operation":  "DeleteValue",
+                         "valueName":  "TailoredExperiencesWithDiagnosticDataEnabled"
+                     },
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKCU",
+                         "key":  "Software\\Microsoft\\Speech_OneCore\\Settings\\OnlineSpeechPrivacy",
+                         "operation":  "DeleteValue",
+                         "valueName":  "HasAccepted"
+                     },
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKCU",
+                         "key":  "Software\\Microsoft\\Input\\TIPC",
+                         "operation":  "DeleteValue",
+                         "valueName":  "Enabled"
+                     },
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKCU",
+                         "key":  "Software\\Microsoft\\InputPersonalization",
+                         "operation":  "DeleteValue",
+                         "valueName":  "RestrictImplicitInkCollection"
+                     },
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKCU",
+                         "key":  "Software\\Microsoft\\InputPersonalization",
+                         "operation":  "DeleteValue",
+                         "valueName":  "RestrictImplicitTextCollection"
+                     },
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKCU",
+                         "key":  "Software\\Microsoft\\InputPersonalization\\TrainedDataStore",
+                         "operation":  "DeleteValue",
+                         "valueName":  "HarvestContacts"
+                     },
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKCU",
+                         "key":  "Software\\Microsoft\\Personalization\\Settings",
+                         "operation":  "DeleteValue",
+                         "valueName":  "AcceptedPrivacyPolicy"
+                     },
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKLM",
+                         "key":  "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\DataCollection",
+                         "operation":  "DeleteValue",
+                         "valueName":  "AllowTelemetry"
+                     },
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKCU",
+                         "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+                         "operation":  "DeleteValue",
+                         "valueName":  "Start_TrackProgs"
+                     },
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKLM",
+                         "key":  "SOFTWARE\\Policies\\Microsoft\\Windows\\System",
+                         "operation":  "DeleteValue",
+                         "valueName":  "PublishUserActivities"
+                     },
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKCU",
+                         "key":  "Software\\Microsoft\\Siuf\\Rules",
+                         "operation":  "DeleteValue",
+                         "valueName":  "NumberOfSIUFInPeriod"
+                     },
+                     {
+                         "type":  "PowerShell",
+                         "operation":  "Execute",
+                         "script":  "# Enable Defender Auto Sample Submission\n      if (Get-Command Set-MpPreference -ErrorAction SilentlyContinue) {\n          Set-MpPreference -SubmitSamplesConsent 1 -ErrorAction SilentlyContinue\n      }\n\n      # Enable (Connected User Experiences and Telemetry) Service\n      if (Get-Service -Name diagtrack -ErrorAction SilentlyContinue) {\n          Set-Service -Name diagtrack -StartupType Automatic -ErrorAction SilentlyContinue\n      }\n\n      # Enable (Windows Error Reporting Service)\n      if (Get-Service -Name WerSvc -ErrorAction SilentlyContinue) {\n          Set-Service -Name WerSvc -StartupType Automatic -ErrorAction SilentlyContinue\n      }\n\n      # Enable PowerShell 7 telemetry\n      [Environment]::SetEnvironmentVariable(\u0027POWERSHELL_TELEMETRY_OPTOUT\u0027, \u0027\u0027, \u0027Machine\u0027)",
+                         "timeoutSeconds":  60
+                     }
+                 ],
+        "source":  "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/telemetry",
+        "verifiedOnBuild":  "26100",
+        "evidence":  "documented"
     },
-    "requiresReboot": false,
-    "requiresExplorerRestart": false,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKCU",
-      "key": "Software\\Policies\\Microsoft\\Windows\\CloudContent",
-      "valueName": "DisableWindowsConsumerFeatures",
-      "matchType": "Equals",
-      "expectedValue": 1
+    {
+        "schemaVersion":  "1.0.0",
+        "id":  "essential.deliveryoptimization",
+        "origin":  "WPFTweaksDeliveryOptimization",
+        "name":  "Delivery Optimization - Disable",
+        "description":  "Stops Windows from using your bandwidth to upload updates to other PCs on the internet or local network.",
+        "category":  "network",
+        "subcategory":  "Essential Tweaks",
+        "risk":  "Safe",
+        "impacts":  [
+                        "network"
+                    ],
+        "windows":  {
+                        "minBuild":  19041
+                    },
+        "requiresReboot":  false,
+        "requiresExplorerRestart":  false,
+        "detect":  {
+                       "type":  "Registry",
+                       "hive":  "HKLM",
+                       "key":  "SOFTWARE\\Policies\\Microsoft\\Windows\\DeliveryOptimization",
+                       "valueName":  "DODownloadMode",
+                       "matchType":  "Equals",
+                       "expectedValue":  0
+                   },
+        "apply":  [
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKLM",
+                          "key":  "SOFTWARE\\Policies\\Microsoft\\Windows\\DeliveryOptimization",
+                          "operation":  "Set",
+                          "valueName":  "DODownloadMode",
+                          "valueKind":  "DWord",
+                          "data":  0
+                      }
+                  ],
+        "undo":  [
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKLM",
+                         "key":  "SOFTWARE\\Policies\\Microsoft\\Windows\\DeliveryOptimization",
+                         "operation":  "DeleteValue",
+                         "valueName":  "DODownloadMode"
+                     }
+                 ],
+        "source":  "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/deliveryoptimization",
+        "verifiedOnBuild":  "26100",
+        "evidence":  "documented"
     },
-    "apply": [
-      {
-        "type": "PowerShell",
-        "operation": "Execute",
-        "script": "icacls \"$Env:LocalAppData\\Packages\\Microsoft.WindowsStore_8wekyb3d8bbwe\\LocalState\\store.db\" /deny *S-1-1-0:F -ErrorAction SilentlyContinue",
-        "timeoutSeconds": 60
-      },
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Policies\\Microsoft\\Windows\\CloudContent",
-        "operation": "Set",
-        "valueName": "DisableWindowsConsumerFeatures",
-        "valueKind": "DWord",
-        "data": 1
-      }
-    ],
-    "undo": [
-      {
-        "type": "PowerShell",
-        "operation": "Execute",
-        "script": "icacls \"$Env:LocalAppData\\Packages\\Microsoft.WindowsStore_8wekyb3d8bbwe\\LocalState\\store.db\" /grant *S-1-1-0:F -ErrorAction SilentlyContinue",
-        "timeoutSeconds": 60
-      },
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Policies\\Microsoft\\Windows\\CloudContent",
-        "operation": "DeleteValue",
-        "valueName": "DisableWindowsConsumerFeatures"
-      }
-    ],
-    "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/disablestoresearch",
-    "verifiedOnBuild": "26100"
-  },
-  {
-    "schemaVersion": "1.0.0",
-    "id": "essential.location",
-    "origin": "WPFTweaksLocation",
-    "name": "Location Tracking - Disable",
-    "description": "Disables Location Tracking.",
-    "category": "privacy",
-    "subcategory": "Essential Tweaks",
-    "risk": "Safe",
-    "impacts": [
-      "privacy"
-    ],
-    "windows": {
-      "minBuild": 19041
+    {
+        "schemaVersion":  "1.0.0",
+        "id":  "essential.restorepoint",
+        "origin":  "WPFTweaksRestorePoint",
+        "name":  "Restore Point - Create",
+        "description":  "Creates a restore point at runtime in case a revert is needed from WinUtil modifications.",
+        "category":  "system",
+        "subcategory":  "Essential Tweaks",
+        "risk":  "Safe",
+        "impacts":  [
+                        "ui"
+                    ],
+        "windows":  {
+                        "minBuild":  19041
+                    },
+        "requiresReboot":  false,
+        "requiresExplorerRestart":  false,
+        "detect":  {
+                       "type":  "Registry",
+                       "hive":  "HKLM",
+                       "key":  "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\SystemRestore",
+                       "valueName":  "SystemRestorePointCreationFrequency",
+                       "matchType":  "Equals",
+                       "expectedValue":  0
+                   },
+        "apply":  [
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKLM",
+                          "key":  "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\SystemRestore",
+                          "operation":  "Set",
+                          "valueName":  "SystemRestorePointCreationFrequency",
+                          "valueKind":  "DWord",
+                          "data":  0
+                      },
+                      {
+                          "type":  "PowerShell",
+                          "operation":  "Execute",
+                          "script":  "if (-not (Get-ComputerRestorePoint)) {\n          Enable-ComputerRestore -Drive $Env:SystemDrive\n      }\n\n      Checkpoint-Computer -Description \"System Restore Point created by WinUtil\" -RestorePointType MODIFY_SETTINGS\n      Write-Host \"System Restore Point Created Successfully\" -ForegroundColor Green",
+                          "timeoutSeconds":  60
+                      }
+                  ],
+        "undo":  [
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKLM",
+                         "key":  "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\SystemRestore",
+                         "operation":  "Set",
+                         "valueName":  "SystemRestorePointCreationFrequency",
+                         "valueKind":  "DWord",
+                         "data":  1440
+                     }
+                 ],
+        "source":  "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/restorepoint",
+        "verifiedOnBuild":  "26100",
+        "evidence":  "documented"
     },
-    "requiresReboot": false,
-    "requiresExplorerRestart": false,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKLM",
-      "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\location",
-      "valueName": "Value",
-      "matchType": "Equals",
-      "expectedValue": "Deny"
+    {
+        "schemaVersion":  "1.0.0",
+        "id":  "essential.endtaskontaskbar",
+        "origin":  "WPFTweaksEndTaskOnTaskbar",
+        "name":  "End Task With Right Click - Enable",
+        "description":  "Enables option to end task when right-clicking a program in the taskbar.",
+        "category":  "system",
+        "subcategory":  "Essential Tweaks",
+        "risk":  "Safe",
+        "impacts":  [
+                        "ui"
+                    ],
+        "windows":  {
+                        "minBuild":  19041
+                    },
+        "requiresReboot":  false,
+        "requiresExplorerRestart":  true,
+        "detect":  {
+                       "type":  "Registry",
+                       "hive":  "HKCU",
+                       "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced\\TaskbarDeveloperSettings",
+                       "valueName":  "TaskbarEndTask",
+                       "matchType":  "Equals",
+                       "expectedValue":  1
+                   },
+        "apply":  [
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKCU",
+                          "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced\\TaskbarDeveloperSettings",
+                          "operation":  "Set",
+                          "valueName":  "TaskbarEndTask",
+                          "valueKind":  "DWord",
+                          "data":  1
+                      }
+                  ],
+        "undo":  [
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKCU",
+                         "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced\\TaskbarDeveloperSettings",
+                         "operation":  "DeleteValue",
+                         "valueName":  "TaskbarEndTask"
+                     }
+                 ],
+        "source":  "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/endtaskontaskbar",
+        "verifiedOnBuild":  "26100",
+        "evidence":  "documented"
     },
-    "apply": [
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\location",
-        "operation": "Set",
-        "valueName": "Value",
-        "valueKind": "String",
-        "data": "Deny"
-      },
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Sensor\\Overrides\\{BFA794E4-F964-4FDB-90F6-51056BFE4B44}",
-        "operation": "Set",
-        "valueName": "SensorPermissionState",
-        "valueKind": "DWord",
-        "data": 0
-      },
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SYSTEM\\Maps",
-        "operation": "Set",
-        "valueName": "AutoUpdateEnabled",
-        "valueKind": "DWord",
-        "data": 0
-      },
-      {
-        "type": "Service",
-        "operation": "SetStartup",
-        "serviceName": "lfsvc",
-        "startupType": "Disabled"
-      }
-    ],
-    "undo": [
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\location",
-        "operation": "Set",
-        "valueName": "Value",
-        "valueKind": "String",
-        "data": "Allow"
-      },
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Sensor\\Overrides\\{BFA794E4-F964-4FDB-90F6-51056BFE4B44}",
-        "operation": "Set",
-        "valueName": "SensorPermissionState",
-        "valueKind": "DWord",
-        "data": 1
-      },
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SYSTEM\\Maps",
-        "operation": "Set",
-        "valueName": "AutoUpdateEnabled",
-        "valueKind": "DWord",
-        "data": 1
-      },
-      {
-        "type": "Service",
-        "operation": "SetStartup",
-        "serviceName": "lfsvc",
-        "startupType": "Manual"
-      }
-    ],
-    "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/location",
-    "verifiedOnBuild": "26100"
-  },
-  {
-    "schemaVersion": "1.0.0",
-    "id": "essential.services",
-    "origin": "WPFTweaksServices",
-    "name": "Services - Set to Manual",
-    "description": "Sets some services to Manual startup and adjusts the SvcHostSplitThresholdInKB registry value to better match system memory, which can significantly reduce the number of svchost.exe processes.",
-    "category": "performance",
-    "subcategory": "Essential Tweaks",
-    "risk": "Safe",
-    "impacts": [
-      "performance"
-    ],
-    "windows": {
-      "minBuild": 19041
+    {
+        "schemaVersion":  "1.0.0",
+        "id":  "essential.wpbt",
+        "origin":  "WPFTweaksWPBT",
+        "name":  "Windows Platform Binary Table (WPBT) - Disable",
+        "description":  "If enabled, WPBT allows your computer vendor to execute programs at boot time, such as anti-theft software, software drivers, as well as force install software without user consent. Poses potential security risk.",
+        "category":  "system",
+        "subcategory":  "Essential Tweaks",
+        "risk":  "Safe",
+        "impacts":  [
+                        "ui"
+                    ],
+        "windows":  {
+                        "minBuild":  19041
+                    },
+        "requiresReboot":  false,
+        "requiresExplorerRestart":  false,
+        "detect":  {
+                       "type":  "Registry",
+                       "hive":  "HKLM",
+                       "key":  "SYSTEM\\CurrentControlSet\\Control\\Session Manager",
+                       "valueName":  "DisableWpbtExecution",
+                       "matchType":  "Equals",
+                       "expectedValue":  1
+                   },
+        "apply":  [
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKLM",
+                          "key":  "SYSTEM\\CurrentControlSet\\Control\\Session Manager",
+                          "operation":  "Set",
+                          "valueName":  "DisableWpbtExecution",
+                          "valueKind":  "DWord",
+                          "data":  1
+                      }
+                  ],
+        "undo":  [
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKLM",
+                         "key":  "SYSTEM\\CurrentControlSet\\Control\\Session Manager",
+                         "operation":  "DeleteValue",
+                         "valueName":  "DisableWpbtExecution"
+                     }
+                 ],
+        "source":  "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/wpbt",
+        "verifiedOnBuild":  "26100",
+        "evidence":  "documented"
     },
-    "requiresReboot": false,
-    "requiresExplorerRestart": false,
-    "detect": {
-      "type": "Service",
-      "serviceName": "CscService",
-      "expectedStartup": "Disabled"
+    {
+        "schemaVersion":  "1.0.0",
+        "id":  "essential.preventdevicemetadatafromnetwork",
+        "origin":  "WPFTweaksPreventDeviceMetadataFromNetwork",
+        "name":  "Prevent Device Companion Apps",
+        "description":  "Prevents additional software from being installed when plugging in devices (e.g. Ads when plugging in a monitor). Poses potential security risk.",
+        "category":  "system",
+        "subcategory":  "Essential Tweaks",
+        "risk":  "Safe",
+        "impacts":  [
+                        "ui"
+                    ],
+        "windows":  {
+                        "minBuild":  19041
+                    },
+        "requiresReboot":  false,
+        "requiresExplorerRestart":  false,
+        "detect":  {
+                       "type":  "Registry",
+                       "hive":  "HKLM",
+                       "key":  "SOFTWARE\\Policies\\Microsoft\\Windows\\Device Metadata",
+                       "valueName":  "PreventDeviceMetadataFromNetwork",
+                       "matchType":  "Equals",
+                       "expectedValue":  1
+                   },
+        "apply":  [
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKLM",
+                          "key":  "SOFTWARE\\Policies\\Microsoft\\Windows\\Device Metadata",
+                          "operation":  "Set",
+                          "valueName":  "PreventDeviceMetadataFromNetwork",
+                          "valueKind":  "DWord",
+                          "data":  1
+                      }
+                  ],
+        "undo":  [
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKLM",
+                         "key":  "SOFTWARE\\Policies\\Microsoft\\Windows\\Device Metadata",
+                         "operation":  "DeleteValue",
+                         "valueName":  "PreventDeviceMetadataFromNetwork"
+                     }
+                 ],
+        "source":  "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/preventdevicemetadatafromnetwork",
+        "verifiedOnBuild":  "26100",
+        "evidence":  "documented"
     },
-    "apply": [
-      {
-        "type": "Service",
-        "operation": "SetStartup",
-        "serviceName": "CscService",
-        "startupType": "Disabled"
-      },
-      {
-        "type": "Service",
-        "operation": "SetStartup",
-        "serviceName": "DiagTrack",
-        "startupType": "Disabled"
-      },
-      {
-        "type": "Service",
-        "operation": "SetStartup",
-        "serviceName": "MapsBroker",
-        "startupType": "Manual"
-      },
-      {
-        "type": "Service",
-        "operation": "SetStartup",
-        "serviceName": "StorSvc",
-        "startupType": "Manual"
-      },
-      {
-        "type": "Service",
-        "operation": "SetStartup",
-        "serviceName": "SharedAccess",
-        "startupType": "Disabled"
-      },
-      {
-        "type": "PowerShell",
-        "operation": "Execute",
-        "script": "$Memory = (Get-CimInstance Win32_PhysicalMemory | Measure-Object Capacity -Sum).Sum / 1KB\n      Set-ItemProperty -Path \"HKLM:\\SYSTEM\\CurrentControlSet\\Control\" -Name SvcHostSplitThresholdInKB -Value $Memory",
-        "timeoutSeconds": 60
-      }
-    ],
-    "undo": [
-      {
-        "type": "Service",
-        "operation": "SetStartup",
-        "serviceName": "CscService",
-        "startupType": "Manual"
-      },
-      {
-        "type": "Service",
-        "operation": "SetStartup",
-        "serviceName": "DiagTrack",
-        "startupType": "Automatic"
-      },
-      {
-        "type": "Service",
-        "operation": "SetStartup",
-        "serviceName": "MapsBroker",
-        "startupType": "Automatic"
-      },
-      {
-        "type": "Service",
-        "operation": "SetStartup",
-        "serviceName": "StorSvc",
-        "startupType": "Automatic"
-      },
-      {
-        "type": "Service",
-        "operation": "SetStartup",
-        "serviceName": "SharedAccess",
-        "startupType": "Automatic"
-      }
-    ],
-    "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/services",
-    "verifiedOnBuild": "26100"
-  },
-  {
-    "schemaVersion": "1.0.0",
-    "id": "essential.consumerfeatures",
-    "origin": "WPFTweaksConsumerFeatures",
-    "name": "ConsumerFeatures - Disable",
-    "description": "Stops promoted app installs and reduces app suggestions from Microsoft Store content.",
-    "category": "system",
-    "subcategory": "Essential Tweaks",
-    "risk": "Safe",
-    "impacts": [
-      "ui"
-    ],
-    "windows": {
-      "minBuild": 19041
+    {
+        "schemaVersion":  "1.0.0",
+        "id":  "essential.diskcleanup",
+        "origin":  "WPFTweaksDiskCleanup",
+        "name":  "Disk Cleanup - Run",
+        "description":  "Runs Disk Cleanup on Drive C: and removes old Windows Updates.",
+        "category":  "performance",
+        "subcategory":  "Essential Tweaks",
+        "risk":  "Safe",
+        "impacts":  [
+                        "performance"
+                    ],
+        "windows":  {
+                        "minBuild":  19041
+                    },
+        "requiresReboot":  false,
+        "requiresExplorerRestart":  false,
+        "detect":  {
+                       "type":  "Registry",
+                       "hive":  "HKLM",
+                       "key":  "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VolumeCaches\\Temporary Files",
+                       "valueName":  "StateFlags0001",
+                       "matchType":  "Equals",
+                       "expectedValue":  2
+                   },
+        "apply":  [
+                      {
+                          "type":  "PowerShell",
+                          "operation":  "Execute",
+                          "script":  "cleanmgr.exe /d C: /VERYLOWDISK\n      if ($LASTEXITCODE -ne 0) { throw \"cleanmgr failed with exit code $LASTEXITCODE\" }\n      Dism.exe /online /Cleanup-Image /StartComponentCleanup /ResetBase\n      if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 3010) { throw \"Dism failed with exit code $LASTEXITCODE\" }",
+                          "timeoutSeconds":  600
+                      },
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKLM",
+                          "key":  "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VolumeCaches\\Temporary Files",
+                          "operation":  "Set",
+                          "valueName":  "StateFlags0001",
+                          "valueKind":  "DWord",
+                          "data":  2
+                      }
+                  ],
+        "undo":  [
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKLM",
+                         "key":  "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VolumeCaches\\Temporary Files",
+                         "operation":  "DeleteValue",
+                         "valueName":  "StateFlags0001"
+                     }
+                 ],
+        "source":  "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/diskcleanup",
+        "verifiedOnBuild":  "26100",
+        "warnings":  "Purges superseded Windows update components via DISM /ResetBase. Once executed, superseded updates cannot be rolled back. Undo only resets CleanMgr registry flags.",
+        "reversible":  false,
+        "irreversibleReason":  "Executes DISM ResetBase and CleanMgr which permanently purge superseded Windows update components; deleted update baselines cannot be restored.",
+        "evidence":  "documented"
     },
-    "requiresReboot": false,
-    "requiresExplorerRestart": false,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKLM",
-      "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\CloudContent",
-      "valueName": "DisableWindowsConsumerFeatures",
-      "matchType": "Equals",
-      "expectedValue": 1
+    {
+        "schemaVersion":  "1.0.0",
+        "id":  "essential.deletetempfiles",
+        "origin":  "WPFTweaksDeleteTempFiles",
+        "name":  "Temporary Files - Remove",
+        "description":  "Erases TEMP Folders.",
+        "category":  "performance",
+        "subcategory":  "Essential Tweaks",
+        "risk":  "Safe",
+        "impacts":  [
+                        "performance"
+                    ],
+        "windows":  {
+                        "minBuild":  19041
+                    },
+        "requiresReboot":  false,
+        "requiresExplorerRestart":  false,
+        "detect":  {
+                       "type":  "Registry",
+                       "hive":  "HKCU",
+                       "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\StorageSense\\Parameters\\StoragePolicy",
+                       "valueName":  "01",
+                       "matchType":  "Equals",
+                       "expectedValue":  1
+                   },
+        "apply":  [
+                      {
+                          "type":  "PowerShell",
+                          "operation":  "Execute",
+                          "script":  "Remove-Item -Path \"$Env:Temp\\*\" -Recurse -Force -ErrorAction SilentlyContinue\n      Remove-Item -Path \"$Env:SystemRoot\\Temp\\*\" -Recurse -Force -ErrorAction SilentlyContinue",
+                          "timeoutSeconds":  60
+                      },
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKCU",
+                          "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\StorageSense\\Parameters\\StoragePolicy",
+                          "operation":  "Set",
+                          "valueName":  "01",
+                          "valueKind":  "DWord",
+                          "data":  1
+                      }
+                  ],
+        "undo":  [
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKCU",
+                         "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\StorageSense\\Parameters\\StoragePolicy",
+                         "operation":  "DeleteValue",
+                         "valueName":  "01"
+                     }
+                 ],
+        "source":  "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/deletetempfiles",
+        "verifiedOnBuild":  "26100",
+        "warnings":  "Permanently empties all user and system temp folders. Files deleted from temp cannot be recovered. Undo only resets the StorageSense registry flag.",
+        "reversible":  false,
+        "irreversibleReason":  "Permanently deletes all files in user and system TEMP directories; deleted temporary files cannot be restored.",
+        "evidence":  "documented"
     },
-    "apply": [
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\CloudContent",
-        "operation": "Set",
-        "valueName": "DisableWindowsConsumerFeatures",
-        "valueKind": "DWord",
-        "data": 1
-      }
-    ],
-    "undo": [
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\CloudContent",
-        "operation": "DeleteValue",
-        "valueName": "DisableWindowsConsumerFeatures"
-      }
-    ],
-    "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/consumerfeatures",
-    "verifiedOnBuild": "26100"
-  },
-  {
-    "schemaVersion": "1.0.0",
-    "id": "essential.telemetry",
-    "origin": "WPFTweaksTelemetry",
-    "name": "Telemetry - Disable",
-    "description": "Disables Microsoft Telemetry.",
-    "category": "privacy",
-    "subcategory": "Essential Tweaks",
-    "risk": "Safe",
-    "impacts": [
-      "privacy"
-    ],
-    "windows": {
-      "minBuild": 19041
-    },
-    "requiresReboot": false,
-    "requiresExplorerRestart": false,
-    "detect": {
-      "any": [
-        {
-          "type": "Registry",
-          "hive": "HKLM",
-          "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection",
-          "valueName": "AllowTelemetry",
-          "matchType": "Equals",
-          "expectedValue": 0
-        },
-        {
-          "type": "Registry",
-          "hive": "HKLM",
-          "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\DataCollection",
-          "valueName": "AllowTelemetry",
-          "matchType": "Equals",
-          "expectedValue": 0
-        },
-        {
-          "type": "Registry",
-          "hive": "HKCU",
-          "key": "Software\\Microsoft\\Windows\\CurrentVersion\\AdvertisingInfo",
-          "valueName": "Enabled",
-          "matchType": "Equals",
-          "expectedValue": 0
-        }
-      ]
-    },
-    "apply": [
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\AdvertisingInfo",
-        "operation": "Set",
-        "valueName": "Enabled",
-        "valueKind": "DWord",
-        "data": 0
-      },
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Privacy",
-        "operation": "Set",
-        "valueName": "TailoredExperiencesWithDiagnosticDataEnabled",
-        "valueKind": "DWord",
-        "data": 0
-      },
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\Speech_OneCore\\Settings\\OnlineSpeechPrivacy",
-        "operation": "Set",
-        "valueName": "HasAccepted",
-        "valueKind": "DWord",
-        "data": 0
-      },
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\Input\\TIPC",
-        "operation": "Set",
-        "valueName": "Enabled",
-        "valueKind": "DWord",
-        "data": 0
-      },
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\InputPersonalization",
-        "operation": "Set",
-        "valueName": "RestrictImplicitInkCollection",
-        "valueKind": "DWord",
-        "data": 1
-      },
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\InputPersonalization",
-        "operation": "Set",
-        "valueName": "RestrictImplicitTextCollection",
-        "valueKind": "DWord",
-        "data": 1
-      },
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\InputPersonalization\\TrainedDataStore",
-        "operation": "Set",
-        "valueName": "HarvestContacts",
-        "valueKind": "DWord",
-        "data": 0
-      },
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\Personalization\\Settings",
-        "operation": "Set",
-        "valueName": "AcceptedPrivacyPolicy",
-        "valueKind": "DWord",
-        "data": 0
-      },
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\DataCollection",
-        "operation": "Set",
-        "valueName": "AllowTelemetry",
-        "valueKind": "DWord",
-        "data": 0
-      },
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-        "operation": "Set",
-        "valueName": "Start_TrackProgs",
-        "valueKind": "DWord",
-        "data": 0
-      },
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\System",
-        "operation": "Set",
-        "valueName": "PublishUserActivities",
-        "valueKind": "DWord",
-        "data": 0
-      },
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\Siuf\\Rules",
-        "operation": "Set",
-        "valueName": "NumberOfSIUFInPeriod",
-        "valueKind": "DWord",
-        "data": 0
-      },
-      {
-        "type": "PowerShell",
-        "operation": "Execute",
-        "script": "# Disable Defender Auto Sample Submission\n      if (Get-Command Set-MpPreference -ErrorAction SilentlyContinue) {\n          Set-MpPreference -SubmitSamplesConsent 2 -ErrorAction SilentlyContinue\n      }\n\n      # Disable (Connected User Experiences and Telemetry) Service\n      if (Get-Service -Name diagtrack -ErrorAction SilentlyContinue) {\n          Set-Service -Name diagtrack -StartupType Disabled -ErrorAction SilentlyContinue\n      }\n\n      # Disable (Windows Error Reporting Service)\n      if (Get-Service -Name WerSvc -ErrorAction SilentlyContinue) {\n          Set-Service -Name WerSvc -StartupType Disabled -ErrorAction SilentlyContinue\n      }\n\n      # Disable PowerShell 7 telemetry\n      [Environment]::SetEnvironmentVariable('POWERSHELL_TELEMETRY_OPTOUT', '1', 'Machine')\n\n      Remove-ItemProperty -Path \"HKCU:\\Software\\Microsoft\\Siuf\\Rules\" -Name PeriodInNanoSeconds -ErrorAction SilentlyContinue",
-        "timeoutSeconds": 60
-      }
-    ],
-    "undo": [
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\AdvertisingInfo",
-        "operation": "DeleteValue",
-        "valueName": "Enabled"
-      },
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Privacy",
-        "operation": "DeleteValue",
-        "valueName": "TailoredExperiencesWithDiagnosticDataEnabled"
-      },
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\Speech_OneCore\\Settings\\OnlineSpeechPrivacy",
-        "operation": "DeleteValue",
-        "valueName": "HasAccepted"
-      },
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\Input\\TIPC",
-        "operation": "DeleteValue",
-        "valueName": "Enabled"
-      },
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\InputPersonalization",
-        "operation": "DeleteValue",
-        "valueName": "RestrictImplicitInkCollection"
-      },
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\InputPersonalization",
-        "operation": "DeleteValue",
-        "valueName": "RestrictImplicitTextCollection"
-      },
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\InputPersonalization\\TrainedDataStore",
-        "operation": "DeleteValue",
-        "valueName": "HarvestContacts"
-      },
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\Personalization\\Settings",
-        "operation": "DeleteValue",
-        "valueName": "AcceptedPrivacyPolicy"
-      },
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\DataCollection",
-        "operation": "DeleteValue",
-        "valueName": "AllowTelemetry"
-      },
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-        "operation": "DeleteValue",
-        "valueName": "Start_TrackProgs"
-      },
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\System",
-        "operation": "DeleteValue",
-        "valueName": "PublishUserActivities"
-      },
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\Siuf\\Rules",
-        "operation": "DeleteValue",
-        "valueName": "NumberOfSIUFInPeriod"
-      },
-      {
-        "type": "PowerShell",
-        "operation": "Execute",
-        "script": "# Enable Defender Auto Sample Submission\n      if (Get-Command Set-MpPreference -ErrorAction SilentlyContinue) {\n          Set-MpPreference -SubmitSamplesConsent 1 -ErrorAction SilentlyContinue\n      }\n\n      # Enable (Connected User Experiences and Telemetry) Service\n      if (Get-Service -Name diagtrack -ErrorAction SilentlyContinue) {\n          Set-Service -Name diagtrack -StartupType Automatic -ErrorAction SilentlyContinue\n      }\n\n      # Enable (Windows Error Reporting Service)\n      if (Get-Service -Name WerSvc -ErrorAction SilentlyContinue) {\n          Set-Service -Name WerSvc -StartupType Automatic -ErrorAction SilentlyContinue\n      }\n\n      # Enable PowerShell 7 telemetry\n      [Environment]::SetEnvironmentVariable('POWERSHELL_TELEMETRY_OPTOUT', '', 'Machine')",
-        "timeoutSeconds": 60
-      }
-    ],
-    "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/telemetry",
-    "verifiedOnBuild": "26100"
-  },
-  {
-    "schemaVersion": "1.0.0",
-    "id": "essential.deliveryoptimization",
-    "origin": "WPFTweaksDeliveryOptimization",
-    "name": "Delivery Optimization - Disable",
-    "description": "Stops Windows from using your bandwidth to upload updates to other PCs on the internet or local network.",
-    "category": "network",
-    "subcategory": "Essential Tweaks",
-    "risk": "Safe",
-    "impacts": [
-      "network"
-    ],
-    "windows": {
-      "minBuild": 19041
-    },
-    "requiresReboot": false,
-    "requiresExplorerRestart": false,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKLM",
-      "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\DeliveryOptimization",
-      "valueName": "DODownloadMode",
-      "matchType": "Equals",
-      "expectedValue": 0
-    },
-    "apply": [
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\DeliveryOptimization",
-        "operation": "Set",
-        "valueName": "DODownloadMode",
-        "valueKind": "DWord",
-        "data": 0
-      }
-    ],
-    "undo": [
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\DeliveryOptimization",
-        "operation": "DeleteValue",
-        "valueName": "DODownloadMode"
-      }
-    ],
-    "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/deliveryoptimization",
-    "verifiedOnBuild": "26100"
-  },
-  {
-    "schemaVersion": "1.0.0",
-    "id": "essential.restorepoint",
-    "origin": "WPFTweaksRestorePoint",
-    "name": "Restore Point - Create",
-    "description": "Creates a restore point at runtime in case a revert is needed from WinUtil modifications.",
-    "category": "system",
-    "subcategory": "Essential Tweaks",
-    "risk": "Safe",
-    "impacts": [
-      "ui"
-    ],
-    "windows": {
-      "minBuild": 19041
-    },
-    "requiresReboot": false,
-    "requiresExplorerRestart": false,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKLM",
-      "key": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\SystemRestore",
-      "valueName": "SystemRestorePointCreationFrequency",
-      "matchType": "Equals",
-      "expectedValue": 0
-    },
-    "apply": [
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\SystemRestore",
-        "operation": "Set",
-        "valueName": "SystemRestorePointCreationFrequency",
-        "valueKind": "DWord",
-        "data": 0
-      },
-      {
-        "type": "PowerShell",
-        "operation": "Execute",
-        "script": "if (-not (Get-ComputerRestorePoint)) {\n          Enable-ComputerRestore -Drive $Env:SystemDrive\n      }\n\n      Checkpoint-Computer -Description \"System Restore Point created by WinUtil\" -RestorePointType MODIFY_SETTINGS\n      Write-Host \"System Restore Point Created Successfully\" -ForegroundColor Green",
-        "timeoutSeconds": 60
-      }
-    ],
-    "undo": [
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\SystemRestore",
-        "operation": "Set",
-        "valueName": "SystemRestorePointCreationFrequency",
-        "valueKind": "DWord",
-        "data": 1440
-      }
-    ],
-    "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/restorepoint",
-    "verifiedOnBuild": "26100"
-  },
-  {
-    "schemaVersion": "1.0.0",
-    "id": "essential.endtaskontaskbar",
-    "origin": "WPFTweaksEndTaskOnTaskbar",
-    "name": "End Task With Right Click - Enable",
-    "description": "Enables option to end task when right-clicking a program in the taskbar.",
-    "category": "system",
-    "subcategory": "Essential Tweaks",
-    "risk": "Safe",
-    "impacts": [
-      "ui"
-    ],
-    "windows": {
-      "minBuild": 19041
-    },
-    "requiresReboot": false,
-    "requiresExplorerRestart": true,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKCU",
-      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced\\TaskbarDeveloperSettings",
-      "valueName": "TaskbarEndTask",
-      "matchType": "Equals",
-      "expectedValue": 1
-    },
-    "apply": [
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced\\TaskbarDeveloperSettings",
-        "operation": "Set",
-        "valueName": "TaskbarEndTask",
-        "valueKind": "DWord",
-        "data": 1
-      }
-    ],
-    "undo": [
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced\\TaskbarDeveloperSettings",
-        "operation": "DeleteValue",
-        "valueName": "TaskbarEndTask"
-      }
-    ],
-    "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/endtaskontaskbar",
-    "verifiedOnBuild": "26100"
-  },
-  {
-    "schemaVersion": "1.0.0",
-    "id": "essential.wpbt",
-    "origin": "WPFTweaksWPBT",
-    "name": "Windows Platform Binary Table (WPBT) - Disable",
-    "description": "If enabled, WPBT allows your computer vendor to execute programs at boot time, such as anti-theft software, software drivers, as well as force install software without user consent. Poses potential security risk.",
-    "category": "system",
-    "subcategory": "Essential Tweaks",
-    "risk": "Safe",
-    "impacts": [
-      "ui"
-    ],
-    "windows": {
-      "minBuild": 19041
-    },
-    "requiresReboot": false,
-    "requiresExplorerRestart": false,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKLM",
-      "key": "SYSTEM\\CurrentControlSet\\Control\\Session Manager",
-      "valueName": "DisableWpbtExecution",
-      "matchType": "Equals",
-      "expectedValue": 1
-    },
-    "apply": [
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SYSTEM\\CurrentControlSet\\Control\\Session Manager",
-        "operation": "Set",
-        "valueName": "DisableWpbtExecution",
-        "valueKind": "DWord",
-        "data": 1
-      }
-    ],
-    "undo": [
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SYSTEM\\CurrentControlSet\\Control\\Session Manager",
-        "operation": "DeleteValue",
-        "valueName": "DisableWpbtExecution"
-      }
-    ],
-    "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/wpbt",
-    "verifiedOnBuild": "26100"
-  },
-  {
-    "schemaVersion": "1.0.0",
-    "id": "essential.preventdevicemetadatafromnetwork",
-    "origin": "WPFTweaksPreventDeviceMetadataFromNetwork",
-    "name": "Prevent Device Companion Apps",
-    "description": "Prevents additional software from being installed when plugging in devices (e.g. Ads when plugging in a monitor). Poses potential security risk.",
-    "category": "system",
-    "subcategory": "Essential Tweaks",
-    "risk": "Safe",
-    "impacts": [
-      "ui"
-    ],
-    "windows": {
-      "minBuild": 19041
-    },
-    "requiresReboot": false,
-    "requiresExplorerRestart": false,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKLM",
-      "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\Device Metadata",
-      "valueName": "PreventDeviceMetadataFromNetwork",
-      "matchType": "Equals",
-      "expectedValue": 1
-    },
-    "apply": [
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\Device Metadata",
-        "operation": "Set",
-        "valueName": "PreventDeviceMetadataFromNetwork",
-        "valueKind": "DWord",
-        "data": 1
-      }
-    ],
-    "undo": [
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\Device Metadata",
-        "operation": "DeleteValue",
-        "valueName": "PreventDeviceMetadataFromNetwork"
-      }
-    ],
-    "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/preventdevicemetadatafromnetwork",
-    "verifiedOnBuild": "26100"
-  },
-  {
-    "schemaVersion": "1.0.0",
-    "id": "essential.diskcleanup",
-    "origin": "WPFTweaksDiskCleanup",
-    "name": "Disk Cleanup - Run",
-    "description": "Runs Disk Cleanup on Drive C: and removes old Windows Updates.",
-    "category": "performance",
-    "subcategory": "Essential Tweaks",
-    "risk": "Safe",
-    "impacts": [
-      "performance"
-    ],
-    "windows": {
-      "minBuild": 19041
-    },
-    "requiresReboot": false,
-    "requiresExplorerRestart": false,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKLM",
-      "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VolumeCaches\\Temporary Files",
-      "valueName": "StateFlags0001",
-      "matchType": "Equals",
-      "expectedValue": 2
-    },
-    "apply": [
-      {
-        "type": "PowerShell",
-        "operation": "Execute",
-        "script": "cleanmgr.exe /d C: /VERYLOWDISK\n      if ($LASTEXITCODE -ne 0) { throw \"cleanmgr failed with exit code $LASTEXITCODE\" }\n      Dism.exe /online /Cleanup-Image /StartComponentCleanup /ResetBase\n      if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 3010) { throw \"Dism failed with exit code $LASTEXITCODE\" }",
-        "timeoutSeconds": 600
-      },
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VolumeCaches\\Temporary Files",
-        "operation": "Set",
-        "valueName": "StateFlags0001",
-        "valueKind": "DWord",
-        "data": 2
-      }
-    ],
-    "undo": [
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VolumeCaches\\Temporary Files",
-        "operation": "DeleteValue",
-        "valueName": "StateFlags0001"
-      }
-    ],
-    "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/diskcleanup",
-    "verifiedOnBuild": "26100",
-    "warnings": "Purges superseded Windows update components via DISM /ResetBase. Once executed, superseded updates cannot be rolled back. Undo only resets CleanMgr registry flags.",
-    "reversible": false,
-    "irreversibleReason": "Executes DISM ResetBase and CleanMgr which permanently purge superseded Windows update components; deleted update baselines cannot be restored."
-  },
-  {
-    "schemaVersion": "1.0.0",
-    "id": "essential.deletetempfiles",
-    "origin": "WPFTweaksDeleteTempFiles",
-    "name": "Temporary Files - Remove",
-    "description": "Erases TEMP Folders.",
-    "category": "performance",
-    "subcategory": "Essential Tweaks",
-    "risk": "Safe",
-    "impacts": [
-      "performance"
-    ],
-    "windows": {
-      "minBuild": 19041
-    },
-    "requiresReboot": false,
-    "requiresExplorerRestart": false,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKCU",
-      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\StorageSense\\Parameters\\StoragePolicy",
-      "valueName": "01",
-      "matchType": "Equals",
-      "expectedValue": 1
-    },
-    "apply": [
-      {
-        "type": "PowerShell",
-        "operation": "Execute",
-        "script": "Remove-Item -Path \"$Env:Temp\\*\" -Recurse -Force -ErrorAction SilentlyContinue\n      Remove-Item -Path \"$Env:SystemRoot\\Temp\\*\" -Recurse -Force -ErrorAction SilentlyContinue",
-        "timeoutSeconds": 60
-      },
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\StorageSense\\Parameters\\StoragePolicy",
-        "operation": "Set",
-        "valueName": "01",
-        "valueKind": "DWord",
-        "data": 1
-      }
-    ],
-    "undo": [
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\StorageSense\\Parameters\\StoragePolicy",
-        "operation": "DeleteValue",
-        "valueName": "01"
-      }
-    ],
-    "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/deletetempfiles",
-    "verifiedOnBuild": "26100",
-    "warnings": "Permanently empties all user and system temp folders. Files deleted from temp cannot be recovered. Undo only resets the StorageSense registry flag.",
-    "reversible": false,
-    "irreversibleReason": "Permanently deletes all files in user and system TEMP directories; deleted temporary files cannot be restored."
-  },
-  {
-    "schemaVersion": "1.0.0",
-    "id": "essential.disableexplorerautodiscovery",
-    "origin": "WPFTweaksDisableExplorerAutoDiscovery",
-    "name": "File Explorer Automatic Folder Discovery - Disable",
-    "description": "Windows Explorer automatically tries to guess the type of the folder based on its contents, slowing down the browsing experience. WARNING! Will disable File Explorer grouping.",
-    "category": "system",
-    "subcategory": "Essential Tweaks",
-    "risk": "Safe",
-    "impacts": [
-      "ui"
-    ],
-    "windows": {
-      "minBuild": 19041
-    },
-    "requiresReboot": false,
-    "requiresExplorerRestart": true,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKCU",
-      "key": "Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\Bags\\AllFolders\\Shell",
-      "valueName": "FolderType",
-      "matchType": "Equals",
-      "expectedValue": "NotSpecified"
-    },
-    "apply": [
-      {
-        "type": "PowerShell",
-        "operation": "Execute",
-        "script": "$bags = \"HKCU:\\Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\Bags\"\n      $bagMRU = \"HKCU:\\Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\BagMRU\"\n      Remove-Item -Path $bags -Recurse -Force -ErrorAction SilentlyContinue\n      Remove-Item -Path $bagMRU -Recurse -Force -ErrorAction SilentlyContinue\n      $allFolders = \"HKCU:\\Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\Bags\\AllFolders\\Shell\"\n      if (!(Test-Path $allFolders)) {\n        New-Item -Path $allFolders -Force -ErrorAction SilentlyContinue | Out-Null\n      }",
-        "timeoutSeconds": 60
-      },
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\Bags\\AllFolders\\Shell",
-        "operation": "Set",
-        "valueName": "FolderType",
-        "valueKind": "String",
-        "data": "NotSpecified"
-      }
-    ],
-    "undo": [
-      {
-        "type": "PowerShell",
-        "operation": "Execute",
-        "script": "$bags = \"HKCU:\\Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\Bags\"\n      $bagMRU = \"HKCU:\\Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\BagMRU\"\n      Remove-Item -Path $bags -Recurse -Force -ErrorAction SilentlyContinue\n      Remove-Item -Path $bagMRU -Recurse -Force -ErrorAction SilentlyContinue",
-        "timeoutSeconds": 60
-      },
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\Bags\\AllFolders\\Shell",
-        "operation": "DeleteValue",
-        "valueName": "FolderType"
-      }
-    ],
-    "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/disableexplorerautodiscovery",
-    "verifiedOnBuild": "26100"
-  }
+    {
+        "schemaVersion":  "1.0.0",
+        "id":  "essential.disableexplorerautodiscovery",
+        "origin":  "WPFTweaksDisableExplorerAutoDiscovery",
+        "name":  "File Explorer Automatic Folder Discovery - Disable",
+        "description":  "Windows Explorer automatically tries to guess the type of the folder based on its contents, slowing down the browsing experience. WARNING! Will disable File Explorer grouping.",
+        "category":  "system",
+        "subcategory":  "Essential Tweaks",
+        "risk":  "Safe",
+        "impacts":  [
+                        "ui"
+                    ],
+        "windows":  {
+                        "minBuild":  19041
+                    },
+        "requiresReboot":  false,
+        "requiresExplorerRestart":  true,
+        "detect":  {
+                       "type":  "Registry",
+                       "hive":  "HKCU",
+                       "key":  "Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\Bags\\AllFolders\\Shell",
+                       "valueName":  "FolderType",
+                       "matchType":  "Equals",
+                       "expectedValue":  "NotSpecified"
+                   },
+        "apply":  [
+                      {
+                          "type":  "PowerShell",
+                          "operation":  "Execute",
+                          "script":  "$bags = \"HKCU:\\Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\Bags\"\n      $bagMRU = \"HKCU:\\Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\BagMRU\"\n      Remove-Item -Path $bags -Recurse -Force -ErrorAction SilentlyContinue\n      Remove-Item -Path $bagMRU -Recurse -Force -ErrorAction SilentlyContinue\n      $allFolders = \"HKCU:\\Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\Bags\\AllFolders\\Shell\"\n      if (!(Test-Path $allFolders)) {\n        New-Item -Path $allFolders -Force -ErrorAction SilentlyContinue | Out-Null\n      }",
+                          "timeoutSeconds":  60
+                      },
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKCU",
+                          "key":  "Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\Bags\\AllFolders\\Shell",
+                          "operation":  "Set",
+                          "valueName":  "FolderType",
+                          "valueKind":  "String",
+                          "data":  "NotSpecified"
+                      }
+                  ],
+        "undo":  [
+                     {
+                         "type":  "PowerShell",
+                         "operation":  "Execute",
+                         "script":  "$bags = \"HKCU:\\Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\Bags\"\n      $bagMRU = \"HKCU:\\Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\BagMRU\"\n      Remove-Item -Path $bags -Recurse -Force -ErrorAction SilentlyContinue\n      Remove-Item -Path $bagMRU -Recurse -Force -ErrorAction SilentlyContinue",
+                         "timeoutSeconds":  60
+                     },
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKCU",
+                         "key":  "Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\Bags\\AllFolders\\Shell",
+                         "operation":  "DeleteValue",
+                         "valueName":  "FolderType"
+                     }
+                 ],
+        "source":  "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/disableexplorerautodiscovery",
+        "verifiedOnBuild":  "26100",
+        "evidence":  "documented"
+    }
 ]

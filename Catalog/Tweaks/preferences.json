@@ -1,1510 +1,1536 @@
-[
-  {
-    "schemaVersion": "1.0.0",
-    "id": "pref.detailedbsod",
-    "origin": "WPFToggleDetailedBSoD",
-    "name": "BSoD Verbose Mode",
-    "description": "Gives more information when you blue screen.",
-    "category": "ui",
-    "subcategory": "Customize Preferences",
-    "risk": "Safe",
-    "impacts": [
-      "ui"
-    ],
-    "windows": {
-      "minBuild": 19041
+﻿[
+    {
+        "schemaVersion":  "1.0.0",
+        "id":  "pref.detailedbsod",
+        "origin":  "WPFToggleDetailedBSoD",
+        "name":  "BSoD Verbose Mode",
+        "description":  "Gives more information when you blue screen.",
+        "category":  "ui",
+        "subcategory":  "Customize Preferences",
+        "risk":  "Safe",
+        "impacts":  [
+                        "ui"
+                    ],
+        "windows":  {
+                        "minBuild":  19041
+                    },
+        "requiresReboot":  false,
+        "requiresExplorerRestart":  false,
+        "detect":  {
+                       "type":  "Registry",
+                       "hive":  "HKLM",
+                       "key":  "SYSTEM\\CurrentControlSet\\Control\\CrashControl",
+                       "valueName":  "DisplayParameters",
+                       "matchType":  "Equals",
+                       "expectedValue":  1
+                   },
+        "apply":  [
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKLM",
+                          "key":  "SYSTEM\\CurrentControlSet\\Control\\CrashControl",
+                          "operation":  "Set",
+                          "valueName":  "DisplayParameters",
+                          "valueKind":  "DWord",
+                          "data":  1
+                      },
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKLM",
+                          "key":  "SYSTEM\\CurrentControlSet\\Control\\CrashControl",
+                          "operation":  "Set",
+                          "valueName":  "DisableEmoticon",
+                          "valueKind":  "DWord",
+                          "data":  1
+                      }
+                  ],
+        "undo":  [
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKLM",
+                         "key":  "SYSTEM\\CurrentControlSet\\Control\\CrashControl",
+                         "operation":  "Set",
+                         "valueName":  "DisplayParameters",
+                         "valueKind":  "DWord",
+                         "data":  0
+                     },
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKLM",
+                         "key":  "SYSTEM\\CurrentControlSet\\Control\\CrashControl",
+                         "operation":  "Set",
+                         "valueName":  "DisableEmoticon",
+                         "valueKind":  "DWord",
+                         "data":  0
+                     }
+                 ],
+        "source":  "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/detailedbsod",
+        "verifiedOnBuild":  "26100",
+        "evidence":  "documented"
     },
-    "requiresReboot": false,
-    "requiresExplorerRestart": false,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKLM",
-      "key": "SYSTEM\\CurrentControlSet\\Control\\CrashControl",
-      "valueName": "DisplayParameters",
-      "matchType": "Equals",
-      "expectedValue": 1
+    {
+        "schemaVersion":  "1.0.0",
+        "id":  "pref.batterypercentage",
+        "origin":  "WPFToggleBatteryPercentage",
+        "name":  "System Tray Battery Percentage",
+        "description":  "Shows numeric battery percentage next to the battery icon in the system tray.",
+        "category":  "ui",
+        "subcategory":  "Customize Preferences",
+        "risk":  "Safe",
+        "impacts":  [
+                        "ui"
+                    ],
+        "windows":  {
+                        "minBuild":  19041
+                    },
+        "requiresReboot":  false,
+        "requiresExplorerRestart":  false,
+        "detect":  {
+                       "type":  "Registry",
+                       "hive":  "HKCU",
+                       "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+                       "valueName":  "IsBatteryPercentageEnabled",
+                       "matchType":  "Equals",
+                       "expectedValue":  1
+                   },
+        "apply":  [
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKCU",
+                          "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+                          "operation":  "Set",
+                          "valueName":  "IsBatteryPercentageEnabled",
+                          "valueKind":  "DWord",
+                          "data":  1
+                      }
+                  ],
+        "undo":  [
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKCU",
+                         "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+                         "operation":  "DeleteValue",
+                         "valueName":  "IsBatteryPercentageEnabled"
+                     }
+                 ],
+        "source":  "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/batterypercentage",
+        "verifiedOnBuild":  "26100",
+        "evidence":  "documented"
     },
-    "apply": [
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SYSTEM\\CurrentControlSet\\Control\\CrashControl",
-        "operation": "Set",
-        "valueName": "DisplayParameters",
-        "valueKind": "DWord",
-        "data": 1
-      },
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SYSTEM\\CurrentControlSet\\Control\\CrashControl",
-        "operation": "Set",
-        "valueName": "DisableEmoticon",
-        "valueKind": "DWord",
-        "data": 1
-      }
-    ],
-    "undo": [
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SYSTEM\\CurrentControlSet\\Control\\CrashControl",
-        "operation": "Set",
-        "valueName": "DisplayParameters",
-        "valueKind": "DWord",
-        "data": 0
-      },
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SYSTEM\\CurrentControlSet\\Control\\CrashControl",
-        "operation": "Set",
-        "valueName": "DisableEmoticon",
-        "valueKind": "DWord",
-        "data": 0
-      }
-    ],
-    "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/detailedbsod",
-    "verifiedOnBuild": "26100"
-  },
-  {
-    "schemaVersion": "1.0.0",
-    "id": "pref.batterypercentage",
-    "origin": "WPFToggleBatteryPercentage",
-    "name": "System Tray Battery Percentage",
-    "description": "Shows numeric battery percentage next to the battery icon in the system tray.",
-    "category": "ui",
-    "subcategory": "Customize Preferences",
-    "risk": "Safe",
-    "impacts": [
-      "ui"
-    ],
-    "windows": {
-      "minBuild": 19041
+    {
+        "schemaVersion":  "1.0.0",
+        "id":  "pref.darkmode",
+        "origin":  "WPFToggleDarkMode",
+        "name":  "Dark Theme for Windows",
+        "description":  "Dark Mode for the system and applications.",
+        "category":  "ui",
+        "subcategory":  "Customize Preferences",
+        "risk":  "Safe",
+        "impacts":  [
+                        "ui"
+                    ],
+        "windows":  {
+                        "minBuild":  19041
+                    },
+        "requiresReboot":  false,
+        "requiresExplorerRestart":  false,
+        "detect":  {
+                       "type":  "Registry",
+                       "hive":  "HKCU",
+                       "key":  "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
+                       "valueName":  "AppsUseLightTheme",
+                       "matchType":  "Equals",
+                       "expectedValue":  0
+                   },
+        "apply":  [
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKCU",
+                          "key":  "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
+                          "operation":  "Set",
+                          "valueName":  "AppsUseLightTheme",
+                          "valueKind":  "DWord",
+                          "data":  0
+                      },
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKCU",
+                          "key":  "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
+                          "operation":  "Set",
+                          "valueName":  "SystemUsesLightTheme",
+                          "valueKind":  "DWord",
+                          "data":  0
+                      }
+                  ],
+        "undo":  [
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKCU",
+                         "key":  "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
+                         "operation":  "Set",
+                         "valueName":  "AppsUseLightTheme",
+                         "valueKind":  "DWord",
+                         "data":  1
+                     },
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKCU",
+                         "key":  "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
+                         "operation":  "Set",
+                         "valueName":  "SystemUsesLightTheme",
+                         "valueKind":  "DWord",
+                         "data":  1
+                     }
+                 ],
+        "source":  "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/darkmode",
+        "verifiedOnBuild":  "26100",
+        "evidence":  "documented"
     },
-    "requiresReboot": false,
-    "requiresExplorerRestart": false,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKCU",
-      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-      "valueName": "IsBatteryPercentageEnabled",
-      "matchType": "Equals",
-      "expectedValue": 1
+    {
+        "schemaVersion":  "1.0.0",
+        "id":  "pref.showext",
+        "origin":  "WPFToggleShowExt",
+        "name":  "File Explorer File Extensions",
+        "description":  "Shows .file extensions in Explorer (.exe, .png, etc.)",
+        "category":  "ui",
+        "subcategory":  "Customize Preferences",
+        "risk":  "Safe",
+        "impacts":  [
+                        "ui"
+                    ],
+        "windows":  {
+                        "minBuild":  19041
+                    },
+        "requiresReboot":  false,
+        "requiresExplorerRestart":  false,
+        "detect":  {
+                       "type":  "Registry",
+                       "hive":  "HKCU",
+                       "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+                       "valueName":  "HideFileExt",
+                       "matchType":  "Equals",
+                       "expectedValue":  0
+                   },
+        "apply":  [
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKCU",
+                          "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+                          "operation":  "Set",
+                          "valueName":  "HideFileExt",
+                          "valueKind":  "DWord",
+                          "data":  0
+                      }
+                  ],
+        "undo":  [
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKCU",
+                         "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+                         "operation":  "Set",
+                         "valueName":  "HideFileExt",
+                         "valueKind":  "DWord",
+                         "data":  1
+                     }
+                 ],
+        "source":  "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/showext",
+        "verifiedOnBuild":  "26100",
+        "evidence":  "documented"
     },
-    "apply": [
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-        "operation": "Set",
-        "valueName": "IsBatteryPercentageEnabled",
-        "valueKind": "DWord",
-        "data": 1
-      }
-    ],
-    "undo": [
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-        "operation": "DeleteValue",
-        "valueName": "IsBatteryPercentageEnabled"
-      }
-    ],
-    "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/batterypercentage",
-    "verifiedOnBuild": "26100"
-  },
-  {
-    "schemaVersion": "1.0.0",
-    "id": "pref.darkmode",
-    "origin": "WPFToggleDarkMode",
-    "name": "Dark Theme for Windows",
-    "description": "Dark Mode for the system and applications.",
-    "category": "ui",
-    "subcategory": "Customize Preferences",
-    "risk": "Safe",
-    "impacts": [
-      "ui"
-    ],
-    "windows": {
-      "minBuild": 19041
+    {
+        "schemaVersion":  "1.0.0",
+        "id":  "pref.hiddenfiles",
+        "origin":  "WPFToggleHiddenFiles",
+        "name":  "File Explorer Hidden Files",
+        "description":  "Reveals hidden files in Explorer.",
+        "category":  "ui",
+        "subcategory":  "Customize Preferences",
+        "risk":  "Safe",
+        "impacts":  [
+                        "ui"
+                    ],
+        "windows":  {
+                        "minBuild":  19041
+                    },
+        "requiresReboot":  false,
+        "requiresExplorerRestart":  false,
+        "detect":  {
+                       "type":  "Registry",
+                       "hive":  "HKCU",
+                       "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+                       "valueName":  "Hidden",
+                       "matchType":  "Equals",
+                       "expectedValue":  1
+                   },
+        "apply":  [
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKCU",
+                          "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+                          "operation":  "Set",
+                          "valueName":  "Hidden",
+                          "valueKind":  "DWord",
+                          "data":  1
+                      }
+                  ],
+        "undo":  [
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKCU",
+                         "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+                         "operation":  "Set",
+                         "valueName":  "Hidden",
+                         "valueKind":  "DWord",
+                         "data":  0
+                     }
+                 ],
+        "source":  "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/hiddenfiles",
+        "verifiedOnBuild":  "26100",
+        "evidence":  "documented"
     },
-    "requiresReboot": false,
-    "requiresExplorerRestart": false,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKCU",
-      "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
-      "valueName": "AppsUseLightTheme",
-      "matchType": "Equals",
-      "expectedValue": 0
+    {
+        "schemaVersion":  "1.0.0",
+        "id":  "pref.verboselogon",
+        "origin":  "WPFToggleVerboseLogon",
+        "name":  "Logon Verbose Mode",
+        "description":  "Show detailed messages during startup/shutdown.",
+        "category":  "ui",
+        "subcategory":  "Customize Preferences",
+        "risk":  "Safe",
+        "impacts":  [
+                        "ui"
+                    ],
+        "windows":  {
+                        "minBuild":  19041
+                    },
+        "requiresReboot":  false,
+        "requiresExplorerRestart":  false,
+        "detect":  {
+                       "type":  "Registry",
+                       "hive":  "HKLM",
+                       "key":  "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System",
+                       "valueName":  "VerboseStatus",
+                       "matchType":  "Equals",
+                       "expectedValue":  1
+                   },
+        "apply":  [
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKLM",
+                          "key":  "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System",
+                          "operation":  "Set",
+                          "valueName":  "VerboseStatus",
+                          "valueKind":  "DWord",
+                          "data":  1
+                      }
+                  ],
+        "undo":  [
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKLM",
+                         "key":  "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System",
+                         "operation":  "Set",
+                         "valueName":  "VerboseStatus",
+                         "valueKind":  "DWord",
+                         "data":  0
+                     }
+                 ],
+        "source":  "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/verboselogon",
+        "verifiedOnBuild":  "26100",
+        "evidence":  "documented"
     },
-    "apply": [
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
-        "operation": "Set",
-        "valueName": "AppsUseLightTheme",
-        "valueKind": "DWord",
-        "data": 0
-      },
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
-        "operation": "Set",
-        "valueName": "SystemUsesLightTheme",
-        "valueKind": "DWord",
-        "data": 0
-      }
-    ],
-    "undo": [
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
-        "operation": "Set",
-        "valueName": "AppsUseLightTheme",
-        "valueKind": "DWord",
-        "data": 1
-      },
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
-        "operation": "Set",
-        "valueName": "SystemUsesLightTheme",
-        "valueKind": "DWord",
-        "data": 1
-      }
-    ],
-    "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/darkmode",
-    "verifiedOnBuild": "26100"
-  },
-  {
-    "schemaVersion": "1.0.0",
-    "id": "pref.showext",
-    "origin": "WPFToggleShowExt",
-    "name": "File Explorer File Extensions",
-    "description": "Shows .file extensions in Explorer (.exe, .png, etc.)",
-    "category": "ui",
-    "subcategory": "Customize Preferences",
-    "risk": "Safe",
-    "impacts": [
-      "ui"
-    ],
-    "windows": {
-      "minBuild": 19041
+    {
+        "schemaVersion":  "1.0.0",
+        "id":  "pref.newoutlook",
+        "origin":  "WPFToggleNewOutlook",
+        "name":  "Microsoft Outlook New Version",
+        "description":  "This will ensure the new Outlook application is used.",
+        "category":  "ui",
+        "subcategory":  "Customize Preferences",
+        "risk":  "Safe",
+        "impacts":  [
+                        "ui"
+                    ],
+        "windows":  {
+                        "minBuild":  19041
+                    },
+        "requiresReboot":  false,
+        "requiresExplorerRestart":  false,
+        "detect":  {
+                       "type":  "Registry",
+                       "hive":  "HKCU",
+                       "key":  "SOFTWARE\\Microsoft\\Office\\16.0\\Outlook\\Preferences",
+                       "valueName":  "UseNewOutlook",
+                       "matchType":  "Equals",
+                       "expectedValue":  1
+                   },
+        "apply":  [
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKCU",
+                          "key":  "SOFTWARE\\Microsoft\\Office\\16.0\\Outlook\\Preferences",
+                          "operation":  "Set",
+                          "valueName":  "UseNewOutlook",
+                          "valueKind":  "DWord",
+                          "data":  1
+                      },
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKCU",
+                          "key":  "Software\\Microsoft\\Office\\16.0\\Outlook\\Options\\General",
+                          "operation":  "Set",
+                          "valueName":  "HideNewOutlookToggle",
+                          "valueKind":  "DWord",
+                          "data":  0
+                      },
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKCU",
+                          "key":  "Software\\Policies\\Microsoft\\Office\\16.0\\Outlook\\Options\\General",
+                          "operation":  "Set",
+                          "valueName":  "DoNewOutlookAutoMigration",
+                          "valueKind":  "DWord",
+                          "data":  0
+                      },
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKCU",
+                          "key":  "Software\\Policies\\Microsoft\\Office\\16.0\\Outlook\\Preferences",
+                          "operation":  "Set",
+                          "valueName":  "NewOutlookMigrationUserSetting",
+                          "valueKind":  "DWord",
+                          "data":  0
+                      }
+                  ],
+        "undo":  [
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKCU",
+                         "key":  "SOFTWARE\\Microsoft\\Office\\16.0\\Outlook\\Preferences",
+                         "operation":  "Set",
+                         "valueName":  "UseNewOutlook",
+                         "valueKind":  "DWord",
+                         "data":  0
+                     },
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKCU",
+                         "key":  "Software\\Microsoft\\Office\\16.0\\Outlook\\Options\\General",
+                         "operation":  "Set",
+                         "valueName":  "HideNewOutlookToggle",
+                         "valueKind":  "DWord",
+                         "data":  1
+                     },
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKCU",
+                         "key":  "Software\\Policies\\Microsoft\\Office\\16.0\\Outlook\\Options\\General",
+                         "operation":  "Set",
+                         "valueName":  "DoNewOutlookAutoMigration",
+                         "valueKind":  "DWord",
+                         "data":  0
+                     },
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKCU",
+                         "key":  "Software\\Policies\\Microsoft\\Office\\16.0\\Outlook\\Preferences",
+                         "operation":  "DeleteValue",
+                         "valueName":  "NewOutlookMigrationUserSetting"
+                     }
+                 ],
+        "source":  "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/newoutlook",
+        "verifiedOnBuild":  "26100",
+        "evidence":  "documented"
     },
-    "requiresReboot": false,
-    "requiresExplorerRestart": false,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKCU",
-      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-      "valueName": "HideFileExt",
-      "matchType": "Equals",
-      "expectedValue": 0
+    {
+        "schemaVersion":  "1.0.0",
+        "id":  "pref.scrollbars",
+        "origin":  "WPFToggleScrollbars",
+        "name":  "Scrollbars Always Visible",
+        "description":  "If enabled, scrollbars will always be visible. If disabled, Windows will automatically hide scrollbars when not in use.",
+        "category":  "ui",
+        "subcategory":  "Customize Preferences",
+        "risk":  "Safe",
+        "impacts":  [
+                        "ui"
+                    ],
+        "windows":  {
+                        "minBuild":  19041
+                    },
+        "requiresReboot":  false,
+        "requiresExplorerRestart":  false,
+        "detect":  {
+                       "type":  "Registry",
+                       "hive":  "HKCU",
+                       "key":  "Control Panel\\Accessibility",
+                       "valueName":  "DynamicScrollbars",
+                       "matchType":  "Equals",
+                       "expectedValue":  0
+                   },
+        "apply":  [
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKCU",
+                          "key":  "Control Panel\\Accessibility",
+                          "operation":  "Set",
+                          "valueName":  "DynamicScrollbars",
+                          "valueKind":  "DWord",
+                          "data":  0
+                      }
+                  ],
+        "undo":  [
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKCU",
+                         "key":  "Control Panel\\Accessibility",
+                         "operation":  "Set",
+                         "valueName":  "DynamicScrollbars",
+                         "valueKind":  "DWord",
+                         "data":  1
+                     }
+                 ],
+        "source":  "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/scrollbars",
+        "verifiedOnBuild":  "26100",
+        "evidence":  "documented"
     },
-    "apply": [
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-        "operation": "Set",
-        "valueName": "HideFileExt",
-        "valueKind": "DWord",
-        "data": 0
-      }
-    ],
-    "undo": [
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-        "operation": "Set",
-        "valueName": "HideFileExt",
-        "valueKind": "DWord",
-        "data": 1
-      }
-    ],
-    "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/showext",
-    "verifiedOnBuild": "26100"
-  },
-  {
-    "schemaVersion": "1.0.0",
-    "id": "pref.hiddenfiles",
-    "origin": "WPFToggleHiddenFiles",
-    "name": "File Explorer Hidden Files",
-    "description": "Reveals hidden files in Explorer.",
-    "category": "ui",
-    "subcategory": "Customize Preferences",
-    "risk": "Safe",
-    "impacts": [
-      "ui"
-    ],
-    "windows": {
-      "minBuild": 19041
+    {
+        "schemaVersion":  "1.0.0",
+        "id":  "pref.multiplaneoverlay",
+        "origin":  "WPFMultiplaneOverlay",
+        "name":  "Multiplane Overlay Workaround",
+        "description":  "Workaround for specific display-flicker bugs on certain older GPU drivers. Note: Disabling MPO is not a general performance optimization; it increases power usage and disables hardware-level windowed presentation optimizations on modern systems.",
+        "category":  "preferences",
+        "subcategory":  "Customize Preferences",
+        "risk":  "Safe",
+        "evidence":  "situational",
+        "sideEffects":  "Increases GPU and display power consumption; disables independent hardware composition planes for windowed applications and video playback.",
+        "impacts":  [
+                        "ui"
+                    ],
+        "windows":  {
+                        "minBuild":  19041
+                    },
+        "requiresReboot":  false,
+        "requiresExplorerRestart":  false,
+        "detect":  {
+                       "type":  "Registry",
+                       "hive":  "HKLM",
+                       "key":  "SOFTWARE\\Microsoft\\Windows\\Dwm",
+                       "valueName":  "OverlayTestMode",
+                       "matchType":  "Equals",
+                       "expectedValue":  1
+                   },
+        "apply":  [
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKLM",
+                          "key":  "SOFTWARE\\Microsoft\\Windows\\Dwm",
+                          "operation":  "Set",
+                          "valueName":  "OverlayTestMode",
+                          "valueKind":  "DWord",
+                          "data":  1
+                      },
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKLM",
+                          "key":  "SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers",
+                          "operation":  "Set",
+                          "valueName":  "DisableOverlays",
+                          "valueKind":  "DWord",
+                          "data":  1
+                      }
+                  ],
+        "undo":  [
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKLM",
+                         "key":  "SOFTWARE\\Microsoft\\Windows\\Dwm",
+                         "operation":  "DeleteValue",
+                         "valueName":  "OverlayTestMode"
+                     },
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKLM",
+                         "key":  "SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers",
+                         "operation":  "DeleteValue",
+                         "valueName":  "DisableOverlays"
+                     }
+                 ],
+        "source":  "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/multiplaneoverlay",
+        "verifiedOnBuild":  "26100"
     },
-    "requiresReboot": false,
-    "requiresExplorerRestart": false,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKCU",
-      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-      "valueName": "Hidden",
-      "matchType": "Equals",
-      "expectedValue": 1
+    {
+        "schemaVersion":  "1.0.0",
+        "id":  "pref.mouseacceleration",
+        "origin":  "WPFToggleMouseAcceleration",
+        "name":  "Mouse Acceleration",
+        "description":  "User preference toggle to enable or disable non-linear pointer acceleration curves (Enhance Pointer Precision).",
+        "category":  "preferences",
+        "subcategory":  "Customize Preferences",
+        "risk":  "Safe",
+        "evidence":  "documented",
+        "impacts":  [
+                        "ui"
+                    ],
+        "windows":  {
+                        "minBuild":  19041
+                    },
+        "requiresReboot":  false,
+        "requiresExplorerRestart":  false,
+        "detect":  {
+                       "type":  "Registry",
+                       "hive":  "HKCU",
+                       "key":  "Control Panel\\Mouse",
+                       "valueName":  "MouseSpeed",
+                       "matchType":  "Equals",
+                       "expectedValue":  1
+                   },
+        "apply":  [
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKCU",
+                          "key":  "Control Panel\\Mouse",
+                          "operation":  "Set",
+                          "valueName":  "MouseSpeed",
+                          "valueKind":  "DWord",
+                          "data":  1
+                      },
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKCU",
+                          "key":  "Control Panel\\Mouse",
+                          "operation":  "Set",
+                          "valueName":  "MouseThreshold1",
+                          "valueKind":  "DWord",
+                          "data":  6
+                      },
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKCU",
+                          "key":  "Control Panel\\Mouse",
+                          "operation":  "Set",
+                          "valueName":  "MouseThreshold2",
+                          "valueKind":  "DWord",
+                          "data":  10
+                      }
+                  ],
+        "undo":  [
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKCU",
+                         "key":  "Control Panel\\Mouse",
+                         "operation":  "Set",
+                         "valueName":  "MouseSpeed",
+                         "valueKind":  "DWord",
+                         "data":  0
+                     },
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKCU",
+                         "key":  "Control Panel\\Mouse",
+                         "operation":  "Set",
+                         "valueName":  "MouseThreshold1",
+                         "valueKind":  "DWord",
+                         "data":  0
+                     },
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKCU",
+                         "key":  "Control Panel\\Mouse",
+                         "operation":  "Set",
+                         "valueName":  "MouseThreshold2",
+                         "valueKind":  "DWord",
+                         "data":  0
+                     }
+                 ],
+        "source":  "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/mouseacceleration",
+        "verifiedOnBuild":  "26100"
     },
-    "apply": [
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-        "operation": "Set",
-        "valueName": "Hidden",
-        "valueKind": "DWord",
-        "data": 1
-      }
-    ],
-    "undo": [
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-        "operation": "Set",
-        "valueName": "Hidden",
-        "valueKind": "DWord",
-        "data": 0
-      }
-    ],
-    "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/hiddenfiles",
-    "verifiedOnBuild": "26100"
-  },
-  {
-    "schemaVersion": "1.0.0",
-    "id": "pref.verboselogon",
-    "origin": "WPFToggleVerboseLogon",
-    "name": "Logon Verbose Mode",
-    "description": "Show detailed messages during startup/shutdown.",
-    "category": "ui",
-    "subcategory": "Customize Preferences",
-    "risk": "Safe",
-    "impacts": [
-      "ui"
-    ],
-    "windows": {
-      "minBuild": 19041
+    {
+        "schemaVersion":  "1.0.0",
+        "id":  "pref.numlock",
+        "origin":  "WPFToggleNumLock",
+        "name":  "Num Lock on Startup",
+        "description":  "Toggle the Num Lock key state when your computer starts.",
+        "category":  "ui",
+        "subcategory":  "Customize Preferences",
+        "risk":  "Safe",
+        "impacts":  [
+                        "ui"
+                    ],
+        "windows":  {
+                        "minBuild":  19041
+                    },
+        "requiresReboot":  false,
+        "requiresExplorerRestart":  false,
+        "detect":  {
+                       "type":  "Registry",
+                       "hive":  "HKU",
+                       "key":  ".Default\\Control Panel\\Keyboard",
+                       "valueName":  "InitialKeyboardIndicators",
+                       "matchType":  "Equals",
+                       "expectedValue":  "2"
+                   },
+        "apply":  [
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKU",
+                          "key":  ".Default\\Control Panel\\Keyboard",
+                          "operation":  "Set",
+                          "valueName":  "InitialKeyboardIndicators",
+                          "valueKind":  "String",
+                          "data":  "2"
+                      },
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKCU",
+                          "key":  "Control Panel\\Keyboard",
+                          "operation":  "Set",
+                          "valueName":  "InitialKeyboardIndicators",
+                          "valueKind":  "String",
+                          "data":  "2"
+                      }
+                  ],
+        "undo":  [
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKU",
+                         "key":  ".Default\\Control Panel\\Keyboard",
+                         "operation":  "Set",
+                         "valueName":  "InitialKeyboardIndicators",
+                         "valueKind":  "String",
+                         "data":  "0"
+                     },
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKCU",
+                         "key":  "Control Panel\\Keyboard",
+                         "operation":  "Set",
+                         "valueName":  "InitialKeyboardIndicators",
+                         "valueKind":  "String",
+                         "data":  "0"
+                     }
+                 ],
+        "source":  "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/numlock",
+        "verifiedOnBuild":  "26100",
+        "evidence":  "documented"
     },
-    "requiresReboot": false,
-    "requiresExplorerRestart": false,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKLM",
-      "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System",
-      "valueName": "VerboseStatus",
-      "matchType": "Equals",
-      "expectedValue": 1
+    {
+        "schemaVersion":  "1.0.0",
+        "id":  "pref.windowsnapping",
+        "origin":  "WPFToggleWindowSnapping",
+        "name":  "Window Snapping",
+        "description":  "Toggles the window snapping feature when dragging windows.",
+        "category":  "ui",
+        "subcategory":  "Customize Preferences",
+        "risk":  "Safe",
+        "impacts":  [
+                        "ui"
+                    ],
+        "windows":  {
+                        "minBuild":  19041
+                    },
+        "requiresReboot":  false,
+        "requiresExplorerRestart":  false,
+        "detect":  {
+                       "type":  "Registry",
+                       "hive":  "HKCU",
+                       "key":  "Control Panel\\Desktop",
+                       "valueName":  "WindowArrangementActive",
+                       "matchType":  "Equals",
+                       "expectedValue":  "1"
+                   },
+        "apply":  [
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKCU",
+                          "key":  "Control Panel\\Desktop",
+                          "operation":  "Set",
+                          "valueName":  "WindowArrangementActive",
+                          "valueKind":  "String",
+                          "data":  "1"
+                      }
+                  ],
+        "undo":  [
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKCU",
+                         "key":  "Control Panel\\Desktop",
+                         "operation":  "Set",
+                         "valueName":  "WindowArrangementActive",
+                         "valueKind":  "String",
+                         "data":  "0"
+                     }
+                 ],
+        "source":  "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/windowsnapping",
+        "verifiedOnBuild":  "26100",
+        "evidence":  "documented"
     },
-    "apply": [
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System",
-        "operation": "Set",
-        "valueName": "VerboseStatus",
-        "valueKind": "DWord",
-        "data": 1
-      }
-    ],
-    "undo": [
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System",
-        "operation": "Set",
-        "valueName": "VerboseStatus",
-        "valueKind": "DWord",
-        "data": 0
-      }
-    ],
-    "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/verboselogon",
-    "verifiedOnBuild": "26100"
-  },
-  {
-    "schemaVersion": "1.0.0",
-    "id": "pref.newoutlook",
-    "origin": "WPFToggleNewOutlook",
-    "name": "Microsoft Outlook New Version",
-    "description": "This will ensure the new Outlook application is used.",
-    "category": "ui",
-    "subcategory": "Customize Preferences",
-    "risk": "Safe",
-    "impacts": [
-      "ui"
-    ],
-    "windows": {
-      "minBuild": 19041
+    {
+        "schemaVersion":  "1.0.0",
+        "id":  "pref.standbyfix",
+        "origin":  "WPFToggleStandbyFix",
+        "name":  "S0 Sleep Network Connectivity",
+        "description":  "Toggles network connectivity during S0 Sleep which is low power idle in modern laptops.",
+        "category":  "ui",
+        "subcategory":  "Customize Preferences",
+        "risk":  "Safe",
+        "impacts":  [
+                        "ui"
+                    ],
+        "windows":  {
+                        "minBuild":  19041
+                    },
+        "requiresReboot":  false,
+        "requiresExplorerRestart":  false,
+        "detect":  {
+                       "type":  "Registry",
+                       "hive":  "HKCU",
+                       "key":  "SOFTWARE\\Policies\\Microsoft\\Power\\PowerSettings\\f15576e8-98b7-4186-b944-eafa664402d9",
+                       "valueName":  "ACSettingIndex",
+                       "matchType":  "Equals",
+                       "expectedValue":  1
+                   },
+        "apply":  [
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKCU",
+                          "key":  "SOFTWARE\\Policies\\Microsoft\\Power\\PowerSettings\\f15576e8-98b7-4186-b944-eafa664402d9",
+                          "operation":  "Set",
+                          "valueName":  "ACSettingIndex",
+                          "valueKind":  "DWord",
+                          "data":  1
+                      }
+                  ],
+        "undo":  [
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKCU",
+                         "key":  "SOFTWARE\\Policies\\Microsoft\\Power\\PowerSettings\\f15576e8-98b7-4186-b944-eafa664402d9",
+                         "operation":  "Set",
+                         "valueName":  "ACSettingIndex",
+                         "valueKind":  "DWord",
+                         "data":  0
+                     }
+                 ],
+        "source":  "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/standbyfix",
+        "verifiedOnBuild":  "26100",
+        "evidence":  "situational"
     },
-    "requiresReboot": false,
-    "requiresExplorerRestart": false,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKCU",
-      "key": "SOFTWARE\\Microsoft\\Office\\16.0\\Outlook\\Preferences",
-      "valueName": "UseNewOutlook",
-      "matchType": "Equals",
-      "expectedValue": 1
+    {
+        "schemaVersion":  "1.0.0",
+        "id":  "pref.s3sleep",
+        "origin":  "WPFToggleS3Sleep",
+        "name":  "S3 Sleep",
+        "description":  "Toggles between Modern Standby and S3 Sleep, which cuts off power to the CPU while continuing to refresh the memory.",
+        "category":  "ui",
+        "subcategory":  "Customize Preferences",
+        "risk":  "Safe",
+        "impacts":  [
+                        "ui"
+                    ],
+        "windows":  {
+                        "minBuild":  19041
+                    },
+        "requiresReboot":  false,
+        "requiresExplorerRestart":  false,
+        "detect":  {
+                       "type":  "Registry",
+                       "hive":  "HKLM",
+                       "key":  "SYSTEM\\CurrentControlSet\\Control\\Power",
+                       "valueName":  "PlatformAoAcOverride",
+                       "matchType":  "Equals",
+                       "expectedValue":  0
+                   },
+        "apply":  [
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKLM",
+                          "key":  "SYSTEM\\CurrentControlSet\\Control\\Power",
+                          "operation":  "Set",
+                          "valueName":  "PlatformAoAcOverride",
+                          "valueKind":  "DWord",
+                          "data":  0
+                      }
+                  ],
+        "undo":  [
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKLM",
+                         "key":  "SYSTEM\\CurrentControlSet\\Control\\Power",
+                         "operation":  "DeleteValue",
+                         "valueName":  "PlatformAoAcOverride"
+                     }
+                 ],
+        "source":  "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/s3sleep",
+        "verifiedOnBuild":  "26100",
+        "evidence":  "situational"
     },
-    "apply": [
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "SOFTWARE\\Microsoft\\Office\\16.0\\Outlook\\Preferences",
-        "operation": "Set",
-        "valueName": "UseNewOutlook",
-        "valueKind": "DWord",
-        "data": 1
-      },
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\Office\\16.0\\Outlook\\Options\\General",
-        "operation": "Set",
-        "valueName": "HideNewOutlookToggle",
-        "valueKind": "DWord",
-        "data": 0
-      },
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Policies\\Microsoft\\Office\\16.0\\Outlook\\Options\\General",
-        "operation": "Set",
-        "valueName": "DoNewOutlookAutoMigration",
-        "valueKind": "DWord",
-        "data": 0
-      },
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Policies\\Microsoft\\Office\\16.0\\Outlook\\Preferences",
-        "operation": "Set",
-        "valueName": "NewOutlookMigrationUserSetting",
-        "valueKind": "DWord",
-        "data": 0
-      }
-    ],
-    "undo": [
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "SOFTWARE\\Microsoft\\Office\\16.0\\Outlook\\Preferences",
-        "operation": "Set",
-        "valueName": "UseNewOutlook",
-        "valueKind": "DWord",
-        "data": 0
-      },
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\Office\\16.0\\Outlook\\Options\\General",
-        "operation": "Set",
-        "valueName": "HideNewOutlookToggle",
-        "valueKind": "DWord",
-        "data": 1
-      },
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Policies\\Microsoft\\Office\\16.0\\Outlook\\Options\\General",
-        "operation": "Set",
-        "valueName": "DoNewOutlookAutoMigration",
-        "valueKind": "DWord",
-        "data": 0
-      },
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Policies\\Microsoft\\Office\\16.0\\Outlook\\Preferences",
-        "operation": "DeleteValue",
-        "valueName": "NewOutlookMigrationUserSetting"
-      }
-    ],
-    "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/newoutlook",
-    "verifiedOnBuild": "26100"
-  },
-  {
-    "schemaVersion": "1.0.0",
-    "id": "pref.scrollbars",
-    "origin": "WPFToggleScrollbars",
-    "name": "Scrollbars Always Visible",
-    "description": "If enabled, scrollbars will always be visible. If disabled, Windows will automatically hide scrollbars when not in use.",
-    "category": "ui",
-    "subcategory": "Customize Preferences",
-    "risk": "Safe",
-    "impacts": [
-      "ui"
-    ],
-    "windows": {
-      "minBuild": 19041
+    {
+        "schemaVersion":  "1.0.0",
+        "id":  "pref.hidesettingshome",
+        "origin":  "WPFToggleHideSettingsHome",
+        "name":  "Settings Home Page",
+        "description":  "Toggles the Home Page in the Windows Settings app.",
+        "category":  "ui",
+        "subcategory":  "Customize Preferences",
+        "risk":  "Safe",
+        "impacts":  [
+                        "ui"
+                    ],
+        "windows":  {
+                        "minBuild":  19041
+                    },
+        "requiresReboot":  false,
+        "requiresExplorerRestart":  false,
+        "detect":  {
+                       "type":  "Registry",
+                       "hive":  "HKCU",
+                       "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
+                       "valueName":  "SettingsPageVisibility",
+                       "matchType":  "Equals",
+                       "expectedValue":  "show:home"
+                   },
+        "apply":  [
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKCU",
+                          "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
+                          "operation":  "Set",
+                          "valueName":  "SettingsPageVisibility",
+                          "valueKind":  "String",
+                          "data":  "show:home"
+                      }
+                  ],
+        "undo":  [
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKCU",
+                         "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
+                         "operation":  "Set",
+                         "valueName":  "SettingsPageVisibility",
+                         "valueKind":  "String",
+                         "data":  "hide:home"
+                     }
+                 ],
+        "source":  "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/hidesettingshome",
+        "verifiedOnBuild":  "26100",
+        "evidence":  "documented"
     },
-    "requiresReboot": false,
-    "requiresExplorerRestart": false,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKCU",
-      "key": "Control Panel\\Accessibility",
-      "valueName": "DynamicScrollbars",
-      "matchType": "Equals",
-      "expectedValue": 0
+    {
+        "schemaVersion":  "1.0.0",
+        "id":  "pref.bingsearch",
+        "origin":  "WPFToggleBingSearch",
+        "name":  "Start Menu Bing Search",
+        "description":  "Toggles Bing web search results in Windows Search.",
+        "category":  "ui",
+        "subcategory":  "Customize Preferences",
+        "risk":  "Safe",
+        "impacts":  [
+                        "ui"
+                    ],
+        "windows":  {
+                        "minBuild":  19041
+                    },
+        "requiresReboot":  false,
+        "requiresExplorerRestart":  false,
+        "detect":  {
+                       "any":  [
+                                   {
+                                       "type":  "Registry",
+                                       "hive":  "HKCU",
+                                       "key":  "Software\\Policies\\Microsoft\\Windows\\Explorer",
+                                       "valueName":  "DisableSearchBoxSuggestions",
+                                       "matchType":  "Equals",
+                                       "expectedValue":  1
+                                   },
+                                   {
+                                       "type":  "Registry",
+                                       "hive":  "HKCU",
+                                       "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\Search",
+                                       "valueName":  "BingSearchEnabled",
+                                       "matchType":  "Equals",
+                                       "expectedValue":  0
+                                   }
+                               ]
+                   },
+        "apply":  [
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKCU",
+                          "key":  "Software\\Policies\\Microsoft\\Windows\\Explorer",
+                          "operation":  "Set",
+                          "valueName":  "DisableSearchBoxSuggestions",
+                          "valueKind":  "DWord",
+                          "data":  1
+                      },
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKCU",
+                          "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\Search",
+                          "operation":  "Set",
+                          "valueName":  "BingSearchEnabled",
+                          "valueKind":  "DWord",
+                          "data":  0
+                      }
+                  ],
+        "undo":  [
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKCU",
+                         "key":  "Software\\Policies\\Microsoft\\Windows\\Explorer",
+                         "operation":  "Set",
+                         "valueName":  "DisableSearchBoxSuggestions",
+                         "valueKind":  "DWord",
+                         "data":  0
+                     },
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKCU",
+                         "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\Search",
+                         "operation":  "Set",
+                         "valueName":  "BingSearchEnabled",
+                         "valueKind":  "DWord",
+                         "data":  1
+                     }
+                 ],
+        "source":  "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/bingsearch",
+        "verifiedOnBuild":  "26100",
+        "evidence":  "documented"
     },
-    "apply": [
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Control Panel\\Accessibility",
-        "operation": "Set",
-        "valueName": "DynamicScrollbars",
-        "valueKind": "DWord",
-        "data": 0
-      }
-    ],
-    "undo": [
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Control Panel\\Accessibility",
-        "operation": "Set",
-        "valueName": "DynamicScrollbars",
-        "valueKind": "DWord",
-        "data": 1
-      }
-    ],
-    "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/scrollbars",
-    "verifiedOnBuild": "26100"
-  },
-  {
-    "schemaVersion": "1.0.0",
-    "id": "pref.multiplaneoverlay",
-    "origin": "WPFMultiplaneOverlay",
-    "name": "Multiplane Overlay",
-    "description": "Multiplane Overlay composes multiple image layers, which can sometimes cause issues with graphics cards. Changes to this preference are applied immediately.",
-    "category": "ui",
-    "subcategory": "Customize Preferences",
-    "risk": "Safe",
-    "impacts": [
-      "ui"
-    ],
-    "windows": {
-      "minBuild": 19041
+    {
+        "schemaVersion":  "1.0.0",
+        "id":  "pref.loginblur",
+        "origin":  "WPFToggleLoginBlur",
+        "name":  "Logon Screen Acrylic Blur",
+        "description":  "Toggles the acrylic blur effect on login screen background.",
+        "category":  "ui",
+        "subcategory":  "Customize Preferences",
+        "risk":  "Safe",
+        "impacts":  [
+                        "ui"
+                    ],
+        "windows":  {
+                        "minBuild":  19041
+                    },
+        "requiresReboot":  false,
+        "requiresExplorerRestart":  false,
+        "detect":  {
+                       "type":  "Registry",
+                       "hive":  "HKLM",
+                       "key":  "SOFTWARE\\Policies\\Microsoft\\Windows\\System",
+                       "valueName":  "DisableAcrylicBackgroundOnLogon",
+                       "matchType":  "Equals",
+                       "expectedValue":  0
+                   },
+        "apply":  [
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKLM",
+                          "key":  "SOFTWARE\\Policies\\Microsoft\\Windows\\System",
+                          "operation":  "Set",
+                          "valueName":  "DisableAcrylicBackgroundOnLogon",
+                          "valueKind":  "DWord",
+                          "data":  0
+                      }
+                  ],
+        "undo":  [
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKLM",
+                         "key":  "SOFTWARE\\Policies\\Microsoft\\Windows\\System",
+                         "operation":  "Set",
+                         "valueName":  "DisableAcrylicBackgroundOnLogon",
+                         "valueKind":  "DWord",
+                         "data":  1
+                     }
+                 ],
+        "source":  "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/loginblur",
+        "verifiedOnBuild":  "26100",
+        "evidence":  "documented"
     },
-    "requiresReboot": false,
-    "requiresExplorerRestart": false,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKLM",
-      "key": "SOFTWARE\\Microsoft\\Windows\\Dwm",
-      "valueName": "OverlayTestMode",
-      "matchType": "Equals",
-      "expectedValue": 1
+    {
+        "schemaVersion":  "1.0.0",
+        "id":  "pref.disablelockscreen",
+        "origin":  "WPFToggleDisableLockscreen",
+        "name":  "Lock Screen - Disable",
+        "description":  "Skips the lock screen entirely and goes directly to the sign-in screen on boot and wake.",
+        "category":  "ui",
+        "subcategory":  "Customize Preferences",
+        "risk":  "Safe",
+        "impacts":  [
+                        "ui"
+                    ],
+        "windows":  {
+                        "minBuild":  19041
+                    },
+        "requiresReboot":  false,
+        "requiresExplorerRestart":  false,
+        "detect":  {
+                       "type":  "Registry",
+                       "hive":  "HKLM",
+                       "key":  "SOFTWARE\\Policies\\Microsoft\\Windows\\Personalization",
+                       "valueName":  "NoLockScreen",
+                       "matchType":  "Equals",
+                       "expectedValue":  1
+                   },
+        "apply":  [
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKLM",
+                          "key":  "SOFTWARE\\Policies\\Microsoft\\Windows\\Personalization",
+                          "operation":  "Set",
+                          "valueName":  "NoLockScreen",
+                          "valueKind":  "DWord",
+                          "data":  1
+                      }
+                  ],
+        "undo":  [
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKLM",
+                         "key":  "SOFTWARE\\Policies\\Microsoft\\Windows\\Personalization",
+                         "operation":  "DeleteValue",
+                         "valueName":  "NoLockScreen"
+                     }
+                 ],
+        "source":  "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/disablelockscreen",
+        "verifiedOnBuild":  "26100",
+        "evidence":  "documented"
     },
-    "apply": [
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Microsoft\\Windows\\Dwm",
-        "operation": "Set",
-        "valueName": "OverlayTestMode",
-        "valueKind": "DWord",
-        "data": 1
-      },
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers",
-        "operation": "Set",
-        "valueName": "DisableOverlays",
-        "valueKind": "DWord",
-        "data": 1
-      }
-    ],
-    "undo": [
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Microsoft\\Windows\\Dwm",
-        "operation": "DeleteValue",
-        "valueName": "OverlayTestMode"
-      },
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers",
-        "operation": "DeleteValue",
-        "valueName": "DisableOverlays"
-      }
-    ],
-    "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/multiplaneoverlay",
-    "verifiedOnBuild": "26100"
-  },
-  {
-    "schemaVersion": "1.0.0",
-    "id": "pref.mouseacceleration",
-    "origin": "WPFToggleMouseAcceleration",
-    "name": "Mouse Acceleration",
-    "description": "Makes it so Cursor movement is affected by the speed of your physical mouse movements.",
-    "category": "ui",
-    "subcategory": "Customize Preferences",
-    "risk": "Safe",
-    "impacts": [
-      "ui"
-    ],
-    "windows": {
-      "minBuild": 19041
+    {
+        "schemaVersion":  "1.0.0",
+        "id":  "pref.startmenurecommendations",
+        "origin":  "WPFToggleStartMenuRecommendations",
+        "name":  "Start Menu Recommendations",
+        "description":  "Toggles the recommendations section in the Start Menu. WARNING: This will also disable Windows Spotlight on your Lock Screen as a side effect.",
+        "category":  "ui",
+        "subcategory":  "Customize Preferences",
+        "risk":  "Safe",
+        "impacts":  [
+                        "ui"
+                    ],
+        "windows":  {
+                        "minBuild":  19041
+                    },
+        "requiresReboot":  false,
+        "requiresExplorerRestart":  true,
+        "detect":  {
+                       "type":  "Registry",
+                       "hive":  "HKLM",
+                       "key":  "SOFTWARE\\Microsoft\\PolicyManager\\current\\device\\Start",
+                       "valueName":  "HideRecommendedSection",
+                       "matchType":  "Equals",
+                       "expectedValue":  0
+                   },
+        "apply":  [
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKLM",
+                          "key":  "SOFTWARE\\Microsoft\\PolicyManager\\current\\device\\Start",
+                          "operation":  "Set",
+                          "valueName":  "HideRecommendedSection",
+                          "valueKind":  "DWord",
+                          "data":  0
+                      },
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKLM",
+                          "key":  "SOFTWARE\\Microsoft\\PolicyManager\\current\\device\\Education",
+                          "operation":  "Set",
+                          "valueName":  "IsEducationEnvironment",
+                          "valueKind":  "DWord",
+                          "data":  0
+                      },
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKLM",
+                          "key":  "SOFTWARE\\Policies\\Microsoft\\Windows\\Explorer",
+                          "operation":  "Set",
+                          "valueName":  "HideRecommendedSection",
+                          "valueKind":  "DWord",
+                          "data":  0
+                      },
+                      {
+                          "type":  "PowerShell",
+                          "operation":  "Execute",
+                          "script":  "Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue\n      $timeout = 5; while ($timeout -gt 0 -and !(Get-Process explorer -ErrorAction SilentlyContinue)) { Start-Sleep -Milliseconds 500; $timeout -= 0.5 }\n      if (!(Get-Process explorer -ErrorAction SilentlyContinue)) { Start-Process explorer.exe }",
+                          "timeoutSeconds":  60
+                      }
+                  ],
+        "undo":  [
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKLM",
+                         "key":  "SOFTWARE\\Microsoft\\PolicyManager\\current\\device\\Start",
+                         "operation":  "Set",
+                         "valueName":  "HideRecommendedSection",
+                         "valueKind":  "DWord",
+                         "data":  1
+                     },
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKLM",
+                         "key":  "SOFTWARE\\Microsoft\\PolicyManager\\current\\device\\Education",
+                         "operation":  "Set",
+                         "valueName":  "IsEducationEnvironment",
+                         "valueKind":  "DWord",
+                         "data":  1
+                     },
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKLM",
+                         "key":  "SOFTWARE\\Policies\\Microsoft\\Windows\\Explorer",
+                         "operation":  "Set",
+                         "valueName":  "HideRecommendedSection",
+                         "valueKind":  "DWord",
+                         "data":  1
+                     },
+                     {
+                         "type":  "PowerShell",
+                         "operation":  "Execute",
+                         "script":  "Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue\n      $timeout = 5; while ($timeout -gt 0 -and !(Get-Process explorer -ErrorAction SilentlyContinue)) { Start-Sleep -Milliseconds 500; $timeout -= 0.5 }\n      if (!(Get-Process explorer -ErrorAction SilentlyContinue)) { Start-Process explorer.exe }",
+                         "timeoutSeconds":  60
+                     }
+                 ],
+        "source":  "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/startmenurecommendations",
+        "verifiedOnBuild":  "26100",
+        "evidence":  "documented"
     },
-    "requiresReboot": false,
-    "requiresExplorerRestart": false,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKCU",
-      "key": "Control Panel\\Mouse",
-      "valueName": "MouseSpeed",
-      "matchType": "Equals",
-      "expectedValue": 1
+    {
+        "schemaVersion":  "1.0.0",
+        "id":  "pref.stickykeys",
+        "origin":  "WPFToggleStickyKeys",
+        "name":  "Sticky Keys",
+        "description":  "Toggles the Sticky Keys, which activate when clicking shift rapidly.",
+        "category":  "ui",
+        "subcategory":  "Customize Preferences",
+        "risk":  "Safe",
+        "impacts":  [
+                        "ui"
+                    ],
+        "windows":  {
+                        "minBuild":  19041
+                    },
+        "requiresReboot":  false,
+        "requiresExplorerRestart":  false,
+        "detect":  {
+                       "type":  "Registry",
+                       "hive":  "HKCU",
+                       "key":  "Control Panel\\Accessibility\\StickyKeys",
+                       "valueName":  "Flags",
+                       "matchType":  "Equals",
+                       "expectedValue":  506
+                   },
+        "apply":  [
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKCU",
+                          "key":  "Control Panel\\Accessibility\\StickyKeys",
+                          "operation":  "Set",
+                          "valueName":  "Flags",
+                          "valueKind":  "DWord",
+                          "data":  506
+                      }
+                  ],
+        "undo":  [
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKCU",
+                         "key":  "Control Panel\\Accessibility\\StickyKeys",
+                         "operation":  "Set",
+                         "valueName":  "Flags",
+                         "valueKind":  "DWord",
+                         "data":  58
+                     }
+                 ],
+        "source":  "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/stickykeys",
+        "verifiedOnBuild":  "26100",
+        "evidence":  "documented"
     },
-    "apply": [
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Control Panel\\Mouse",
-        "operation": "Set",
-        "valueName": "MouseSpeed",
-        "valueKind": "DWord",
-        "data": 1
-      },
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Control Panel\\Mouse",
-        "operation": "Set",
-        "valueName": "MouseThreshold1",
-        "valueKind": "DWord",
-        "data": 6
-      },
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Control Panel\\Mouse",
-        "operation": "Set",
-        "valueName": "MouseThreshold2",
-        "valueKind": "DWord",
-        "data": 10
-      }
-    ],
-    "undo": [
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Control Panel\\Mouse",
-        "operation": "Set",
-        "valueName": "MouseSpeed",
-        "valueKind": "DWord",
-        "data": 0
-      },
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Control Panel\\Mouse",
-        "operation": "Set",
-        "valueName": "MouseThreshold1",
-        "valueKind": "DWord",
-        "data": 0
-      },
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Control Panel\\Mouse",
-        "operation": "Set",
-        "valueName": "MouseThreshold2",
-        "valueKind": "DWord",
-        "data": 0
-      }
-    ],
-    "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/mouseacceleration",
-    "verifiedOnBuild": "26100"
-  },
-  {
-    "schemaVersion": "1.0.0",
-    "id": "pref.numlock",
-    "origin": "WPFToggleNumLock",
-    "name": "Num Lock on Startup",
-    "description": "Toggle the Num Lock key state when your computer starts.",
-    "category": "ui",
-    "subcategory": "Customize Preferences",
-    "risk": "Safe",
-    "impacts": [
-      "ui"
-    ],
-    "windows": {
-      "minBuild": 19041
+    {
+        "schemaVersion":  "1.0.0",
+        "id":  "pref.taskbaralignment",
+        "origin":  "WPFToggleTaskbarAlignment",
+        "name":  "Taskbar Centered Icons",
+        "description":  "Toggles the Taskbar alignment either to the left or center.",
+        "category":  "ui",
+        "subcategory":  "Customize Preferences",
+        "risk":  "Safe",
+        "impacts":  [
+                        "ui"
+                    ],
+        "windows":  {
+                        "minBuild":  19041
+                    },
+        "requiresReboot":  false,
+        "requiresExplorerRestart":  true,
+        "detect":  {
+                       "type":  "Registry",
+                       "hive":  "HKCU",
+                       "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+                       "valueName":  "TaskbarAl",
+                       "matchType":  "Equals",
+                       "expectedValue":  1
+                   },
+        "apply":  [
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKCU",
+                          "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+                          "operation":  "Set",
+                          "valueName":  "TaskbarAl",
+                          "valueKind":  "DWord",
+                          "data":  1
+                      },
+                      {
+                          "type":  "PowerShell",
+                          "operation":  "Execute",
+                          "script":  "Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue\n      $timeout = 5; while ($timeout -gt 0 -and !(Get-Process explorer -ErrorAction SilentlyContinue)) { Start-Sleep -Milliseconds 500; $timeout -= 0.5 }\n      if (!(Get-Process explorer -ErrorAction SilentlyContinue)) { Start-Process explorer.exe }",
+                          "timeoutSeconds":  60
+                      }
+                  ],
+        "undo":  [
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKCU",
+                         "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+                         "operation":  "Set",
+                         "valueName":  "TaskbarAl",
+                         "valueKind":  "DWord",
+                         "data":  0
+                     },
+                     {
+                         "type":  "PowerShell",
+                         "operation":  "Execute",
+                         "script":  "Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue\n      $timeout = 5; while ($timeout -gt 0 -and !(Get-Process explorer -ErrorAction SilentlyContinue)) { Start-Sleep -Milliseconds 500; $timeout -= 0.5 }\n      if (!(Get-Process explorer -ErrorAction SilentlyContinue)) { Start-Process explorer.exe }",
+                         "timeoutSeconds":  60
+                     }
+                 ],
+        "source":  "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/taskbaralignment",
+        "verifiedOnBuild":  "26100",
+        "evidence":  "documented"
     },
-    "requiresReboot": false,
-    "requiresExplorerRestart": false,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKU",
-      "key": ".Default\\Control Panel\\Keyboard",
-      "valueName": "InitialKeyboardIndicators",
-      "matchType": "Equals",
-      "expectedValue": "2"
+    {
+        "schemaVersion":  "1.0.0",
+        "id":  "pref.taskbarsearch",
+        "origin":  "WPFToggleTaskbarSearch",
+        "name":  "Taskbar Search Icon",
+        "description":  "Toggles the Search Button on the Taskbar.",
+        "category":  "ui",
+        "subcategory":  "Customize Preferences",
+        "risk":  "Safe",
+        "impacts":  [
+                        "ui"
+                    ],
+        "windows":  {
+                        "minBuild":  19041
+                    },
+        "requiresReboot":  false,
+        "requiresExplorerRestart":  true,
+        "detect":  {
+                       "type":  "Registry",
+                       "hive":  "HKCU",
+                       "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\Search",
+                       "valueName":  "SearchboxTaskbarMode",
+                       "matchType":  "Equals",
+                       "expectedValue":  1
+                   },
+        "apply":  [
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKCU",
+                          "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\Search",
+                          "operation":  "Set",
+                          "valueName":  "SearchboxTaskbarMode",
+                          "valueKind":  "DWord",
+                          "data":  1
+                      }
+                  ],
+        "undo":  [
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKCU",
+                         "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\Search",
+                         "operation":  "Set",
+                         "valueName":  "SearchboxTaskbarMode",
+                         "valueKind":  "DWord",
+                         "data":  0
+                     }
+                 ],
+        "source":  "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/taskbarsearch",
+        "verifiedOnBuild":  "26100",
+        "evidence":  "documented"
     },
-    "apply": [
-      {
-        "type": "Registry",
-        "hive": "HKU",
-        "key": ".Default\\Control Panel\\Keyboard",
-        "operation": "Set",
-        "valueName": "InitialKeyboardIndicators",
-        "valueKind": "String",
-        "data": "2"
-      },
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Control Panel\\Keyboard",
-        "operation": "Set",
-        "valueName": "InitialKeyboardIndicators",
-        "valueKind": "String",
-        "data": "2"
-      }
-    ],
-    "undo": [
-      {
-        "type": "Registry",
-        "hive": "HKU",
-        "key": ".Default\\Control Panel\\Keyboard",
-        "operation": "Set",
-        "valueName": "InitialKeyboardIndicators",
-        "valueKind": "String",
-        "data": "0"
-      },
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Control Panel\\Keyboard",
-        "operation": "Set",
-        "valueName": "InitialKeyboardIndicators",
-        "valueKind": "String",
-        "data": "0"
-      }
-    ],
-    "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/numlock",
-    "verifiedOnBuild": "26100"
-  },
-  {
-    "schemaVersion": "1.0.0",
-    "id": "pref.windowsnapping",
-    "origin": "WPFToggleWindowSnapping",
-    "name": "Window Snapping",
-    "description": "Toggles the window snapping feature when dragging windows.",
-    "category": "ui",
-    "subcategory": "Customize Preferences",
-    "risk": "Safe",
-    "impacts": [
-      "ui"
-    ],
-    "windows": {
-      "minBuild": 19041
+    {
+        "schemaVersion":  "1.0.0",
+        "id":  "pref.taskview",
+        "origin":  "WPFToggleTaskView",
+        "name":  "Taskbar Task View Icon",
+        "description":  "Toggles the Task View Button in the Taskbar.",
+        "category":  "ui",
+        "subcategory":  "Customize Preferences",
+        "risk":  "Safe",
+        "impacts":  [
+                        "ui"
+                    ],
+        "windows":  {
+                        "minBuild":  19041
+                    },
+        "requiresReboot":  false,
+        "requiresExplorerRestart":  false,
+        "detect":  {
+                       "type":  "Registry",
+                       "hive":  "HKCU",
+                       "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+                       "valueName":  "ShowTaskViewButton",
+                       "matchType":  "Equals",
+                       "expectedValue":  1
+                   },
+        "apply":  [
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKCU",
+                          "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+                          "operation":  "Set",
+                          "valueName":  "ShowTaskViewButton",
+                          "valueKind":  "DWord",
+                          "data":  1
+                      }
+                  ],
+        "undo":  [
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKCU",
+                         "key":  "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+                         "operation":  "Set",
+                         "valueName":  "ShowTaskViewButton",
+                         "valueKind":  "DWord",
+                         "data":  0
+                     }
+                 ],
+        "source":  "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/taskview",
+        "verifiedOnBuild":  "26100",
+        "evidence":  "documented"
     },
-    "requiresReboot": false,
-    "requiresExplorerRestart": false,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKCU",
-      "key": "Control Panel\\Desktop",
-      "valueName": "WindowArrangementActive",
-      "matchType": "Equals",
-      "expectedValue": "1"
+    {
+        "schemaVersion":  "1.0.0",
+        "id":  "pref.gamemode",
+        "origin":  "WPFToggleGameMode",
+        "name":  "Game Mode",
+        "description":  "Toggles Windows prioritizes gaming performance by allocating system resources to games.",
+        "category":  "ui",
+        "subcategory":  "Customize Preferences",
+        "risk":  "Safe",
+        "impacts":  [
+                        "ui"
+                    ],
+        "windows":  {
+                        "minBuild":  19041
+                    },
+        "requiresReboot":  false,
+        "requiresExplorerRestart":  false,
+        "detect":  {
+                       "type":  "Registry",
+                       "hive":  "HKCU",
+                       "key":  "Software\\Microsoft\\GameBar",
+                       "valueName":  "AllowAutoGameMode",
+                       "matchType":  "Equals",
+                       "expectedValue":  1
+                   },
+        "apply":  [
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKCU",
+                          "key":  "Software\\Microsoft\\GameBar",
+                          "operation":  "Set",
+                          "valueName":  "AllowAutoGameMode",
+                          "valueKind":  "DWord",
+                          "data":  1
+                      },
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKCU",
+                          "key":  "Software\\Microsoft\\GameBar",
+                          "operation":  "Set",
+                          "valueName":  "AutoGameModeEnabled",
+                          "valueKind":  "DWord",
+                          "data":  1
+                      }
+                  ],
+        "undo":  [
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKCU",
+                         "key":  "Software\\Microsoft\\GameBar",
+                         "operation":  "Set",
+                         "valueName":  "AllowAutoGameMode",
+                         "valueKind":  "DWord",
+                         "data":  0
+                     },
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKCU",
+                         "key":  "Software\\Microsoft\\GameBar",
+                         "operation":  "Set",
+                         "valueName":  "AutoGameModeEnabled",
+                         "valueKind":  "DWord",
+                         "data":  0
+                     }
+                 ],
+        "source":  "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/gamemode",
+        "verifiedOnBuild":  "26100",
+        "evidence":  "documented"
     },
-    "apply": [
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Control Panel\\Desktop",
-        "operation": "Set",
-        "valueName": "WindowArrangementActive",
-        "valueKind": "String",
-        "data": "1"
-      }
-    ],
-    "undo": [
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Control Panel\\Desktop",
-        "operation": "Set",
-        "valueName": "WindowArrangementActive",
-        "valueKind": "String",
-        "data": "0"
-      }
-    ],
-    "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/windowsnapping",
-    "verifiedOnBuild": "26100"
-  },
-  {
-    "schemaVersion": "1.0.0",
-    "id": "pref.standbyfix",
-    "origin": "WPFToggleStandbyFix",
-    "name": "S0 Sleep Network Connectivity",
-    "description": "Toggles network connectivity during S0 Sleep which is low power idle in modern laptops.",
-    "category": "ui",
-    "subcategory": "Customize Preferences",
-    "risk": "Safe",
-    "impacts": [
-      "ui"
-    ],
-    "windows": {
-      "minBuild": 19041
-    },
-    "requiresReboot": false,
-    "requiresExplorerRestart": false,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKCU",
-      "key": "SOFTWARE\\Policies\\Microsoft\\Power\\PowerSettings\\f15576e8-98b7-4186-b944-eafa664402d9",
-      "valueName": "ACSettingIndex",
-      "matchType": "Equals",
-      "expectedValue": 1
-    },
-    "apply": [
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "SOFTWARE\\Policies\\Microsoft\\Power\\PowerSettings\\f15576e8-98b7-4186-b944-eafa664402d9",
-        "operation": "Set",
-        "valueName": "ACSettingIndex",
-        "valueKind": "DWord",
-        "data": 1
-      }
-    ],
-    "undo": [
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "SOFTWARE\\Policies\\Microsoft\\Power\\PowerSettings\\f15576e8-98b7-4186-b944-eafa664402d9",
-        "operation": "Set",
-        "valueName": "ACSettingIndex",
-        "valueKind": "DWord",
-        "data": 0
-      }
-    ],
-    "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/standbyfix",
-    "verifiedOnBuild": "26100"
-  },
-  {
-    "schemaVersion": "1.0.0",
-    "id": "pref.s3sleep",
-    "origin": "WPFToggleS3Sleep",
-    "name": "S3 Sleep",
-    "description": "Toggles between Modern Standby and S3 Sleep, which cuts off power to the CPU while continuing to refresh the memory.",
-    "category": "ui",
-    "subcategory": "Customize Preferences",
-    "risk": "Safe",
-    "impacts": [
-      "ui"
-    ],
-    "windows": {
-      "minBuild": 19041
-    },
-    "requiresReboot": false,
-    "requiresExplorerRestart": false,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKLM",
-      "key": "SYSTEM\\CurrentControlSet\\Control\\Power",
-      "valueName": "PlatformAoAcOverride",
-      "matchType": "Equals",
-      "expectedValue": 0
-    },
-    "apply": [
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SYSTEM\\CurrentControlSet\\Control\\Power",
-        "operation": "Set",
-        "valueName": "PlatformAoAcOverride",
-        "valueKind": "DWord",
-        "data": 0
-      }
-    ],
-    "undo": [
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SYSTEM\\CurrentControlSet\\Control\\Power",
-        "operation": "DeleteValue",
-        "valueName": "PlatformAoAcOverride"
-      }
-    ],
-    "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/s3sleep",
-    "verifiedOnBuild": "26100"
-  },
-  {
-    "schemaVersion": "1.0.0",
-    "id": "pref.hidesettingshome",
-    "origin": "WPFToggleHideSettingsHome",
-    "name": "Settings Home Page",
-    "description": "Toggles the Home Page in the Windows Settings app.",
-    "category": "ui",
-    "subcategory": "Customize Preferences",
-    "risk": "Safe",
-    "impacts": [
-      "ui"
-    ],
-    "windows": {
-      "minBuild": 19041
-    },
-    "requiresReboot": false,
-    "requiresExplorerRestart": false,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKCU",
-      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
-      "valueName": "SettingsPageVisibility",
-      "matchType": "Equals",
-      "expectedValue": "show:home"
-    },
-    "apply": [
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
-        "operation": "Set",
-        "valueName": "SettingsPageVisibility",
-        "valueKind": "String",
-        "data": "show:home"
-      }
-    ],
-    "undo": [
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
-        "operation": "Set",
-        "valueName": "SettingsPageVisibility",
-        "valueKind": "String",
-        "data": "hide:home"
-      }
-    ],
-    "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/hidesettingshome",
-    "verifiedOnBuild": "26100"
-  },
-  {
-    "schemaVersion": "1.0.0",
-    "id": "pref.bingsearch",
-    "origin": "WPFToggleBingSearch",
-    "name": "Start Menu Bing Search",
-    "description": "Toggles Bing web search results in Windows Search.",
-    "category": "ui",
-    "subcategory": "Customize Preferences",
-    "risk": "Safe",
-    "impacts": [
-      "ui"
-    ],
-    "windows": {
-      "minBuild": 19041
-    },
-    "requiresReboot": false,
-    "requiresExplorerRestart": false,
-    "detect": {
-      "any": [
-        {
-          "type": "Registry",
-          "hive": "HKCU",
-          "key": "Software\\Policies\\Microsoft\\Windows\\Explorer",
-          "valueName": "DisableSearchBoxSuggestions",
-          "matchType": "Equals",
-          "expectedValue": 1
-        },
-        {
-          "type": "Registry",
-          "hive": "HKCU",
-          "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Search",
-          "valueName": "BingSearchEnabled",
-          "matchType": "Equals",
-          "expectedValue": 0
-        }
-      ]
-    },
-    "apply": [
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Policies\\Microsoft\\Windows\\Explorer",
-        "operation": "Set",
-        "valueName": "DisableSearchBoxSuggestions",
-        "valueKind": "DWord",
-        "data": 1
-      },
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Search",
-        "operation": "Set",
-        "valueName": "BingSearchEnabled",
-        "valueKind": "DWord",
-        "data": 0
-      }
-    ],
-    "undo": [
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Policies\\Microsoft\\Windows\\Explorer",
-        "operation": "Set",
-        "valueName": "DisableSearchBoxSuggestions",
-        "valueKind": "DWord",
-        "data": 0
-      },
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Search",
-        "operation": "Set",
-        "valueName": "BingSearchEnabled",
-        "valueKind": "DWord",
-        "data": 1
-      }
-    ],
-    "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/bingsearch",
-    "verifiedOnBuild": "26100"
-  },
-  {
-    "schemaVersion": "1.0.0",
-    "id": "pref.loginblur",
-    "origin": "WPFToggleLoginBlur",
-    "name": "Logon Screen Acrylic Blur",
-    "description": "Toggles the acrylic blur effect on login screen background.",
-    "category": "ui",
-    "subcategory": "Customize Preferences",
-    "risk": "Safe",
-    "impacts": [
-      "ui"
-    ],
-    "windows": {
-      "minBuild": 19041
-    },
-    "requiresReboot": false,
-    "requiresExplorerRestart": false,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKLM",
-      "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\System",
-      "valueName": "DisableAcrylicBackgroundOnLogon",
-      "matchType": "Equals",
-      "expectedValue": 0
-    },
-    "apply": [
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\System",
-        "operation": "Set",
-        "valueName": "DisableAcrylicBackgroundOnLogon",
-        "valueKind": "DWord",
-        "data": 0
-      }
-    ],
-    "undo": [
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\System",
-        "operation": "Set",
-        "valueName": "DisableAcrylicBackgroundOnLogon",
-        "valueKind": "DWord",
-        "data": 1
-      }
-    ],
-    "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/loginblur",
-    "verifiedOnBuild": "26100"
-  },
-  {
-    "schemaVersion": "1.0.0",
-    "id": "pref.disablelockscreen",
-    "origin": "WPFToggleDisableLockscreen",
-    "name": "Lock Screen - Disable",
-    "description": "Skips the lock screen entirely and goes directly to the sign-in screen on boot and wake.",
-    "category": "ui",
-    "subcategory": "Customize Preferences",
-    "risk": "Safe",
-    "impacts": [
-      "ui"
-    ],
-    "windows": {
-      "minBuild": 19041
-    },
-    "requiresReboot": false,
-    "requiresExplorerRestart": false,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKLM",
-      "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\Personalization",
-      "valueName": "NoLockScreen",
-      "matchType": "Equals",
-      "expectedValue": 1
-    },
-    "apply": [
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\Personalization",
-        "operation": "Set",
-        "valueName": "NoLockScreen",
-        "valueKind": "DWord",
-        "data": 1
-      }
-    ],
-    "undo": [
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\Personalization",
-        "operation": "DeleteValue",
-        "valueName": "NoLockScreen"
-      }
-    ],
-    "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/disablelockscreen",
-    "verifiedOnBuild": "26100"
-  },
-  {
-    "schemaVersion": "1.0.0",
-    "id": "pref.startmenurecommendations",
-    "origin": "WPFToggleStartMenuRecommendations",
-    "name": "Start Menu Recommendations",
-    "description": "Toggles the recommendations section in the Start Menu. WARNING: This will also disable Windows Spotlight on your Lock Screen as a side effect.",
-    "category": "ui",
-    "subcategory": "Customize Preferences",
-    "risk": "Safe",
-    "impacts": [
-      "ui"
-    ],
-    "windows": {
-      "minBuild": 19041
-    },
-    "requiresReboot": false,
-    "requiresExplorerRestart": true,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKLM",
-      "key": "SOFTWARE\\Microsoft\\PolicyManager\\current\\device\\Start",
-      "valueName": "HideRecommendedSection",
-      "matchType": "Equals",
-      "expectedValue": 0
-    },
-    "apply": [
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Microsoft\\PolicyManager\\current\\device\\Start",
-        "operation": "Set",
-        "valueName": "HideRecommendedSection",
-        "valueKind": "DWord",
-        "data": 0
-      },
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Microsoft\\PolicyManager\\current\\device\\Education",
-        "operation": "Set",
-        "valueName": "IsEducationEnvironment",
-        "valueKind": "DWord",
-        "data": 0
-      },
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\Explorer",
-        "operation": "Set",
-        "valueName": "HideRecommendedSection",
-        "valueKind": "DWord",
-        "data": 0
-      },
-      {
-        "type": "PowerShell",
-        "operation": "Execute",
-        "script": "Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue\n      $timeout = 5; while ($timeout -gt 0 -and !(Get-Process explorer -ErrorAction SilentlyContinue)) { Start-Sleep -Milliseconds 500; $timeout -= 0.5 }\n      if (!(Get-Process explorer -ErrorAction SilentlyContinue)) { Start-Process explorer.exe }",
-        "timeoutSeconds": 60
-      }
-    ],
-    "undo": [
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Microsoft\\PolicyManager\\current\\device\\Start",
-        "operation": "Set",
-        "valueName": "HideRecommendedSection",
-        "valueKind": "DWord",
-        "data": 1
-      },
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Microsoft\\PolicyManager\\current\\device\\Education",
-        "operation": "Set",
-        "valueName": "IsEducationEnvironment",
-        "valueKind": "DWord",
-        "data": 1
-      },
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\Explorer",
-        "operation": "Set",
-        "valueName": "HideRecommendedSection",
-        "valueKind": "DWord",
-        "data": 1
-      },
-      {
-        "type": "PowerShell",
-        "operation": "Execute",
-        "script": "Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue\n      $timeout = 5; while ($timeout -gt 0 -and !(Get-Process explorer -ErrorAction SilentlyContinue)) { Start-Sleep -Milliseconds 500; $timeout -= 0.5 }\n      if (!(Get-Process explorer -ErrorAction SilentlyContinue)) { Start-Process explorer.exe }",
-        "timeoutSeconds": 60
-      }
-    ],
-    "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/startmenurecommendations",
-    "verifiedOnBuild": "26100"
-  },
-  {
-    "schemaVersion": "1.0.0",
-    "id": "pref.stickykeys",
-    "origin": "WPFToggleStickyKeys",
-    "name": "Sticky Keys",
-    "description": "Toggles the Sticky Keys, which activate when clicking shift rapidly.",
-    "category": "ui",
-    "subcategory": "Customize Preferences",
-    "risk": "Safe",
-    "impacts": [
-      "ui"
-    ],
-    "windows": {
-      "minBuild": 19041
-    },
-    "requiresReboot": false,
-    "requiresExplorerRestart": false,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKCU",
-      "key": "Control Panel\\Accessibility\\StickyKeys",
-      "valueName": "Flags",
-      "matchType": "Equals",
-      "expectedValue": 506
-    },
-    "apply": [
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Control Panel\\Accessibility\\StickyKeys",
-        "operation": "Set",
-        "valueName": "Flags",
-        "valueKind": "DWord",
-        "data": 506
-      }
-    ],
-    "undo": [
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Control Panel\\Accessibility\\StickyKeys",
-        "operation": "Set",
-        "valueName": "Flags",
-        "valueKind": "DWord",
-        "data": 58
-      }
-    ],
-    "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/stickykeys",
-    "verifiedOnBuild": "26100"
-  },
-  {
-    "schemaVersion": "1.0.0",
-    "id": "pref.taskbaralignment",
-    "origin": "WPFToggleTaskbarAlignment",
-    "name": "Taskbar Centered Icons",
-    "description": "Toggles the Taskbar alignment either to the left or center.",
-    "category": "ui",
-    "subcategory": "Customize Preferences",
-    "risk": "Safe",
-    "impacts": [
-      "ui"
-    ],
-    "windows": {
-      "minBuild": 19041
-    },
-    "requiresReboot": false,
-    "requiresExplorerRestart": true,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKCU",
-      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-      "valueName": "TaskbarAl",
-      "matchType": "Equals",
-      "expectedValue": 1
-    },
-    "apply": [
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-        "operation": "Set",
-        "valueName": "TaskbarAl",
-        "valueKind": "DWord",
-        "data": 1
-      },
-      {
-        "type": "PowerShell",
-        "operation": "Execute",
-        "script": "Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue\n      $timeout = 5; while ($timeout -gt 0 -and !(Get-Process explorer -ErrorAction SilentlyContinue)) { Start-Sleep -Milliseconds 500; $timeout -= 0.5 }\n      if (!(Get-Process explorer -ErrorAction SilentlyContinue)) { Start-Process explorer.exe }",
-        "timeoutSeconds": 60
-      }
-    ],
-    "undo": [
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-        "operation": "Set",
-        "valueName": "TaskbarAl",
-        "valueKind": "DWord",
-        "data": 0
-      },
-      {
-        "type": "PowerShell",
-        "operation": "Execute",
-        "script": "Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue\n      $timeout = 5; while ($timeout -gt 0 -and !(Get-Process explorer -ErrorAction SilentlyContinue)) { Start-Sleep -Milliseconds 500; $timeout -= 0.5 }\n      if (!(Get-Process explorer -ErrorAction SilentlyContinue)) { Start-Process explorer.exe }",
-        "timeoutSeconds": 60
-      }
-    ],
-    "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/taskbaralignment",
-    "verifiedOnBuild": "26100"
-  },
-  {
-    "schemaVersion": "1.0.0",
-    "id": "pref.taskbarsearch",
-    "origin": "WPFToggleTaskbarSearch",
-    "name": "Taskbar Search Icon",
-    "description": "Toggles the Search Button on the Taskbar.",
-    "category": "ui",
-    "subcategory": "Customize Preferences",
-    "risk": "Safe",
-    "impacts": [
-      "ui"
-    ],
-    "windows": {
-      "minBuild": 19041
-    },
-    "requiresReboot": false,
-    "requiresExplorerRestart": true,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKCU",
-      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Search",
-      "valueName": "SearchboxTaskbarMode",
-      "matchType": "Equals",
-      "expectedValue": 1
-    },
-    "apply": [
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Search",
-        "operation": "Set",
-        "valueName": "SearchboxTaskbarMode",
-        "valueKind": "DWord",
-        "data": 1
-      }
-    ],
-    "undo": [
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Search",
-        "operation": "Set",
-        "valueName": "SearchboxTaskbarMode",
-        "valueKind": "DWord",
-        "data": 0
-      }
-    ],
-    "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/taskbarsearch",
-    "verifiedOnBuild": "26100"
-  },
-  {
-    "schemaVersion": "1.0.0",
-    "id": "pref.taskview",
-    "origin": "WPFToggleTaskView",
-    "name": "Taskbar Task View Icon",
-    "description": "Toggles the Task View Button in the Taskbar.",
-    "category": "ui",
-    "subcategory": "Customize Preferences",
-    "risk": "Safe",
-    "impacts": [
-      "ui"
-    ],
-    "windows": {
-      "minBuild": 19041
-    },
-    "requiresReboot": false,
-    "requiresExplorerRestart": false,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKCU",
-      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-      "valueName": "ShowTaskViewButton",
-      "matchType": "Equals",
-      "expectedValue": 1
-    },
-    "apply": [
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-        "operation": "Set",
-        "valueName": "ShowTaskViewButton",
-        "valueKind": "DWord",
-        "data": 1
-      }
-    ],
-    "undo": [
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-        "operation": "Set",
-        "valueName": "ShowTaskViewButton",
-        "valueKind": "DWord",
-        "data": 0
-      }
-    ],
-    "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/taskview",
-    "verifiedOnBuild": "26100"
-  },
-  {
-    "schemaVersion": "1.0.0",
-    "id": "pref.gamemode",
-    "origin": "WPFToggleGameMode",
-    "name": "Game Mode",
-    "description": "Toggles Windows prioritizes gaming performance by allocating system resources to games.",
-    "category": "ui",
-    "subcategory": "Customize Preferences",
-    "risk": "Safe",
-    "impacts": [
-      "ui"
-    ],
-    "windows": {
-      "minBuild": 19041
-    },
-    "requiresReboot": false,
-    "requiresExplorerRestart": false,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKCU",
-      "key": "Software\\Microsoft\\GameBar",
-      "valueName": "AllowAutoGameMode",
-      "matchType": "Equals",
-      "expectedValue": 1
-    },
-    "apply": [
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\GameBar",
-        "operation": "Set",
-        "valueName": "AllowAutoGameMode",
-        "valueKind": "DWord",
-        "data": 1
-      },
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\GameBar",
-        "operation": "Set",
-        "valueName": "AutoGameModeEnabled",
-        "valueKind": "DWord",
-        "data": 1
-      }
-    ],
-    "undo": [
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\GameBar",
-        "operation": "Set",
-        "valueName": "AllowAutoGameMode",
-        "valueKind": "DWord",
-        "data": 0
-      },
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\GameBar",
-        "operation": "Set",
-        "valueName": "AutoGameModeEnabled",
-        "valueKind": "DWord",
-        "data": 0
-      }
-    ],
-    "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/gamemode",
-    "verifiedOnBuild": "26100"
-  },
-  {
-    "schemaVersion": "1.0.0",
-    "id": "pref.longpaths",
-    "origin": "WPFToggleLongPaths",
-    "name": "Enable Long Paths",
-    "description": "Toggles support for file paths longer than 260 characters in Explorer.",
-    "category": "ui",
-    "subcategory": "Customize Preferences",
-    "risk": "Safe",
-    "impacts": [
-      "ui"
-    ],
-    "windows": {
-      "minBuild": 19041
-    },
-    "requiresReboot": false,
-    "requiresExplorerRestart": false,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKLM",
-      "key": "SYSTEM\\CurrentControlSet\\Control\\FileSystem",
-      "valueName": "LongPathsEnabled",
-      "matchType": "Equals",
-      "expectedValue": 1
-    },
-    "apply": [
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SYSTEM\\CurrentControlSet\\Control\\FileSystem",
-        "operation": "Set",
-        "valueName": "LongPathsEnabled",
-        "valueKind": "DWord",
-        "data": 1
-      }
-    ],
-    "undo": [
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SYSTEM\\CurrentControlSet\\Control\\FileSystem",
-        "operation": "Set",
-        "valueName": "LongPathsEnabled",
-        "valueKind": "DWord",
-        "data": 0
-      }
-    ],
-    "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/longpaths",
-    "verifiedOnBuild": "26100"
-  }
+    {
+        "schemaVersion":  "1.0.0",
+        "id":  "pref.longpaths",
+        "origin":  "WPFToggleLongPaths",
+        "name":  "Enable Long Paths",
+        "description":  "Toggles support for file paths longer than 260 characters in Explorer.",
+        "category":  "ui",
+        "subcategory":  "Customize Preferences",
+        "risk":  "Safe",
+        "impacts":  [
+                        "ui"
+                    ],
+        "windows":  {
+                        "minBuild":  19041
+                    },
+        "requiresReboot":  false,
+        "requiresExplorerRestart":  false,
+        "detect":  {
+                       "type":  "Registry",
+                       "hive":  "HKLM",
+                       "key":  "SYSTEM\\CurrentControlSet\\Control\\FileSystem",
+                       "valueName":  "LongPathsEnabled",
+                       "matchType":  "Equals",
+                       "expectedValue":  1
+                   },
+        "apply":  [
+                      {
+                          "type":  "Registry",
+                          "hive":  "HKLM",
+                          "key":  "SYSTEM\\CurrentControlSet\\Control\\FileSystem",
+                          "operation":  "Set",
+                          "valueName":  "LongPathsEnabled",
+                          "valueKind":  "DWord",
+                          "data":  1
+                      }
+                  ],
+        "undo":  [
+                     {
+                         "type":  "Registry",
+                         "hive":  "HKLM",
+                         "key":  "SYSTEM\\CurrentControlSet\\Control\\FileSystem",
+                         "operation":  "Set",
+                         "valueName":  "LongPathsEnabled",
+                         "valueKind":  "DWord",
+                         "data":  0
+                     }
+                 ],
+        "source":  "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/longpaths",
+        "verifiedOnBuild":  "26100",
+        "evidence":  "documented"
+    }
 ]

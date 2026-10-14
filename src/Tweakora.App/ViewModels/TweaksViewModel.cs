@@ -55,6 +55,7 @@ public sealed partial class TweakCardModel : ObservableObject
     public string Category => Tweak.Category;
     public string? Subcategory => Tweak.Subcategory;
     public string Risk => Tweak.Risk;
+    public string Evidence => Tweak.Evidence ?? "documented";
     public bool RequiresReboot => Tweak.RequiresReboot;
     public bool RequiresExplorerRestart => Tweak.RequiresExplorerRestart;
     public string? Warnings => Tweak.Warnings;
@@ -549,6 +550,9 @@ public sealed partial class TweaksViewModel : ObservableObject
     [ObservableProperty]
     private bool _isBeginnerMode = false;
 
+    [ObservableProperty]
+    private bool _showExperimentalTweaks = false;
+
     public void SetSearchQuery(string query)
     {
         SearchQuery = query;
@@ -557,6 +561,7 @@ public sealed partial class TweaksViewModel : ObservableObject
     partial void OnSearchQueryChanged(string value) => ApplyFilter();
     partial void OnSelectedCategoryChanged(string value) => ApplyFilter();
     partial void OnIsBeginnerModeChanged(bool value) => ApplyFilter();
+    partial void OnShowExperimentalTweaksChanged(bool value) => ApplyFilter();
 
     [RelayCommand]
     public void SetMode(string mode)
@@ -583,6 +588,14 @@ public sealed partial class TweaksViewModel : ObservableObject
 
         foreach (var card in _allTweaks)
         {
+            // Experimental filter: hide unproven community tweaks unless explicitly enabled
+            bool isExperimental = string.Equals(card.Category, "Experimental", StringComparison.OrdinalIgnoreCase) ||
+                                  string.Equals(card.Tweak.Evidence, "anecdotal", StringComparison.OrdinalIgnoreCase);
+            if (isExperimental && !ShowExperimentalTweaks)
+            {
+                continue;
+            }
+
             // Beginner mode filter: hide caution / high-risk tweaks
             if (IsBeginnerMode)
             {

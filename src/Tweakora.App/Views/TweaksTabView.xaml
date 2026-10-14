@@ -41,6 +41,14 @@
                                        Padding="10,3" FontSize="11" />
                         </StackPanel>
                     </Border>
+
+                    <!-- Show Experimental Tweaks Toggle -->
+                    <CheckBox AutomationProperties.AutomationId="ShowExperimentalTweaksCheckBox"
+                              Content="Show experimental tweaks"
+                              IsChecked="{Binding ShowExperimentalTweaks, Mode=TwoWay}"
+                              Margin="16,0,0,0" VerticalAlignment="Center"
+                              FontSize="11" Foreground="#94A3B8"
+                              ToolTip="Display unproven community-lore tweaks (quarantined from presets)" />
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center">

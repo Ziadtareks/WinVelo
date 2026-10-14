@@ -43,7 +43,7 @@
     },
     "category": {
       "type": "string",
-      "enum": ["privacy", "ai", "performance", "gaming", "ui", "network", "system", "updates"]
+      "enum": ["privacy", "ai", "performance", "gaming", "ui", "network", "system", "updates", "preferences", "Preferences", "experimental", "Experimental"]
     },
     "subcategory": { "type": "string" },
     "risk": {

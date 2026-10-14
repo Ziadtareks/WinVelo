@@ -104,14 +104,14 @@
                         </StackPanel>
                     </Border>
 
-                    <!-- Card 4: Estimated Boot Impact -->
+                    <!-- Card 4: Estimated Impact (Heuristic) -->
                     <Border Grid.Column="3" Background="#181B22" BorderBrush="#262B36" BorderThickness="1" CornerRadius="8" Padding="14,10">
                         <StackPanel>
                             <DockPanel LastChildFill="False">
-                                <TextBlock Text="BOOT IMPACT" FontSize="10" FontWeight="Bold" Foreground="#A78BFA" DockPanel.Dock="Left" />
+                                <TextBlock Text="ESTIMATED IMPACT" FontSize="10" FontWeight="Bold" Foreground="#A78BFA" DockPanel.Dock="Left" />
                                 <ui:SymbolIcon Symbol="Timer24" Foreground="#A78BFA" FontSize="14" DockPanel.Dock="Right" />
                             </DockPanel>
-                            <TextBlock Text="{Binding BootDelayText}" FontSize="20" FontWeight="Bold" Foreground="#A78BFA" Margin="0,4,0,2" />
+                            <TextBlock Text="{Binding BootDelayText}" FontSize="15" FontWeight="Bold" Foreground="#A78BFA" Margin="0,6,0,2" />
                             <TextBlock Text="{Binding BootTimeSavedText}" FontSize="11" Foreground="#10B981" FontWeight="SemiBold" />
                         </StackPanel>
                     </Border>

@@ -130,6 +130,7 @@ public static class Program
                         }
 
                         ValidateServicingProtection(item, id, ref errorCount);
+                        ValidateEvidenceField(item, id, ref errorCount);
 
                         if (!result.IsValid)
                         {
@@ -182,6 +183,7 @@ public static class Program
                     }
 
                     ValidateServicingProtection(single, id, ref errorCount);
+                    ValidateEvidenceField(single, id, ref errorCount);
 
                     if (!result.IsValid)
                     {
@@ -358,6 +360,26 @@ public static class Program
                             errorCount++;
                             presetOk = false;
                         }
+
+                        string? evidence = tweakNode["evidence"]?.ToString();
+                        if (!string.Equals(evidence, "documented", StringComparison.OrdinalIgnoreCase))
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine($"  [FAIL] {fileName} ({pId}): Contains tweak '{tid}' with evidence '{evidence ?? "missing"}'. Presets must contain ONLY documented tweaks.");
+                            Console.ResetColor();
+                            errorCount++;
+                            presetOk = false;
+                        }
+
+                        string? category = tweakNode["category"]?.ToString();
+                        if (string.Equals(category, "Experimental", StringComparison.OrdinalIgnoreCase))
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine($"  [FAIL] {fileName} ({pId}): Contains tweak '{tid}' with category 'Experimental'. Presets cannot contain experimental tweaks.");
+                            Console.ResetColor();
+                            errorCount++;
+                            presetOk = false;
+                        }
                     }
 
                     if (presetOk)
@@ -462,6 +484,21 @@ public static class Program
                 Console.WriteLine($"  [FAIL] Tweak '{id}' impacts Windows servicing ({reason}) but is missing required 'sideEffects' explanation.");
                 Console.ResetColor();
             }
+        }
+    }
+
+    private static void ValidateEvidenceField(JsonNode item, string id, ref int errorCount)
+    {
+        string? evidence = item["evidence"]?.ToString();
+        if (string.IsNullOrWhiteSpace(evidence) ||
+            (!string.Equals(evidence, "documented", StringComparison.OrdinalIgnoreCase) &&
+             !string.Equals(evidence, "situational", StringComparison.OrdinalIgnoreCase) &&
+             !string.Equals(evidence, "anecdotal", StringComparison.OrdinalIgnoreCase)))
+        {
+            errorCount++;
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"  [FAIL] Tweak '{id}' is missing a valid 'evidence' field ('documented', 'situational', or 'anecdotal'). Found: '{evidence}'.");
+            Console.ResetColor();
         }
     }
 }

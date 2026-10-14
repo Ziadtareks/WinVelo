@@ -287,5 +287,26 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
   4. Added `ServicingProtectionHelper.CheckServicingHealthAsync` and `RestoreServicingComponentsAsync` to check and repair servicing health.
   5. Integrated post-apply servicing health check into `DashboardViewModel` and CLI `ExecutePresetAsync`.
   6. Added CLI command `--health-check [--restore]`.
-  7. Added unit tests in `ServicingProtectionTests.cs`.
+---
+
+## BUG-021: Placebo Tweaks, Unproven Performance Claims, and Optimization Score Gaming
+- **Component**: `Catalog/Tweaks`, `Catalog/schema`, `tools/CatalogValidator`, `Tweakora.App` (`DashboardViewModel`, `DashboardTabView`, `TweaksViewModel`, `TweaksTabView`, `StartupViewModel`, `StartupTabView`, `ToolboxViewModel`, `ToolboxPage`, `MainViewModel`), `Tweakora.Modules` (`NetworkOptimizerService`, `MemoryOptimizerService`), `Tweakora.Tests` (`PlaceboAndClaimScrubTests.cs`)
+- **Finding**:
+  1. The catalog lacked an evidence classification system, allowing unproven community claims (such as reducing `MouseDataQueueSize` or CPU unparking on modern Windows schedulers) to be presented alongside documented tweaks.
+  2. Tweaks addressing situational hardware bugs (such as disabling MPO to prevent multi-monitor flicker or disabling power throttling on plugged-in machines) were marketed as universal performance/FPS boosts without disclosing battery life or windowed presentation trade-offs.
+  3. Genuine user preferences (mouse acceleration curve disabling, HAGS) were miscategorized as system performance enhancements.
+  4. The UI featured an "Optimization Score" that rewarded users for blindly applying more tweaks, incentivizing over-tweaking and damaging system stability.
+  5. The UI featured unmeasured claims ("Easy Boost", "faster boot", "saves ~1.2s on boot") that could not be empirically validated.
+  6. Global adapter-level Nagle algorithm disabling and standby list RAM purging were promoted without disclaimers about gaming socket/UDP reality or Windows memory caching mechanics.
+- **Root Cause**: Absence of an evidence hierarchy in the schema and adoption of traditional optimizer marketing tropes instead of truthful, evidence-based descriptions.
+- **Fix**:
+  1. Added schema property `evidence` (`"documented"`, `"situational"`, `"anecdotal"`) and `Experimental` / `preferences` categories.
+  2. Moved anecdotal items (`performance.input.buffer-queue`, `performance.cpu.unpark-cores`) to `Experimental` category, excluded from presets, and hidden behind a user toggle "Show experimental tweaks" (off by default) with clear notices.
+  3. Relabeled situational tweaks (MPO, power throttling, priority separation) with honest bug-fix or trade-off descriptions rather than performance claims.
+  4. Reclassified user preferences (mouse acceleration, HAGS) under `category: "preferences"`.
+  5. Enforced in `CatalogValidator` that presets contain ONLY `evidence: "documented"` tweaks and zero `Experimental` tweaks.
+  6. Completely replaced the "Optimization Score" banner with an honest "Configured System Settings" meter (`{appliedCount} of {totalCount} settings configured`).
+  7. Scrubbed unmeasured claims ("Easy Boost", "faster boot", boot-time-saved numbers) from the UI and Startup manager, labeling startup impact as "Estimated (heuristic)".
+  8. Documented the real mechanics and limitations of Nagle disabling and standby RAM purging in `NetworkOptimizerService`, `MemoryOptimizerService`, `ToolboxViewModel`, and `ToolboxPage`.
+  9. Added comprehensive unit tests in `PlaceboAndClaimScrubTests.cs`.
 

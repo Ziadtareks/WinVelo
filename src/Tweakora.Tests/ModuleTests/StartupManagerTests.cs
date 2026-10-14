@@ -236,6 +236,8 @@ public sealed class StartupManagerTests
         // Run 1-Click Startup Optimization
         await vm.OptimizeStartupAsync();
         Assert.Equal(0, vm.HighImpactCount);
-        Assert.Contains("boot time saved", vm.BootTimeSavedText);
+        Assert.Contains("heuristic", vm.BootDelayText, StringComparison.OrdinalIgnoreCase);
+        Assert.Equal("0 high-impact active", vm.BootTimeSavedText);
+        Assert.DoesNotContain("saved", vm.BootTimeSavedText, StringComparison.OrdinalIgnoreCase);
     }
 }

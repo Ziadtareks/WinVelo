@@ -17,6 +17,13 @@ public sealed class MemoryPurgeResult
     public int ProcessesTrimmedCount { get; init; }
 }
 
+/// <summary>
+/// Provides memory cache purge utilities.
+/// Note: In Windows, the Standby List consists of cached file pages that the Memory Manager
+/// automatically discards if free physical memory is requested by an application. Purging the
+/// standby list empties this cache, which reduces reported 'in-use' memory temporarily but can
+/// lead to extra disk I/O when processes re-read cached files.
+/// </summary>
 public interface IMemoryOptimizerService
 {
     Task<MemoryPurgeResult> PurgeMemoryAndStandbyListAsync(CancellationToken cancellationToken = default);

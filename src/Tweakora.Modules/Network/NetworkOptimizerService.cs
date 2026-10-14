@@ -211,6 +211,11 @@ public sealed class NetworkOptimizerService : INetworkOptimizerService
         });
     }
 
+    /// <summary>
+    /// Detects whether Nagle's algorithm has been disabled across active network interfaces.
+    /// Note: Disabling Nagle (TCPNoDelay) is a situational tweak. Most multiplayer games use UDP or
+    /// set TCP_NODELAY at the socket level. Global disabling can increase TCP packet overhead for general traffic.
+    /// </summary>
     public async Task<bool> DetectNagleAlgorithmDisabledAsync()
     {
         var guids = await GetActiveNetworkAdapterGuidsAsync();
@@ -231,6 +236,9 @@ public sealed class NetworkOptimizerService : INetworkOptimizerService
         return false;
     }
 
+    /// <summary>
+    /// Configures or restores Nagle's algorithm on active network interfaces.
+    /// </summary>
     public async Task<bool> SetNagleAlgorithmStateAsync(bool disableNagle, CancellationToken cancellationToken = default)
     {
         var guids = await GetActiveNetworkAdapterGuidsAsync();

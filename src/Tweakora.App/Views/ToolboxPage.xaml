@@ -299,9 +299,9 @@
                             <StackPanel Grid.Column="0">
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
                                     <ui:SymbolIcon Symbol="Games24" Foreground="#F59E0B" FontSize="16" Margin="0,0,8,0" VerticalAlignment="Center" />
-                                    <TextBlock Text="Low-Latency Gaming Packets (Disable Nagle's Algorithm)" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                    <TextBlock Text="Disable Nagle's Algorithm (Global Adapter TCPNoDelay)" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center" />
                                 </StackPanel>
-                                <TextBlock Text="Disables TCP packet queuing delays (TcpAckFrequency = 1, TCPNoDelay = 1) on active network adapters for immediate packet dispatch in multiplayer games."
+                                <TextBlock Text="Sets TcpAckFrequency = 1 and TCPNoDelay = 1 on active network adapters. Note: Most multiplayer games already manage socket-level TCP_NODELAY or use UDP. Disabling Nagle globally may increase packet overhead with no measured gaming benefit."
                                            Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,6" />
                                 <TextBlock Text="{Binding NetworkStatusText}" FontWeight="Medium" Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}" FontSize="12" />
                             </StackPanel>

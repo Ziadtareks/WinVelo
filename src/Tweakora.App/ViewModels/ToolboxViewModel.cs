@@ -344,7 +344,7 @@ public sealed partial class ToolboxViewModel : ObservableObject
         }
 
         bool target = parameter is bool b ? b : !IsNagleDisabled;
-        NetworkStatusText = $"{(target ? "Disabling Nagle's Algorithm (Low Latency Gaming)" : "Enabling default TCP packet batching")}...";
+        NetworkStatusText = $"{(target ? "Disabling Nagle's Algorithm (TCPNoDelay)" : "Restoring default TCP packet batching")}...";
         await Task.Yield();
 
         bool ok = await Task.Run(async () => await _networkOptimizer.SetNagleAlgorithmStateAsync(target));
@@ -352,7 +352,7 @@ public sealed partial class ToolboxViewModel : ObservableObject
         {
             IsNagleDisabled = await Task.Run(async () => await _networkOptimizer.DetectNagleAlgorithmDisabledAsync());
             NetworkStatusText = IsNagleDisabled
-                ? "Nagle's Algorithm Disabled: Instant gaming packet transmission active on active NIC(s)."
+                ? "Nagle's Algorithm Disabled: TCPNoDelay active on active network adapter(s)."
                 : "Standard TCP packet batching restored.";
         }
         else

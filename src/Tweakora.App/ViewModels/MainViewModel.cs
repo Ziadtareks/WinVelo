@@ -360,7 +360,7 @@ public sealed partial class MainViewModel : ObservableObject
         _allPaletteItems.Add(new PaletteItem { Title = "Backups & Restore", Subtitle = "Inspect and restore system snapshots", Category = "Tool", ActionToExecute = () => SwitchTab("Backups") });
 
         // Actions
-        _allPaletteItems.Add(new PaletteItem { Title = "1-Click Optimize Startup", Subtitle = "Disable heavy non-essential apps for faster boot", Category = "Action", ActionToExecute = () => _ = StartupVM.OptimizeStartupAsync() });
+        _allPaletteItems.Add(new PaletteItem { Title = "1-Click Optimize Startup", Subtitle = "Disable heavy non-essential startup apps", Category = "Action", ActionToExecute = () => _ = StartupVM.OptimizeStartupAsync() });
         _allPaletteItems.Add(new PaletteItem { Title = "Standard Preset", Subtitle = "Select recommended desktop tweaks", Category = "Action", ActionToExecute = () => TweaksVM.ApplyPreset("Standard") });
         _allPaletteItems.Add(new PaletteItem { Title = "Minimal Preset", Subtitle = "Select essential telemetry reductions", Category = "Action", ActionToExecute = () => TweaksVM.ApplyPreset("Minimal") });
         _allPaletteItems.Add(new PaletteItem { Title = "Clear Selection", Subtitle = "Deselect all tweaks", Category = "Action", ActionToExecute = () => TweaksVM.ClearSelection() });

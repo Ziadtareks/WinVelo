@@ -34,10 +34,10 @@ public sealed partial class StartupViewModel : ObservableObject
     private double _bootDelaySeconds;
 
     [ObservableProperty]
-    private string _bootDelayText = "~0.0s boot impact";
+    private string _bootDelayText = "Estimated (heuristic)";
 
     [ObservableProperty]
-    private string _bootTimeSavedText = "~0.0s saved";
+    private string _bootTimeSavedText = "Relative weight";
 
     [ObservableProperty]
     private string _searchText = string.Empty;
@@ -173,9 +173,8 @@ public sealed partial class StartupViewModel : ObservableObject
         {
             int disabledCount = await Task.Run(async () => await _startupService.OptimizeStartupAsync());
             await LoadStartupAppsAsync(silent: true);
-            double timeSaved = disabledCount * 1.2;
-            StatusMessage = $"Optimized! Disabled {disabledCount} heavy apps, saving ~{timeSaved:F1}s on boot.";
-            _activityTracker?.CompleteActivity($"Startup optimized! Disabled {disabledCount} heavy apps (saved ~{timeSaved:F1}s boot time)");
+            StatusMessage = $"Disabled {disabledCount} heavy non-essential startup applications.";
+            _activityTracker?.CompleteActivity($"Startup optimized: Disabled {disabledCount} heavy non-essential apps");
         }
         catch (Exception ex)
         {
@@ -270,7 +269,7 @@ public sealed partial class StartupViewModel : ObservableObject
 
                 if (!silent)
                 {
-                    StatusMessage = $"Found {TotalCount} startup apps ({EnabledCount} enabled, ~{BootDelaySeconds:F1}s boot delay).";
+                    StatusMessage = $"Found {TotalCount} startup apps ({EnabledCount} enabled, {HighImpactCount} high impact).";
                 }
             };
 
@@ -307,10 +306,8 @@ public sealed partial class StartupViewModel : ObservableObject
 
         double totalDelay = AllApps.Where(a => a.IsEnabled).Sum(a => a.BootDelaySeconds);
         BootDelaySeconds = Math.Round(totalDelay, 1);
-        BootDelayText = $"~{BootDelaySeconds:F1}s boot impact";
-
-        double savedDelay = AllApps.Where(a => !a.IsEnabled).Sum(a => a.BootDelaySeconds);
-        BootTimeSavedText = $"~{savedDelay:F1}s boot time saved";
+        BootDelayText = "Estimated (heuristic)";
+        BootTimeSavedText = $"{HighImpactCount} high-impact active";
     }
 
     private void ApplyFilter()
