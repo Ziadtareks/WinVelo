@@ -147,10 +147,10 @@ public partial class App : Application
                 int idx = Array.FindIndex(e.Args, a => string.Equals(a, "--capture-screenshots", StringComparison.OrdinalIgnoreCase));
                 string targetDir = (idx >= 0 && idx + 1 < e.Args.Length && !e.Args[idx + 1].StartsWith("--")) ? e.Args[idx + 1] : "docs/screenshots";
                 
-                Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, new Action(() =>
+                await Dispatcher.InvokeAsync(() =>
                 {
                     CaptureAllScreenshots(window, targetDir);
-                }));
+                }, DispatcherPriority.ApplicationIdle);
                 return;
             }
         }
@@ -168,6 +168,8 @@ public partial class App : Application
         }
     }
 
+    private static Visual GetWindowVisual(MainWindow window) => (Visual?)window.Content ?? window;
+
     private void CaptureAllScreenshots(MainWindow window, string targetDir)
     {
         try
@@ -183,49 +185,49 @@ public partial class App : Application
             // 0. Dashboard Tab (Home / Easy Boost)
             vm.SwitchTabCommand.Execute("Dashboard");
             FlushUi(window);
-            SaveVisualToPng((Visual)window.Content ?? window, 1440, 900, Path.Combine(targetDir, "dashboard.png"));
+            SaveVisualToPng(GetWindowVisual(window), 1440, 900, Path.Combine(targetDir, "dashboard.png"));
             Log.Information("Captured dashboard.png");
 
             // 1. Tweaks Tab
             vm.SwitchTabCommand.Execute("Tweaks");
             FlushUi(window);
-            SaveVisualToPng((Visual)window.Content ?? window, 1440, 900, Path.Combine(targetDir, "tweaks.png"));
+            SaveVisualToPng(GetWindowVisual(window), 1440, 900, Path.Combine(targetDir, "tweaks.png"));
             Log.Information("Captured tweaks.png");
 
             // 2. Install Tab
             vm.SwitchTabCommand.Execute("Install");
             FlushUi(window);
-            SaveVisualToPng((Visual)window.Content ?? window, 1440, 900, Path.Combine(targetDir, "install.png"));
+            SaveVisualToPng(GetWindowVisual(window), 1440, 900, Path.Combine(targetDir, "install.png"));
             Log.Information("Captured install.png");
 
             // 3. Config Tab
             vm.SwitchTabCommand.Execute("Config");
             FlushUi(window);
-            SaveVisualToPng((Visual)window.Content ?? window, 1440, 900, Path.Combine(targetDir, "config.png"));
+            SaveVisualToPng(GetWindowVisual(window), 1440, 900, Path.Combine(targetDir, "config.png"));
             Log.Information("Captured config.png");
 
             // 4. Updates Tab
             vm.SwitchTabCommand.Execute("Updates");
             FlushUi(window);
-            SaveVisualToPng((Visual)window.Content ?? window, 1440, 900, Path.Combine(targetDir, "updates.png"));
+            SaveVisualToPng(GetWindowVisual(window), 1440, 900, Path.Combine(targetDir, "updates.png"));
             Log.Information("Captured updates.png");
 
             // 5. Toolbox Tab
             vm.SwitchTabCommand.Execute("Toolbox");
             FlushUi(window);
-            SaveVisualToPng((Visual)window.Content ?? window, 1440, 900, Path.Combine(targetDir, "toolbox.png"));
+            SaveVisualToPng(GetWindowVisual(window), 1440, 900, Path.Combine(targetDir, "toolbox.png"));
             Log.Information("Captured toolbox.png");
 
             // 6. Startup Apps Tab
             vm.SwitchTabCommand.Execute("Startup");
             FlushUi(window);
-            SaveVisualToPng((Visual)window.Content ?? window, 1440, 900, Path.Combine(targetDir, "startup.png"));
+            SaveVisualToPng(GetWindowVisual(window), 1440, 900, Path.Combine(targetDir, "startup.png"));
             Log.Information("Captured startup.png");
 
             // 7. Backups Tab
             vm.SwitchTabCommand.Execute("Backups");
             FlushUi(window);
-            SaveVisualToPng((Visual)window.Content ?? window, 1440, 900, Path.Combine(targetDir, "backups.png"));
+            SaveVisualToPng(GetWindowVisual(window), 1440, 900, Path.Combine(targetDir, "backups.png"));
             Log.Information("Captured backups.png");
 
             // 7. Diff Preview Overlay
@@ -234,7 +236,7 @@ public partial class App : Application
             FlushUi(window);
             vm.TweaksVM.OpenDiffPreviewCommand.Execute(null);
             FlushUi(window);
-            SaveVisualToPng((Visual)window.Content ?? window, 1440, 900, Path.Combine(targetDir, "diff-preview.png"));
+            SaveVisualToPng(GetWindowVisual(window), 1440, 900, Path.Combine(targetDir, "diff-preview.png"));
             Log.Information("Captured diff-preview.png");
             vm.TweaksVM.CloseDiffPreviewCommand.Execute(null);
             vm.TweaksVM.ClearSelectionCommand.Execute(null);
@@ -243,7 +245,7 @@ public partial class App : Application
             // 8. Command Palette Overlay
             vm.ToggleCommandPaletteCommand.Execute(null);
             FlushUi(window);
-            SaveVisualToPng((Visual)window.Content ?? window, 1440, 900, Path.Combine(targetDir, "command-palette.png"));
+            SaveVisualToPng(GetWindowVisual(window), 1440, 900, Path.Combine(targetDir, "command-palette.png"));
             Log.Information("Captured command-palette.png");
             vm.ToggleCommandPaletteCommand.Execute(null);
 
