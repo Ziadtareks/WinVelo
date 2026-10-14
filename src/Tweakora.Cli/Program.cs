@@ -932,37 +932,59 @@ public static class Program
         string catalogDir,
         string[] args)
     {
-        string presetPath = Path.Combine(catalogDir, "..", "Config", "preset.json");
-        if (!File.Exists(presetPath))
+        string presetsDir = Path.Combine(catalogDir, "..", "Presets");
+        if (!Directory.Exists(presetsDir))
         {
             string? p = Directory.GetParent(catalogDir)?.FullName;
             if (p != null)
             {
-                presetPath = Path.Combine(p, "Config", "preset.json");
+                presetsDir = Path.Combine(p, "Presets");
             }
         }
 
-        if (!File.Exists(presetPath))
+        List<PresetDefinition> loadedPresets = new();
+        if (Directory.Exists(presetsDir))
         {
-            Console.WriteLine($"[ERROR] Presets file not found: {presetPath}");
+            foreach (var pFile in Directory.GetFiles(presetsDir, "*.json"))
+            {
+                try
+                {
+                    string pJson = File.ReadAllText(pFile);
+                    var def = JsonSerializer.Deserialize<PresetDefinition>(pJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    if (def != null) loadedPresets.Add(def);
+                }
+                catch { }
+            }
+        }
+
+        PresetDefinition? matchedPreset = loadedPresets.FirstOrDefault(p =>
+            string.Equals(p.Id, presetName, StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(p.Id, $"preset.{presetName}", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(p.Name, presetName, StringComparison.OrdinalIgnoreCase));
+
+        if (matchedPreset == null && Directory.Exists(presetsDir))
+        {
+            string namedFile = Path.Combine(presetsDir, $"{presetName}.json");
+            if (File.Exists(namedFile))
+            {
+                try
+                {
+                    matchedPreset = JsonSerializer.Deserialize<PresetDefinition>(File.ReadAllText(namedFile), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                }
+                catch { }
+            }
+        }
+
+        if (matchedPreset == null)
+        {
+            Console.WriteLine($"[ERROR] Preset '{presetName}' not found in Catalog/Presets.");
+            Console.WriteLine("Available presets: " + string.Join(", ", loadedPresets.Select(x => $"{x.Id} ({x.Name})")));
             return 1;
         }
 
-        string presetJson = File.ReadAllText(presetPath);
-        using var presetDoc = JsonDocument.Parse(presetJson);
-
-        if (!presetDoc.RootElement.TryGetProperty(presetName, out var presetElem))
-        {
-            Console.WriteLine($"[ERROR] Preset '{presetName}' not found in preset.json.");
-            Console.WriteLine("Available presets: " + string.Join(", ", presetDoc.RootElement.EnumerateObject().Select(x => x.Name)));
-            return 1;
-        }
-
-        List<string> keys = presetElem.EnumerateArray().Select(x => x.GetString() ?? "").Where(s => !string.IsNullOrEmpty(s)).ToList();
-        var keySet = new HashSet<string>(keys, StringComparer.OrdinalIgnoreCase);
-
-        var targetTweaks = catalog.Where(t => keySet.Contains(t.Id) || (t.Origin != null && keySet.Contains(t.Origin))).ToList();
-        Console.WriteLine($"[INFO] Preset '{presetName}' matched {targetTweaks.Count} of {keys.Count} configured keys.");
+        var keySet = new HashSet<string>(matchedPreset.TweakIds, StringComparer.OrdinalIgnoreCase);
+        var targetTweaks = catalog.Where(t => keySet.Contains(t.Id)).ToList();
+        Console.WriteLine($"[INFO] Preset '{matchedPreset.Name}' ({matchedPreset.Id}) matched {targetTweaks.Count} of {matchedPreset.TweakIds.Count} configured tweaks.");
 
         if (isRun)
         {

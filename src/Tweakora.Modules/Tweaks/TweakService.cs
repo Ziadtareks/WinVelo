@@ -18,6 +18,8 @@ namespace Tweakora.Modules.Tweaks;
 public interface ITweakService
 {
     IReadOnlyList<TweakDefinition> LoadCatalog();
+    IReadOnlyList<PresetDefinition> LoadPresets() => Array.Empty<PresetDefinition>();
+    IReadOnlyList<TweakDefinition> GetActiveJournalTweaks() => Array.Empty<TweakDefinition>();
     bool DetectState(TweakDefinition tweak);
     Task<string> GenerateDryRunDiffAsync(IEnumerable<TweakDefinition> tweaks);
     Task<OperationExecutionReport> ApplyTweaksAsync(
@@ -138,6 +140,83 @@ public sealed class TweakService : ITweakService
         }
 
         return list;
+    }
+
+    public IReadOnlyList<PresetDefinition> LoadPresets()
+    {
+        string rootDir = AppContext.BaseDirectory;
+        string presetsDir = Path.Combine(rootDir, "Catalog", "Presets");
+
+        if (!Directory.Exists(presetsDir))
+        {
+            string? parent = Directory.GetParent(rootDir)?.FullName;
+            while (parent != null)
+            {
+                string candidate = Path.Combine(parent, "Catalog", "Presets");
+                if (Directory.Exists(candidate))
+                {
+                    presetsDir = candidate;
+                    break;
+                }
+                parent = Directory.GetParent(parent)?.FullName;
+            }
+        }
+
+        List<PresetDefinition> list = new();
+        if (Directory.Exists(presetsDir))
+        {
+            foreach (string file in Directory.GetFiles(presetsDir, "*.json", SearchOption.AllDirectories).OrderBy(f => f))
+            {
+                try
+                {
+                    string json = File.ReadAllText(file);
+                    var item = JsonSerializer.Deserialize<PresetDefinition>(json, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
+                    if (item != null) list.Add(item);
+                }
+                catch { }
+            }
+        }
+
+        return list;
+    }
+
+    public IReadOnlyList<TweakDefinition> GetActiveJournalTweaks()
+    {
+        var catalog = LoadCatalog();
+        var catalogMap = catalog.ToDictionary(t => t.Id, StringComparer.OrdinalIgnoreCase);
+
+        var sessions = _journal.GetAllSessions();
+        var orderedTweakIds = new List<string>();
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var session in sessions)
+        {
+            for (int i = session.Records.Count - 1; i >= 0; i--)
+            {
+                var r = session.Records[i];
+                if (!r.IsReverted && !string.IsNullOrWhiteSpace(r.TweakId))
+                {
+                    if (seen.Add(r.TweakId))
+                    {
+                        orderedTweakIds.Add(r.TweakId);
+                    }
+                }
+            }
+        }
+
+        var result = new List<TweakDefinition>();
+        foreach (var id in orderedTweakIds)
+        {
+            if (catalogMap.TryGetValue(id, out var tweak))
+            {
+                result.Add(tweak);
+            }
+        }
+
+        return result;
     }
 
     public bool DetectState(TweakDefinition tweak)

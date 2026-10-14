@@ -1,7 +1,7 @@
 {
   "id": "preset.gaming",
-  "name": "Gaming & Low-Latency",
-  "description": "Disables background Xbox Game Bar recording overlays, Game DVR, and enables Windows Game Mode.",
+  "name": "Gaming: Fewer Background Interruptions",
+  "description": "Disables background Xbox Game Bar recording overlays, Game DVR background captures, and enables Windows Game Mode to reduce background interruptions.",
   "tweakIds": [
     "gaming.mode.enable",
     "gaming.xbox.disable-game-bar",

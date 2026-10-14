@@ -251,6 +251,234 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
         return await _irreversibleConfirmTcs.Task;
     }
 
+    [ObservableProperty]
+    private bool _isProfilePreviewOpen;
+
+    [ObservableProperty]
+    private string _profilePreviewTitle = "Profile Preview";
+
+    [ObservableProperty]
+    private string _profilePreviewDescription = string.Empty;
+
+    [ObservableProperty]
+    private string _profilePreviewNotice = string.Empty;
+
+    [ObservableProperty]
+    private string _profilePreviewConfirmText = "Confirm & Apply";
+
+    [ObservableProperty]
+    private bool _isProfilePreviewUndo;
+
+    [ObservableProperty]
+    private bool _isProfilePreviewLoading;
+
+    public ObservableCollection<ProfilePreviewItemModel> ProfilePreviewItems { get; } = new();
+
+    private ProfileCardModel? _activePreviewCard;
+
+    [RelayCommand]
+    public async Task ConfirmProfilePreviewAsync()
+    {
+        IsProfilePreviewOpen = false;
+
+        var selected = ProfilePreviewItems
+            .Where(i => i.IsSelected && !i.IsAlreadyApplied)
+            .Select(i => i.Tweak)
+            .ToList();
+
+        if (selected.Count == 0)
+        {
+            GlobalStatusMessage = "No tweaks selected to execute.";
+            return;
+        }
+
+        bool isUndo = IsProfilePreviewUndo;
+        var card = _activePreviewCard;
+
+        if (card != null)
+        {
+            card.IsBusy = true;
+            card.StatusMessage = isUndo ? "Reverting selected tweaks..." : "Applying selected tweaks...";
+        }
+
+        GlobalStatusMessage = isUndo ? $"Reverting {selected.Count} tweak(s)..." : $"Applying {selected.Count} tweak(s)...";
+
+        using var activity = _activityTracker?.BeginActivity(isUndo ? "Reverting WinVelo Tweaks..." : "Applying Profile Tweaks...");
+        await Task.Yield();
+
+        try
+        {
+            OperationExecutionReport report;
+            if (isUndo)
+            {
+                report = await Task.Run(() => _tweakService.UndoTweaksAsync(selected, _runner));
+            }
+            else
+            {
+                var irreversible = selected.Where(t => !t.Reversible).ToList();
+                if (irreversible.Count > 0)
+                {
+                    bool confirmed = await RequestIrreversibleConfirmationAsync(irreversible);
+                    if (!confirmed)
+                    {
+                        if (card != null) card.StatusMessage = "Cancelled by user.";
+                        GlobalStatusMessage = "Operation cancelled.";
+                        return;
+                    }
+                }
+                report = await Task.Run(() => _tweakService.ApplyTweaksAsync(selected, _runner));
+            }
+
+            if (card != null)
+            {
+                HandleProfileReport(card, report, isRestore: isUndo);
+            }
+            else
+            {
+                GlobalStatusMessage = isUndo
+                    ? $"Restored {report.SucceededCount} of {report.TotalRequested} changes."
+                    : $"Applied {report.SucceededCount} of {report.TotalRequested} optimizations.";
+            }
+
+            await RefreshAllToggleStatesAsync();
+            _ = RecalculateOptimizationScoreAsync();
+        }
+        catch (Exception ex)
+        {
+            if (card != null)
+            {
+                card.HasFailures = true;
+                card.StatusColor = "#EF4444";
+                card.StatusMessage = $"Error: {ex.Message}";
+            }
+            GlobalStatusMessage = $"Execution failed: {ex.Message}";
+        }
+        finally
+        {
+            if (card != null) card.IsBusy = false;
+        }
+    }
+
+    [RelayCommand]
+    public void CancelProfilePreview()
+    {
+        IsProfilePreviewOpen = false;
+        GlobalStatusMessage = "Profile preview cancelled.";
+    }
+
+    public async Task OpenProfilePreviewAsync(
+        string title,
+        string description,
+        string notice,
+        string confirmText,
+        IReadOnlyList<TweakDefinition> tweaks,
+        bool isUndo,
+        ProfileCardModel? card)
+    {
+        _activePreviewCard = card;
+        ProfilePreviewTitle = title;
+        ProfilePreviewDescription = description;
+        ProfilePreviewNotice = notice;
+        ProfilePreviewConfirmText = confirmText;
+        IsProfilePreviewUndo = isUndo;
+        ProfilePreviewItems.Clear();
+        IsProfilePreviewLoading = true;
+        IsProfilePreviewOpen = true;
+
+        var items = new List<ProfilePreviewItemModel>();
+        foreach (var t in tweaks)
+        {
+            items.Add(new ProfilePreviewItemModel
+            {
+                Tweak = t,
+                Id = t.Id,
+                Name = t.Name,
+                Risk = t.Risk,
+                Reversible = t.Reversible,
+                RequiresReboot = t.RequiresReboot,
+                RequiresExplorerRestart = t.RequiresExplorerRestart,
+                IsSelected = true,
+                IsAlreadyApplied = false
+            });
+        }
+
+        foreach (var item in items)
+        {
+            ProfilePreviewItems.Add(item);
+        }
+
+        _ = Task.Run(async () =>
+        {
+            foreach (var item in items)
+            {
+                try
+                {
+                    if (isUndo)
+                    {
+                        var state = await _tweakService.DetectTweakStateAsync(item.Tweak);
+                        Application.Current?.Dispatcher?.Invoke(() =>
+                        {
+                            item.StateText = state switch
+                            {
+                                TweakState.Applied => "Applied (In Journal)",
+                                TweakState.Partial => "Partial (In Journal)",
+                                _ => "Modified in Journal"
+                            };
+                            item.StateBg = "#1E3A8A";
+                            item.StateFg = "#60A5FA";
+                            item.IsAlreadyApplied = false;
+                            item.IsSelected = true;
+                        });
+                    }
+                    else
+                    {
+                        var state = await _tweakService.DetectTweakStateAsync(item.Tweak);
+                        Application.Current?.Dispatcher?.Invoke(() =>
+                        {
+                            switch (state)
+                            {
+                                case TweakState.Applied:
+                                    item.StateText = "Applied";
+                                    item.StateBg = "#064E3B";
+                                    item.StateFg = "#10B981";
+                                    item.IsAlreadyApplied = true;
+                                    item.IsSelected = false;
+                                    break;
+                                case TweakState.Partial:
+                                    item.StateText = "Partial";
+                                    item.StateBg = "#78350F";
+                                    item.StateFg = "#FBBF24";
+                                    item.IsAlreadyApplied = false;
+                                    item.IsSelected = true;
+                                    break;
+                                case TweakState.NotApplied:
+                                    item.StateText = "Not Applied";
+                                    item.StateBg = "#1E222D";
+                                    item.StateFg = "#94A3B8";
+                                    item.IsAlreadyApplied = false;
+                                    item.IsSelected = true;
+                                    break;
+                                default:
+                                    item.StateText = "Unknown";
+                                    item.StateBg = "#334155";
+                                    item.StateFg = "#CBD5E1";
+                                    item.IsAlreadyApplied = false;
+                                    item.IsSelected = true;
+                                    break;
+                            }
+                        });
+                    }
+                }
+                catch { }
+            }
+
+            Application.Current?.Dispatcher?.Invoke(() =>
+            {
+                IsProfilePreviewLoading = false;
+            });
+        });
+    }
+
     public ObservableCollection<ProfileCardModel> Profiles { get; } = new();
     public ObservableCollection<QuickToggleCardModel> QuickToggles { get; } = new();
 
@@ -348,68 +576,104 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
     {
         Profiles.Clear();
 
-        // 1. Everyday Speed & Clean Setup
-        Profiles.Add(new ProfileCardModel
+        var presets = _tweakService.LoadPresets();
+        foreach (var preset in presets)
         {
-            Id = "everyday",
-            Title = "Everyday Speed & Clean Setup",
-            Description = "Safely disable telemetry, Bing web search in Start, disk clutter, and optimize Windows responsiveness for daily work and browsing.",
-            BadgeText = "SAFE & RECOMMENDED",
-            BadgeBg = "#064E3B",
-            BadgeFg = "#34D399",
-            TweakCountText = "18 Tweaks",
-            ImpactText = "Immediate Responsiveness",
-            ButtonText = "Apply Everyday Boost",
-            IconSymbol = "Flash24",
-            OnApplyAsync = ApplyProfileEverydayAsync
-        });
+            var keySet = new HashSet<string>(preset.TweakIds, StringComparer.OrdinalIgnoreCase);
+            var tweaks = _catalog.Where(t => keySet.Contains(t.Id)).ToList();
 
-        // 2. Gaming & Max FPS Boost
-        Profiles.Add(new ProfileCardModel
-        {
-            Id = "gaming",
-            Title = "Gaming & Max FPS Boost",
-            Description = "Maximize GPU/CPU priority for games, enable Game Mode, disable GameDVR recording, optimize power plan, and stop background task lag.",
-            BadgeText = "MAX PERFORMANCE",
-            BadgeBg = "#78350F",
-            BadgeFg = "#FBBF24",
-            TweakCountText = "14 Tweaks",
-            ImpactText = "Lower Input Lag & Stutter",
-            ButtonText = "Apply Gaming Boost",
-            IconSymbol = "Games24",
-            OnApplyAsync = ApplyProfileGamingAsync
-        });
+            string badgeText = preset.Id switch
+            {
+                "preset.recommended" => "SAFE & RECOMMENDED",
+                "preset.gaming" => "BACKGROUND PACING",
+                "preset.privacy" => "MAX PRIVACY",
+                _ => "CURATED PRESET"
+            };
 
-        // 3. Privacy & Anti-Spyware Shield
-        Profiles.Add(new ProfileCardModel
-        {
-            Id = "privacy",
-            Title = "Privacy & Anti-Spyware Shield",
-            Description = "Lock down Windows data collection: disable telemetry, advertising ID, diagnostics, activity tracking, Cortana, and lockscreen promo ads.",
-            BadgeText = "MAX PRIVACY",
-            BadgeBg = "#1E3A8A",
-            BadgeFg = "#60A5FA",
-            TweakCountText = "16 Tweaks",
-            ImpactText = "Zero Background Telemetry",
-            ButtonText = "Apply Privacy Shield",
-            IconSymbol = "ShieldCheckmark24",
-            OnApplyAsync = ApplyProfilePrivacyAsync
-        });
+            string badgeBg = preset.Id switch
+            {
+                "preset.recommended" => "#064E3B",
+                "preset.gaming" => "#78350F",
+                "preset.privacy" => "#1E3A8A",
+                _ => "#1E293B"
+            };
 
-        // 4. Restore Windows Defaults
+            string badgeFg = preset.Id switch
+            {
+                "preset.recommended" => "#34D399",
+                "preset.gaming" => "#FBBF24",
+                "preset.privacy" => "#60A5FA",
+                _ => "#94A3B8"
+            };
+
+            string icon = preset.Id switch
+            {
+                "preset.recommended" => "Flash24",
+                "preset.gaming" => "Games24",
+                "preset.privacy" => "ShieldCheckmark24",
+                _ => "Sparkle24"
+            };
+
+            Profiles.Add(new ProfileCardModel
+            {
+                Id = preset.Id,
+                Title = preset.Name,
+                Description = preset.Description,
+                BadgeText = badgeText,
+                BadgeBg = badgeBg,
+                BadgeFg = badgeFg,
+                TweakCountText = $"{tweaks.Count} Tweaks",
+                ImpactText = "Curated Configuration",
+                ButtonText = "Review & Apply",
+                IconSymbol = icon,
+                OnApplyAsync = async (card) =>
+                {
+                    await OpenProfilePreviewAsync(
+                        preset.Name,
+                        preset.Description,
+                        "Already applied tweaks are skipped. You may untick any items before applying.",
+                        "Apply Selected Tweaks",
+                        tweaks,
+                        isUndo: false,
+                        card);
+                }
+            });
+        }
+
+        // 4. Undo all WinVelo changes
         Profiles.Add(new ProfileCardModel
         {
-            Id = "defaults",
-            Title = "Restore Windows Defaults",
-            Description = "Safely revert applied tweaks back to standard Windows defaults. Restores default telemetry, search, and original system behavior.",
-            BadgeText = "SAFE ROLLBACK",
+            Id = "undo-all",
+            Title = "Undo all WinVelo changes",
+            Description = "Safely undo all tweaks previously applied by WinVelo using active journal records (newest first). Note: Changes made by other tools or Windows updates are not covered.",
+            BadgeText = "JOURNAL ROLLBACK",
             BadgeBg = "#374151",
             BadgeFg = "#E5E7EB",
-            TweakCountText = "Rollback",
-            ImpactText = "Standard System Defaults",
-            ButtonText = "Restore Defaults",
+            TweakCountText = "Active Changes",
+            ImpactText = "Safe Journal Reversal",
+            ButtonText = "Review & Revert",
             IconSymbol = "ArrowCounterclockwise24",
-            OnApplyAsync = ApplyProfileRestoreDefaultsAsync
+            OnApplyAsync = async (card) =>
+            {
+                var activeTweaks = _tweakService.GetActiveJournalTweaks();
+                if (activeTweaks.Count == 0)
+                {
+                    card.HasFailures = false;
+                    card.StatusColor = "#34D399";
+                    card.StatusMessage = "No active changes in journal.";
+                    GlobalStatusMessage = "No active tweaks found in WinVelo journal to revert. Changes made by other tools are not covered.";
+                    return;
+                }
+
+                await OpenProfilePreviewAsync(
+                    "Undo all WinVelo changes",
+                    "Revert applied tweaks recorded in the write-ahead journal (newest first).",
+                    "Only tweaks modified and tracked by WinVelo are restored. Changes made by other tools or Windows updates are not covered.",
+                    "Revert Selected Tweaks",
+                    activeTweaks,
+                    isUndo: true,
+                    card);
+            }
         });
 
         foreach (var p in Profiles)
@@ -731,236 +995,6 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
         }
     }
 
-    private async Task ApplyProfileEverydayAsync(ProfileCardModel card)
-    {
-        card.IsBusy = true;
-        card.StatusMessage = "Applying Everyday Speed Profile...";
-        GlobalStatusMessage = "Applying Everyday Speed & Clean Setup...";
-
-        using var activity = _activityTracker?.BeginActivity("Applying Everyday Speed & Clean Setup...");
-        await Task.Yield();
-
-        try
-        {
-            var targets = _catalog.Where(t =>
-                string.Equals(t.Category, "Essential", StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(t.Origin, "WPFTweaksTelemetry", StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(t.Origin, "WPFToggleBingSearch", StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(t.Origin, "WPFTweaksDiskCleanup", StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(t.Origin, "WPFTweaksDeleteTempFiles", StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(t.Origin, "WPFTweaksEndTaskOnTaskbar", StringComparison.OrdinalIgnoreCase)
-            ).Take(18).ToList();
-
-            if (targets.Count > 0)
-            {
-                var irreversible = targets.Where(t => !t.Reversible).ToList();
-                if (irreversible.Count > 0)
-                {
-                    bool confirmed = await RequestIrreversibleConfirmationAsync(irreversible);
-                    if (!confirmed)
-                    {
-                        card.StatusMessage = "Cancelled by user.";
-                        GlobalStatusMessage = "Profile application cancelled.";
-                        return;
-                    }
-                }
-
-                var report = await Task.Run(() => _tweakService.ApplyTweaksAsync(targets, _runner));
-                HandleProfileReport(card, report, isRestore: false);
-            }
-            else
-            {
-                card.StatusMessage = "No tweaks matched this profile.";
-                GlobalStatusMessage = "No tweaks matched this profile.";
-            }
-
-            await RefreshAllToggleStatesAsync();
-            _ = RecalculateOptimizationScoreAsync();
-        }
-        catch (Exception ex)
-        {
-            card.HasFailures = true;
-            card.StatusColor = "#EF4444";
-            card.StatusMessage = $"Error: {ex.Message}";
-            GlobalStatusMessage = $"Failed: {ex.Message}";
-        }
-        finally
-        {
-            card.IsBusy = false;
-        }
-    }
-
-    private async Task ApplyProfileGamingAsync(ProfileCardModel card)
-    {
-        card.IsBusy = true;
-        card.StatusMessage = "Applying Gaming & FPS Profile...";
-        GlobalStatusMessage = "Applying Gaming & Max FPS Boost...";
-
-        using var activity = _activityTracker?.BeginActivity("Applying Gaming & Max FPS Boost...");
-        await Task.Yield();
-
-        try
-        {
-            var targets = _catalog.Where(t =>
-                string.Equals(t.Origin, "WPFToggleGameMode", StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(t.Origin, "WPFTweaksDisableBGapps", StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(t.Id, "advanced.disablebgapps", StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(t.Id, "gaming.dvr.disable-background-recording", StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(t.Id, "gaming.gamebar.disable-broadcast", StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(t.Id, "performance.cpu.priority-separation", StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(t.Id, "performance.gaming.mmcss-responsiveness", StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(t.Id, "performance.gpu.hags", StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(t.Id, "performance.input.raw-mouse", StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(t.Id, "performance.cpu.unpark-cores", StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(t.Id, "performance.power.disable-throttling", StringComparison.OrdinalIgnoreCase) ||
-                (t.Description.Contains("Game", StringComparison.OrdinalIgnoreCase) && !string.Equals(t.Risk, "High", StringComparison.OrdinalIgnoreCase))
-            ).Take(14).ToList();
-
-            if (targets.Count > 0)
-            {
-                var irreversible = targets.Where(t => !t.Reversible).ToList();
-                if (irreversible.Count > 0)
-                {
-                    bool confirmed = await RequestIrreversibleConfirmationAsync(irreversible);
-                    if (!confirmed)
-                    {
-                        card.StatusMessage = "Cancelled by user.";
-                        GlobalStatusMessage = "Profile application cancelled.";
-                        return;
-                    }
-                }
-
-                var report = await Task.Run(() => _tweakService.ApplyTweaksAsync(targets, _runner));
-                HandleProfileReport(card, report, isRestore: false);
-            }
-            else
-            {
-                card.StatusMessage = "No tweaks matched this profile.";
-                GlobalStatusMessage = "No tweaks matched this profile.";
-            }
-
-            await RefreshAllToggleStatesAsync();
-            _ = RecalculateOptimizationScoreAsync();
-        }
-        catch (Exception ex)
-        {
-            card.HasFailures = true;
-            card.StatusColor = "#EF4444";
-            card.StatusMessage = $"Error: {ex.Message}";
-            GlobalStatusMessage = $"Failed: {ex.Message}";
-        }
-        finally
-        {
-            card.IsBusy = false;
-        }
-    }
-
-    private async Task ApplyProfilePrivacyAsync(ProfileCardModel card)
-    {
-        card.IsBusy = true;
-        card.StatusMessage = "Applying Privacy Shield Profile...";
-        GlobalStatusMessage = "Applying Privacy & Anti-Spyware Shield...";
-
-        using var activity = _activityTracker?.BeginActivity("Applying Privacy & Anti-Spyware Shield...");
-        await Task.Yield();
-
-        try
-        {
-            var targets = _catalog.Where(t =>
-                string.Equals(t.Category, "Privacy", StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(t.Origin, "WPFTweaksTelemetry", StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(t.Origin, "WPFToggleDisableLockscreen", StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(t.Id, "privacy.activity.activity-history", StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(t.Id, "privacy.advertising.advertising-id", StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(t.Id, "privacy.experiences.tailored-experiences", StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(t.Id, "privacy.spotlight.lockscreen-ads", StringComparison.OrdinalIgnoreCase)
-            ).Take(16).ToList();
-
-            if (targets.Count > 0)
-            {
-                var irreversible = targets.Where(t => !t.Reversible).ToList();
-                if (irreversible.Count > 0)
-                {
-                    bool confirmed = await RequestIrreversibleConfirmationAsync(irreversible);
-                    if (!confirmed)
-                    {
-                        card.StatusMessage = "Cancelled by user.";
-                        GlobalStatusMessage = "Profile application cancelled.";
-                        return;
-                    }
-                }
-
-                var report = await Task.Run(() => _tweakService.ApplyTweaksAsync(targets, _runner));
-                HandleProfileReport(card, report, isRestore: false);
-            }
-            else
-            {
-                card.StatusMessage = "No tweaks matched this profile.";
-                GlobalStatusMessage = "No tweaks matched this profile.";
-            }
-
-            await RefreshAllToggleStatesAsync();
-            _ = RecalculateOptimizationScoreAsync();
-        }
-        catch (Exception ex)
-        {
-            card.HasFailures = true;
-            card.StatusColor = "#EF4444";
-            card.StatusMessage = $"Error: {ex.Message}";
-            GlobalStatusMessage = $"Failed: {ex.Message}";
-        }
-        finally
-        {
-            card.IsBusy = false;
-        }
-    }
-
-    private async Task ApplyProfileRestoreDefaultsAsync(ProfileCardModel card)
-    {
-        card.IsBusy = true;
-        card.StatusMessage = "Reverting to Windows defaults...";
-        GlobalStatusMessage = "Reverting system settings to standard defaults...";
-
-        using var activity = _activityTracker?.BeginActivity("Restoring Windows Defaults...");
-        await Task.Yield();
-
-        try
-        {
-            var activeTweaks = QuickToggles.Where(q => q.IsActive)
-                .Select(q => FindTweak(q.OriginKey))
-                .Where(t => t != null)
-                .Select(t => t!)
-                .ToList();
-
-            if (activeTweaks.Count > 0)
-            {
-                var report = await Task.Run(() => _tweakService.UndoTweaksAsync(activeTweaks, _runner));
-                HandleProfileReport(card, report, isRestore: true);
-            }
-            else
-            {
-                card.HasFailures = false;
-                card.StatusColor = "#34D399";
-                card.StatusMessage = "Defaults restored!";
-                GlobalStatusMessage = "No active tweaks found to revert.";
-            }
-
-            await RefreshAllToggleStatesAsync();
-            _ = RecalculateOptimizationScoreAsync();
-        }
-        catch (Exception ex)
-        {
-            card.HasFailures = true;
-            card.StatusColor = "#EF4444";
-            card.StatusMessage = $"Error: {ex.Message}";
-            GlobalStatusMessage = $"Failed: {ex.Message}";
-        }
-        finally
-        {
-            card.IsBusy = false;
-        }
-    }
-
     [RelayCommand]
     private async Task FreeUpRamAsync()
     {
@@ -994,21 +1028,34 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
     {
         if (IsSmartOptimizing) return;
         IsSmartOptimizing = true;
-        GlobalStatusMessage = "Analyzing hardware profile and applying smart tailored optimizations...";
+        GlobalStatusMessage = "Analyzing hardware profile and generating tailored recommendations...";
 
-        using var activity = _activityTracker?.BeginActivity("Analyzing & Applying Smart Optimizations...");
+        using var activity = _activityTracker?.BeginActivity("Analyzing Smart Recommendations...");
         await Task.Yield();
 
         try
         {
-            var report = await Task.Run(() => _advisorService.ApplySmartTailoredOptimizationsAsync(_catalog, _tweakService, _runner));
-            await RefreshAllToggleStatesAsync();
-            await RecalculateOptimizationScoreAsync();
-            GlobalStatusMessage = $"Smart Boost Applied: {report.SucceededCount} hardware-tailored optimizations active.";
+            var recommended = await Task.Run(() => _advisorService.GetSmartRecommendationsAsync(_catalog, _tweakService));
+            if (recommended.Count == 0)
+            {
+                GlobalStatusMessage = "Smart Analysis: All recommended optimizations are already active on this system.";
+                return;
+            }
+
+            await OpenProfilePreviewAsync(
+                "Smart Hardware Recommendations",
+                "Based on your hardware profile and telemetry assessment, the following optimizations are recommended for review.",
+                "Already applied tweaks are skipped. You may untick any settings before applying.",
+                "Apply Recommended Tweaks",
+                recommended,
+                isUndo: false,
+                card: null);
+
+            GlobalStatusMessage = $"Smart Analysis: {recommended.Count} optimizations staged for review.";
         }
         catch (Exception ex)
         {
-            GlobalStatusMessage = $"Smart Optimization Notice: {ex.Message}";
+            GlobalStatusMessage = $"Smart Analysis Notice: {ex.Message}";
         }
         finally
         {

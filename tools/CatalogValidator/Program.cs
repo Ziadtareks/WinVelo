@@ -84,6 +84,7 @@ public static class Program
         int totalTweaks = 0;
         int errorCount = 0;
         HashSet<string> seenIds = new(StringComparer.OrdinalIgnoreCase);
+        Dictionary<string, JsonNode> tweakMap = new(StringComparer.OrdinalIgnoreCase);
 
         foreach (string file in jsonFiles)
         {
@@ -102,6 +103,7 @@ public static class Program
                         if (item == null) continue;
 
                         string id = item["id"]?.ToString() ?? $"item-{i}";
+                        tweakMap[id] = item;
                         if (!seenIds.Add(id))
                         {
                             Console.ForegroundColor = ConsoleColor.Red;
@@ -151,6 +153,7 @@ public static class Program
                 {
                     totalTweaks++;
                     string id = single["id"]?.ToString() ?? "single-item";
+                    tweakMap[id] = single;
                     if (!seenIds.Add(id))
                     {
                         Console.ForegroundColor = ConsoleColor.Red;
@@ -205,8 +208,162 @@ public static class Program
             }
         }
 
+        Console.WriteLine("\n[CHECKING PRESETS] Validating Catalog/Presets/*.json...");
+        string presetsDir = Path.Combine(rootDir, "Catalog", "Presets");
+        if (!Directory.Exists(presetsDir))
+        {
+            string? parent = Directory.GetParent(rootDir)?.FullName;
+            while (parent != null)
+            {
+                string candidate = Path.Combine(parent, "Catalog", "Presets");
+                if (Directory.Exists(candidate))
+                {
+                    presetsDir = candidate;
+                    break;
+                }
+                parent = Directory.GetParent(parent)?.FullName;
+            }
+        }
+
+        int totalPresets = 0;
+        if (!Directory.Exists(presetsDir))
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"[ERROR] Presets directory not found: {presetsDir}");
+            Console.ResetColor();
+            errorCount++;
+        }
+        else
+        {
+            string[] presetFiles = Directory.GetFiles(presetsDir, "*.json", SearchOption.AllDirectories);
+            Console.WriteLine($"[INFO] Found {presetFiles.Length} preset file(s) to validate.");
+
+            foreach (string pFile in presetFiles)
+            {
+                totalPresets++;
+                string fileName = Path.GetFileName(pFile);
+                try
+                {
+                    string pJson = File.ReadAllText(pFile);
+                    JsonNode? pNode = JsonNode.Parse(pJson);
+                    if (pNode == null)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine($"  [FAIL] {fileName}: Preset JSON is empty or null.");
+                        Console.ResetColor();
+                        errorCount++;
+                        continue;
+                    }
+
+                    string pId = pNode["id"]?.ToString() ?? "";
+                    string pName = pNode["name"]?.ToString() ?? "";
+                    string pDesc = pNode["description"]?.ToString() ?? "";
+                    JsonArray? tweakIds = pNode["tweakIds"]?.AsArray();
+
+                    if (string.IsNullOrWhiteSpace(pId))
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine($"  [FAIL] {fileName}: Missing or empty 'id'.");
+                        Console.ResetColor();
+                        errorCount++;
+                    }
+                    if (string.IsNullOrWhiteSpace(pName))
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine($"  [FAIL] {fileName}: Missing or empty 'name'.");
+                        Console.ResetColor();
+                        errorCount++;
+                    }
+                    if (string.IsNullOrWhiteSpace(pDesc))
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine($"  [FAIL] {fileName}: Missing or empty 'description'.");
+                        Console.ResetColor();
+                        errorCount++;
+                    }
+                    if (tweakIds == null || tweakIds.Count == 0)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine($"  [FAIL] {fileName}: Missing or empty 'tweakIds' array.");
+                        Console.ResetColor();
+                        errorCount++;
+                        continue;
+                    }
+
+                    bool presetOk = true;
+                    foreach (var tidNode in tweakIds)
+                    {
+                        string tid = tidNode?.ToString() ?? "";
+                        if (string.IsNullOrWhiteSpace(tid))
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine($"  [FAIL] {fileName}: Empty tweakId in array.");
+                            Console.ResetColor();
+                            errorCount++;
+                            presetOk = false;
+                            continue;
+                        }
+
+                        if (!tweakMap.TryGetValue(tid, out var tweakNode))
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine($"  [FAIL] {fileName} ({pId}): References nonexistent tweak ID '{tid}'.");
+                            Console.ResetColor();
+                            errorCount++;
+                            presetOk = false;
+                            continue;
+                        }
+
+                        string? risk = tweakNode["risk"]?.ToString();
+                        if (string.Equals(risk, "High", StringComparison.OrdinalIgnoreCase))
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine($"  [FAIL] {fileName} ({pId}): Contains High-risk tweak '{tid}'. Presets cannot contain High-risk tweaks.");
+                            Console.ResetColor();
+                            errorCount++;
+                            presetOk = false;
+                        }
+
+                        bool? isReversible = tweakNode["reversible"]?.GetValue<bool>();
+                        if (isReversible == false)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine($"  [FAIL] {fileName} ({pId}): Contains irreversible tweak '{tid}'. Presets cannot contain irreversible tweaks.");
+                            Console.ResetColor();
+                            errorCount++;
+                            presetOk = false;
+                        }
+
+                        bool? needsReview = tweakNode["needsReview"]?.GetValue<bool>();
+                        if (needsReview == true)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine($"  [FAIL] {fileName} ({pId}): Contains unverified tweak '{tid}' marked with needsReview=true.");
+                            Console.ResetColor();
+                            errorCount++;
+                            presetOk = false;
+                        }
+                    }
+
+                    if (presetOk)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine($"  [PASS] Preset '{pId}' ({tweakIds.Count} tweaks)");
+                        Console.ResetColor();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"  [FAIL] Could not parse preset file {fileName}: {ex.Message}");
+                    Console.ResetColor();
+                    errorCount++;
+                }
+            }
+        }
+
         Console.WriteLine("\n----------------------------------------");
-        Console.WriteLine($"Summary: {totalTweaks} tweak(s) validated. {errorCount} error(s).");
+        Console.WriteLine($"Summary: {totalTweaks} tweak(s) and {totalPresets} preset(s) validated. {errorCount} error(s).");
         Console.WriteLine("----------------------------------------");
 
         return errorCount == 0 ? 0 : 1;

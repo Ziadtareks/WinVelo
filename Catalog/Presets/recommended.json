@@ -1,7 +1,7 @@
 {
   "id": "preset.recommended",
   "name": "Recommended Baseline",
-  "description": "Safe baseline settings that balance privacy, system responsiveness, and clean UI without breaking any features.",
+  "description": "Safe, reversible baseline settings that balance privacy, system responsiveness, and clean UI without breaking any features.",
   "tweakIds": [
     "privacy.telemetry.diagnostic-data",
     "privacy.advertising.advertising-id",

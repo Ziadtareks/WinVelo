@@ -1,7 +1,7 @@
 {
   "id": "preset.privacy",
-  "name": "Privacy & Security Shield",
-  "description": "Minimizes telemetry, diagnostic collection, tailored experiences, and targeted advertising.",
+  "name": "Privacy: Telemetry & Activity Shield",
+  "description": "Minimizes diagnostic collection, tailored experiences, advertising identifiers, and activity history tracking.",
   "tweakIds": [
     "privacy.telemetry.diagnostic-data",
     "privacy.advertising.advertising-id",

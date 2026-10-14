@@ -159,4 +159,19 @@ public sealed class TweakDefinition
 
     [JsonPropertyName("irreversibleReason")]
     public string? IrreversibleReason { get; set; }
+
+    [JsonPropertyName("needsReview")]
+    public bool NeedsReview { get; set; }
+
+    [JsonPropertyName("evidence")]
+    public string Evidence { get; set; } = "documented";
+
+    [JsonPropertyName("whatItDoes")]
+    public string? WhatItDoes { get; set; }
+
+    [JsonPropertyName("sideEffects")]
+    public string? SideEffects { get; set; }
+
+    [JsonPropertyName("sources")]
+    public List<string>? Sources { get; set; }
 }

@@ -58,6 +58,9 @@ public interface ISmartAdvisorService
         IReadOnlyList<TweakDefinition> catalog,
         ITweakService tweakService,
         IOperationRunner runner);
+    Task<IReadOnlyList<TweakDefinition>> GetSmartRecommendationsAsync(
+        IReadOnlyList<TweakDefinition> catalog,
+        ITweakService tweakService);
 }
 
 public sealed class SmartAdvisorService : ISmartAdvisorService
@@ -340,5 +343,20 @@ public sealed class SmartAdvisorService : ISmartAdvisorService
 
         var tweaks = catalog.Where(t => tweakIdsToApply.Contains(t.Id)).ToList();
         return await tweakService.ApplyTweaksAsync(tweaks, runner);
+    }
+
+    public async Task<IReadOnlyList<TweakDefinition>> GetSmartRecommendationsAsync(
+        IReadOnlyList<TweakDefinition> catalog,
+        ITweakService tweakService)
+    {
+        var assessment = await CalculateOptimizationScoreAsync(catalog, tweakService);
+        var recIds = new HashSet<string>(assessment.RecommendedTweakIds, StringComparer.OrdinalIgnoreCase);
+
+        return catalog
+            .Where(t => recIds.Contains(t.Id) &&
+                        !string.Equals(t.Risk, "High", StringComparison.OrdinalIgnoreCase) &&
+                        t.Reversible &&
+                        !t.NeedsReview)
+            .ToList();
     }
 }

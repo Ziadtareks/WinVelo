@@ -251,3 +251,22 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
   3. Added CLI startup check in `Program.cs` that warns of unfinished sessions, displays affected tweaks and action counts, prompts `Run rollback recovery? (y/n)`, and accepts `--recover rollback` / `--recover keep` flags.
   4. Added GUI startup recovery dialog overlay in `MainWindow.xaml` and `MainViewModel.cs` showing: "A previous session did not finish. X actions were applied to [tweak names]." with "Roll back these changes" and "Keep and mark complete" buttons.
   5. Added comprehensive regression tests in `JournalCrashRecoveryTests.cs` verifying baseline value restoration, keep without revert, and GUI dialog execution.
+
+---
+
+## BUG-019: Hardcoded Profile Filters, Blind Auto-Apply, and Dishonest Rollback Claims
+- **Component**: `Tweakora.App` (`DashboardViewModel.cs`, `DashboardTabView.xaml`, `ProfilePreviewItemModel.cs`), `Tweakora.Cli` (`Program.cs`), `Catalog/Presets`, `tools/CatalogValidator`
+- **Finding**:
+  1. `DashboardViewModel` used hardcoded string-matching queries (`Origin` matches, `Description.Contains("Game")`, `Take(14)` / `Take(18)`, and a dead `Category=="Essential"` filter) instead of declarative preset definitions from disk.
+  2. Clicking a profile button applied tweaks directly to the host without displaying a preview of what was about to be changed, their risk levels, reversibility, or whether they were already applied.
+  3. "Restore Windows Defaults" only checked 8 arbitrary quick-toggles in memory, dishonestly claiming to revert Windows defaults while completely ignoring all applied catalog tweaks and third-party tool modifications.
+  4. `SmartAnalyzeAndOptimize` executed modifications immediately upon clicking rather than recommending tweaks for user confirmation.
+- **Root Cause**: UI prototyping shortcuts conflating preset definitions with procedural LINQ filters and lacking an interactive staging and review dialog.
+- **Fix**:
+  1. Replaced hardcoded queries with declarative preset definitions in `Catalog/Presets/*.json` with explicit tweak IDs.
+  2. Added `ProfilePreviewDialog` displaying tweak name, risk, reversibility, reboot/explorer restart requirements, and current state. Already-applied tweaks are skipped automatically and shown as such.
+  3. Renamed profile descriptions honestly (e.g. "Gaming: Fewer Background Interruptions" without unmeasurable claims like "Max FPS Boost").
+  4. Replaced "Restore Windows Defaults" with "Undo all WinVelo changes", which queries active write-ahead journal records (newest first), shows the same preview dialog, and provides a clear disclaimer that changes made by third-party tools or Windows updates are not covered.
+  5. Updated `SmartAnalyzeAndOptimize` to only recommend tweaks and open the preview dialog without auto-applying.
+  6. Enforced in `CatalogValidator` and unit tests that every preset references existing IDs only, contains zero High-risk tweaks, zero irreversible tweaks, and zero tweaks marked `needsReview`.
+
