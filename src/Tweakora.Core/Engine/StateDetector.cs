@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -14,7 +15,7 @@ public sealed class StateDetector
     private readonly IRegistryService _registry;
     private readonly ISystemServicesService _services;
     private readonly ITaskSchedulerService _tasks;
-    private readonly ConcurrentDictionary<string, (bool Result, DateTime CheckedAt)> _cache = new();
+    private readonly ConcurrentDictionary<string, (TweakState State, DateTime CheckedAt)> _cache = new();
     private readonly TimeSpan _cacheDuration = TimeSpan.FromSeconds(5);
 
     public StateDetector(
@@ -39,32 +40,261 @@ public sealed class StateDetector
         }
     }
 
-    public Task<bool> IsTweakActiveAsync(TweakDefinition tweak, bool useCache = true)
+    public Task<TweakState> DetectTweakStateAsync(TweakDefinition tweak, bool useCache = true)
     {
         if (useCache && _cache.TryGetValue(tweak.Id, out var cached))
         {
             if (DateTime.UtcNow - cached.CheckedAt < _cacheDuration)
             {
-                return Task.FromResult(cached.Result);
+                return Task.FromResult(cached.State);
             }
         }
 
         return Task.Run(() =>
         {
-            bool result = false;
+            TweakState state = TweakState.Unknown;
             try
             {
-                result = EvaluateStructure(tweak.Detect);
+                state = EvaluateTweakState(tweak);
             }
             catch
             {
-                // Detection must fail safe to false (Default), NEVER throw an error
-                result = false;
+                // Detection must fail safe to NotApplied, NEVER throw an error
+                state = TweakState.NotApplied;
             }
 
-            _cache[tweak.Id] = (result, DateTime.UtcNow);
-            return result;
+            _cache[tweak.Id] = (state, DateTime.UtcNow);
+            return state;
         });
+    }
+
+    public async Task<bool> IsTweakActiveAsync(TweakDefinition tweak, bool useCache = true)
+    {
+        var state = await DetectTweakStateAsync(tweak, useCache);
+        return state == TweakState.Applied;
+    }
+
+    private TweakState EvaluateTweakState(TweakDefinition tweak)
+    {
+        if (tweak == null) return TweakState.Unknown;
+
+        // 1. Explicit alternative conditions: if detect.any is specified, ANY match indicates active state
+        // (e.g. Bing Search or Telemetry disabled via GPO vs user settings)
+        if (tweak.Detect?.Any != null && tweak.Detect.Any.Count > 0)
+        {
+            bool anyPassed = tweak.Detect.Any.Any(EvaluateRule);
+            return anyPassed ? TweakState.Applied : TweakState.NotApplied;
+        }
+
+        // 2. Derive detection directly from Apply actions if verifiable actions exist
+        var verifiableActions = tweak.Apply?.Where(IsVerifiableAction).ToList() ?? new List<ActionItem>();
+
+        if (verifiableActions.Count > 0)
+        {
+            int passedCount = 0;
+            foreach (var action in verifiableActions)
+            {
+                if (EvaluateActionItem(action))
+                {
+                    passedCount++;
+                }
+            }
+
+            if (passedCount == verifiableActions.Count)
+            {
+                return TweakState.Applied;
+            }
+            if (passedCount > 0)
+            {
+                return TweakState.Partial;
+            }
+            return TweakState.NotApplied;
+        }
+
+        // 3. If no verifiable Apply actions, check if explicit Detect block is defined
+        if (HasDetectRules(tweak.Detect))
+        {
+            return EvaluateStructureToState(tweak.Detect);
+        }
+
+        // 4. For tweaks that cannot be verified (e.g. pure PowerShell with no inspectable state): return Unknown
+        return TweakState.Unknown;
+    }
+
+    private static bool IsVerifiableAction(ActionItem action)
+    {
+        string type = action.Type ?? string.Empty;
+        if (string.Equals(type, "registry", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(type, "policy", StringComparison.OrdinalIgnoreCase))
+        {
+            return !string.IsNullOrEmpty(action.Hive) && !string.IsNullOrEmpty(action.Key);
+        }
+        if (string.Equals(type, "service", StringComparison.OrdinalIgnoreCase))
+        {
+            return !string.IsNullOrEmpty(action.ServiceName);
+        }
+        if (string.Equals(type, "task", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(type, "scheduledtask", StringComparison.OrdinalIgnoreCase))
+        {
+            return !string.IsNullOrEmpty(action.TaskName);
+        }
+        return false;
+    }
+
+    private bool EvaluateActionItem(ActionItem action)
+    {
+        string type = action.Type ?? string.Empty;
+        if (string.Equals(type, "registry", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(type, "policy", StringComparison.OrdinalIgnoreCase))
+        {
+            return EvaluateRegistryAction(action);
+        }
+        if (string.Equals(type, "service", StringComparison.OrdinalIgnoreCase))
+        {
+            return EvaluateServiceAction(action);
+        }
+        if (string.Equals(type, "task", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(type, "scheduledtask", StringComparison.OrdinalIgnoreCase))
+        {
+            return EvaluateTaskAction(action);
+        }
+        return false;
+    }
+
+    private bool EvaluateRegistryAction(ActionItem action)
+    {
+        if (string.IsNullOrEmpty(action.Hive) || string.IsNullOrEmpty(action.Key)) return false;
+
+        var (hive, key) = RegistryPathHelper.Normalize(action.Hive, action.Key);
+        string valName = action.ValueName ?? string.Empty;
+        string op = action.Operation ?? "Set";
+
+        bool isRemoveEntry = action.Data.HasValue &&
+            action.Data.Value.ValueKind == JsonValueKind.String &&
+            string.Equals(action.Data.Value.GetString(), "<RemoveEntry>", StringComparison.OrdinalIgnoreCase);
+
+        if (string.Equals(op, "DeleteValue", StringComparison.OrdinalIgnoreCase) || isRemoveEntry)
+        {
+            if (!_registry.KeyExists(hive, key)) return true;
+            return !_registry.ValueExists(hive, key, valName);
+        }
+
+        if (string.Equals(op, "DeleteKey", StringComparison.OrdinalIgnoreCase))
+        {
+            return !_registry.KeyExists(hive, key);
+        }
+
+        if (string.Equals(op, "CreateKey", StringComparison.OrdinalIgnoreCase))
+        {
+            return !_registry.KeyExists(hive, key);
+        }
+
+        // Default operation is "Set"
+        if (!_registry.KeyExists(hive, key)) return false;
+
+        // Special COM redirection / empty default value pattern (e.g. InprocServer32 key presence)
+        if (string.IsNullOrEmpty(valName) &&
+            action.Data.HasValue &&
+            action.Data.Value.ValueKind == JsonValueKind.String &&
+            string.IsNullOrEmpty(action.Data.Value.GetString()))
+        {
+            if (!_registry.ValueExists(hive, key, valName)) return true;
+            object? defVal = _registry.GetValue(hive, key, valName);
+            return defVal == null || string.Equals(defVal.ToString(), "", StringComparison.OrdinalIgnoreCase);
+        }
+
+        if (!_registry.ValueExists(hive, key, valName)) return false;
+
+        object? actual = _registry.GetValue(hive, key, valName);
+        return CompareJsonElementToData(action.Data, actual);
+    }
+
+    private bool EvaluateServiceAction(ActionItem action)
+    {
+        if (string.IsNullOrEmpty(action.ServiceName)) return false;
+        if (!_services.ServiceExists(action.ServiceName))
+        {
+            return false;
+        }
+
+        string targetStartup = action.StartupType ?? string.Empty;
+        if (string.IsNullOrEmpty(targetStartup))
+        {
+            string op = action.Operation ?? string.Empty;
+            if (string.Equals(op, "Disable", StringComparison.OrdinalIgnoreCase))
+            {
+                targetStartup = "Disabled";
+            }
+            else if (string.Equals(op, "Enable", StringComparison.OrdinalIgnoreCase) ||
+                     string.Equals(op, "Start", StringComparison.OrdinalIgnoreCase))
+            {
+                targetStartup = "Automatic";
+            }
+        }
+
+        if (!string.IsNullOrEmpty(targetStartup))
+        {
+            string actualStartup = _services.GetStartupType(action.ServiceName);
+            return string.Equals(actualStartup, targetStartup, StringComparison.OrdinalIgnoreCase);
+        }
+
+        return true;
+    }
+
+    private bool EvaluateTaskAction(ActionItem action)
+    {
+        if (string.IsNullOrEmpty(action.TaskName)) return false;
+        string path = action.TaskPath ?? "\\";
+        if (!_tasks.TaskExists(path, action.TaskName)) return true; // If task doesn't exist, it cannot run
+
+        bool isEnabled = _tasks.IsTaskEnabled(path, action.TaskName);
+        string op = action.Operation ?? "Disable";
+        if (string.Equals(op, "Disable", StringComparison.OrdinalIgnoreCase))
+        {
+            return !isEnabled;
+        }
+        if (string.Equals(op, "Enable", StringComparison.OrdinalIgnoreCase))
+        {
+            return isEnabled;
+        }
+        return true;
+    }
+
+    private static bool HasDetectRules(DetectStructure? detect)
+    {
+        if (detect == null) return false;
+        if (detect.All != null && detect.All.Count > 0) return true;
+        if (detect.Any != null && detect.Any.Count > 0) return true;
+        var single = detect.AsSingleRule();
+        return single != null && !string.IsNullOrEmpty(single.Type);
+    }
+
+    private TweakState EvaluateStructureToState(DetectStructure? detect)
+    {
+        if (detect == null) return TweakState.Unknown;
+
+        if (detect.All != null && detect.All.Count > 0)
+        {
+            int passed = detect.All.Count(EvaluateRule);
+            if (passed == detect.All.Count) return TweakState.Applied;
+            if (passed > 0) return TweakState.Partial;
+            return TweakState.NotApplied;
+        }
+
+        if (detect.Any != null && detect.Any.Count > 0)
+        {
+            bool anyPassed = detect.Any.Any(EvaluateRule);
+            return anyPassed ? TweakState.Applied : TweakState.NotApplied;
+        }
+
+        var single = detect.AsSingleRule();
+        if (single != null && !string.IsNullOrEmpty(single.Type))
+        {
+            bool passed = EvaluateRule(single);
+            return passed ? TweakState.Applied : TweakState.NotApplied;
+        }
+
+        return TweakState.Unknown;
     }
 
     private bool EvaluateStructure(DetectStructure detect)

@@ -20,7 +20,7 @@ Upstream Reference: [ChrisTitusTech/winutil](https://github.com/ChrisTitusTech/w
 
 | Test Suite / Tool | Scope | Result | Duration |
 |---|---|---|---|
-| **Unit & Architecture Tests** (`Tweakora.Tests`) | 109 tests (Engine, Handlers, Schema, NetArchTest gates) | **PASS (109/109)** | 3.5 s |
+| **Unit & Architecture Tests** (`Tweakora.Tests`) | 135 tests (Engine, Handlers, Schema, NetArchTest gates) | **PASS (135/135)** | 3.5 s |
 | **Automated UI Suite** (`Tweakora.UiTests`) | 5 horizontal tabs (Install, Tweaks, Config, Updates, Toolbox) + dialogs | **PASS (1/1)** | 1 m 45 s |
 | **Catalog Schema Validator** (`CatalogValidator`) | 149 tweaks against `tweak.schema.json` | **PASS (149/149, 0 errors)** | 3.8 s |
 | **Source Documentation Checker** (`SourceChecker`) | 149 tweak documentation links against live web | **PASS (149/149 HTTP 200 OK)** | 42.1 s |

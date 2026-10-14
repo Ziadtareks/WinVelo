@@ -266,6 +266,7 @@ public sealed class IrreversibleTweaksTests : IDisposable
         public IReadOnlyList<TweakDefinition> LoadCatalog() => _catalog;
         public bool DetectState(TweakDefinition tweak) => false;
         public Task<bool> DetectStateAsync(TweakDefinition tweak, CancellationToken cancellationToken = default) => Task.FromResult(false);
+        public Task<TweakState> DetectTweakStateAsync(TweakDefinition tweak, CancellationToken cancellationToken = default) => Task.FromResult(TweakState.NotApplied);
         public Task<string> GenerateDryRunDiffAsync(IEnumerable<TweakDefinition> tweaks) => Task.FromResult(string.Empty);
 
         public Task<OperationExecutionReport> ApplyTweaksAsync(IReadOnlyList<TweakDefinition> tweaks, IOperationRunner runner, CancellationToken cancellationToken = default)

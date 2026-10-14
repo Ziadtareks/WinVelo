@@ -31,6 +31,7 @@ public interface ITweakService
     Task<bool> SetPerformancePlanAsync(string planName);
     Task<bool> SetDnsAsync(string primary, string secondary);
     Task<bool> DetectStateAsync(TweakDefinition tweak, CancellationToken cancellationToken = default);
+    Task<TweakState> DetectTweakStateAsync(TweakDefinition tweak, CancellationToken cancellationToken = default);
     BackupManager BackupManager { get; }
 }
 
@@ -142,6 +143,11 @@ public sealed class TweakService : ITweakService
     public Task<bool> DetectStateAsync(TweakDefinition tweak, CancellationToken cancellationToken = default)
     {
         return _detector.IsTweakActiveAsync(tweak, useCache: false);
+    }
+
+    public Task<TweakState> DetectTweakStateAsync(TweakDefinition tweak, CancellationToken cancellationToken = default)
+    {
+        return _detector.DetectTweakStateAsync(tweak, useCache: false);
     }
 
     public Task<string> GenerateDryRunDiffAsync(IEnumerable<TweakDefinition> tweaks)

@@ -82,7 +82,23 @@ public sealed partial class TweakCardModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(StatusBadgeBackground))]
     [NotifyPropertyChangedFor(nameof(StatusBadgeForeground))]
     [NotifyPropertyChangedFor(nameof(StatusBadgeBorder))]
-    private bool _isActive;
+    [NotifyPropertyChangedFor(nameof(IsActive))]
+    [NotifyPropertyChangedFor(nameof(ToggleCheckedState))]
+    private TweakState _state = TweakState.NotApplied;
+
+    public bool IsActive
+    {
+        get => State == TweakState.Applied;
+        set => State = value ? TweakState.Applied : TweakState.NotApplied;
+    }
+
+    public bool? ToggleCheckedState => State switch
+    {
+        TweakState.Applied => true,
+        TweakState.Partial => null,
+        TweakState.Unknown => false,
+        _ => false
+    };
 
     [ObservableProperty]
     private bool _isBusy;
@@ -97,10 +113,65 @@ public sealed partial class TweakCardModel : ObservableObject
 
     public bool IsNotApplying => !IsApplying;
 
-    public string StatusBadgeText => IsApplying ? "APPLYING..." : (IsActive ? "APPLIED ✓" : "DEFAULT");
-    public string StatusBadgeBackground => IsApplying ? "#1E3A8A" : (IsActive ? "#064E3B" : "#1E222D");
-    public string StatusBadgeForeground => IsApplying ? "#60A5FA" : (IsActive ? "#10B981" : "#94A3B8");
-    public string StatusBadgeBorder => IsApplying ? "#3B82F6" : (IsActive ? "#059669" : "#334155");
+    public string StatusBadgeText
+    {
+        get
+        {
+            if (IsApplying) return "APPLYING...";
+            return State switch
+            {
+                TweakState.Applied => "APPLIED ✓",
+                TweakState.Partial => "PARTIAL ⚠",
+                TweakState.Unknown => "CAN'T VERIFY",
+                _ => "DEFAULT"
+            };
+        }
+    }
+
+    public string StatusBadgeBackground
+    {
+        get
+        {
+            if (IsApplying) return "#1E3A8A";
+            return State switch
+            {
+                TweakState.Applied => "#064E3B",
+                TweakState.Partial => "#451A03",
+                TweakState.Unknown => "#1E222D",
+                _ => "#1E222D"
+            };
+        }
+    }
+
+    public string StatusBadgeForeground
+    {
+        get
+        {
+            if (IsApplying) return "#60A5FA";
+            return State switch
+            {
+                TweakState.Applied => "#10B981",
+                TweakState.Partial => "#F59E0B",
+                TweakState.Unknown => "#94A3B8",
+                _ => "#94A3B8"
+            };
+        }
+    }
+
+    public string StatusBadgeBorder
+    {
+        get
+        {
+            if (IsApplying) return "#3B82F6";
+            return State switch
+            {
+                TweakState.Applied => "#059669",
+                TweakState.Partial => "#D97706",
+                TweakState.Unknown => "#475569",
+                _ => "#334155"
+            };
+        }
+    }
 
     public string RiskBadgeBackground => Risk switch
     {
@@ -439,12 +510,12 @@ public sealed partial class TweaksViewModel : ObservableObject
                 var card = _allTweaks[i];
                 try
                 {
-                    bool active = await _tweakService.DetectStateAsync(card.Tweak, cancellationToken);
-                    if (card.IsActive != active)
+                    var state = await _tweakService.DetectTweakStateAsync(card.Tweak, cancellationToken);
+                    if (card.State != state)
                     {
                         Application.Current?.Dispatcher?.InvokeAsync(() =>
                         {
-                            card.IsActive = active;
+                            card.State = state;
                         });
                     }
                 }
@@ -575,7 +646,7 @@ public sealed partial class TweaksViewModel : ObservableObject
 
         try
         {
-            var (report, actualActive) = await Task.Run(async () =>
+            var (report, actualState) = await Task.Run(async () =>
             {
                 OperationExecutionReport rep;
                 if (targetState)
@@ -587,18 +658,18 @@ public sealed partial class TweaksViewModel : ObservableObject
                     rep = await _tweakService.UndoTweaksAsync(new[] { card.Tweak }, _runner);
                 }
                 _ = WindowsSettingNotifier.NotifySettingsChangedAsync();
-                bool active = await _tweakService.DetectStateAsync(card.Tweak);
-                return (rep, active);
+                TweakState actualState = await _tweakService.DetectTweakStateAsync(card.Tweak);
+                return (rep, actualState);
             });
 
-            card.IsActive = actualActive;
+            card.State = actualState;
             AppliedCount = _allTweaks.Count(t => t.IsActive);
 
             var res = report.Results.FirstOrDefault();
             bool opSucceeded = res != null && (res.Status is OperationItemStatus.Succeeded or OperationItemStatus.Applied or OperationItemStatus.Restored);
             if (opSucceeded)
             {
-                AddLog("OK", $"Successfully {(actualActive ? "applied" : "reverted")}: {card.Title}");
+                AddLog("OK", $"Successfully {(actualState == TweakState.Applied ? "applied" : "reverted")}: {card.Title}");
             }
             else
             {

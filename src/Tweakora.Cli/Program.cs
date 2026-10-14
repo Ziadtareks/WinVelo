@@ -772,7 +772,9 @@ public static class Program
         };
 
         int appliedCount = 0;
+        int partialCount = 0;
         int defaultCount = 0;
+        int unknownCount = 0;
         int errorCount = 0;
 
         for (int i = 0; i < catalog.Count; i++)
@@ -783,16 +785,25 @@ public static class Program
 
             try
             {
-                bool isActive = await detector.IsTweakActiveAsync(tweak, useCache: false);
-                if (isActive)
+                var state = await detector.DetectTweakStateAsync(tweak, useCache: false);
+                switch (state)
                 {
-                    status = "Applied";
-                    appliedCount++;
-                }
-                else
-                {
-                    status = "Default";
-                    defaultCount++;
+                    case TweakState.Applied:
+                        status = "Applied";
+                        appliedCount++;
+                        break;
+                    case TweakState.Partial:
+                        status = "Partial";
+                        partialCount++;
+                        break;
+                    case TweakState.Unknown:
+                        status = "Unknown";
+                        unknownCount++;
+                        break;
+                    default:
+                        status = "Default";
+                        defaultCount++;
+                        break;
                 }
             }
             catch (Exception ex)
@@ -810,13 +821,15 @@ public static class Program
         lines.Add("## Summary");
         lines.Add("");
         lines.Add($"- **Applied**: {appliedCount}");
+        lines.Add($"- **Partial**: {partialCount}");
         lines.Add($"- **Default (Inactive)**: {defaultCount}");
+        lines.Add($"- **Unknown (Unverifiable)**: {unknownCount}");
         lines.Add($"- **Errors/Access Issues**: {errorCount}");
 
         File.WriteAllText(reportPath, string.Join(Environment.NewLine, lines));
 
         Console.WriteLine("\n=======================================================");
-        Console.WriteLine($"Detection Complete! Applied: {appliedCount}, Default: {defaultCount}, Errors: {errorCount}");
+        Console.WriteLine($"Detection Complete! Applied: {appliedCount}, Partial: {partialCount}, Default: {defaultCount}, Unknown: {unknownCount}, Errors: {errorCount}");
         Console.WriteLine($"Saved full detection report to: {reportPath}");
         Console.WriteLine("=======================================================");
 

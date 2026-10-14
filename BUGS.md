@@ -153,3 +153,21 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
   4. Added CLI gate `CheckIrreversibleTweaksGate` in `Program.cs` that refuses to apply irreversible tweaks without `--yes-irreversible`, displaying the affected tweaks and reasons.
   5. Implemented unmissable confirmation dialog modals in `TweaksTabView` and `DashboardTabView` backed by `RequestIrreversibleConfirmationAsync` in `TweaksViewModel` and `DashboardViewModel`, allowing users to review permanent modifications and confirm or cancel before execution.
 
+---
+
+## BUG-013: Single-Action State Detection Masked Composite Tweaks and Produced False Positives
+- **Component**: `Tweakora.Core` (`StateDetector.cs`, `TweakState.cs`), `Tweakora.Modules` (`TweakService.cs`, `ITweakService.cs`), `Tweakora.Cli` (`Program.cs`), `Tweakora.App` (`TweakCardModel`, `TweaksViewModel.cs`, `TweaksTabView.xaml`), `Tweakora.Tests` (`CompositeStateDetectionTests.cs`)
+- **Finding**:
+  1. State detection previously evaluated only a single registry key or service rule from `tweak.Detect` (e.g. `essential.services` changes 30 services but checked only `CscService`). If only 1 service was disabled while 29 were left running, the app reported the tweak as 100% "Applied".
+  2. Tweaks with multiple registry/policy modifications had no intermediate state representation; partial configurations either caused false positives (if checked via a single sentinel) or false negatives.
+  3. Services did not verify configured startup types against declared states.
+  4. Pure PowerShell tweaks with no inspectable system state guessed state or defaulted to false without indicating inability to verify.
+  5. The UI only supported binary on/off toggles without representing partial or unverifiable states.
+- **Root Cause**: `StateDetector` relied strictly on single-rule `tweak.Detect` rather than deriving composite multi-action verification from `tweak.Apply`, and lacked a multi-state enum (`TweakState`) to differentiate between `NotApplied`, `Applied`, `Partial`, and `Unknown`.
+- **Fix**:
+  1. Created `TweakState` enum (`NotApplied = 0`, `Applied = 1`, `Partial = 2`, `Unknown = 3`).
+  2. Rewrote `StateDetector.DetectTweakStateAsync` to derive detection directly from `tweak.Apply` stateful actions: verifies all Registry values, policies, service startup types, and scheduled tasks. If all match -> `Applied`; if some match -> `Partial`; if none match -> `NotApplied`. Explicit `detect.any` blocks are evaluated for alternative policies (e.g. GPO vs user settings for Bing search and Telemetry).
+  3. Returns `Unknown` for pure PowerShell or uninspectable tweaks rather than guessing.
+  4. Updated `TweakCardModel` with nullable `bool? ToggleCheckedState` (tri-state indeterminate for `Partial`), `State` property, and distinct visual badges (`PARTIAL ⚠` in amber/yellow outline, `CAN'T VERIFY` in subtle gray, `APPLIED ✓` in green).
+  5. Updated CLI `winvelo-cli --detect-all` to count and report `Applied`, `Partial`, `Default`, and `Unknown` states across the catalog.
+  6. Added comprehensive unit tests in `CompositeStateDetectionTests.cs`.

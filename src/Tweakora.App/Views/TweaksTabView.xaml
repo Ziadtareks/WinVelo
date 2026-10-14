@@ -114,7 +114,7 @@
 
                                         <!-- Direct 1-Click Toggle Switch -->
                                         <ui:ToggleSwitch AutomationProperties.AutomationId="{Binding Id, StringFormat='TweakToggle_{0}'}"
-                                                         IsChecked="{Binding IsActive, Mode=OneWay}"
+                                                         IsChecked="{Binding ToggleCheckedState, Mode=OneWay}"
                                                          IsEnabled="{Binding IsNotApplying}"
                                                          Command="{Binding DataContext.ToggleTweakCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                          CommandParameter="{Binding}"
