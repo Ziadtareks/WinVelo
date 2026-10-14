@@ -197,10 +197,26 @@
                                 <ColumnDefinition Width="Auto" /> <!-- Impact Badge, Status, Open Folder, Switch -->
                             </Grid.ColumnDefinitions>
 
-                            <!-- Column 0: Colored Icon Tile with Initial -->
-                            <Border Grid.Column="0" Width="44" Height="44" CornerRadius="8" Background="{Binding IconColor}" Margin="0,0,14,0" VerticalAlignment="Center">
-                                <TextBlock Text="{Binding IconLetter}" Foreground="White" FontSize="16" FontWeight="Bold"
-                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <!-- Column 0: Real Program Icon Tile -->
+                            <Border Grid.Column="0" Width="44" Height="44" CornerRadius="10"
+                                    Background="{Binding IconBackground}" BorderBrush="{Binding IconBorder}" BorderThickness="1"
+                                    Margin="0,0,14,0" VerticalAlignment="Center" ClipToBounds="True">
+                                <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <!-- 1. Real Extracted Windows Exe Icon from Disk -->
+                                    <Image Source="{Binding IconImage}" Width="32" Height="32"
+                                           RenderOptions.BitmapScalingMode="HighQuality"
+                                           Visibility="{Binding HasIconImage, Converter={StaticResource BoolToVisConverter}}" />
+
+                                    <!-- 2. Authentic Branded SVG Vector Logo (when not on disk) -->
+                                    <Viewbox Width="24" Height="24"
+                                             Visibility="{Binding HasSvgIcon, Converter={StaticResource BoolToVisConverter}}">
+                                        <Path Data="{Binding SvgIconPath}" Fill="White" Stretch="Uniform" />
+                                    </Viewbox>
+
+                                    <!-- 3. Fluent Symbol Icon Fallback -->
+                                    <ui:SymbolIcon Symbol="{Binding IconSymbol}" Foreground="White" FontSize="22"
+                                                   Visibility="{Binding HasSymbolIcon, Converter={StaticResource BoolToVisConverter}}" />
+                                </Grid>
                             </Border>
 
                             <!-- Column 1: App Metadata -->

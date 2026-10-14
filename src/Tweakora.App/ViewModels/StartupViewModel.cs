@@ -236,7 +236,24 @@ public sealed partial class StartupViewModel : ObservableObject
             }
 
             await Task.Yield();
-            var entries = await Task.Run(async () => await _startupService.GetStartupEntriesAsync());
+            var entries = await Task.Run(async () =>
+            {
+                var list = await _startupService.GetStartupEntriesAsync();
+                foreach (var entry in list)
+                {
+                    try
+                    {
+                        string targetPath = !string.IsNullOrEmpty(entry.CleanExePath) ? entry.CleanExePath : entry.Command;
+                        var icon = AppIconExtractor.ExtractIcon(targetPath);
+                        if (icon != null)
+                        {
+                            entry.IconImage = icon;
+                        }
+                    }
+                    catch { }
+                }
+                return list;
+            });
 
             Action updateAction = () =>
             {

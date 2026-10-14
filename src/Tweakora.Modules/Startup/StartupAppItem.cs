@@ -39,6 +39,23 @@ public partial class StartupAppItem : ObservableObject
 
     public string IconColor { get; set; } = "#3B82F6";
     public string IconLetter { get; set; } = "A";
+    public string IconSymbol { get; set; } = "Apps24";
+    public string? SvgIconPath { get; set; } = null;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasIconImage))]
+    [NotifyPropertyChangedFor(nameof(HasSvgIcon))]
+    [NotifyPropertyChangedFor(nameof(HasSymbolIcon))]
+    [NotifyPropertyChangedFor(nameof(IconBackground))]
+    [NotifyPropertyChangedFor(nameof(IconBorder))]
+    private object? _iconImage;
+
+    public bool HasIconImage => IconImage != null;
+    public bool HasSvgIcon => IconImage == null && !string.IsNullOrWhiteSpace(SvgIconPath);
+    public bool HasSymbolIcon => IconImage == null && string.IsNullOrWhiteSpace(SvgIconPath);
+
+    public string IconBackground => HasIconImage ? "#20242D" : IconColor;
+    public string IconBorder => HasIconImage ? "#2F3642" : "Transparent";
 
     [ObservableProperty]
     private bool _isToggling = false;

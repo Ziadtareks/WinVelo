@@ -166,6 +166,7 @@ public sealed class StartupService : IStartupService
                 var (publisher, description, fileSize) = ExtractFileMetadata(cleanExe, valName);
                 var (impact, delay) = StartupImpactEvaluator.CalculateImpact(valName, cleanExe, fileSize, command);
                 bool isEssential = StartupImpactEvaluator.IsEssential(valName, cleanExe);
+                var (brandColor, brandSymbol, brandSvg) = StartupImpactEvaluator.GetBrandIcon(valName, cleanExe);
 
                 entries.Add(new StartupAppItem
                 {
@@ -186,7 +187,9 @@ public sealed class StartupService : IStartupService
                     FileSizeBytes = fileSize,
                     FileSizeFormatted = FormatFileSize(fileSize),
                     IsEssentialSystemItem = isEssential,
-                    IconColor = StartupImpactEvaluator.GetIconColor(valName),
+                    IconColor = brandColor,
+                    IconSymbol = brandSymbol,
+                    SvgIconPath = brandSvg,
                     IconLetter = StartupImpactEvaluator.GetIconLetter(valName)
                 });
             }
@@ -226,6 +229,7 @@ public sealed class StartupService : IStartupService
                     var (publisher, description, fileSize) = ExtractFileMetadata(cleanExe, name);
                     var (impact, delay) = StartupImpactEvaluator.CalculateImpact(name, cleanExe, fileSize, file);
                     bool isEssential = StartupImpactEvaluator.IsEssential(name, cleanExe);
+                    var (brandColor, brandSymbol, brandSvg) = StartupImpactEvaluator.GetBrandIcon(name, cleanExe);
 
                     entries.Add(new StartupAppItem
                     {
@@ -246,7 +250,9 @@ public sealed class StartupService : IStartupService
                         FileSizeBytes = fileSize,
                         FileSizeFormatted = FormatFileSize(fileSize),
                         IsEssentialSystemItem = isEssential,
-                        IconColor = StartupImpactEvaluator.GetIconColor(name),
+                        IconColor = brandColor,
+                        IconSymbol = brandSymbol,
+                        SvgIconPath = brandSvg,
                         IconLetter = StartupImpactEvaluator.GetIconLetter(name)
                     });
                 }
@@ -275,6 +281,7 @@ public sealed class StartupService : IStartupService
                     var (publisher, description, fileSize) = ExtractFileMetadata(cleanExe, name);
                     var (impact, delay) = StartupImpactEvaluator.CalculateImpact(name, cleanExe, fileSize, fakePath);
                     bool isEssential = StartupImpactEvaluator.IsEssential(name, cleanExe);
+                    var (brandColor, brandSymbol, brandSvg) = StartupImpactEvaluator.GetBrandIcon(name, cleanExe);
 
                     entries.Add(new StartupAppItem
                     {
@@ -295,7 +302,9 @@ public sealed class StartupService : IStartupService
                         FileSizeBytes = fileSize,
                         FileSizeFormatted = FormatFileSize(fileSize),
                         IsEssentialSystemItem = isEssential,
-                        IconColor = StartupImpactEvaluator.GetIconColor(name),
+                        IconColor = brandColor,
+                        IconSymbol = brandSymbol,
+                        SvgIconPath = brandSvg,
                         IconLetter = StartupImpactEvaluator.GetIconLetter(name)
                     });
                 }
