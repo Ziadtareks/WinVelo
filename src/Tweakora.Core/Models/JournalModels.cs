@@ -31,6 +31,12 @@ public sealed class JournalActionRecord
     [JsonPropertyName("isBaseline")]
     public bool IsBaseline { get; set; } = true;
 
+    [JsonPropertyName("isReverted")]
+    public bool IsReverted { get; set; }
+
+    [JsonPropertyName("revertedAtUtc")]
+    public DateTime? RevertedAtUtc { get; set; }
+
     [JsonPropertyName("appliedAtUtc")]
     public DateTime AppliedAtUtc { get; set; } = DateTime.UtcNow;
 }

@@ -32,8 +32,8 @@ public sealed class OperationItemResult
         OperationItemStatus.Succeeded => "Applied",
         OperationItemStatus.Skipped => "Skipped",
         OperationItemStatus.Failed => "Failed",
-        OperationItemStatus.FailedRolledBack => "Failed-rolled-back",
-        OperationItemStatus.FailedRollbackIncomplete => "Failed-rollback-incomplete",
+        OperationItemStatus.FailedRolledBack => "Failed (rolled back)",
+        OperationItemStatus.FailedRollbackIncomplete => "Failed (rollback incomplete)",
         _ => Status.ToString()
     };
 

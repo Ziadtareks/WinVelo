@@ -119,3 +119,20 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
   3. Populated detailed execution failure dialogs in `DashboardTabView`, `TweaksTabView`, and `ConfigTabView` with error reasons.
   4. In `TweaksViewModel`, guaranteed that only succeeded items have `IsActive = true`; failed items retain their pre-operation state.
   5. In `Tweakora.Cli`, printed `[Failed] <id>: <reason>` for each failure, formatted `"Applied {succ} of {total} — {fail} failed"`, and exited with non-zero exit code (`1`) on any failure.
+
+---
+
+## BUG-011: Flawed Undo Engine, Journal Replay Corruption, and Missing Script Undo Execution
+- **Component**: `Tweakora.Core` (`TweakRunner.cs`, `RollbackJournalManager.cs`, `JournalActionRecord.cs`, `IActionHandler.cs`)
+- **Finding**:
+  1. `UndoTweakAsync` relied solely on journal records whenever any existed. PowerShell/Script actions have `PreviousData = null`, so their journal undo was a no-op while catalog `undo` scripts were ignored (e.g. undoing Edge removal never ran the reinstall script, yet reported "Restored").
+  2. Stateless undos did not isolate script actions from registry actions; applying catalog undo registry actions risked overwriting genuine user pre-tweak registry baselines with hardcoded catalog defaults.
+  3. Journal records were never marked reverted after an undo; re-applying a tweak after external modifications retained the stale baseline, corrupting subsequent rollbacks.
+  4. Partial failure rollback did not distinguish between complete rollback (`FailedRolledBack`) and partial rollback failure (`FailedRollbackIncomplete`), and left orphaned baseline records active in the journal.
+- **Root Cause**: The rollback engine treated all actions uniformly without separating stateful baseline restoration (Registry, Service, Task, File) from stateless compensations (PowerShell, Script), and lacked lifecycle reversion tracking on journal records.
+- **Fix**:
+  1. Refactored `UndoTweakAsync` to restore stateful actions strictly from active journal baselines in reverse order, while executing matching catalog `undo` scripts for stateless actions without overwriting restored registry baselines.
+  2. Added `IsReverted` and `RevertedAtUtc` fields to `JournalActionRecord`, and added `MarkTweakRecordsReverted` / `MarkRecordsReverted` to `RollbackJournalManager`. Updated baseline discovery to ignore reverted records so subsequent applies capture fresh baselines.
+  3. Added structured step aggregation in `ActionResult` (`ExecutedSteps`, `FailedSteps`) and gated success strictly on zero failed steps.
+  4. Updated partial failure rollback in `ApplyBatchAsync` to mark rolled back records as reverted and report `Failed (rolled back)` vs `Failed (rollback incomplete)`.
+

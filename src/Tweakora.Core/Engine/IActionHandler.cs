@@ -19,6 +19,11 @@ public sealed class ActionResult
     public bool Success { get; init; }
     public string? Message { get; init; }
     public JournalActionRecord? JournalRecord { get; init; }
+    public List<string> ExecutedSteps { get; init; } = new();
+    public List<string> FailedSteps { get; init; } = new();
+
+    public static ActionResult Ok(string? message = null) => new() { Success = true, Message = message };
+    public static ActionResult Fail(string? message = null) => new() { Success = false, Message = message };
 }
 
 public sealed class ActionPreview

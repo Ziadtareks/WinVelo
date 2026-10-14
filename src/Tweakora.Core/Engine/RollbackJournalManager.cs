@@ -96,7 +96,7 @@ public sealed class RollbackJournalManager
         if (_currentSession != null)
         {
             JournalActionRecord? found = _currentSession.Records
-                .FirstOrDefault(r => r.TweakId == tweakId && r.TargetIdentifier == targetIdentifier && r.IsBaseline);
+                .FirstOrDefault(r => r.TweakId == tweakId && r.TargetIdentifier == targetIdentifier && r.IsBaseline && !r.IsReverted);
             if (found != null) return found;
         }
 
@@ -114,7 +114,7 @@ public sealed class RollbackJournalManager
                 if (session != null)
                 {
                     JournalActionRecord? record = session.Records
-                        .FirstOrDefault(r => r.TweakId == tweakId && r.TargetIdentifier == targetIdentifier && r.IsBaseline);
+                        .FirstOrDefault(r => r.TweakId == tweakId && r.TargetIdentifier == targetIdentifier && r.IsBaseline && !r.IsReverted);
                     if (record != null)
                     {
                         return record;
@@ -128,6 +128,101 @@ public sealed class RollbackJournalManager
         }
 
         return null;
+    }
+
+    public void MarkTweakRecordsReverted(string tweakId)
+    {
+        lock (_lock)
+        {
+            if (_currentSession != null)
+            {
+                bool modified = false;
+                foreach (var r in _currentSession.Records.Where(r => r.TweakId == tweakId && !r.IsReverted))
+                {
+                    r.IsReverted = true;
+                    r.RevertedAtUtc = DateTime.UtcNow;
+                    modified = true;
+                }
+                if (modified) FlushSessionUnsafe(_currentSession);
+            }
+
+            string[] files = Directory.GetFiles(_journalDirectory, "*.json");
+            foreach (string file in files)
+            {
+                try
+                {
+                    string json = File.ReadAllText(file);
+                    RollbackJournalSession? session = JsonSerializer.Deserialize<RollbackJournalSession>(json);
+                    if (session != null)
+                    {
+                        bool modified = false;
+                        foreach (var r in session.Records.Where(r => r.TweakId == tweakId && !r.IsReverted))
+                        {
+                            r.IsReverted = true;
+                            r.RevertedAtUtc = DateTime.UtcNow;
+                            modified = true;
+                        }
+                        if (modified)
+                        {
+                            FlushSessionUnsafe(session);
+                        }
+                    }
+                }
+                catch { }
+            }
+        }
+    }
+
+    public void MarkRecordsReverted(IEnumerable<JournalActionRecord> records)
+    {
+        var targetSet = new HashSet<JournalActionRecord>(records);
+        if (targetSet.Count == 0) return;
+
+        lock (_lock)
+        {
+            if (_currentSession != null)
+            {
+                bool modified = false;
+                foreach (var r in _currentSession.Records)
+                {
+                    if (targetSet.Contains(r) && !r.IsReverted)
+                    {
+                        r.IsReverted = true;
+                        r.RevertedAtUtc = DateTime.UtcNow;
+                        modified = true;
+                    }
+                }
+                if (modified) FlushSessionUnsafe(_currentSession);
+            }
+
+            string[] files = Directory.GetFiles(_journalDirectory, "*.json");
+            foreach (string file in files)
+            {
+                try
+                {
+                    string json = File.ReadAllText(file);
+                    RollbackJournalSession? session = JsonSerializer.Deserialize<RollbackJournalSession>(json);
+                    if (session != null)
+                    {
+                        bool modified = false;
+                        foreach (var r in session.Records)
+                        {
+                            if (targetSet.Any(t => t.TweakId == r.TweakId && t.ActionIndex == r.ActionIndex && t.TargetIdentifier == r.TargetIdentifier) && !r.IsReverted)
+                            {
+                                r.IsReverted = true;
+                                r.RevertedAtUtc = DateTime.UtcNow;
+                                modified = true;
+                            }
+                        }
+                        if (modified)
+                        {
+                            FlushSessionUnsafe(session);
+                        }
+                    }
+                }
+                catch { }
+            }
+        }
     }
 
     public List<RollbackJournalSession> GetAllSessions()
