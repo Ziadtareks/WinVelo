@@ -358,8 +358,27 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
   1. Implemented `Program.CheckConfirmationGate(args, operationDescription)` in `src/Tweakora.Cli/Program.cs`.
   2. Enforced that any command mutating host state prompts interactively for confirmation `(y/N)` unless `--yes` / `-y` is supplied.
   3. When standard input is non-interactive (`Console.IsInputRedirected == true`), commands strictly refuse to execute unless `--yes` is explicitly passed.
-  4. Simulation / test mode (`--test-mode`) operates safely in-memory against simulation fakes without modifying host state.
-  5. Added unit test suite in `CliConfirmationTests.cs`.
+---
 
-
-
+## BUG-025: Catalog Explanations Desynchronized From Actual Action Payloads and Missing Auto-Generated Technical Change Specifications
+- **Component**: `Catalog/Tweaks/*.json`, `src/Tweakora.Core/Utilities/TweakActionFormatter.cs`, `src/Tweakora.App/ViewModels/TweaksViewModel.cs`, `src/Tweakora.App/Views/TweaksTabView.xaml`, `src/Tweakora.Cli/Program.cs`, `src/Tweakora.Tests/TweakExplanationTests.cs`, `src/Tweakora.Tests/CliConfirmationTests.cs`
+- **Finding**:
+  1. Human-written descriptions (`whatItDoes` and `sideEffects`) in several catalog tweaks contradicted actual underlying action data:
+     - `performance.input.buffer-queue`: text stated `MouseDataQueueSize=16` (actions set both `MouseDataQueueSize=20` and `KeyboardDataQueueSize=20`).
+     - `performance.cpu.unpark-cores`: text stated `ValueMax=100%` (apply action sets `ValueMax=0`).
+     - `performance.gaming.mmcss-responsiveness`: text stated `SystemResponsiveness=0` (apply action sets `SystemResponsiveness=10`, `NetworkThrottlingIndex=-1`, `GPU Priority=8`, `Priority=6`).
+     - `essential.services`: text omitted `SvcHostSplitThresholdInKB` script setting.
+     - `advanced.disablewarningforunsignedrdp`: text referred to `WarnUnsignedConnection to 0` (actions set `RedirectionWarningDialogVersion=1` and `RdpLaunchConsentAccepted=1`).
+     - `advanced.disablebgapps`: text referred to `LetAppsRunInBackground to 2` (actions set `GlobalUserDisabled=1`).
+     - `performance.gpu.hags`: text referred to `HagsEnabled = 2` (actions set `HwSchMode = 2`).
+     - `pref.multiplaneoverlay`: text claimed `OverlayTestMode to 5` (actions set `OverlayTestMode = 1` and `DisableOverlays = 1`).
+     - `privacy.telemetry.diagnostic-data`: text claimed `AllowTelemetry = 0 or 1` (apply action sets `AllowTelemetry = 0`).
+  2. The UI and CLI lacked an auto-generated, deterministic technical specification of the exact engine actions (`hive\key\valueName = data`, `Service → StartupType`, `Scheduled Task → State`, `PowerShell: summary`). Users had to rely solely on human-written prose which could become outdated or inaccurate.
+- **Root Cause**: Manual authoring of explanation text without automated cross-validation tests between text tokens (registry value names and setting numbers) and actual JSON action payloads.
+- **Fix**:
+  1. Audited all 149 catalog tweaks and aligned all descriptions with actual action payloads and registry keys.
+  2. Implemented `TweakActionFormatter` in `Tweakora.Core.Utilities` generating deterministic "Exact changes" lists from apply actions for Registry, Service, Task, PowerShell, AppX, Feature, and File actions.
+  3. Integrated "EXACT CHANGES (ENGINE SPECIFICATION)" into the UI details drawer (`TweaksTabView.xaml` and `TweakCardModel`).
+  4. Added `--info <tweakId>` command to `winvelo-cli` displaying metadata, descriptions, side effects, and exact changes specifications.
+  5. Added regression test `AllTweaks_RegistryValueNamesAndNumbersInExplanations_MatchCatalogActions` in `TweakExplanationTests.cs` enforcing that every registry value name and setting number mentioned in explanations exists in that tweak's apply/undo actions.
+  6. Added tests in `TweakExplanationTests.cs` and `CliConfirmationTests.cs`.

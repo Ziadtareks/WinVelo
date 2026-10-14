@@ -266,6 +266,20 @@
                                             <TextBlock Text="{Binding SideEffects}" FontSize="12" Foreground="#E2E8F0" LineHeight="17" TextWrapping="Wrap" />
                                         </StackPanel>
 
+                                        <!-- Exact Changes Section -->
+                                        <StackPanel Margin="0,0,0,8" Visibility="{Binding HasExactChanges, Converter={StaticResource BoolToVis}}">
+                                            <TextBlock Text="EXACT CHANGES (ENGINE SPECIFICATION)" FontSize="10" FontWeight="Bold" Foreground="#38BDF8" Margin="0,0,0,3" />
+                                            <ItemsControl ItemsSource="{Binding ExactChanges}">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="{Binding StringFormat='• {0}'}"
+                                                                   FontFamily="Consolas, Cascadia Code, monospace"
+                                                                   FontSize="11" Foreground="#CBD5E1" LineHeight="16" TextWrapping="Wrap" Margin="0,1,0,1" />
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </StackPanel>
+
                                         <!-- Needs Review Warning Notice (if applicable) -->
                                         <Border Background="#451A03" BorderBrush="#D97706" BorderThickness="1" CornerRadius="4" Padding="8,6" Margin="0,0,0,8"
                                                 Visibility="{Binding NeedsReview, Converter={StaticResource BoolToVis}}">

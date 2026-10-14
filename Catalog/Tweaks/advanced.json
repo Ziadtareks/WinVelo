@@ -294,7 +294,7 @@
     "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/disablewarningforunsignedrdp",
     "verifiedOnBuild": "26100",
     "evidence": "documented",
-    "whatItDoes": "Sets RemoteDesktop WarnUnsignedConnection to 0 in HKLM terminal server client policies.",
+    "whatItDoes": "Sets RedirectionWarningDialogVersion to 1 in HKLM Terminal Services client policies and RdpLaunchConsentAccepted to 1 in HKCU Terminal Server Client settings.",
     "sideEffects": "Suppresses security warning dialogs when connecting to untrusted or self-signed Remote Desktop endpoints.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/welcome-to-rds"
@@ -1964,7 +1964,7 @@
     "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/disablebgapps",
     "verifiedOnBuild": "26100",
     "evidence": "documented",
-    "whatItDoes": "Sets LetAppsRunInBackground to 2 under AppPrivacy policies, preventing background execution.",
+    "whatItDoes": "Sets GlobalUserDisabled to 1 under BackgroundAccessApplications, preventing background execution of Store and UWP apps.",
     "sideEffects": "Prevents Windows Store and UWP applications from running or updating in the background when minimized.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-privacy#privacy-letappsruninbackground"

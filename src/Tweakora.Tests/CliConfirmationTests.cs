@@ -41,4 +41,27 @@ public sealed class CliConfirmationTests
             Assert.False(confirmed);
         }
     }
+
+    [Fact]
+    public async System.Threading.Tasks.Task CliInfoCommand_ValidTweak_OutputsDetailsAndReturnsZero()
+    {
+        var originalOut = Console.Out;
+        using var sw = new System.IO.StringWriter();
+        try
+        {
+            Console.SetOut(sw);
+            int exitCode = await Program.Main(new[] { "--info", "performance.cpu.priority-separation" });
+            Assert.Equal(0, exitCode);
+
+            string output = sw.ToString();
+            Assert.Contains("TWEAK INFORMATION: performance.cpu.priority-separation", output);
+            Assert.Contains("EXACT CHANGES (ENGINE SPECIFICATION):", output);
+            Assert.Contains("Win32PrioritySeparation = 38 (DWord)", output);
+            Assert.Contains("WHAT IT DOES:", output);
+        }
+        finally
+        {
+            Console.SetOut(originalOut);
+        }
+    }
 }

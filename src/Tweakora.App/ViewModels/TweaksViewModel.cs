@@ -14,6 +14,7 @@ using Tweakora.Core.Engine.Runners;
 using Tweakora.Core.Models;
 using Tweakora.Core.Operations;
 using Tweakora.Core.Safety;
+using Tweakora.Core.Utilities;
 using Tweakora.Modules.Tweaks;
 using Tweakora.Platform;
 
@@ -220,6 +221,9 @@ public sealed partial class TweakCardModel : ObservableObject
 
     public bool HasSources => Sources.Count > 0;
     public bool NeedsReview => Tweak.NeedsReview;
+
+    public IReadOnlyList<string> ExactChanges => TweakActionFormatter.FormatExactChanges(Tweak);
+    public bool HasExactChanges => ExactChanges.Count > 0;
 
     [ObservableProperty]
     private bool _isExpanded;

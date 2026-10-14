@@ -577,7 +577,7 @@
     "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/services",
     "verifiedOnBuild": "26100",
     "evidence": "situational",
-    "whatItDoes": "Sets non-essential background services (Offline Files, Diagnostics Tracking, Downloaded Maps, Storage Service, and Mobile Hotspot) to Manual or Disabled.",
+    "whatItDoes": "Sets background services (CscService to Disabled, DiagTrack to Disabled, MapsBroker to Manual, StorSvc to Manual, SharedAccess to Disabled) and configures SvcHostSplitThresholdInKB to match physical memory.",
     "sideEffects": "Disables Mobile Hotspot and Internet Connection Sharing (SharedAccess), disables Offline Files sync (CscService), and may delay offline map updates (MapsBroker).",
     "sources": [
       "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/services",

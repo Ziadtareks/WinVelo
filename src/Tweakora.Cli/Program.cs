@@ -12,6 +12,7 @@ using Tweakora.Core.Models;
 using Tweakora.Core.Operations;
 using Tweakora.Core.Profiles;
 using Tweakora.Core.Safety;
+using Tweakora.Core.Utilities;
 using Tweakora.Modules.Cleaner;
 using Tweakora.Modules.Config;
 using Tweakora.Modules.Network;
@@ -102,6 +103,40 @@ public static class Program
             {
                 Console.WriteLine($"  - [{t.Risk,-6}] {t.Id}: {t.Name} (Category: {t.Category})");
             }
+            return 0;
+        }
+
+        int infoIdx = Array.FindIndex(args, a => string.Equals(a, "--info", StringComparison.OrdinalIgnoreCase) || a.StartsWith("--info=", StringComparison.OrdinalIgnoreCase));
+        if (infoIdx >= 0)
+        {
+            string? targetId = null;
+            if (args[infoIdx].StartsWith("--info=", StringComparison.OrdinalIgnoreCase))
+            {
+                targetId = args[infoIdx].Substring("--info=".Length);
+            }
+            else if (infoIdx + 1 < args.Length)
+            {
+                targetId = args[infoIdx + 1];
+            }
+
+            if (string.IsNullOrWhiteSpace(targetId))
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("[WARN] Please specify a tweak ID to inspect: winvelo-cli --info <tweakId>");
+                Console.ResetColor();
+                return 1;
+            }
+
+            var tweak = catalog.FirstOrDefault(t => string.Equals(t.Id, targetId, StringComparison.OrdinalIgnoreCase));
+            if (tweak == null)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"[ERROR] Tweak '{targetId}' not found in catalog.");
+                Console.ResetColor();
+                return 1;
+            }
+
+            PrintTweakInfo(tweak);
             return 0;
         }
 
@@ -1281,9 +1316,67 @@ public static class Program
         return 0;
     }
 
+    private static void PrintTweakInfo(TweakDefinition tweak)
+    {
+        Console.WriteLine("\n============================================================");
+        Console.WriteLine($" TWEAK INFORMATION: {tweak.Id}");
+        Console.WriteLine("============================================================");
+        Console.WriteLine($"Name:                  {tweak.Name}");
+        Console.WriteLine($"Category:              {tweak.Category} (Subcategory: {tweak.Subcategory ?? "N/A"})");
+        Console.WriteLine($"Risk:                  {tweak.Risk}");
+        Console.WriteLine($"Evidence:              {tweak.Evidence}");
+        Console.WriteLine($"Reversible:            {(tweak.Reversible ? "Yes" : "No")}");
+        Console.WriteLine($"Requires Reboot:       {(tweak.RequiresReboot ? "Yes" : "No")}");
+        Console.WriteLine($"Requires Explorer:     {(tweak.RequiresExplorerRestart ? "Yes" : "No")}");
+        Console.WriteLine($"Needs Review:          {(tweak.NeedsReview ? "Yes (Excluded from automated presets)" : "No")}");
+
+        Console.WriteLine("\nWHAT IT DOES:");
+        Console.WriteLine(string.IsNullOrWhiteSpace(tweak.WhatItDoes) ? tweak.Description : tweak.WhatItDoes);
+
+        Console.WriteLine("\nSIDE EFFECTS / POTENTIAL IMPACT:");
+        Console.WriteLine(string.IsNullOrWhiteSpace(tweak.SideEffects)
+            ? (string.Equals(tweak.Risk, "Safe", StringComparison.OrdinalIgnoreCase) ? "None known." : "See documentation for potential impacts.")
+            : tweak.SideEffects);
+
+        Console.WriteLine("\nEXACT CHANGES (ENGINE SPECIFICATION):");
+        var exactChanges = TweakActionFormatter.FormatExactChanges(tweak);
+        if (exactChanges.Count > 0)
+        {
+            foreach (var change in exactChanges)
+            {
+                Console.WriteLine($"  • {change}");
+            }
+        }
+        else
+        {
+            Console.WriteLine("  (No direct apply actions defined)");
+        }
+
+        Console.WriteLine("\nDOCUMENTATION & SOURCES:");
+        var sources = tweak.Sources != null && tweak.Sources.Count > 0
+            ? tweak.Sources
+            : (tweak.Source.ValueKind == JsonValueKind.String && !string.IsNullOrWhiteSpace(tweak.Source.GetString())
+                ? new List<string> { tweak.Source.GetString()! }
+                : new List<string>());
+
+        if (sources.Count > 0)
+        {
+            foreach (var s in sources)
+            {
+                Console.WriteLine($"  • {s}");
+            }
+        }
+        else
+        {
+            Console.WriteLine("  (No sources documented)");
+        }
+        Console.WriteLine("============================================================\n");
+    }
+
     private static void PrintUsage()
     {
         Console.WriteLine("Usage:");
+        Console.WriteLine("  winvelo-cli --info <tweakId>             Show detailed technical specification and exact changes");
         Console.WriteLine("  winvelo-cli --self-test --level 1        Run automated safe HKCU self-test with restore point");
         Console.WriteLine("  winvelo-cli --detect-all                 Non-destructive read-only detection across all tweaks");
         Console.WriteLine("  winvelo-cli --health-check [--restore]   Verify Windows Update, Store, and servicing integrity");

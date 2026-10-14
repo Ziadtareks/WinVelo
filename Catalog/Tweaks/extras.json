@@ -1658,7 +1658,7 @@
     "verifiedOnBuild": "22631.4317",
     "warnings": "Windows Settings will display 'Some settings are managed by your organization'. This is normal when Group Policy registry keys are set.",
     "evidence": "documented",
-    "whatItDoes": "Sets diagnostic data collection to the minimum required level (AllowTelemetry = 0 or 1).",
+    "whatItDoes": "Sets diagnostic data collection to the minimum required level (AllowTelemetry = 0).",
     "sideEffects": "Reduces telemetry reported to Microsoft; diagnostic insights in Feedback Hub and Windows Insider may be limited.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/privacy/configure-windows-diagnostic-data-in-your-organization"

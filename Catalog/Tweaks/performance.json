@@ -201,7 +201,7 @@
     ],
     "source": "https://github.com/hellzerg/optimizer",
     "verifiedOnBuild": "22631",
-    "whatItDoes": "Configures Multimedia Class Scheduler Service (MMCSS) SystemResponsiveness to 0, granting up to 100% of CPU time to multimedia and game threads.",
+    "whatItDoes": "Configures Multimedia Class Scheduler Service (MMCSS) by setting SystemResponsiveness to 10 and NetworkThrottlingIndex to -1 in SystemProfile, with Games task GPU Priority to 8 and Priority to 6.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/win32/procthread/multimedia-class-scheduler-service"
     ],
@@ -258,7 +258,7 @@
     ],
     "source": "https://github.com/hellzerg/optimizer",
     "verifiedOnBuild": "22631",
-    "whatItDoes": "Enables Hardware-Accelerated GPU Scheduling (HagsEnabled = 2) in the DirectX Graphics Kernel to allow the GPU to manage its own video memory scheduling.",
+    "whatItDoes": "Sets HwSchMode to 2 under GraphicsDrivers to enable Hardware-Accelerated GPU Scheduling (HAGS) in WDDM.",
     "sideEffects": "Requires a system restart; may cause instability, stuttering, or frame drops in select older games or video capture/streaming applications with certain GPU drivers.",
     "sources": [
       "https://devblogs.microsoft.com/directx/hardware-accelerated-gpu-scheduling/"
@@ -485,7 +485,7 @@
     ],
     "source": "https://github.com/hellzerg/optimizer",
     "verifiedOnBuild": "22631",
-    "whatItDoes": "Sets MouseDataQueueSize to 16 in the Mouclass driver service parameters to minimize queued mouse input packets.",
+    "whatItDoes": "Sets MouseDataQueueSize to 20 in Mouclass and KeyboardDataQueueSize to 20 in Kbdclass driver service parameters.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows-hardware/drivers/hid/keyboard-and-mouse-class-drivers"
     ],
@@ -543,7 +543,7 @@
     ],
     "source": "https://github.com/hellzerg/optimizer",
     "verifiedOnBuild": "22631",
-    "whatItDoes": "Sets the processor performance core parking minimum cores unparked percentage (ValueMax) to 100% in system power settings.",
+    "whatItDoes": "Sets the processor performance core parking minimum cores unparked percentage (ValueMax) to 0 in system power settings.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows-server/administration/performance-tuning/hardware/power/"
     ],

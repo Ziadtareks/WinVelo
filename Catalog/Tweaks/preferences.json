@@ -606,7 +606,7 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/multiplaneoverlay",
     "verifiedOnBuild": "26100",
-    "whatItDoes": "Sets OverlayTestMode to 5 to disable Multi-Plane Overlay (MPO) in DWM.",
+    "whatItDoes": "Sets OverlayTestMode to 1 in DWM and DisableOverlays to 1 in GraphicsDrivers to disable Multi-Plane Overlay (MPO).",
     "sources": [
       "https://learn.microsoft.com/en-us/windows-hardware/drivers/display/multiplane-overlay-support"
     ],

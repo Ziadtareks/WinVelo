@@ -206,4 +206,167 @@ public sealed class TweakExplanationTests
         Assert.False(vm.IsRecommendedOnly);
         Assert.Equal(totalBefore, vm.FilteredTweaks.Count);
     }
+
+    [Fact]
+    public void AllTweaks_RegistryValueNamesAndNumbersInExplanations_MatchCatalogActions()
+    {
+        var tweaks = LoadAllTweaks();
+        Assert.Equal(149, tweaks.Count);
+
+        // Gather all registry value names across the entire catalog
+        var allValNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var t in tweaks)
+        {
+            if (t.Detect?.ValueName != null) allValNames.Add(t.Detect.ValueName);
+            if (t.Detect?.All != null)
+            {
+                foreach (var r in t.Detect.All) if (!string.IsNullOrEmpty(r.ValueName)) allValNames.Add(r.ValueName);
+            }
+            if (t.Detect?.Any != null)
+            {
+                foreach (var r in t.Detect.Any) if (!string.IsNullOrEmpty(r.ValueName)) allValNames.Add(r.ValueName);
+            }
+            foreach (var a in t.Apply.Concat(t.Undo))
+            {
+                if (!string.IsNullOrEmpty(a.ValueName)) allValNames.Add(a.ValueName);
+            }
+        }
+
+        var stopWords = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "1", "0", "explorer", "copilot", "disabled", "enabled", "default", "start", "value"
+        };
+        var validCatalogValNames = allValNames.Where(v => !stopWords.Contains(v) && v.Length >= 3).ToList();
+
+        var ignoredNumbers = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "10", "11", "7", "8", "260", "8.3", "30"
+        };
+
+        var errors = new List<string>();
+
+        foreach (var t in tweaks)
+        {
+            string text = $"{t.WhatItDoes ?? string.Empty} {t.SideEffects ?? string.Empty}";
+
+            var ownValNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var ownNumbers = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            if (t.Detect?.ValueName != null) ownValNames.Add(t.Detect.ValueName);
+            if (t.Detect?.ExpectedValue != null) ownNumbers.Add(t.Detect.ExpectedValue.ToString()!);
+            if (t.Detect?.All != null)
+            {
+                foreach (var r in t.Detect.All)
+                {
+                    if (!string.IsNullOrEmpty(r.ValueName)) ownValNames.Add(r.ValueName);
+                    if (r.ExpectedValue != null) ownNumbers.Add(r.ExpectedValue.ToString()!);
+                }
+            }
+            if (t.Detect?.Any != null)
+            {
+                foreach (var r in t.Detect.Any)
+                {
+                    if (!string.IsNullOrEmpty(r.ValueName)) ownValNames.Add(r.ValueName);
+                    if (r.ExpectedValue != null) ownNumbers.Add(r.ExpectedValue.ToString()!);
+                }
+            }
+
+            foreach (var a in t.Apply.Concat(t.Undo))
+            {
+                if (!string.IsNullOrEmpty(a.ValueName)) ownValNames.Add(a.ValueName);
+                if (!string.IsNullOrEmpty(a.ServiceName)) ownValNames.Add(a.ServiceName);
+                if (!string.IsNullOrEmpty(a.TaskName)) ownValNames.Add(a.TaskName);
+                if (!string.IsNullOrEmpty(a.FeatureName)) ownValNames.Add(a.FeatureName);
+                if (a.Data != null)
+                {
+                    string dStr = a.Data.ToString()!;
+                    ownNumbers.Add(dStr);
+                    if (long.TryParse(dStr, out long numVal))
+                    {
+                        ownNumbers.Add("0x" + numVal.ToString("x"));
+                    }
+                }
+                if (!string.IsNullOrEmpty(a.Script))
+                {
+                    var numMatches = System.Text.RegularExpressions.Regex.Matches(a.Script, @"-?\b\d+\b");
+                    foreach (System.Text.RegularExpressions.Match m in numMatches) ownNumbers.Add(m.Value);
+
+                    var nameMatches = System.Text.RegularExpressions.Regex.Matches(a.Script, @"-(?:Name|Value)\s+[""']?([A-Za-z0-9_]+)[""']?", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                    foreach (System.Text.RegularExpressions.Match m in nameMatches)
+                    {
+                        if (m.Groups.Count > 1) ownValNames.Add(m.Groups[1].Value);
+                    }
+                }
+            }
+
+            // Verify registry value names mentioned in explanation text belong to this tweak
+            foreach (var valName in validCatalogValNames)
+            {
+                var reg = new System.Text.RegularExpressions.Regex($@"\b{System.Text.RegularExpressions.Regex.Escape(valName)}\b", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                if (reg.IsMatch(text) && !ownValNames.Contains(valName))
+                {
+                    errors.Add($"Tweak '{t.Id}' mentions foreign registry value '{valName}' not found in its actions.");
+                }
+            }
+
+            // Verify numbers mentioned in explanation text
+            // Strip domain constants
+            string cleanedText = System.Text.RegularExpressions.Regex.Replace(text, @"\b(16|32|64)[ -]?bit\b", "", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            cleanedText = System.Text.RegularExpressions.Regex.Replace(cleanedText, @"\b1:1\b", "");
+            cleanedText = System.Text.RegularExpressions.Regex.Replace(cleanedText, @"Shift\s+5\s+times", "", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+            var numberMatches = System.Text.RegularExpressions.Regex.Matches(cleanedText, @"-?\b\d+(?:\.\d+)?\b|0x[0-9a-fA-F]+\b");
+            foreach (System.Text.RegularExpressions.Match m in numberMatches)
+            {
+                string num = m.Value;
+                if (ignoredNumbers.Contains(num)) continue;
+
+                if (!ownNumbers.Contains(num))
+                {
+                    errors.Add($"Tweak '{t.Id}' mentions setting number '{num}' in explanation that does not appear in apply/undo actions.");
+                }
+            }
+        }
+
+        Assert.Empty(errors);
+    }
+
+    [Fact]
+    public void TweakActionFormatter_FormatsExpectedSpecifications()
+    {
+        var tweak = new TweakDefinition
+        {
+            Id = "test.exact.changes",
+            Name = "Test Exact Changes",
+            Apply = new List<ActionItem>
+            {
+                new ActionItem
+                {
+                    Type = "Registry",
+                    Hive = "HKLM",
+                    Key = "SYSTEM\\CurrentControlSet\\Control\\PriorityControl",
+                    ValueName = "Win32PrioritySeparation",
+                    ValueKind = "DWord",
+                    Data = JsonSerializer.SerializeToElement(38)
+                },
+                new ActionItem
+                {
+                    Type = "Service",
+                    ServiceName = "DiagTrack",
+                    StartupType = "Disabled"
+                },
+                new ActionItem
+                {
+                    Type = "PowerShell",
+                    Script = "# Disable Defender Auto Sample Submission\nSet-MpPreference -SubmitSamplesConsent 2"
+                }
+            }
+        };
+
+        var changes = Tweakora.Core.Utilities.TweakActionFormatter.FormatExactChanges(tweak);
+        Assert.Equal(3, changes.Count);
+        Assert.Equal(@"HKLM\SYSTEM\CurrentControlSet\Control\PriorityControl\Win32PrioritySeparation = 38 (DWord)", changes[0]);
+        Assert.Equal("Service 'DiagTrack' → StartupType: Disabled", changes[1]);
+        Assert.Equal("PowerShell: Disable Defender Auto Sample Submission", changes[2]);
+    }
 }
