@@ -134,6 +134,36 @@ public sealed partial class MainViewModel : ObservableObject
         {
             OnTopSearchTextChanged(TopSearchText);
         }
+
+        if (tabName is "Dashboard" or "Home")
+        {
+            _ = DashboardVM.RefreshAllToggleStatesAsync();
+        }
+        else if (tabName == "Tweaks")
+        {
+            _ = TweaksVM.RefreshActiveStatesAsync();
+        }
+    }
+
+    private DateTime _lastFocusScan = DateTime.MinValue;
+
+    public async Task RefreshActiveStatesOnFocusAsync()
+    {
+        if (DateTime.UtcNow - _lastFocusScan < TimeSpan.FromSeconds(1)) return;
+        _lastFocusScan = DateTime.UtcNow;
+
+        try
+        {
+            await DashboardVM.RefreshAllToggleStatesAsync();
+            if (ActiveTab == "Tweaks")
+            {
+                await TweaksVM.RefreshActiveStatesAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "Failed to refresh system states on window focus");
+        }
     }
 
     [RelayCommand]

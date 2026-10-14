@@ -30,13 +30,14 @@ public sealed partial class QuickToggleCardModel : ObservableObject
     [ObservableProperty]
     private bool _isBusy;
 
-    public Func<QuickToggleCardModel, Task>? OnToggleAsync { get; set; }
+    public Func<QuickToggleCardModel, bool?, Task>? OnToggleAsync { get; set; }
 
     [RelayCommand]
-    private async Task ToggleAsync()
+    private async Task ToggleAsync(object? parameter)
     {
         if (IsBusy || OnToggleAsync == null) return;
-        await OnToggleAsync(this);
+        bool? target = parameter is bool b ? b : null;
+        await OnToggleAsync(this, target);
     }
 }
 
@@ -237,7 +238,7 @@ public sealed partial class DashboardViewModel : ObservableObject
         QuickToggles.Add(new QuickToggleCardModel
         {
             Id = "tweak.spotlight-ads",
-            OriginKey = "WPFToggleDisableLockscreen",
+            OriginKey = "privacy.spotlight.lockscreen-ads",
             Title = "Disable Lockscreen Ads",
             Description = "Disable tips, suggested promotions, and Spotlight advertisements on the lock screen.",
             IconSymbol = "LockClosed24",
@@ -259,7 +260,7 @@ public sealed partial class DashboardViewModel : ObservableObject
         QuickToggles.Add(new QuickToggleCardModel
         {
             Id = "tweak.background-apps",
-            OriginKey = "WPFTweaksBackgroundApps",
+            OriginKey = "WPFTweaksDisableBGapps",
             Title = "Disable Background Apps",
             Description = "Prevent Store apps from continuously consuming RAM and CPU in the background.",
             IconSymbol = "Power24",
@@ -287,7 +288,7 @@ public sealed partial class DashboardViewModel : ObservableObject
             string.Equals(t.Id, originOrId, StringComparison.OrdinalIgnoreCase));
     }
 
-    private async Task RefreshAllToggleStatesAsync()
+    public async Task RefreshAllToggleStatesAsync()
     {
         foreach (var toggle in QuickToggles)
         {
@@ -307,48 +308,61 @@ public sealed partial class DashboardViewModel : ObservableObject
         }
     }
 
-    private async Task HandleQuickToggleAsync(QuickToggleCardModel model)
+    private async Task HandleQuickToggleAsync(QuickToggleCardModel model, bool? target = null)
     {
         var tweak = FindTweak(model.OriginKey);
-        if (tweak == null) return;
+        if (tweak == null)
+        {
+            GlobalStatusMessage = $"Configuration not found for {model.Title}.";
+            return;
+        }
 
+        if (model.IsBusy) return;
         model.IsBusy = true;
-        bool targetState = !model.IsActive;
+        bool targetState = target ?? !model.IsActive;
 
         try
         {
+            GlobalStatusMessage = $"{(targetState ? "Enabling" : "Disabling")} {model.Title}...";
+
+            OperationExecutionReport report;
             if (targetState)
             {
-                var report = await _tweakService.ApplyTweaksAsync(new[] { tweak }, _runner);
-                var res = report.Results.FirstOrDefault();
-                if (res != null && res.Status == OperationItemStatus.Succeeded)
-                {
-                    model.IsActive = true;
-                    GlobalStatusMessage = $"{model.Title} enabled successfully.";
-                }
-                else
-                {
-                    GlobalStatusMessage = $"Failed to enable {model.Title}: {res?.Reason ?? "Incomplete"}";
-                }
+                report = await _tweakService.ApplyTweaksAsync(new[] { tweak }, _runner);
             }
             else
             {
-                var report = await _tweakService.UndoTweaksAsync(new[] { tweak }, _runner);
-                var res = report.Results.FirstOrDefault();
-                if (res != null && res.Status == OperationItemStatus.Succeeded)
-                {
-                    model.IsActive = false;
-                    GlobalStatusMessage = $"{model.Title} reverted to default.";
-                }
-                else
-                {
-                    GlobalStatusMessage = $"Failed to revert {model.Title}: {res?.Reason ?? "Incomplete"}";
-                }
+                report = await _tweakService.UndoTweaksAsync(new[] { tweak }, _runner);
+            }
+
+            bool actualActive = await _tweakService.DetectStateAsync(tweak);
+            Application.Current?.Dispatcher?.Invoke(() =>
+            {
+                model.IsActive = actualActive;
+            });
+
+            var res = report.Results.FirstOrDefault();
+            if (res != null && (res.Status == OperationItemStatus.Succeeded || actualActive == targetState))
+            {
+                GlobalStatusMessage = $"{model.Title} is now {(actualActive ? "enabled" : "reverted to default")}.";
+            }
+            else
+            {
+                GlobalStatusMessage = $"Status for {model.Title}: {res?.Reason ?? "System policy updated."}";
             }
         }
         catch (Exception ex)
         {
             GlobalStatusMessage = $"Failed to toggle {model.Title}: {ex.Message}";
+            try
+            {
+                bool actualActive = await _tweakService.DetectStateAsync(tweak);
+                Application.Current?.Dispatcher?.Invoke(() =>
+                {
+                    model.IsActive = actualActive;
+                });
+            }
+            catch { }
         }
         finally
         {

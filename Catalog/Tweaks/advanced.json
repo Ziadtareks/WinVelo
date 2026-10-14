@@ -612,8 +612,8 @@
     "detect": {
       "type": "Registry",
       "hive": "HKLM",
-      "key": "SOFTWARE\\WinVelo\\State",
-      "valueName": "WPFTweaksRemoveEdge",
+      "key": "SOFTWARE\\Policies\\Microsoft\\EdgeUpdate",
+      "valueName": "DoNotUpdateToEdgeWithChromium",
       "matchType": "Equals",
       "expectedValue": 1
     },
@@ -621,15 +621,15 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "$Path = Resolve-Path -Path \"$Env:ProgramFiles (x86)\\Microsoft\\Edge\\Application\\*\\Installer\\setup.exe\" | Select-Object -Last 1\n\n      if (Test-Path $Path) {\n          New-Item -Path \"$Env:SystemRoot\\SystemApps\\Microsoft.MicrosoftEdge_8wekyb3d8bbwe\\MicrosoftEdge.exe\" -Force\n          Start-Process -FilePath $Path -ArgumentList \"--uninstall --system-level --force-uninstall --delete-profile\" -Wait\n          Write-Host \"Microsoft Edge was removed\"\n      } else {\n          Write-Host \"Microsoft Edge is not installed\"\n      }",
+        "script": "$Path = Resolve-Path -Path \"$Env:ProgramFiles (x86)\\Microsoft\\Edge\\Application\\*\\Installer\\setup.exe\" -ErrorAction SilentlyContinue | Select-Object -Last 1\n\n      if ($Path -and (Test-Path $Path)) {\n          Start-Process -FilePath $Path -ArgumentList \"--uninstall --system-level --force-uninstall --delete-profile\" -Wait\n      }",
         "timeoutSeconds": 60
       },
       {
         "type": "Registry",
         "hive": "HKLM",
-        "key": "SOFTWARE\\WinVelo\\State",
+        "key": "SOFTWARE\\Policies\\Microsoft\\EdgeUpdate",
         "operation": "Set",
-        "valueName": "WPFTweaksRemoveEdge",
+        "valueName": "DoNotUpdateToEdgeWithChromium",
         "valueKind": "DWord",
         "data": 1
       }
@@ -638,15 +638,15 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "Write-Host \"Installing Microsoft Edge...\"\n      winget install Microsoft.Edge --source winget",
+        "script": "winget install Microsoft.Edge --source winget --accept-package-agreements --accept-source-agreements",
         "timeoutSeconds": 60
       },
       {
         "type": "Registry",
         "hive": "HKLM",
-        "key": "SOFTWARE\\WinVelo\\State",
+        "key": "SOFTWARE\\Policies\\Microsoft\\EdgeUpdate",
         "operation": "DeleteValue",
-        "valueName": "WPFTweaksRemoveEdge"
+        "valueName": "DoNotUpdateToEdgeWithChromium"
       }
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/removeedge",
@@ -673,8 +673,8 @@
     "detect": {
       "type": "Registry",
       "hive": "HKLM",
-      "key": "SOFTWARE\\WinVelo\\State",
-      "valueName": "WPFTweaksDisableBitLocker",
+      "key": "SYSTEM\\CurrentControlSet\\Control\\BitLocker",
+      "valueName": "PreventDeviceEncryption",
       "matchType": "Equals",
       "expectedValue": 1
     },
@@ -682,15 +682,15 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "Disable-BitLocker -MountPoint $Env:SystemDrive",
+        "script": "Disable-BitLocker -MountPoint $Env:SystemDrive -ErrorAction SilentlyContinue",
         "timeoutSeconds": 60
       },
       {
         "type": "Registry",
         "hive": "HKLM",
-        "key": "SOFTWARE\\WinVelo\\State",
+        "key": "SYSTEM\\CurrentControlSet\\Control\\BitLocker",
         "operation": "Set",
-        "valueName": "WPFTweaksDisableBitLocker",
+        "valueName": "PreventDeviceEncryption",
         "valueKind": "DWord",
         "data": 1
       }
@@ -699,15 +699,15 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "Enable-BitLocker -MountPoint $Env:SystemDrive",
+        "script": "Enable-BitLocker -MountPoint $Env:SystemDrive -ErrorAction SilentlyContinue",
         "timeoutSeconds": 60
       },
       {
         "type": "Registry",
         "hive": "HKLM",
-        "key": "SOFTWARE\\WinVelo\\State",
+        "key": "SYSTEM\\CurrentControlSet\\Control\\BitLocker",
         "operation": "DeleteValue",
-        "valueName": "WPFTweaksDisableBitLocker"
+        "valueName": "PreventDeviceEncryption"
       }
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/disablebitlocker",
@@ -785,8 +785,8 @@
     "detect": {
       "type": "Registry",
       "hive": "HKLM",
-      "key": "SOFTWARE\\WinVelo\\State",
-      "valueName": "WPFTweaksRemoveOneDrive",
+      "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\OneDrive",
+      "valueName": "DisableFileSyncNGSC",
       "matchType": "Equals",
       "expectedValue": 1
     },
@@ -794,15 +794,15 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "# Deny permission to remove OneDrive folder\n      icacls $Env:OneDrive /deny \"*S-1-5-32-544:(D,DC)\"\n\n      Write-Host \"Uninstalling OneDrive...\"\n      Start-Process -FilePath (Join-Path $Env:SystemRoot \"System32\\OneDriveSetup.exe\") -ArgumentList '/uninstall' -Wait\n\n      # Some of OneDrive files use explorer, and OneDrive uses FileCoAuth\n      Write-Host \"Removing leftover OneDrive Files...\"\n\n      Stop-Process -Name FileCoAuth,Explorer\n\n      Remove-Item \"$Env:LocalAppData\\Microsoft\\OneDrive\" -Recurse -Force\n      Remove-Item \"$Env:ProgramData\\Microsoft OneDrive\" -Recurse -Force\n\n      # Grant back permission to access OneDrive folder\n      icacls $Env:OneDrive /grant \"*S-1-5-32-544:(D,DC)\"\n\n      if (-not (Get-ChildItem -Path $Env:OneDrive)) {\n          Remove-Item -Path $Env:OneDrive -Recurse\n          [Environment]::SetEnvironmentVariable('OneDrive', $null, 'User')\n      }\n\n      # Disable OneSyncSvc\n      Set-Service -Name OneSyncSvc -StartupType Disabled",
+        "script": "Start-Process -FilePath (Join-Path $Env:SystemRoot \"System32\\OneDriveSetup.exe\") -ArgumentList '/uninstall' -Wait -ErrorAction SilentlyContinue\n      Stop-Process -Name FileCoAuth,OneDrive -Force -ErrorAction SilentlyContinue",
         "timeoutSeconds": 60
       },
       {
         "type": "Registry",
         "hive": "HKLM",
-        "key": "SOFTWARE\\WinVelo\\State",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\OneDrive",
         "operation": "Set",
-        "valueName": "WPFTweaksRemoveOneDrive",
+        "valueName": "DisableFileSyncNGSC",
         "valueKind": "DWord",
         "data": 1
       }
@@ -811,15 +811,15 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "Write-Host \"Installing OneDrive\"\n      winget install Microsoft.Onedrive --source winget\n\n      # Enabled OneSyncSvc\n      Set-Service -Name OneSyncSvc -StartupType Automatic",
+        "script": "winget install Microsoft.OneDrive --source winget --accept-package-agreements --accept-source-agreements",
         "timeoutSeconds": 60
       },
       {
         "type": "Registry",
         "hive": "HKLM",
-        "key": "SOFTWARE\\WinVelo\\State",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\OneDrive",
         "operation": "DeleteValue",
-        "valueName": "WPFTweaksRemoveOneDrive"
+        "valueName": "DisableFileSyncNGSC"
       }
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/removeonedrive",
@@ -1186,41 +1186,43 @@
     "detect": {
       "type": "Registry",
       "hive": "HKLM",
-      "key": "SOFTWARE\\WinVelo\\State",
-      "valueName": "WPFTweaksReservedStorage",
+      "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\ReserveManager",
+      "valueName": "ShippedWithReserves",
       "matchType": "Equals",
-      "expectedValue": 1
+      "expectedValue": 0
     },
     "apply": [
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "DISM /Online /Set-ReservedStorageState /State:Disabled",
+        "script": "DISM /Online /Set-ReservedStorageState /State:Disabled -ErrorAction SilentlyContinue",
         "timeoutSeconds": 60
       },
       {
         "type": "Registry",
         "hive": "HKLM",
-        "key": "SOFTWARE\\WinVelo\\State",
+        "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\ReserveManager",
         "operation": "Set",
-        "valueName": "WPFTweaksReservedStorage",
+        "valueName": "ShippedWithReserves",
         "valueKind": "DWord",
-        "data": 1
+        "data": 0
       }
     ],
     "undo": [
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "DISM /Online /Set-ReservedStorageState /State:Enabled",
+        "script": "DISM /Online /Set-ReservedStorageState /State:Enabled -ErrorAction SilentlyContinue",
         "timeoutSeconds": 60
       },
       {
         "type": "Registry",
         "hive": "HKLM",
-        "key": "SOFTWARE\\WinVelo\\State",
-        "operation": "DeleteValue",
-        "valueName": "WPFTweaksReservedStorage"
+        "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\ReserveManager",
+        "operation": "Set",
+        "valueName": "ShippedWithReserves",
+        "valueKind": "DWord",
+        "data": 1
       }
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/reservedstorage",
@@ -1448,41 +1450,40 @@
     "detect": {
       "type": "Registry",
       "hive": "HKLM",
-      "key": "SOFTWARE\\WinVelo\\State",
-      "valueName": "WPFTweaksLogiBlock",
+      "key": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\LogiLDA.exe",
+      "valueName": "Debugger",
       "matchType": "Equals",
-      "expectedValue": 1
+      "expectedValue": "systray.exe"
     },
     "apply": [
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "Stop-Process -Name \"logi_download_assistant\" -Force -ErrorAction SilentlyContinue\n\n      $ProgramFiles64 = if ($Env:ProgramW6432) { $Env:ProgramW6432 } else { $Env:ProgramFiles }\n      $LogiPath = \"$ProgramFiles64\\LogiDownloadAssistant\"\n\n      if (Test-Path $LogiPath) {\n        Remove-Item $LogiPath\\* -Recurse -Force\n      } else {\n        New-Item -Path $LogiPath -ItemType Directory\n      }\n\n      icacls $LogiPath /deny \"*S-1-1-0:(W)\"\n      if ($LASTEXITCODE -ne 0) { throw \"icacls failed to deny write access on $LogiPath (exit code $LASTEXITCODE)\" }",
+        "script": "Stop-Process -Name \"logi_download_assistant\" -Force -ErrorAction SilentlyContinue\n\n      $ProgramFiles64 = if ($Env:ProgramW6432) { $Env:ProgramW6432 } else { $Env:ProgramFiles }\n      $LogiPath = \"$ProgramFiles64\\LogiDownloadAssistant\"\n\n      if (Test-Path $LogiPath) {\n        Remove-Item $LogiPath\\* -Recurse -Force -ErrorAction SilentlyContinue\n      } else {\n        New-Item -Path $LogiPath -ItemType Directory -ErrorAction SilentlyContinue\n      }\n\n      icacls $LogiPath /deny \"*S-1-1-0:(W)\" | Out-Null",
         "timeoutSeconds": 60
       },
       {
         "type": "Registry",
         "hive": "HKLM",
-        "key": "SOFTWARE\\WinVelo\\State",
+        "key": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\LogiLDA.exe",
         "operation": "Set",
-        "valueName": "WPFTweaksLogiBlock",
-        "valueKind": "DWord",
-        "data": 1
+        "valueName": "Debugger",
+        "valueKind": "String",
+        "data": "systray.exe"
       }
     ],
     "undo": [
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "$ProgramFiles64 = if ($Env:ProgramW6432) { $Env:ProgramW6432 } else { $Env:ProgramFiles }\n      $LogiPath = \"$ProgramFiles64\\LogiDownloadAssistant\"\n\n      if (Test-Path $LogiPath) {\n        icacls $LogiPath /remove:d \"*S-1-1-0\"\n        if ($LASTEXITCODE -ne 0) { throw \"icacls failed to remove the write-deny rule on $LogiPath (exit code $LASTEXITCODE)\" }\n      }",
+        "script": "$ProgramFiles64 = if ($Env:ProgramW6432) { $Env:ProgramW6432 } else { $Env:ProgramFiles }\n      $LogiPath = \"$ProgramFiles64\\LogiDownloadAssistant\"\n\n      if (Test-Path $LogiPath) {\n        icacls $LogiPath /remove:d \"*S-1-1-0\" -ErrorAction SilentlyContinue | Out-Null\n      }",
         "timeoutSeconds": 60
       },
       {
         "type": "Registry",
         "hive": "HKLM",
-        "key": "SOFTWARE\\WinVelo\\State",
-        "operation": "DeleteValue",
-        "valueName": "WPFTweaksLogiBlock"
+        "key": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\LogiLDA.exe",
+        "operation": "DeleteKey"
       }
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/logiblock",
@@ -1573,42 +1574,27 @@
     "requiresExplorerRestart": false,
     "detect": {
       "type": "Registry",
-      "hive": "HKLM",
-      "key": "SOFTWARE\\WinVelo\\State",
-      "valueName": "WPFTweaksRightClickMenu",
-      "matchType": "Equals",
-      "expectedValue": 1
+      "hive": "HKCU",
+      "key": "Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\\InprocServer32",
+      "matchType": "Exists"
     },
     "apply": [
       {
-        "type": "PowerShell",
-        "operation": "Execute",
-        "script": "New-Item -Path \"HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\" -Name InprocServer32 -Value \"\" -Force\n      Stop-Process -Name explorer",
-        "timeoutSeconds": 60
-      },
-      {
         "type": "Registry",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\WinVelo\\State",
+        "hive": "HKCU",
+        "key": "Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\\InprocServer32",
         "operation": "Set",
-        "valueName": "WPFTweaksRightClickMenu",
-        "valueKind": "DWord",
-        "data": 1
+        "valueName": "",
+        "valueKind": "String",
+        "data": ""
       }
     ],
     "undo": [
       {
-        "type": "PowerShell",
-        "operation": "Execute",
-        "script": "Remove-Item -Path \"HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\" -Recurse",
-        "timeoutSeconds": 60
-      },
-      {
         "type": "Registry",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\WinVelo\\State",
-        "operation": "DeleteValue",
-        "valueName": "WPFTweaksRightClickMenu"
+        "hive": "HKCU",
+        "key": "Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}",
+        "operation": "DeleteKey"
       }
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/rightclickmenu",

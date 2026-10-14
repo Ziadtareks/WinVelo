@@ -158,12 +158,6 @@
         "valueName": "SystemUsesLightTheme",
         "valueKind": "DWord",
         "data": 0
-      },
-      {
-        "type": "PowerShell",
-        "operation": "Execute",
-        "script": "Invoke-WinUtilExplorerUpdate\n      if ($sync.ThemeButton.Content -eq [char]0xF08C) {\n        Invoke-WinutilThemeChange -theme \"Auto\"\n      }",
-        "timeoutSeconds": 60
       }
     ],
     "undo": [
@@ -184,12 +178,6 @@
         "valueName": "SystemUsesLightTheme",
         "valueKind": "DWord",
         "data": 1
-      },
-      {
-        "type": "PowerShell",
-        "operation": "Execute",
-        "script": "Invoke-WinUtilExplorerUpdate\n      if ($sync.ThemeButton.Content -eq [char]0xF08C) {\n        Invoke-WinutilThemeChange -theme \"Auto\"\n      }",
-        "timeoutSeconds": 60
       }
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/darkmode",
@@ -229,12 +217,6 @@
         "valueName": "HideFileExt",
         "valueKind": "DWord",
         "data": 0
-      },
-      {
-        "type": "PowerShell",
-        "operation": "Execute",
-        "script": "Invoke-WinUtilExplorerUpdate -action \"restart\"",
-        "timeoutSeconds": 60
       }
     ],
     "undo": [
@@ -246,12 +228,6 @@
         "valueName": "HideFileExt",
         "valueKind": "DWord",
         "data": 1
-      },
-      {
-        "type": "PowerShell",
-        "operation": "Execute",
-        "script": "Invoke-WinUtilExplorerUpdate -action \"restart\"",
-        "timeoutSeconds": 60
       }
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/showext",
@@ -955,25 +931,35 @@
     "requiresReboot": false,
     "requiresExplorerRestart": false,
     "detect": {
-      "type": "Registry",
-      "hive": "HKCU",
-      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Search",
-      "valueName": "BingSearchEnabled",
-      "matchType": "Equals",
-      "expectedValue": 1
+      "any": [
+        {
+          "type": "Registry",
+          "hive": "HKCU",
+          "key": "Software\\Policies\\Microsoft\\Windows\\Explorer",
+          "valueName": "DisableSearchBoxSuggestions",
+          "matchType": "Equals",
+          "expectedValue": 1
+        },
+        {
+          "type": "Registry",
+          "hive": "HKCU",
+          "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Search",
+          "valueName": "BingSearchEnabled",
+          "matchType": "Equals",
+          "expectedValue": 0
+        }
+      ]
     },
     "apply": [
       {
         "type": "Registry",
         "hive": "HKCU",
-        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Search",
+        "key": "Software\\Policies\\Microsoft\\Windows\\Explorer",
         "operation": "Set",
-        "valueName": "BingSearchEnabled",
+        "valueName": "DisableSearchBoxSuggestions",
         "valueKind": "DWord",
         "data": 1
-      }
-    ],
-    "undo": [
+      },
       {
         "type": "Registry",
         "hive": "HKCU",
@@ -982,6 +968,26 @@
         "valueName": "BingSearchEnabled",
         "valueKind": "DWord",
         "data": 0
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Policies\\Microsoft\\Windows\\Explorer",
+        "operation": "Set",
+        "valueName": "DisableSearchBoxSuggestions",
+        "valueKind": "DWord",
+        "data": 0
+      },
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Search",
+        "operation": "Set",
+        "valueName": "BingSearchEnabled",
+        "valueKind": "DWord",
+        "data": 1
       }
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/bingsearch",

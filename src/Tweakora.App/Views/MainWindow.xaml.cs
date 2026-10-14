@@ -14,6 +14,14 @@ public partial class MainWindow : FluentWindow
         InitializeComponent();
 
         ApplySystemBackdrop();
+
+        Activated += async (s, e) =>
+        {
+            if (DataContext is MainViewModel vm)
+            {
+                await vm.RefreshActiveStatesOnFocusAsync();
+            }
+        };
     }
 
     private void ApplySystemBackdrop()

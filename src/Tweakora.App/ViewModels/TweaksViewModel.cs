@@ -325,6 +325,12 @@ public sealed partial class TweaksViewModel : ObservableObject
         ApplyFilter();
     }
 
+    public async Task RefreshActiveStatesAsync(CancellationToken cancellationToken = default)
+    {
+        if (IsScanning) return;
+        await ScanSystemStateAsync(cancellationToken);
+    }
+
     public async Task ScanSystemStateAsync(CancellationToken cancellationToken = default)
     {
         IsScanning = true;

@@ -25,40 +25,29 @@ Upstream Reference: [ChrisTitusTech/winutil](https://github.com/ChrisTitusTech/w
 | **Phase E (UI Quality)** | Visual polish, button progress, screenshots | **DONE** | FlaUI UI automation passes across all 5 tabs and dialogs. |
 | **Upstream Parity & Quality Audit** | Chris Titus WinUtil 1:1 Parity & Engine Verification | **DONE** | 141 verified tweaks synchronized. 64 unit/architecture tests pass. Non-destructive host detection (`--detect-all`) 100% clean. |
 | **WinVelo Overhaul & Rebrand** | Full rebranding, Beginner Dashboard, Curated Winget Installer | **DONE** | Home Tab #1, 4 smart profiles, 8 quick-toggles, 36 branded apps, 66 unit tests + FlaUI passed. |
+| **Real-PC Registry Sync** | Purge fake state, Win32 WM_SETTINGCHANGE broadcasts, Focus Auto-Sync | **DONE** | 74 unit tests passed / FlaUI passed / RealRegistrySyncTests passed |
 | **Release v1.0.0** | Final Production Packaging, SHA256, Screenshots | **DONE** | WinVelo v1.0.0 Portable & Small zip packages created in `dist/`. |
 
 ---
 
-## WinVelo v1.0.0 Final Production Release Summary
+## WinVelo v1.0.0 Real Windows Settings Bi-Directional Sync Overhaul
 
-1. **Rebranding to WinVelo (Windows Velocity)**:
-   - Full application display name, window title, sidebar header, log paths (`%LOCALAPPDATA%\WinVelo`), backup paths (`%APPDATA%\WinVelo`), and published binaries (`WinVelo.exe`, `winvelo-cli.exe`) updated cleanly.
-   - Preserved clean C# project structure and DI composition.
-2. **Beginner-Friendly UX: Home (Easy Boost) Default Tab #1**:
-   - **System Health Banner**: Live physical RAM metrics via Win32 `GlobalMemoryStatusEx` (used GB / total GB, percentage bar), CPU model, OS edition, Hostname, and Administrator active badge.
-   - **4 Smart 1-Click Optimization Profiles**:
-     - `Everyday Speed & Clean Setup`: 18 safe tweaks for daily responsiveness.
-     - `Gaming & Max FPS Boost`: 14 tweaks optimizing GPU/CPU priority, Game Mode, and latency.
-     - `Privacy & Anti-Spyware Shield`: 16 tweaks blocking telemetry, diagnostics, and lockscreen ads.
-     - `Restore Windows Defaults`: 1-click safe rollback to standard Windows defaults.
-   - **8 Instant Quick Toggles**: Classic Right-Click Menu, Disable Bing in Search, Show File Extensions, Disable Telemetry, Disable Spotlight Ads, End Task on Taskbar, Disable Background Apps, System Dark Mode.
-3. **All Tweaks Tab Upgrade**:
-   - Top toolbar mode switch: **Beginner Mode (Recommended Only)** vs **Pro Mode (All 141 Tweaks)**.
-   - Individual `ui:ToggleSwitch` direct 1-click toggles on every tweak card header in addition to bulk checkbox selection.
-4. **Curated Winget App Installer (Tab #3)**:
-   - Completely eliminated unnecessary `FOSS` badges.
-   - Curated 36 famous everyday applications across Browsers, Social, Media, Utilities, Gaming, and Dev with verified Winget IDs in `Catalog/Apps/applications.json`.
-   - Designed 42x42 colorful branded icon tiles with official brand background colors (Chrome `#4285F4`, Brave `#FB542B`, Firefox `#FF7139`, Discord `#5865F2`, Spotify `#1DB954`, Steam `#171A21`, VLC `#FF8800`, VS Code `#007ACC`, 7-Zip `#2B579A`, WinRAR `#8B5CF6`, etc.).
-   - Asynchronous real `winget` execution (`winget list`, `winget install`, `winget upgrade`, `winget uninstall`) with live status streaming and simulated safe mode in `--test-mode`.
-5. **Quality & Verification**:
-   - 66/66 Unit, Golden, and Architecture Tests in `Tweakora.Tests` PASSED.
-   - FlaUI UIA3 Automation Test Suite in `Tweakora.UiTests` PASSED (all tabs, controls, search boxes, and dialogs).
-   - Rendered 9 high-resolution 1440x900 screenshots using `RenderTargetBitmap`: `dashboard.png`, `tweaks.png`, `install.png`, `config.png`, `updates.png`, `toolbox.png`, `backups.png`, `diff-preview.png`, `command-palette.png`.
-   - Visually inspected each screenshot with `view_file` to confirm layout, typography, colors, and padding.
-6. **Release Artifacts (`dist/`)**:
-   - `dist/WinVelo-v1.0.0-win-x64-portable.zip` (SHA-256: `A747C881B457C2BFBCE8F8565E147C495656940C7C6ECBF289BCFA9F1143F02D`)
-   - `dist/WinVelo-v1.0.0-win-x64-small.zip` (SHA-256: `6FF99DF64E5309854856F1C3CDE9E0DF0328E24668FB7FE247F4F18E2AF7A3F0`)
-   - `dist/SHA256SUMS.txt` updated.
+### 1. Root Cause Resolution & Engine Hardening
+- **Complete Elimination of Synthetic State Markers**: Purged all occurrences of `SOFTWARE\WinVelo\State` across `Catalog/Tweaks/*.json`. All tweaks now inspect and manipulate authentic Windows Registry keys (`HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize`, `HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced`, `HKCU\Software\Microsoft\Windows\CurrentVersion\Search`, `HKCU\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32`, etc.).
+- **Non-Blocking System Restore Fallback**: In `TweakRunner.cs`, if System Restore creation is throttled or unavailable on Windows Home editions (and no interactive prompt handler was supplied), the runner logs a diagnostic warning and proceeds safely with the Write-Ahead Rollback Journal and full `.reg` registry snapshot backup instead of aborting tweak execution.
+- **Win32 Shell & Settings Notifications**: Implemented `WindowsSettingNotifier` in `Tweakora.Platform`, dispatching `SendMessageTimeout(HWND_BROADCAST, WM_SETTINGCHANGE, ...)` and `SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_FLUSH, ...)` upon registry writes, ensuring Windows Explorer, the Taskbar, and Windows Settings reflect changes immediately.
+- **Bi-Directional Focus Synchronization**: Bound `MainWindow.Activated` to trigger background state re-detection via `RefreshActiveStatesOnFocusAsync()`. When the user switches to Windows Settings, toggles an option, and clicks back into WinVelo, the UI toggles update automatically to reflect the actual OS state.
+- **8 Core Dashboard Quick Toggles**: Corrected registry mappings, inverted value logic, origin keys, and WPF command binding parameters (`CommandParameter="{Binding IsChecked, RelativeSource={RelativeSource Self}}"`) across Dark Mode, File Extensions, Bing Search, Classic Context Menu, Background Apps, Spotlight Ads, Taskbar End Task, and Telemetry.
+- **Dedicated Automated Verification**: Added `RealRegistrySyncTests.cs` testing bi-directional state detection and execution across all 8 core toggles.
+
+### 2. Quality & Verification
+- **74/74 Unit, Golden, Architecture & Sync Tests** in `Tweakora.Tests` PASSED.
+- **FlaUI UIA3 Automation Test Suite** in `Tweakora.UiTests` PASSED.
+- **9 High-Resolution 1440x900 Screenshots** refreshed in `docs/screenshots/`.
+- **Release Packages (`dist/`)**:
+  - `dist/WinVelo-v1.0.0-win-x64-portable.zip` (SHA-256: `68B52C576D407FBCD24B34905A131A5B5A3CC9E411742AEB5841A41F98D4CDCE`)
+  - `dist/WinVelo-v1.0.0-win-x64-small.zip` (SHA-256: `C5213B2C477ACBFE1B29E19626FCB5539BA2F78933D38182A219F1F56AD02263`)
+  - `dist/SHA256SUMS.txt` updated.
 
 ---
 
@@ -69,5 +58,10 @@ You can safely test Level 1 (HKCU-only) changes anytime by running:
 .\dist\WinVelo-v1.0.0-win-x64-portable\winvelo-cli.exe --self-test --level 1
 ```
 It creates an automatic restore point, tests each HKCU tweak, immediately reverts it, and verifies that the exact original registry state is restored.
+
+To launch the modern GUI:
+```powershell
+.\dist\WinVelo-v1.0.0-win-x64-portable\WinVelo.exe
+```
 
 

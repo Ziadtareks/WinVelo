@@ -122,6 +122,12 @@ public sealed class StateDetector
             return false;
         }
 
+        if (string.IsNullOrEmpty(rule.ValueName))
+        {
+            if (rule.MatchType == "Exists") return keyExists;
+            if (rule.MatchType == "NotExists") return !keyExists;
+        }
+
         bool valExists = _registry.ValueExists(hive, key, valName);
 
         switch (rule.MatchType)

@@ -228,6 +228,7 @@
                                                      AutomationProperties.AutomationId="{Binding Id, StringFormat='Toggle_{0}'}"
                                                      IsChecked="{Binding IsActive, Mode=OneWay}"
                                                      Command="{Binding ToggleCommand}"
+                                                     CommandParameter="{Binding IsChecked, RelativeSource={RelativeSource Self}}"
                                                      VerticalAlignment="Center" />
                                 </DockPanel>
 

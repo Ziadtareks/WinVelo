@@ -239,11 +239,11 @@ public sealed class TweakRunner
             {
                 return await onRestorePointPromptAsync("System Restore is turned off on the system drive. Continue with Registry backup only, or Cancel?");
             }
-            return false;
+            return true;
         }
 
         int countBefore = _restoreService.GetRestorePointCount();
-        RestorePointResult createResult = _restoreService.CreateRestorePoint($"Tweakora Session {DateTime.Now:yyyy-MM-dd HH:mm}");
+        RestorePointResult createResult = _restoreService.CreateRestorePoint($"WinVelo Session {DateTime.Now:yyyy-MM-dd HH:mm}");
 
         int countAfter = _restoreService.GetRestorePointCount();
 
@@ -258,7 +258,7 @@ public sealed class TweakRunner
             {
                 return await onRestorePointPromptAsync($"A new System Restore point could not be created ({reason}). You still have Registry (.reg) backup and Rollback Journal. Do you want to continue, or cancel?");
             }
-            return false;
+            return true;
         }
 
         return true;
