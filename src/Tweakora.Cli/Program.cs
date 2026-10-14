@@ -208,6 +208,11 @@ public static class Program
 
             if (recoverMode == "rollback")
             {
+                if (!CheckConfirmationGate(args, "Rolling back unfinished session changes"))
+                {
+                    return 1;
+                }
+
                 Console.WriteLine("[RECOVERY] Rolling back unfinished session changes...");
                 var res = await runner.RollbackAllUnfinishedSessionsAsync();
                 if (res.Success)
@@ -324,6 +329,11 @@ public static class Program
 
             if (args.Contains("--undo"))
             {
+                if (!CheckConfirmationGate(args, $"Undoing {targetTweaks.Count} tweak(s)"))
+                {
+                    return 1;
+                }
+
                 int restored = 0;
                 int failed = missingCount;
                 foreach (var tweak in targetTweaks)
@@ -347,6 +357,11 @@ public static class Program
             }
             else
             {
+                if (!CheckConfirmationGate(args, $"Applying {targetTweaks.Count} tweak(s)"))
+                {
+                    return 1;
+                }
+
                 if (!CheckIrreversibleTweaksGate(targetTweaks, args))
                 {
                     return 1;
@@ -514,6 +529,11 @@ public static class Program
 
             if (isRun)
             {
+                if (!CheckConfirmationGate(args, $"Applying configuration profile '{configPath}' ({targetTweaks.Count} tweaks)"))
+                {
+                    return 1;
+                }
+
                 if (!CheckIrreversibleTweaksGate(targetTweaks, args))
                 {
                     return 1;
@@ -996,6 +1016,11 @@ public static class Program
 
         if (isRun)
         {
+            if (!CheckConfirmationGate(args, $"Applying preset '{matchedPreset.Name}' ({targetTweaks.Count} tweaks)"))
+            {
+                return 1;
+            }
+
             if (!CheckIrreversibleTweaksGate(targetTweaks, args))
             {
                 return 1;
@@ -1130,6 +1155,46 @@ public static class Program
         return false;
     }
 
+    public static bool CheckConfirmationGate(string[] args, string operationDescription)
+    {
+        // Simulation / test mode never touches the real host system
+        if (args.Any(a => string.Equals(a, "--test-mode", StringComparison.OrdinalIgnoreCase)))
+        {
+            return true;
+        }
+
+        // If explicitly confirmed via --yes or -y, proceed immediately
+        if (args.Any(a => string.Equals(a, "--yes", StringComparison.OrdinalIgnoreCase) || string.Equals(a, "-y", StringComparison.OrdinalIgnoreCase)))
+        {
+            return true;
+        }
+
+        // If stdin is not interactive, refuse to execute
+        if (Console.IsInputRedirected)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"\n[ERROR] Command requires confirmation for '{operationDescription}', but standard input is not interactive.");
+            Console.WriteLine("Pass '--yes' to confirm execution non-interactively.");
+            Console.ResetColor();
+            return false;
+        }
+
+        // Prompt user interactively
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.Write($"\n[CONFIRM] Are you sure you want to proceed with: {operationDescription}? (y/N): ");
+        Console.ResetColor();
+
+        string? response = Console.ReadLine()?.Trim();
+        if (string.Equals(response, "y", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(response, "yes", StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        Console.WriteLine("[INFO] Operation cancelled by user.");
+        return false;
+    }
+
     private static void PrintHealthReport(ServicingHealthReport report)
     {
         Console.WriteLine("========================================");
@@ -1236,6 +1301,7 @@ public static class Program
         Console.WriteLine("  winvelo-cli --update-mode <mode>         Set update mode (Default, Security, DisableAll)");
         Console.WriteLine("  winvelo-cli --fix <id>                   Execute a system maintenance fix");
         Console.WriteLine("  winvelo-cli --config <path> --run        Apply configuration profile (protected by journal)");
+        Console.WriteLine("  winvelo-cli --yes / -y                   Bypass interactive confirmation for modifying commands");
         Console.WriteLine("  winvelo-cli --real-mode                  Use real Windows drivers (default is simulation)");
     }
 }

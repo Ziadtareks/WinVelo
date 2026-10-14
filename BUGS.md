@@ -346,4 +346,20 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
   6. Added "Recommended only" view filter to `TweaksViewModel` and `TweaksTabView.xaml` allowing users to focus exclusively on conservative, well-documented, reversible settings.
   7. Added unit test suite in `TweakExplanationTests.cs` validating explanations, source URLs, side effects rubric, `needsReview` preset quarantine, and the recommended-only filter.
 
+---
+
+## BUG-024: CLI Modifying Commands Lacked Interactive Confirmation and Non-Interactive Safety Guard
+- **Component**: `src/Tweakora.Cli/Program.cs`, `src/Tweakora.Tests/CliConfirmationTests.cs`
+- **Finding**:
+  1. CLI commands that modify host machine state (`--apply`, `--undo`, `--preset ... --run`, `--config ... --run`, `--recover rollback`) could be executed without interactive confirmation or explicit authorization (`--yes`), allowing accidental execution against the host OS.
+  2. In non-interactive environments (e.g. background tasks, scripts, CI, redirected standard input), commands could execute silently without an explicit `--yes` flag.
+- **Root Cause**: Absence of a confirmation gate on mutating CLI execution paths.
+- **Fix**:
+  1. Implemented `Program.CheckConfirmationGate(args, operationDescription)` in `src/Tweakora.Cli/Program.cs`.
+  2. Enforced that any command mutating host state prompts interactively for confirmation `(y/N)` unless `--yes` / `-y` is supplied.
+  3. When standard input is non-interactive (`Console.IsInputRedirected == true`), commands strictly refuse to execute unless `--yes` is explicitly passed.
+  4. Simulation / test mode (`--test-mode`) operates safely in-memory against simulation fakes without modifying host state.
+  5. Added unit test suite in `CliConfirmationTests.cs`.
+
+
 
