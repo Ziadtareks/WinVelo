@@ -161,6 +161,90 @@ public static class Program
         IOperationRunner opRunner = new OperationRunner();
 
         // ---------------------------------------------------------------------
+        // Crash Recovery Check: Unfinished journal sessions
+        // ---------------------------------------------------------------------
+        var unfinishedSessions = journal.GetUnfinishedSessions();
+        int recoverArgIdx = Array.FindIndex(args, a => string.Equals(a, "--recover", StringComparison.OrdinalIgnoreCase));
+        string? recoverMode = (recoverArgIdx >= 0 && recoverArgIdx < args.Length - 1)
+            ? args[recoverArgIdx + 1].ToLowerInvariant()
+            : null;
+
+        if (recoverMode != null && recoverMode != "rollback" && recoverMode != "keep")
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"[ERROR] Invalid recovery option '{recoverMode}'. Supported options: rollback, keep.");
+            Console.ResetColor();
+            return 1;
+        }
+
+        if (unfinishedSessions.Count > 0)
+        {
+            var touchedTweaks = unfinishedSessions
+                .SelectMany(s => s.Records)
+                .Select(r => r.TweakId)
+                .Where(id => !string.IsNullOrWhiteSpace(id))
+                .Distinct()
+                .ToList();
+            int totalActions = unfinishedSessions.Sum(s => s.Records.Count);
+
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("\n[WARNING] Unfinished session(s) detected from a previous run!");
+            Console.WriteLine($"Found {unfinishedSessions.Count} unfinished session(s) with {totalActions} action(s) touching tweak(s): [{string.Join(", ", touchedTweaks)}]");
+            Console.ResetColor();
+
+            if (string.IsNullOrEmpty(recoverMode))
+            {
+                if (Console.IsInputRedirected)
+                {
+                    Console.WriteLine("[INFO] Non-interactive console detected. Please specify --recover rollback or --recover keep.");
+                }
+                else
+                {
+                    Console.Write("Run rollback recovery? (y/n): ");
+                    string? choice = Console.ReadLine()?.Trim().ToLowerInvariant();
+                    recoverMode = (choice == "y" || choice == "yes") ? "rollback" : "keep";
+                }
+            }
+
+            if (recoverMode == "rollback")
+            {
+                Console.WriteLine("[RECOVERY] Rolling back unfinished session changes...");
+                var res = await runner.RollbackAllUnfinishedSessionsAsync();
+                if (res.Success)
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine($"[RECOVERY] {res.Message}");
+                    Console.ResetColor();
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"[RECOVERY ERROR] {res.Message}");
+                    Console.ResetColor();
+                }
+            }
+            else if (recoverMode == "keep")
+            {
+                Console.WriteLine("[RECOVERY] Marking unfinished session(s) complete without rolling back...");
+                runner.KeepAndCompleteAllUnfinishedSessions();
+                Console.WriteLine("[RECOVERY] Unfinished session(s) marked complete.");
+            }
+
+            if (args.Length <= 2 && recoverArgIdx >= 0)
+            {
+                return 0;
+            }
+        }
+        else if (recoverArgIdx >= 0)
+        {
+            Console.WriteLine("[INFO] No unfinished sessions found to recover.");
+            if (args.Length <= 2)
+            {
+                return 0;
+            }
+        }
+
+        // ---------------------------------------------------------------------
         // CLI COMMAND: --self-test [--level <1|2>]
         // ---------------------------------------------------------------------
         if (isSelfTest)
@@ -1021,6 +1105,7 @@ public static class Program
         Console.WriteLine("  winvelo-cli --dry-run                    Preview all catalog tweaks without modifying system");
         Console.WriteLine("  winvelo-cli --tweak <id> --apply         Apply a specific tweak (add --real-mode for real OS)");
         Console.WriteLine("  winvelo-cli --tweak <id> --undo          Undo a specific tweak (add --real-mode for real OS)");
+        Console.WriteLine("  winvelo-cli --recover <rollback|keep>    Recover or resolve unfinished journal sessions");
         Console.WriteLine("  winvelo-cli --yes-irreversible           Confirm application of irreversible tweaks");
         Console.WriteLine("  winvelo-cli --feature <key> --enable     Enable an optional Windows feature");
         Console.WriteLine("  winvelo-cli --feature <key> --disable    Disable an optional Windows feature");

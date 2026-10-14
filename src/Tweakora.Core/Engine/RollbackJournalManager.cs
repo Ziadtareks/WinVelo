@@ -64,6 +64,47 @@ public sealed class RollbackJournalManager
         }
     }
 
+    public void CompleteSession(RollbackJournalSession session)
+    {
+        lock (_lock)
+        {
+            session.IsCompleted = true;
+            FlushSessionUnsafe(session);
+            if (_currentSession != null && _currentSession.SessionId == session.SessionId)
+            {
+                _currentSession.IsCompleted = true;
+            }
+        }
+    }
+
+    public void CompleteSession(string sessionId)
+    {
+        lock (_lock)
+        {
+            if (_currentSession != null && _currentSession.SessionId == sessionId)
+            {
+                _currentSession.IsCompleted = true;
+                FlushSessionUnsafe(_currentSession);
+            }
+
+            string filePath = Path.Combine(_journalDirectory, $"session-{sessionId}.json");
+            if (File.Exists(filePath))
+            {
+                try
+                {
+                    string json = File.ReadAllText(filePath);
+                    RollbackJournalSession? session = JsonSerializer.Deserialize<RollbackJournalSession>(json);
+                    if (session != null)
+                    {
+                        session.IsCompleted = true;
+                        FlushSessionUnsafe(session);
+                    }
+                }
+                catch { }
+            }
+        }
+    }
+
     public bool HasActiveSession
     {
         get

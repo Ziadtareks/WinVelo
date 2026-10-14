@@ -122,7 +122,7 @@ cd winvelo
 # Build solution
 dotnet build Tweakora.sln
 
-# Run unit test suite (135 tests)
+# Run unit test suite (147 tests)
 dotnet test src/Tweakora.Tests/Tweakora.Tests.csproj
 
 # Run UI automation test suite (FlaUI)

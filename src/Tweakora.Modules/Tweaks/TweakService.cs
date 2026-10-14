@@ -33,6 +33,11 @@ public interface ITweakService
     Task<bool> DetectStateAsync(TweakDefinition tweak, CancellationToken cancellationToken = default);
     Task<TweakState> DetectTweakStateAsync(TweakDefinition tweak, CancellationToken cancellationToken = default);
     BackupManager BackupManager { get; }
+    IReadOnlyList<RollbackJournalSession> GetUnfinishedSessions() => Array.Empty<RollbackJournalSession>();
+    Task<ActionResult> RollbackSessionAsync(RollbackJournalSession session) => Task.FromResult(new ActionResult { Success = true });
+    Task<ActionResult> RollbackAllUnfinishedSessionsAsync() => Task.FromResult(new ActionResult { Success = true });
+    void CompleteSession(RollbackJournalSession session) { }
+    void KeepAndCompleteAllUnfinishedSessions() { }
 }
 
 public sealed class TweakService : ITweakService
@@ -279,4 +284,10 @@ public sealed class TweakService : ITweakService
         var res = await _shell.ExecutePowerShellAsync(script, 30);
         return res.Success;
     }
+
+    public IReadOnlyList<RollbackJournalSession> GetUnfinishedSessions() => _journal.GetUnfinishedSessions();
+    public Task<ActionResult> RollbackSessionAsync(RollbackJournalSession session) => _runner.RollbackSessionAsync(session);
+    public Task<ActionResult> RollbackAllUnfinishedSessionsAsync() => _runner.RollbackAllUnfinishedSessionsAsync();
+    public void CompleteSession(RollbackJournalSession session) => _journal.CompleteSession(session);
+    public void KeepAndCompleteAllUnfinishedSessions() => _runner.KeepAndCompleteAllUnfinishedSessions();
 }

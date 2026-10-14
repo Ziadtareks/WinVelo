@@ -15,6 +15,14 @@ public partial class MainWindow : FluentWindow
 
         ApplySystemBackdrop();
 
+        Loaded += async (s, e) =>
+        {
+            if (DataContext is MainViewModel vm)
+            {
+                await vm.CheckUnfinishedSessionsOnStartupAsync();
+            }
+        };
+
         Activated += async (s, e) =>
         {
             if (DataContext is MainViewModel vm)

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
@@ -10,8 +11,10 @@ using CommunityToolkit.Mvvm.Input;
 using Serilog;
 using Tweakora.App.Localization;
 using Tweakora.App.Services;
+using Tweakora.Core.Models;
 using Tweakora.Core.Operations;
 using Tweakora.Core.Safety;
+using Tweakora.Modules.Tweaks;
 using Wpf.Ui.Appearance;
 
 namespace Tweakora.App.ViewModels;
@@ -44,6 +47,12 @@ public sealed partial class MainViewModel : ObservableObject
 
     [ObservableProperty]
     private bool _isConfigDialogOpen;
+
+    [ObservableProperty]
+    private bool _isRecoveryDialogOpen;
+
+    [ObservableProperty]
+    private string _recoveryDialogMessage = string.Empty;
 
     [ObservableProperty]
     private string _configDialogText = string.Empty;
@@ -92,6 +101,8 @@ public sealed partial class MainViewModel : ObservableObject
     public ObservableCollection<PaletteItem> PaletteResults { get; } = new();
 
     private readonly IActivityTracker? _activityTracker;
+    private readonly ITweakService? _tweakService;
+    private List<RollbackJournalSession> _unfinishedSessions = new();
     private DispatcherTimer? _hudHideTimer;
 
     public MainViewModel(
@@ -103,7 +114,8 @@ public sealed partial class MainViewModel : ObservableObject
         ToolboxViewModel toolboxVM,
         StartupViewModel startupVM,
         BackupsViewModel backupsVM,
-        IActivityTracker? activityTracker = null)
+        IActivityTracker? activityTracker = null,
+        ITweakService? tweakService = null)
     {
         DashboardVM = dashboardVM;
         InstallVM = installVM;
@@ -114,6 +126,7 @@ public sealed partial class MainViewModel : ObservableObject
         StartupVM = startupVM;
         BackupsVM = backupsVM;
         _activityTracker = activityTracker;
+        _tweakService = tweakService;
 
         _currentPage = DashboardVM;
         _activeTab = "Dashboard";
@@ -390,5 +403,53 @@ public sealed partial class MainViewModel : ObservableObject
         {
             ExecutePaletteItem(PaletteResults[0]);
         }
+    }
+
+    public async Task CheckUnfinishedSessionsOnStartupAsync()
+    {
+        if (_tweakService == null) return;
+
+        var unfinished = _tweakService.GetUnfinishedSessions();
+        if (unfinished.Count > 0)
+        {
+            _unfinishedSessions = unfinished.ToList();
+            var touchedTweaks = _unfinishedSessions
+                .SelectMany(s => s.Records)
+                .Select(r => r.TweakId)
+                .Where(id => !string.IsNullOrWhiteSpace(id))
+                .Distinct()
+                .ToList();
+            int actionCount = _unfinishedSessions.Sum(s => s.Records.Count);
+            string tweakNames = string.Join(", ", touchedTweaks);
+
+            RecoveryDialogMessage = $"A previous session did not finish. {actionCount} actions were applied to [{tweakNames}].";
+            IsRecoveryDialogOpen = true;
+        }
+    }
+
+    [RelayCommand]
+    public async Task RollbackRecoveryAsync()
+    {
+        if (_tweakService != null)
+        {
+            await _tweakService.RollbackAllUnfinishedSessionsAsync();
+            if (TweaksVM != null)
+            {
+                await TweaksVM.RescanSystemAsync();
+            }
+        }
+        IsRecoveryDialogOpen = false;
+        _unfinishedSessions.Clear();
+    }
+
+    [RelayCommand]
+    public void KeepRecovery()
+    {
+        if (_tweakService != null)
+        {
+            _tweakService.KeepAndCompleteAllUnfinishedSessions();
+        }
+        IsRecoveryDialogOpen = false;
+        _unfinishedSessions.Clear();
     }
 }

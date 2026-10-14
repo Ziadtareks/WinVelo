@@ -400,6 +400,117 @@ public sealed class TweakRunner
         }
     }
 
+    public async Task<ActionResult> RollbackSessionAsync(RollbackJournalSession session)
+    {
+        var executedSteps = new List<string>();
+        var failedSteps = new List<string>();
+
+        bool prevIsUndo = _context.IsUndoOperation;
+        _context.IsUndoOperation = true;
+
+        try
+        {
+            // Replay records in reverse order (same as undo)
+            var recordsToRevert = session.Records
+                .Where(r => !r.IsReverted)
+                .OrderByDescending(r => r.AppliedAtUtc)
+                .ThenByDescending(r => r.ActionIndex)
+                .ToList();
+
+            foreach (JournalActionRecord record in recordsToRevert)
+            {
+                IActionHandler? handler = _handlers.FirstOrDefault(h => h.CanHandle(record.ActionType));
+                if (handler != null)
+                {
+                    try
+                    {
+                        var res = await handler.UndoAsync(record, _context);
+                        if (res.Success)
+                        {
+                            executedSteps.Add($"Restored {record.ActionType} ({record.TargetIdentifier}) from session {session.SessionId}");
+                            record.IsReverted = true;
+                            record.RevertedAtUtc = DateTime.UtcNow;
+                            _context.Journal.MarkRecordsReverted(new[] { record });
+                        }
+                        else
+                        {
+                            failedSteps.Add($"Failed to restore {record.ActionType} ({record.TargetIdentifier}): {res.Message}");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        failedSteps.Add($"Exception restoring {record.ActionType} ({record.TargetIdentifier}): {ex.Message}");
+                    }
+                }
+                _detector.InvalidateCache(record.TweakId);
+            }
+
+            // Mark the session complete
+            _context.Journal.CompleteSession(session);
+
+            bool success = failedSteps.Count == 0;
+            string message = success
+                ? $"Successfully rolled back session {session.SessionId} ({executedSteps.Count} action(s))."
+                : $"Session rollback completed with {failedSteps.Count} error(s): {string.Join("; ", failedSteps)}";
+
+            return new ActionResult
+            {
+                Success = success,
+                Message = message,
+                ExecutedSteps = executedSteps,
+                FailedSteps = failedSteps
+            };
+        }
+        finally
+        {
+            _context.IsUndoOperation = prevIsUndo;
+        }
+    }
+
+    public async Task<ActionResult> RollbackAllUnfinishedSessionsAsync()
+    {
+        var unfinished = _context.Journal.GetUnfinishedSessions();
+        if (unfinished.Count == 0)
+        {
+            return new ActionResult
+            {
+                Success = true,
+                Message = "No unfinished sessions found."
+            };
+        }
+
+        var allExecuted = new List<string>();
+        var allFailed = new List<string>();
+
+        // Revert newest sessions first
+        foreach (var session in unfinished.OrderByDescending(s => s.StartedAtUtc))
+        {
+            var res = await RollbackSessionAsync(session);
+            allExecuted.AddRange(res.ExecutedSteps);
+            allFailed.AddRange(res.FailedSteps);
+        }
+
+        bool success = allFailed.Count == 0;
+        return new ActionResult
+        {
+            Success = success,
+            Message = success
+                ? $"Rolled back {unfinished.Count} unfinished session(s) ({allExecuted.Count} action(s))."
+                : $"Rollback had errors in {allFailed.Count} action(s): {string.Join("; ", allFailed)}",
+            ExecutedSteps = allExecuted,
+            FailedSteps = allFailed
+        };
+    }
+
+    public void KeepAndCompleteAllUnfinishedSessions()
+    {
+        var unfinished = _context.Journal.GetUnfinishedSessions();
+        foreach (var session in unfinished)
+        {
+            _context.Journal.CompleteSession(session);
+        }
+    }
+
     private static bool IsStatelessType(string? type)
     {
         if (string.IsNullOrWhiteSpace(type)) return false;

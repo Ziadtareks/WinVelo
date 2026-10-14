@@ -29,7 +29,7 @@ Upstream Reference: [ChrisTitusTech/winutil](https://github.com/ChrisTitusTech/w
 | **Smart Optimization Upgrade** | Hardware Analyzer, Standby RAM Cleaner, DNS Latency Benchmark, Nagle's Disabler, 8 Gaming Tweaks | **DONE** | 80 unit tests passed / 149 tweaks verified / Release packages updated |
 | **UX & Performance Overhaul** | Eliminate UI Freezes, Floating Activity HUD Pill, Card Spinners, Task.Yield Offloading | **DONE** | 80 unit tests passed / 1 FlaUI UI test passed / 0 UI Freezes |
 | **Startup Apps Manager** | Native Windows Task Manager StartupApproved Bi-Directional Sync & Boot Speed Optimizer | **DONE** | 98 unit tests passed / 1 FlaUI UI test passed / 10 Screenshots Inspected |
-| **Final Deep QA Audit** | Toggle loops, Single-file resilience, Startup parsing, 63/63 Self-Test Engine | **DONE** | 135/135 unit tests passed / 63/63 self-test passed / FlaUI passed |
+| **Final Deep QA Audit** | Toggle loops, Single-file resilience, Startup parsing, 63/63 Self-Test Engine | **DONE** | 147/147 unit tests passed / 63/63 self-test passed / FlaUI passed |
 | **Release v1.0.0** | Final Production Packaging, SHA256, Reproducible Build Script | **DONE** | WinVelo v1.0.0 Portable & Small zip packages created in `dist/`. |
 
 ---
@@ -97,7 +97,7 @@ Upstream Reference: [ChrisTitusTech/winutil](https://github.com/ChrisTitusTech/w
   - Direct 1-click toggle switches and preset buttons are cleanly disabled (`IsEnabled="{Binding IsNotToggling}"`) during operations to prevent duplicate race conditions.
 
 ### 3. Quality, Verification & Packaging
-- **135/135 Unit Tests PASSED** (0 failures).
+- **147/147 Unit Tests PASSED** (0 failures).
 - **FlaUI UI Automation Test PASSED** across all tabs and overlays.
 - **63/63 CLI Self-Test Checks PASSED** (100% roundtrip pass rate).
 - **All 10 Screenshots Refreshed & Visually Inspected** in `docs/screenshots/` (dashboard, startup, toolbox, tweaks, backups, config, command-palette, diff-preview, install, updates).

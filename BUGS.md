@@ -235,3 +235,19 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
   2. For tweaks that require an Explorer restart (`pref.startmenurecommendations`, `pref.taskbaralignment`), replaced the raw kill with a safe restart snippet that polls for Explorer's return up to 5 seconds and explicitly launches `explorer.exe` if not detected:
      `Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue; $timeout = 5; while ($timeout -gt 0 -and !(Get-Process explorer -ErrorAction SilentlyContinue)) { Start-Sleep -Milliseconds 500; $timeout -= 0.5 }; if (!(Get-Process explorer -ErrorAction SilentlyContinue)) { Start-Process explorer.exe }`
   3. Verified that all tweaks requiring Explorer reload are flagged with `requiresExplorerRestart: true` in the catalog.
+
+---
+
+## BUG-018: Write-Ahead Journal Unfinished Sessions Orphaned Without Crash Recovery
+- **Component**: `Tweakora.Core` (`RollbackJournalManager.cs`, `TweakRunner.cs`), `Tweakora.Modules` (`ITweakService.cs`, `TweakService.cs`), `Tweakora.Cli` (`Program.cs`), `Tweakora.App` (`MainWindow.xaml`, `MainWindow.xaml.cs`, `MainViewModel.cs`), `Tweakora.Tests` (`JournalCrashRecoveryTests.cs`)
+- **Finding**:
+  1. `RollbackJournalManager.GetUnfinishedSessions` successfully identified interrupted/uncompleted journal sessions on disk, but neither CLI nor GUI consumed them.
+  2. If the application or system crashed mid-apply, partial state modifications remained unmanaged, and subsequent runs ignored the unfinished session files.
+  3. Users had no automated way to rollback partial changes or mark uncompleted sessions resolved.
+- **Root Cause**: The application lacked startup crash recovery detection in both CLI and GUI lifecycle handlers, and the engine lacked batch session rollback orchestration.
+- **Fix**:
+  1. Added `CompleteSession(RollbackJournalSession session)` and `CompleteSession(string sessionId)` to `RollbackJournalManager` to persist completion state for arbitrary sessions on disk.
+  2. Implemented `RollbackSessionAsync(RollbackJournalSession session)`, `RollbackAllUnfinishedSessionsAsync()`, and `KeepAndCompleteAllUnfinishedSessions()` on `TweakRunner` (and forwarded via `ITweakService`). Replays records in reverse order, restores original baseline values, marks records reverted, and marks the session complete.
+  3. Added CLI startup check in `Program.cs` that warns of unfinished sessions, displays affected tweaks and action counts, prompts `Run rollback recovery? (y/n)`, and accepts `--recover rollback` / `--recover keep` flags.
+  4. Added GUI startup recovery dialog overlay in `MainWindow.xaml` and `MainViewModel.cs` showing: "A previous session did not finish. X actions were applied to [tweak names]." with "Roll back these changes" and "Keep and mark complete" buttons.
+  5. Added comprehensive regression tests in `JournalCrashRecoveryTests.cs` verifying baseline value restoration, keep without revert, and GUI dialog execution.
