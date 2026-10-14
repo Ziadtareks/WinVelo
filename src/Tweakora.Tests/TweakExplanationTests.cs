@@ -196,9 +196,12 @@ public sealed class TweakExplanationTests
                         string.Equals(card.Risk, "Low", StringComparison.OrdinalIgnoreCase),
                 $"Recommended tweak '{card.Id}' has risk '{card.Risk}'. Expected Safe or Low.");
 
-            Assert.Equal("documented", card.Evidence);
+            Assert.True(string.Equals(card.Evidence, "documented", StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(card.Evidence, "ui-equivalent", StringComparison.OrdinalIgnoreCase),
+                $"Recommended tweak '{card.Id}' has evidence '{card.Evidence}'. Expected documented or ui-equivalent.");
             Assert.False(card.NeedsReview, $"Recommended tweak '{card.Id}' has NeedsReview=true.");
             Assert.True(card.Tweak.Reversible, $"Recommended tweak '{card.Id}' is irreversible.");
+            Assert.NotEqual("Experimental", card.Category, StringComparer.OrdinalIgnoreCase);
         }
 
         // Toggle back off
@@ -385,6 +388,24 @@ public sealed class TweakExplanationTests
                 $"Tweak '{t.Id}' has evidence='documented' but missing or empty 'sourceQuote'.");
             Assert.True(t.SourceQuote!.Trim().Length >= 10,
                 $"Tweak '{t.Id}' sourceQuote is too short (< 10 chars): '{t.SourceQuote}'.");
+        }
+    }
+
+    [Fact]
+    public void UiEquivalentTweaks_HaveNonEmptyUiLocation()
+    {
+        var tweaks = LoadAllTweaks();
+        var uiTweaks = tweaks.Where(t => string.Equals(t.Evidence, "ui-equivalent", StringComparison.OrdinalIgnoreCase)).ToList();
+
+        Assert.NotEmpty(uiTweaks);
+        Assert.Equal(71, uiTweaks.Count);
+
+        foreach (var t in uiTweaks)
+        {
+            Assert.False(string.IsNullOrWhiteSpace(t.UiEquivalentLocation),
+                $"Tweak '{t.Id}' has evidence='ui-equivalent' but missing or empty 'uiEquivalentLocation'.");
+            Assert.True(t.UiEquivalentLocation!.Trim().Length >= 5,
+                $"Tweak '{t.Id}' uiEquivalentLocation is too short (< 5 chars): '{t.UiEquivalentLocation}'.");
         }
     }
 }

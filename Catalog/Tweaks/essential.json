@@ -248,13 +248,14 @@
     "warnings": "Uninstalls the Windows Widgets Platform and WebExperience AppX packages for all users. Undo restores taskbar registry settings, but does NOT reinstall the removed AppX packages.",
     "reversible": false,
     "irreversibleReason": "Uninstalls Microsoft Widgets and WebExperience AppX packages for all users; undo only restores taskbar visibility registry keys and does not reinstall the packages.",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Removes Windows Widgets Platform and WebExperience AppX packages for all users.",
     "sideEffects": "Uninstalls the Windows Widgets taskbar button and news flyout permanently. Irreversible.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/apps/design/shell/widgets/"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › Personalization › Taskbar › Taskbar items › Widgets"
   },
   {
     "schemaVersion": "1.0.0",
@@ -475,13 +476,14 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/location",
     "verifiedOnBuild": "26100",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Disables Windows Location Platform and sensor services machine-wide.",
     "sideEffects": "System clock timezone auto-detection, Weather app, and location-based maps will not be able to determine your physical location.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services#bkmk-location"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › Privacy & security › Location › Location services"
   },
   {
     "schemaVersion": "1.0.0",
@@ -952,13 +954,14 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/deliveryoptimization",
     "verifiedOnBuild": "26100",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Disables Windows Update Delivery Optimization peer-to-peer sharing over the local network and internet.",
     "sideEffects": "Updates will only download directly from Microsoft servers, which may take longer if multiple PCs share the same local network.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/deployment/do/waas-delivery-optimization"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › Windows Update › Advanced options › Delivery Optimization › Allow downloads from other PCs"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1070,13 +1073,14 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/endtaskontaskbar",
     "verifiedOnBuild": "26100",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Adds 'End Task' option to right-click context menus on taskbar application buttons.",
     "sideEffects": "None known.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/win32/shell/taskbar-extensions"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › System › For developers › End Task"
   },
   {
     "schemaVersion": "1.0.0",

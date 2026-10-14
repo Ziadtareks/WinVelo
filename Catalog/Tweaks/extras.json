@@ -57,13 +57,14 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/client-management/manage-windows-copilot",
     "verifiedOnBuild": "22631.4317",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Hides the Copilot button from the Windows taskbar.",
     "sideEffects": "Removes the quick-access Copilot taskbar icon.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/client-management/manage-windows-copilot"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › Personalization › Taskbar › Taskbar items › Copilot"
   },
   {
     "schemaVersion": "1.0.0",
@@ -322,13 +323,14 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-applicationmanagement#allowgamedvr",
     "verifiedOnBuild": "22631.4317",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Enables Windows Game Mode to prioritize CPU and GPU allocation for active games.",
     "sideEffects": "None known.",
     "sources": [
       "https://support.microsoft.com/en-us/windows/use-game-mode-on-your-pc-5dd4ef61-3397-5072-2765-348619257710"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › Gaming › Game Mode › Game Mode"
   },
   {
     "schemaVersion": "1.0.0",
@@ -386,13 +388,14 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-applicationmanagement#allowgamedvr",
     "verifiedOnBuild": "22631.4317",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Disables the Xbox Game Bar overlay in Windows gaming settings.",
     "sideEffects": "Pressing Win+G will not open the Xbox Game Bar, audio mixer, or performance widget.",
     "sources": [
       "https://learn.microsoft.com/en-us/gaming/game-bar/"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › Gaming › Game Bar › Open Xbox Game Bar using this button on a controller"
   },
   {
     "schemaVersion": "1.0.0",
@@ -451,13 +454,14 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-applicationmanagement#allowgamedvr",
     "verifiedOnBuild": "22631.4317",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Disables background gameplay video and audio capture in Game DVR.",
     "sideEffects": "Background gameplay recording is disabled; retrospective gameplay clips cannot be saved.",
     "sources": [
       "https://learn.microsoft.com/en-us/gaming/game-bar/"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › Gaming › Captures › Record in the background while I'm playing a game"
   },
   {
     "schemaVersion": "1.0.0",
@@ -467,7 +471,7 @@
     "category": "preferences",
     "subcategory": "input",
     "risk": "Safe",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "impacts": [
       "gaming",
       "ui"
@@ -558,7 +562,8 @@
     "sources": [
       "https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-systemparametersinfow"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › Bluetooth & devices › Mouse › Additional mouse settings › Pointer Options › Enhance pointer precision"
   },
   {
     "schemaVersion": "1.0.0",
@@ -878,13 +883,14 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows-server/networking/dns/doh-client-support",
     "verifiedOnBuild": "26100",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Configures DNS-over-HTTPS (DoH) encryption for DNS client queries.",
     "sideEffects": "DNS queries are encrypted; local network DNS filtering or captive portals may fail if DoH cannot reach the upstream resolver.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows-server/networking/dns/doh-client-support"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › Network & internet › Wi-Fi / Ethernet › DNS server assignment › Encrypted only (DNS over HTTPS)"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1007,13 +1013,14 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows-hardware/customize/desktop/unattend/microsoft-windows-shell-setup-themes",
     "verifiedOnBuild": "22631.4317",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Disables acrylic transparency effects across Windows taskbar and application windows.",
     "sideEffects": "None known.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/apps/design/style/acrylic"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › Accessibility › Visual effects › Transparency effects"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1072,13 +1079,14 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-systemparametersinfoa",
     "verifiedOnBuild": "22631.4317",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Disables window minimize, maximize, and control animations.",
     "sideEffects": "None known.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/win32/winmsg/about-windows"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › Accessibility › Visual effects › Animation effects"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1136,13 +1144,14 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-storage#allowstoragesenseglobal",
     "verifiedOnBuild": "22631.4317",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Enables automated Windows Storage Sense to clean temporary files and empty Recycle Bin.",
     "sideEffects": "Automatically purges files older than 30 days from temporary directories and Recycle Bin.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/client-management/mdm/storage-csp"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › System › Storage › Storage Sense"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1199,13 +1208,14 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/deployment/do/waas-delivery-optimization-reference#download-mode",
     "verifiedOnBuild": "22631.4317",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Configures Delivery Optimization to simple HTTP download mode without peer sharing.",
     "sideEffects": "Updates will download solely from Microsoft servers; will not share bandwidth with other PCs on the local network.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/deployment/do/waas-delivery-optimization"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › Windows Update › Advanced options › Delivery Optimization › Allow downloads from other PCs"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1722,13 +1732,14 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services#1-advertising-id",
     "verifiedOnBuild": "22631.4317",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Disables the unique advertising ID used for cross-app advertising tracking.",
     "sideEffects": "None known.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services#bkmk-advertising-id"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › Privacy & security › General › Let apps show me personalized ads by using my advertising ID"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1786,13 +1797,14 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services#30-tailored-experiences",
     "verifiedOnBuild": "22631.4317",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Disables tailored experiences, diagnostic-based tips, and personalized recommendations.",
     "sideEffects": "None known.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services#bkmk-tailored-experiences"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › Privacy & security › Diagnostics & feedback › Tailored experiences"
   },
   {
     "schemaVersion": "1.0.0",
@@ -2307,13 +2319,14 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-system#allowcrossdeviceclipboard",
     "verifiedOnBuild": "22631.4317",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Disables cloud clipboard synchronization across signed-in Windows devices.",
     "sideEffects": "Copied clipboard text and images will not sync to your other Windows devices.",
     "sources": [
       "https://support.microsoft.com/en-us/windows/clipboard-in-windows-c436501e-9842-409d-4ef5-63bc18f10e42"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › System › Clipboard › Clipboard history across your devices"
   },
   {
     "schemaVersion": "1.0.0",
@@ -2371,13 +2384,14 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services#32-search",
     "verifiedOnBuild": "22631.4317",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Disables local device search history collection.",
     "sideEffects": "Search box will not remember or suggest previously entered search queries on this PC.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-admx-search"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › Privacy & security › Search permissions › History"
   },
   {
     "schemaVersion": "1.0.0",
@@ -2437,13 +2451,14 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/configuration/windows-spotlight",
     "verifiedOnBuild": "22631.4317",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Disables suggested content, tips, and promotional ads on the Windows lock screen.",
     "sideEffects": "Lock screen will only show standard wallpapers without interactive tips or suggested links.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-personalization#personalization-nolockscreencamera"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › Personalization › Lock screen › Get fun facts, tips, tricks, and more on your lock screen"
   },
   {
     "schemaVersion": "1.0.0",
@@ -2503,13 +2518,14 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/configuration/windows-spotlight",
     "verifiedOnBuild": "22631.4317",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Disables suggested apps and promotional app recommendations in the Start Menu.",
     "sideEffects": "Promoted third-party apps will not be recommended in the Start Menu.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-start#start-hideshareddocuments"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › Personalization › Start › Show recommendations for tips, shortcuts, new apps, and more"
   },
   {
     "schemaVersion": "1.0.0",
@@ -2568,13 +2584,14 @@
     "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-system#system-allowlocation",
     "verifiedOnBuild": "26100",
     "warnings": "Disables location sensor for apps like Maps, Weather, and Time Zone sync.",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Disables the Windows sensor platform and master location service.",
     "sideEffects": "Desktop applications and Windows features cannot access physical GPS or network-triangulated location sensors.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services#bkmk-location"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › Privacy & security › Location › Location services"
   },
   {
     "schemaVersion": "1.0.0",
@@ -2632,13 +2649,14 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/uwp/packaging/app-capability-declarations",
     "verifiedOnBuild": "26100",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Denies Windows Store and desktop apps default permission to access location.",
     "sideEffects": "Apps will be blocked from accessing your current geographic location until explicitly granted in Settings.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-privacy#privacy-letappsaccesslocation"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › Privacy & security › Location › Let apps access your location"
   },
   {
     "schemaVersion": "1.0.0",
@@ -2696,13 +2714,14 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/uwp/packaging/app-capability-declarations",
     "verifiedOnBuild": "26100",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Denies default application access to system microphone devices.",
     "sideEffects": "Applications will be blocked from capturing audio until explicitly granted permission in Windows Settings.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-privacy#privacy-letappsaccessmicrophone"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › Privacy & security › Microphone › Let apps access your microphone"
   },
   {
     "schemaVersion": "1.0.0",
@@ -2760,13 +2779,14 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/uwp/packaging/app-capability-declarations",
     "verifiedOnBuild": "26100",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Denies default application access to camera and webcam hardware.",
     "sideEffects": "Applications will be blocked from accessing webcam video streams until explicitly granted in Settings.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-privacy#privacy-letappsaccesscamera"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › Privacy & security › Camera › Let apps access your camera"
   },
   {
     "schemaVersion": "1.0.0",
@@ -2823,13 +2843,14 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/uwp/packaging/app-capability-declarations",
     "verifiedOnBuild": "26100",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Denies default application permission to display user notifications.",
     "sideEffects": "Applications will not be permitted to show push notifications on the desktop.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-privacy#privacy-letappsaccessnotifications"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › Privacy & security › Notifications › Let apps access your notifications"
   },
   {
     "schemaVersion": "1.0.0",
@@ -2887,13 +2908,14 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/uwp/packaging/app-capability-declarations",
     "verifiedOnBuild": "26100",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Denies application permission to access user account name and profile picture.",
     "sideEffects": "Apps cannot query Windows user account information.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-privacy#privacy-letappsaccessaccountinfo"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › Privacy & security › Account info › Let apps access your account info"
   },
   {
     "schemaVersion": "1.0.0",
@@ -2951,13 +2973,14 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/uwp/packaging/app-capability-declarations",
     "verifiedOnBuild": "26100",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Denies application permission to access Windows Contacts and address book.",
     "sideEffects": "Apps cannot read your local Windows contacts list.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-privacy#privacy-letappsaccesscontacts"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › Privacy & security › Contacts › Let apps access your contacts"
   },
   {
     "schemaVersion": "1.0.0",
@@ -3014,13 +3037,14 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/uwp/packaging/app-capability-declarations",
     "verifiedOnBuild": "26100",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Denies application permission to access Windows Calendar appointments.",
     "sideEffects": "Apps cannot read or add appointments to your Windows calendar.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-privacy#privacy-letappsaccesscalendar"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › Privacy & security › Calendar › Let apps access your calendar"
   },
   {
     "schemaVersion": "1.0.0",
@@ -3078,13 +3102,14 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/uwp/packaging/app-capability-declarations",
     "verifiedOnBuild": "26100",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Denies application permission to query diagnostic information from other apps.",
     "sideEffects": "Apps cannot inspect diagnostic data from third-party applications.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-privacy#privacy-letappsaccessdiagnosticsinfo"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › Privacy & security › App diagnostics › Let apps access diagnostic info about other apps"
   },
   {
     "schemaVersion": "1.0.0",
@@ -3143,13 +3168,14 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-remoteassistance",
     "verifiedOnBuild": "26100",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Disables Windows Remote Assistance (fAllowToGetHelp = 0).",
     "sideEffects": "Support technicians cannot connect to this computer using the built-in Windows Remote Assistance helper.",
     "sources": [
       "https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2008-R2-and-2008/cc753856(v=ws.10)"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Control Panel › System › Remote settings › Allow Remote Assistance connections to this computer"
   },
   {
     "schemaVersion": "1.0.0",
@@ -3208,13 +3234,14 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/win32/shell/autoplay-reg",
     "verifiedOnBuild": "26100",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Disables AutoRun and AutoPlay execution on optical and removable USB media.",
     "sideEffects": "Removable drives and CDs will not automatically launch executable media installers upon insertion.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/win32/shell/autoplay"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › Bluetooth & devices › AutoPlay"
   },
   {
     "schemaVersion": "1.0.0",
@@ -3463,13 +3490,14 @@
     "source": "https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/clients/remote-desktop-allow-access",
     "verifiedOnBuild": "26100",
     "warnings": "Remote Desktop to this PC will stop working.",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Disables automatic Remote Desktop service activation and denies inbound RDP connections.",
     "sideEffects": "Inbound Remote Desktop connections to this computer will be rejected.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/welcome-to-rds"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › System › Remote Desktop"
   },
   {
     "schemaVersion": "1.0.0",
@@ -3528,13 +3556,14 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-devicelock#preventenablinglockscreencamera",
     "verifiedOnBuild": "26100",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Disables camera access from the Windows lock screen without signing in.",
     "sideEffects": "Camera app shortcut will not appear on the lock screen while the device is locked.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-personalization#personalization-nolockscreencamera"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › Accounts › Sign-in options › Dynamic lock"
   },
   {
     "schemaVersion": "1.0.0",
@@ -3654,13 +3683,14 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows-hardware/customize/desktop/unattend/microsoft-windows-shell-setup",
     "verifiedOnBuild": "22631.4317",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Configures File Explorer to show extensions for all file types.",
     "sideEffects": "None known.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/win32/shell/manage-the-desktop"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "File Explorer › View › Show › File name extensions"
   },
   {
     "schemaVersion": "1.0.0",
@@ -3717,13 +3747,14 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows-hardware/customize/desktop/unattend/microsoft-windows-shell-setup",
     "verifiedOnBuild": "22631.4317",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Configures File Explorer to show hidden files and folders.",
     "sideEffects": "None known.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/win32/shell/manage-the-desktop"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "File Explorer › View › Show › Hidden items"
   },
   {
     "schemaVersion": "1.0.0",
@@ -3781,13 +3812,14 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows-hardware/customize/desktop/unattend/microsoft-windows-shell-setup",
     "verifiedOnBuild": "22631.4317",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Sets File Explorer to open to 'This PC' instead of 'Home'.",
     "sideEffects": "None known.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/win32/shell/manage-the-desktop"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "File Explorer › Options › General › Open File Explorer to: This PC"
   },
   {
     "schemaVersion": "1.0.0",
@@ -3846,13 +3878,14 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/apps/get-started/enable-your-device-for-development",
     "verifiedOnBuild": "22631.4317",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Adds 'End Task' directly to the right-click menu on taskbar application icons.",
     "sideEffects": "None known.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/win32/shell/taskbar-extensions"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › System › For developers › End Task"
   },
   {
     "schemaVersion": "1.0.0",
@@ -3909,13 +3942,14 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-experience",
     "verifiedOnBuild": "22631.4317",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Displays seconds on the taskbar system tray clock.",
     "sideEffects": "None known.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/win32/shell/taskbar-extensions"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › Personalization › Taskbar › Taskbar behaviors › Show seconds in system tray clock"
   },
   {
     "schemaVersion": "1.0.0",
@@ -4036,13 +4070,14 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-experience#experience-taskbaralignment",
     "verifiedOnBuild": "22631.4317",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Aligns Windows 11 taskbar icons to the left.",
     "sideEffects": "None known.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/win32/shell/taskbar-extensions"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › Personalization › Taskbar › Taskbar behaviors › Taskbar alignment"
   },
   {
     "schemaVersion": "1.0.0",
@@ -4166,13 +4201,14 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-admx-windowsexplorer#windowsexplorer_showrecent",
     "verifiedOnBuild": "26100",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Hides recent files from Quick Access / Home in File Explorer.",
     "sideEffects": "None known.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/win32/shell/manage-the-desktop"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "File Explorer › Options › General › Privacy › Show recently used files"
   },
   {
     "schemaVersion": "1.0.0",
@@ -4233,13 +4269,14 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-admx-windowsexplorer",
     "verifiedOnBuild": "26100",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Hides frequently used folders from Quick Access / Home in File Explorer.",
     "sideEffects": "None known.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/win32/shell/manage-the-desktop"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "File Explorer › Options › General › Privacy › Show frequently used folders"
   },
   {
     "schemaVersion": "1.0.0",
@@ -4297,13 +4334,14 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows-hardware/customize/desktop/unattend/microsoft-windows-shell-setup",
     "verifiedOnBuild": "26100",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Displays the full directory path in the File Explorer title bar.",
     "sideEffects": "None known.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/win32/shell/manage-the-desktop"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "File Explorer › Options › View › Display the full path in the title bar"
   },
   {
     "schemaVersion": "1.0.0",
@@ -4364,13 +4402,14 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-search#allowsearchhighlights",
     "verifiedOnBuild": "26100",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Disables colorful search highlights and daily doodles in the Windows search box.",
     "sideEffects": "None known.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-admx-search#search-allowsearchhighlights"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › Privacy & security › Search permissions › More settings › Show search highlights"
   },
   {
     "schemaVersion": "1.0.0",
@@ -4430,13 +4469,14 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-newsandinterests#allownewsandinterests",
     "verifiedOnBuild": "26100",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Hides the Widgets icon from the Windows 11 taskbar.",
     "sideEffects": "Removes the Widgets weather button from the taskbar.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/apps/design/shell/widgets/"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › Personalization › Taskbar › Taskbar items › Widgets"
   },
   {
     "schemaVersion": "1.0.0",
@@ -4495,13 +4535,14 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-experience#experience-configurechaticon",
     "verifiedOnBuild": "26100",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Hides the Microsoft Teams Chat button from the Windows 11 taskbar.",
     "sideEffects": "Removes the Teams Chat icon from the taskbar.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-experience#experience-configurechatontaskbar"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › Personalization › Taskbar › Taskbar items › Chat"
   },
   {
     "schemaVersion": "1.0.0",
@@ -4559,13 +4600,14 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows-hardware/customize/desktop/unattend/microsoft-windows-shell-setup-taskbarlinks",
     "verifiedOnBuild": "26100",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Hides the Task View button from the Windows 11 taskbar.",
     "sideEffects": "Removes the Task View icon from the taskbar; virtual desktops can still be switched using Win+Tab.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/win32/shell/taskbar-extensions"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › Personalization › Taskbar › Taskbar items › Task view"
   },
   {
     "schemaVersion": "1.0.0",
@@ -4624,13 +4666,14 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/configuration/windows-spotlight",
     "verifiedOnBuild": "26100",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Disables the Windows Welcome Experience post-update configuration screen.",
     "sideEffects": "None known.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-experience#experience-allowwindowswelcomeexperience"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › System › Notifications › Additional settings › Show the Windows welcome experience after updates"
   },
   {
     "schemaVersion": "1.0.0",
@@ -4689,13 +4732,14 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/configuration/windows-spotlight",
     "verifiedOnBuild": "26100",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Disables tips, tricks, and feature suggestions in Windows notifications.",
     "sideEffects": "None known.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-experience#experience-allowsoftwareshareofdiagnosticdata"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › System › Notifications › Additional settings › Get tips and suggestions when using Windows"
   },
   {
     "schemaVersion": "1.0.0",
@@ -5003,13 +5047,14 @@
     ],
     "source": "https://learn.microsoft.com/en-us/windows/deployment/do/waas-delivery-optimization-reference",
     "verifiedOnBuild": "26100",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Disables Windows Update downloads over metered or cellular network connections.",
     "sideEffects": "Updates will not download while the active internet connection is marked as metered.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/deployment/do/waas-delivery-optimization"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › Windows Update › Advanced options › Delivery Optimization › Advanced options › Download settings"
   },
   {
     "schemaVersion": "1.0.0",

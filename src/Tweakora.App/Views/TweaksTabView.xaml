@@ -266,6 +266,15 @@
                                             <TextBlock Text="{Binding SideEffects}" FontSize="12" Foreground="#E2E8F0" LineHeight="17" TextWrapping="Wrap" />
                                         </StackPanel>
 
+                                        <!-- Where to find this in Windows (for UI-equivalent settings) -->
+                                        <Border Background="#064E3B" BorderBrush="#059669" BorderThickness="1" CornerRadius="4" Padding="8,6" Margin="0,0,0,8"
+                                                Visibility="{Binding HasUiEquivalentLocation, Converter={StaticResource BoolToVis}}">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="⚙️ WHERE TO FIND THIS IN WINDOWS: " FontSize="10" FontWeight="Bold" Foreground="#34D399" VerticalAlignment="Center" />
+                                                <TextBlock Text="{Binding UiEquivalentLocation}" FontSize="11" Foreground="#A7F3D0" TextWrapping="Wrap" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                        </Border>
+
                                         <!-- Exact Changes Section -->
                                         <StackPanel Margin="0,0,0,8" Visibility="{Binding HasExactChanges, Converter={StaticResource BoolToVis}}">
                                             <TextBlock Text="EXACT CHANGES (ENGINE SPECIFICATION)" FontSize="10" FontWeight="Bold" Foreground="#38BDF8" Margin="0,0,0,3" />

@@ -131,7 +131,11 @@
     },
     "evidence": {
       "type": "string",
-      "enum": ["documented", "situational", "anecdotal"]
+      "enum": ["documented", "situational", "anecdotal", "ui-equivalent"]
+    },
+    "uiEquivalentLocation": {
+      "type": "string",
+      "minLength": 5
     },
     "whatItDoes": {
       "type": "string"
@@ -148,6 +152,17 @@
     }
   },
   "allOf": [
+    {
+      "if": {
+        "properties": {
+          "evidence": { "const": "ui-equivalent" }
+        },
+        "required": ["evidence"]
+      },
+      "then": {
+        "required": ["uiEquivalentLocation"]
+      }
+    },
     {
       "if": {
         "properties": {

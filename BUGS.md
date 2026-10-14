@@ -401,3 +401,20 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
   5. Replaced "Configured Settings" meter and percentage progress bar in `DashboardTabView.xaml` and `DashboardViewModel.cs` with neutral "N tweaks applied by WinVelo" status with no score, percentage, or grade.
   6. Added `sourceQuote` to `tweak.schema.json`, `TweakDefinition.cs`, `TweakCardModel`, `TweaksTabView.xaml`, and CLI `--info`.
   7. Updated `CatalogValidator` and unit tests in `TweakExplanationTests.cs` and `PlaceboAndClaimScrubTests.cs` to enforce `sourceQuote` on all documented tweaks and prevent anecdotal/experimental tweaks in presets.
+
+---
+
+## BUG-027: Ambiguous Evidence Semantics for Ordinary UI Settings and Incomplete Recommended-Only Criteria
+- **Component**: `Catalog/Tweaks/*.json`, `Catalog/schema/tweak.schema.json`, `src/Tweakora.Core/Models/TweakDefinition.cs`, `tools/CatalogValidator/Program.cs`, `src/Tweakora.App/ViewModels/TweaksViewModel.cs`, `src/Tweakora.App/Views/TweaksTabView.xaml`, `src/Tweakora.Cli/Program.cs`, `docs/EVIDENCE_AUDIT.md`, `src/Tweakora.Tests/TweakExplanationTests.cs`, `src/Tweakora.Tests/PlaceboAndClaimScrubTests.cs`
+- **Finding**:
+  1. The previous audit grouped 131 tweaks under `evidence: "situational"`. Most of these were ordinary Windows Settings (e.g., dark mode, file extensions, taskbar alignment, hidden files, transparency), which broke the intended definition of "situational" as "fixes a specific named problem or workaround".
+  2. Users looking at ordinary UI preferences had no indication where that setting could be toggled natively in Windows Settings or Control Panel.
+  3. The "Recommended only" view filter previously checked only `documented` evidence, excluding safe and standard UI settings that have direct GUI equivalents in Windows.
+- **Root Cause**: Absence of an explicit `ui-equivalent` evidence level that captures settings directly configurable via standard Windows GUI dialogs and pages.
+- **Fix**:
+  1. Introduced `ui-equivalent` evidence tier in `tweak.schema.json`, `TweakDefinition.cs`, `TweakCardModel`, and `CatalogValidator`.
+  2. Added required `uiEquivalentLocation` field specifying exact navigation path (e.g. `Settings › Personalization › Colors`).
+  3. Reclassified all 149 tweaks: 16 `documented`, 71 `ui-equivalent`, 60 `situational` (strictly fixing named problems), 2 `anecdotal` (`needsReview: true`).
+  4. Updated "Recommended only" filter criteria: `(Risk is Safe or Low) && (Evidence is documented or ui-equivalent) && Reversible && !NeedsReview && (Category != "Experimental")`.
+  5. Added "⚙️ WHERE TO FIND THIS IN WINDOWS:" disclosure banner to expanded cards in `TweaksTabView.xaml` and CLI `--info`.
+  6. Updated `docs/EVIDENCE_AUDIT.md`, schema validator, and regression tests (`UiEquivalentTweaks_HaveNonEmptyUiLocation`, `TweaksViewModel_RecommendedOnlyFilter_ShowsOnlySafeAndLowDocumentedReversible`).

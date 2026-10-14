@@ -1226,13 +1226,14 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/display",
     "verifiedOnBuild": "26100",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Adjusts graphics driver timeout detection recovery (TdrLevel, TdrDelay) in system graphics drivers.",
     "sideEffects": "Modifies display driver recovery timeouts; display driver crashes may freeze the entire operating system instead of recovering dynamically.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows-hardware/drivers/display/timeout-detection-and-recovery"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "SystemPropertiesPerformance.exe › Visual Effects › Adjust for best performance"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1352,13 +1353,14 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/storage",
     "verifiedOnBuild": "26100",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Configures Windows Storage Sense automated cleanup parameters and temporary file deletion policies.",
     "sideEffects": "Automatically deletes files in Downloads or Recycle Bin that have remained untouched longer than configured retention limits.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/client-management/mdm/storage-csp"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › System › Storage › Storage Sense"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1659,13 +1661,14 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/disablenotifications",
     "verifiedOnBuild": "26100",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Globally disables the Windows notification platform and Action Center alerts via system policies.",
     "sideEffects": "All application notifications, system security alerts, and Action Center banners will be suppressed.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/apps/design/shell/tiles-and-notifications/"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › System › Notifications"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1966,12 +1969,13 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/disablebgapps",
     "verifiedOnBuild": "26100",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Sets GlobalUserDisabled to 1 under BackgroundAccessApplications, preventing background execution of Store and UWP apps.",
     "sideEffects": "Prevents Windows Store and UWP applications from running or updating in the background when minimized.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-privacy#privacy-letappsruninbackground"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › Apps › Installed apps › Advanced options › Background apps permissions"
   }
 ]

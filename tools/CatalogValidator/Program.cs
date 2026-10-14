@@ -497,11 +497,12 @@ public static class Program
         if (string.IsNullOrWhiteSpace(evidence) ||
             (!string.Equals(evidence, "documented", StringComparison.OrdinalIgnoreCase) &&
              !string.Equals(evidence, "situational", StringComparison.OrdinalIgnoreCase) &&
-             !string.Equals(evidence, "anecdotal", StringComparison.OrdinalIgnoreCase)))
+             !string.Equals(evidence, "anecdotal", StringComparison.OrdinalIgnoreCase) &&
+             !string.Equals(evidence, "ui-equivalent", StringComparison.OrdinalIgnoreCase)))
         {
             errorCount++;
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"  [FAIL] Tweak '{id}' is missing a valid 'evidence' field ('documented', 'situational', or 'anecdotal'). Found: '{evidence}'.");
+            Console.WriteLine($"  [FAIL] Tweak '{id}' is missing a valid 'evidence' field ('documented', 'situational', 'anecdotal', or 'ui-equivalent'). Found: '{evidence}'.");
             Console.ResetColor();
         }
 
@@ -513,6 +514,18 @@ public static class Program
                 errorCount++;
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine($"  [FAIL] Tweak '{id}' has evidence='documented' but missing or empty 'sourceQuote' (must quote documented source naming the setting).");
+                Console.ResetColor();
+            }
+        }
+
+        if (string.Equals(evidence, "ui-equivalent", StringComparison.OrdinalIgnoreCase))
+        {
+            string? uiLoc = item["uiEquivalentLocation"]?.ToString();
+            if (string.IsNullOrWhiteSpace(uiLoc) || uiLoc.Trim().Length < 5)
+            {
+                errorCount++;
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"  [FAIL] Tweak '{id}' has evidence='ui-equivalent' but missing or empty 'uiEquivalentLocation' (e.g. 'Settings › Personalization › Colors').");
                 Console.ResetColor();
             }
         }

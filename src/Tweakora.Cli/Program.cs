@@ -1338,6 +1338,11 @@ public static class Program
             ? (string.Equals(tweak.Risk, "Safe", StringComparison.OrdinalIgnoreCase) ? "None known." : "See documentation for potential impacts.")
             : tweak.SideEffects);
 
+        if (!string.IsNullOrWhiteSpace(tweak.UiEquivalentLocation))
+        {
+            Console.WriteLine($"\nWHERE TO FIND THIS IN WINDOWS:\n  {tweak.UiEquivalentLocation}");
+        }
+
         Console.WriteLine("\nEXACT CHANGES (ENGINE SPECIFICATION):");
         var exactChanges = TweakActionFormatter.FormatExactChanges(tweak);
         if (exactChanges.Count > 0)

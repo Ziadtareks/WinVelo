@@ -216,7 +216,7 @@
     "category": "preferences",
     "subcategory": "Gaming & GPU",
     "risk": "Medium",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "impacts": [
       "performance",
       "gaming"
@@ -263,7 +263,8 @@
     "sources": [
       "https://devblogs.microsoft.com/directx/hardware-accelerated-gpu-scheduling/"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › System › Display › Graphics › Default graphics settings › Hardware-accelerated GPU scheduling"
   },
   {
     "schemaVersion": "1.0.0",
@@ -330,7 +331,7 @@
     "category": "preferences",
     "subcategory": "Gaming & Input",
     "risk": "Safe",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "impacts": [
       "gaming",
       "ui"
@@ -413,7 +414,8 @@
     "sources": [
       "https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-systemparametersinfow"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › Bluetooth & devices › Mouse › Additional mouse settings › Pointer Options › Enhance pointer precision"
   },
   {
     "schemaVersion": "1.0.0",

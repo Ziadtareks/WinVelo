@@ -4,6 +4,7 @@ using Xunit;
 
 namespace Tweakora.Tests;
 
+[Collection("CliConsoleTests")]
 public sealed class CliConfirmationTests
 {
     [Fact]

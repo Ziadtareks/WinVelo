@@ -222,6 +222,9 @@ public sealed partial class TweakCardModel : ObservableObject
     public bool HasSources => Sources.Count > 0;
     public string? SourceQuote => Tweak.SourceQuote;
     public bool HasSourceQuote => !string.IsNullOrWhiteSpace(SourceQuote);
+    public string? UiEquivalentLocation => Tweak.UiEquivalentLocation;
+    public bool HasUiEquivalentLocation => !string.IsNullOrWhiteSpace(UiEquivalentLocation);
+    public bool IsUiEquivalent => string.Equals(Tweak.Evidence, "ui-equivalent", StringComparison.OrdinalIgnoreCase);
     public bool NeedsReview => Tweak.NeedsReview;
 
     public IReadOnlyList<string> ExactChanges => TweakActionFormatter.FormatExactChanges(Tweak);
@@ -657,14 +660,16 @@ public sealed partial class TweaksViewModel : ObservableObject
                 continue;
             }
 
-            // Recommended only filter: show only conservative, documented, non-needsReview, reversible tweaks (Safe and Low risk)
+            // Recommended only filter: Safe or Low, evidence documented or ui-equivalent, reversible, not needsReview, not Experimental
             if (IsRecommendedOnly)
             {
                 bool isRecommended = (string.Equals(card.Risk, "Safe", StringComparison.OrdinalIgnoreCase) ||
                                       string.Equals(card.Risk, "Low", StringComparison.OrdinalIgnoreCase)) &&
-                                     string.Equals(card.Evidence, "documented", StringComparison.OrdinalIgnoreCase) &&
+                                     (string.Equals(card.Evidence, "documented", StringComparison.OrdinalIgnoreCase) ||
+                                      string.Equals(card.Evidence, "ui-equivalent", StringComparison.OrdinalIgnoreCase)) &&
+                                     card.Tweak.Reversible &&
                                      !card.NeedsReview &&
-                                     card.Tweak.Reversible;
+                                     !string.Equals(card.Category, "Experimental", StringComparison.OrdinalIgnoreCase);
                 if (!isRecommended)
                 {
                     continue;

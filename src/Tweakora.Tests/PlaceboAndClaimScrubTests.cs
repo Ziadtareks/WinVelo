@@ -33,7 +33,7 @@ public sealed class PlaceboAndClaimScrubTests
     public void Catalog_AllTweaks_HaveValidEvidenceLevel()
     {
         string tweaksDir = Path.Combine(GetCatalogDir(), "Tweaks");
-        var validEvidence = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "documented", "situational", "anecdotal" };
+        var validEvidence = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "documented", "situational", "anecdotal", "ui-equivalent" };
 
         var files = Directory.GetFiles(tweaksDir, "*.json");
         Assert.NotEmpty(files);
@@ -138,22 +138,22 @@ public sealed class PlaceboAndClaimScrubTests
         Assert.Equal("situational", mmcss.Evidence);
         Assert.True(mmcss.NeedsReview);
 
-        // 7. Mouse acceleration & HAGS: user preferences
+        // 7. Mouse acceleration & HAGS: user preferences (ui-equivalent)
         var mouseAcc1 = allTweaks["gaming.input.disable-mouse-acceleration"];
         Assert.Equal("preferences", mouseAcc1.Category);
-        Assert.Equal("situational", mouseAcc1.Evidence);
+        Assert.Equal("ui-equivalent", mouseAcc1.Evidence);
 
         var mouseAcc2 = allTweaks["performance.input.raw-mouse"];
         Assert.Equal("preferences", mouseAcc2.Category);
-        Assert.Equal("situational", mouseAcc2.Evidence);
+        Assert.Equal("ui-equivalent", mouseAcc2.Evidence);
 
         var mouseAcc3 = allTweaks["pref.mouseacceleration"];
         Assert.Equal("preferences", mouseAcc3.Category);
-        Assert.Equal("situational", mouseAcc3.Evidence);
+        Assert.Equal("ui-equivalent", mouseAcc3.Evidence);
 
         var hags = allTweaks["performance.gpu.hags"];
         Assert.Equal("preferences", hags.Category);
-        Assert.Equal("situational", hags.Evidence);
+        Assert.Equal("ui-equivalent", hags.Evidence);
     }
 
     [Fact]

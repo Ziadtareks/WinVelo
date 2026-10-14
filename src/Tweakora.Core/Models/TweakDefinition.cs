@@ -166,6 +166,9 @@ public sealed class TweakDefinition
     [JsonPropertyName("evidence")]
     public string Evidence { get; set; } = "documented";
 
+    [JsonPropertyName("uiEquivalentLocation")]
+    public string? UiEquivalentLocation { get; set; }
+
     [JsonPropertyName("whatItDoes")]
     public string? WhatItDoes { get; set; }
 

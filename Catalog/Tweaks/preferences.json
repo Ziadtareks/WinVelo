@@ -121,13 +121,14 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/batterypercentage",
     "verifiedOnBuild": "26100",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Enables battery remaining percentage indicator on the Windows taskbar.",
     "sideEffects": "Requires a laptop or battery device; not applicable to desktop systems.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/apps/design/controls/progress-bar"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › Personalization › Taskbar › Other system tray icons"
   },
   {
     "schemaVersion": "1.0.0",
@@ -196,13 +197,14 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/darkmode",
     "verifiedOnBuild": "26100",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Enables system-wide dark theme for Windows shell and supported desktop apps.",
     "sideEffects": "None known.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/apps/design/style/color"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › Personalization › Colors › Choose your mode"
   },
   {
     "schemaVersion": "1.0.0",
@@ -253,13 +255,14 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/showext",
     "verifiedOnBuild": "26100",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Configures File Explorer to always display file extensions for known file types.",
     "sideEffects": "None known.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/win32/shell/manage-the-desktop"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "File Explorer › View › Show › File name extensions"
   },
   {
     "schemaVersion": "1.0.0",
@@ -310,13 +313,14 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/hiddenfiles",
     "verifiedOnBuild": "26100",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Configures File Explorer to display hidden files and folders.",
     "sideEffects": "None known.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/win32/shell/manage-the-desktop"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "File Explorer › View › Show › Hidden items"
   },
   {
     "schemaVersion": "1.0.0",
@@ -476,13 +480,14 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/newoutlook",
     "verifiedOnBuild": "26100",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Prevents Windows from auto-installing or forcing the New Outlook web wrapper.",
     "sideEffects": "None known.",
     "sources": [
       "https://learn.microsoft.com/en-us/deployoffice/outlook/new-outlook-for-windows"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Outlook App › Try the new Outlook toggle"
   },
   {
     "schemaVersion": "1.0.0",
@@ -533,13 +538,14 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/scrollbars",
     "verifiedOnBuild": "26100",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Always displays full scrollbars in Windows 11 apps instead of hiding them until hovered.",
     "sideEffects": "None known.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/apps/design/controls/scroll-bar"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › Accessibility › Visual effects › Always show scrollbars"
   },
   {
     "schemaVersion": "1.0.0",
@@ -621,7 +627,7 @@
     "category": "preferences",
     "subcategory": "Customize Preferences",
     "risk": "Safe",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "impacts": [
       "ui"
     ],
@@ -703,7 +709,8 @@
     "sources": [
       "https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-systemparametersinfow"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › Bluetooth & devices › Mouse › Additional mouse settings › Pointer Options › Enhance pointer precision"
   },
   {
     "schemaVersion": "1.0.0",
@@ -772,13 +779,14 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/numlock",
     "verifiedOnBuild": "26100",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Enables NumLock automatically on the Windows logon screen during startup.",
     "sideEffects": "Alters the default state of the NumLock key at system boot; may affect laptop keyboards without dedicated numeric keypads.",
     "sources": [
       "https://learn.microsoft.com/en-us/troubleshoot/windows-client/deployment/enable-num-lock-on-logon-screen"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Control Panel › Ease of Access Center › Make the keyboard easier to use"
   },
   {
     "schemaVersion": "1.0.0",
@@ -829,13 +837,14 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/windowsnapping",
     "verifiedOnBuild": "26100",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Customizes window snapping animations and edge assist behaviors.",
     "sideEffects": "Alters how application windows snap to screen borders and zones.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/apps/design/basics/window-management"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › System › Multitasking › Snap windows"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1197,13 +1206,14 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/disablelockscreen",
     "verifiedOnBuild": "26100",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Disables the swipe/key-press lock screen overlay, presenting the password prompt immediately.",
     "sideEffects": "Bypasses the lock screen clock and notifications overlay, jumping directly to user sign-in.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-personalization#personalization-nolockscreencamera"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › Accounts › Sign-in options"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1302,13 +1312,14 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/startmenurecommendations",
     "verifiedOnBuild": "26100",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Disables recommended files and recently opened items in the Windows 11 Start Menu.",
     "sideEffects": "The 'Recommended' section of the Start Menu remains empty and will not display recent files.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-start#start-hideshareddocuments"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › Personalization › Start › Show recommendations for tips, shortcuts, new apps, and more"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1359,13 +1370,14 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/stickykeys",
     "verifiedOnBuild": "26100",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Disables the accessibility shortcut that triggers Sticky Keys when pressing Shift 5 times.",
     "sideEffects": "None known.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/apps/design/accessibility/accessibility-overview"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › Accessibility › Keyboard › Sticky keys"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1428,13 +1440,14 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/taskbaralignment",
     "verifiedOnBuild": "26100",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Sets Windows 11 taskbar icons alignment to the left instead of center.",
     "sideEffects": "None known.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/win32/shell/taskbar-extensions"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › Personalization › Taskbar › Taskbar behaviors › Taskbar alignment"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1485,13 +1498,14 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/taskbarsearch",
     "verifiedOnBuild": "26100",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Configures Windows taskbar search box display mode.",
     "sideEffects": "None known.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/win32/shell/taskbar-extensions"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › Personalization › Taskbar › Taskbar items › Search"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1542,13 +1556,14 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/taskview",
     "verifiedOnBuild": "26100",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Hides the Task View / virtual desktops button from the Windows taskbar.",
     "sideEffects": "Removes the Task View shortcut icon from the taskbar; virtual desktops can still be switched via Win+Tab.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/win32/shell/taskbar-extensions"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › Personalization › Taskbar › Taskbar items › Task view"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1617,13 +1632,14 @@
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/gamemode",
     "verifiedOnBuild": "26100",
-    "evidence": "situational",
+    "evidence": "ui-equivalent",
     "whatItDoes": "Toggles Windows Game Mode (AutoGameModeEnabled) in user settings.",
     "sideEffects": "Windows Game Mode prioritization will be toggled; may alter background resource balancing during full-screen games.",
     "sources": [
       "https://support.microsoft.com/en-us/windows/use-game-mode-on-your-pc-5dd4ef61-3397-5072-2765-348619257710"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › Gaming › Game Mode › Game Mode"
   },
   {
     "schemaVersion": "1.0.0",
