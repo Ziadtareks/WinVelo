@@ -73,7 +73,10 @@ public sealed partial class HistoryViewModel : ObservableObject
     public ObservableCollection<BackupSnapshotInfo> Snapshots { get; } = new();
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasSelectedSession))]
     private HistorySessionCardModel? _selectedSession;
+
+    public bool HasSelectedSession => SelectedSession != null;
 
     [ObservableProperty]
     private BackupSnapshotInfo? _selectedSnapshot;
@@ -281,9 +284,9 @@ public sealed partial class HistoryViewModel : ObservableObject
             {
                 SelectedSession = Sessions[0];
             }
-            else if (LegacySessions.Count > 0)
+            else
             {
-                SelectedSession = LegacySessions[0];
+                SelectedSession = null;
             }
 
             OnPropertyChanged(nameof(HasLegacySessions));

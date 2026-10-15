@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              xmlns:vm="clr-namespace:Tweakora.App.ViewModels"
+              xmlns:converters="clr-namespace:Tweakora.App.Converters"
              xmlns:models="clr-namespace:Tweakora.Core.Models;assembly=Tweakora.Core"
              xmlns:interfaces="clr-namespace:Tweakora.Core.Interfaces;assembly=Tweakora.Core"
              AutomationProperties.AutomationId="HistoryTabView"
@@ -10,6 +11,31 @@
 
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisConverter" />
+        <converters:InverseBooleanToVisibilityConverter x:Key="InverseBoolToVisConverter" />
+
+        <Style x:Key="SegmentedTabBtn" TargetType="Button">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="14,6" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="TabBorder" Background="{TemplateBinding Background}" CornerRadius="4" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="TabBorder" Property="Background" Value="{DynamicResource BgCardHoverBrush}" />
+                                <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </UserControl.Resources>
 
     <Grid Margin="24">
@@ -28,15 +54,37 @@
             </StackPanel>
 
             <WrapPanel Orientation="Horizontal" VerticalAlignment="Center">
-                <!-- View Switcher -->
+                <!-- View Switcher (Segmented Tabs with Selected State) -->
                 <Border Background="{DynamicResource BgDeepBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="1" CornerRadius="6" Padding="2" Margin="0,0,12,6">
                     <StackPanel Orientation="Horizontal">
                         <Button AutomationProperties.Name="View session timeline" Content="Session Timeline"
-                                Command="{Binding SetHistoryViewCommand}" CommandParameter="Sessions"
-                                Style="{DynamicResource ModernGhostBtn}" Padding="10,5" FontSize="11" />
+                                Command="{Binding SetHistoryViewCommand}" CommandParameter="Sessions">
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource SegmentedTabBtn}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsTimelineView}" Value="True">
+                                            <Setter Property="Background" Value="{DynamicResource BgCardBrush}" />
+                                            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+                                            <Setter Property="FontWeight" Value="SemiBold" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
                         <Button AutomationProperties.Name="View activity log" Content="Activity Log"
-                                Command="{Binding SetHistoryViewCommand}" CommandParameter="ActivityLog"
-                                Style="{DynamicResource ModernGhostBtn}" Padding="10,5" FontSize="11" />
+                                Command="{Binding SetHistoryViewCommand}" CommandParameter="ActivityLog">
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource SegmentedTabBtn}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsActivityLogView}" Value="True">
+                                            <Setter Property="Background" Value="{DynamicResource BgCardBrush}" />
+                                            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+                                            <Setter Property="FontWeight" Value="SemiBold" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
                     </StackPanel>
                 </Border>
 
@@ -247,10 +295,22 @@
                     BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="1"
                     CornerRadius="8" Padding="16">
                 <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" /> <!-- Session Actions Bar -->
-                        <RowDefinition Height="*" />    <!-- Tweaks & Actions List -->
-                    </Grid.RowDefinitions>
+                    <!-- Empty State (When no session is selected) -->
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="32"
+                                Visibility="{Binding HasSelectedSession, Converter={StaticResource InverseBoolToVisConverter}}">
+                        <ui:SymbolIcon Symbol="History24" FontSize="44" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center" Margin="0,0,0,16" />
+                        <TextBlock Text="No changes yet." FontSize="16" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}" HorizontalAlignment="Center" Margin="0,0,0,6" />
+                        <TextBlock Text="Changes you apply with WinVelo will appear here." FontSize="13"
+                                   Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center" />
+                    </StackPanel>
+
+                    <!-- Selected Session Content (When a session is selected) -->
+                    <Grid Visibility="{Binding HasSelectedSession, Converter={StaticResource BoolToVisConverter}}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" /> <!-- Session Actions Bar -->
+                            <RowDefinition Height="*" />    <!-- Tweaks & Actions List -->
+                        </Grid.RowDefinitions>
 
                     <!-- Session Actions Bar -->
                     <Border Grid.Row="0" Background="{DynamicResource BgDeepBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
@@ -373,6 +433,7 @@
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                     </ListBox>
+                    </Grid>
                 </Grid>
             </Border>
             </Grid>
