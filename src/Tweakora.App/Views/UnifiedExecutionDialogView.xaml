@@ -11,13 +11,16 @@
 
     <Grid>
         <!-- 1. UNIFIED PREVIEW DIALOG MODAL -->
-        <Grid Background="#B0000000"
+        <Grid Background="#99000000"
               Visibility="{Binding IsPreviewOpen, Converter={StaticResource BoolToVisConverter}}"
               Panel.ZIndex="3100">
             <Border Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
                     BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
                     BorderThickness="1" CornerRadius="10"
                     Width="780" MaxHeight="620" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="32" ShadowDepth="8" Direction="270" Color="#000000" Opacity="0.75" />
+                </Border.Effect>
                 <Grid Margin="22">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -128,13 +131,16 @@
         </Grid>
 
         <!-- 2. UNIFIED RESULT DIALOG MODAL -->
-        <Grid Background="#B0000000"
+        <Grid Background="#99000000"
               Visibility="{Binding IsResultOpen, Converter={StaticResource BoolToVisConverter}}"
               Panel.ZIndex="3200">
             <Border Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
                     BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
                     BorderThickness="1" CornerRadius="10"
                     Width="740" MaxHeight="600" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="32" ShadowDepth="8" Direction="270" Color="#000000" Opacity="0.75" />
+                </Border.Effect>
                 <Grid Margin="22">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
