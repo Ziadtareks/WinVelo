@@ -46,7 +46,24 @@ public sealed partial class ApplicationItem : ObservableObject
     private bool _isSelected;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(StateText))]
+    [NotifyPropertyChangedFor(nameof(StateBadgeBackground))]
+    [NotifyPropertyChangedFor(nameof(StateBadgeForeground))]
+    [NotifyPropertyChangedFor(nameof(StateBadgeBorder))]
     private bool _isInstalled;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(StateText))]
+    [NotifyPropertyChangedFor(nameof(StateBadgeBackground))]
+    [NotifyPropertyChangedFor(nameof(StateBadgeForeground))]
+    [NotifyPropertyChangedFor(nameof(StateBadgeBorder))]
+    private bool _hasUpdate;
+
+    public string StateText => HasUpdate ? "Update available" : (IsInstalled ? "Installed" : "Not installed");
+
+    public string StateBadgeBackground => HasUpdate ? "#451A03" : (IsInstalled ? "#064E3B" : "#1E222D");
+    public string StateBadgeForeground => HasUpdate ? "#F59E0B" : (IsInstalled ? "#10B981" : "#94A3B8");
+    public string StateBadgeBorder => HasUpdate ? "#D97706" : (IsInstalled ? "#059669" : "#334155");
 
     [ObservableProperty]
     private bool _isBusy;

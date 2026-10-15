@@ -3,170 +3,171 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              xmlns:vm="clr-namespace:Tweakora.App.ViewModels"
+             xmlns:controls="clr-namespace:Tweakora.App.Controls"
              AutomationProperties.AutomationId="InstallTabView">
 
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
     </UserControl.Resources>
 
-    <Grid Margin="20,16,20,16">
+    <Grid Background="Transparent">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" /> <!-- Top Action Bar -->
+            <RowDefinition Height="Auto" /> <!-- Top Search & Manager Bar -->
             <RowDefinition Height="Auto" /> <!-- Category Filter Bar -->
-            <RowDefinition Height="*" />    <!-- Apps Grid -->
-            <RowDefinition Height="Auto" /> <!-- Progress & Log Bar -->
+            <RowDefinition Height="*" />    <!-- Responsive Apps Grid -->
+            <RowDefinition Height="Auto" /> <!-- Sticky Selection Footer (appears only when HasSelection) -->
         </Grid.RowDefinitions>
 
-        <!-- Top Action Bar -->
-        <Border Grid.Row="0" Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
-                BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
-                BorderThickness="1" CornerRadius="8" Padding="14,10" Margin="0,0,0,12">
+        <!-- Top Search, Manager & Upgrade Bar -->
+        <Border Grid.Row="0" Background="{DynamicResource BgCardBrush}"
+                BorderBrush="{DynamicResource BorderSubtleBrush}"
+                BorderThickness="0,0,0,1" Padding="16,10">
             <DockPanel LastChildFill="False">
-                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" VerticalAlignment="Center">
-                    <!-- Package Manager Selector with Automatic Detection -->
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,16,0">
-                        <TextBlock Text="Package Manager:" VerticalAlignment="Center" Margin="0,0,8,0" FontWeight="SemiBold" FontSize="13" Foreground="{DynamicResource TextPrimaryBrush}" />
+                <WrapPanel Orientation="Horizontal" DockPanel.Dock="Left" VerticalAlignment="Center">
+                    <!-- Search Input (AutomationId="TopSearchBox" for UI tests) -->
+                    <ui:TextBox AutomationProperties.AutomationId="TopSearchBox"
+                                AutomationProperties.Name="Search applications"
+                                PlaceholderText="Search applications..."
+                                Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                Width="220" Margin="0,0,12,0" VerticalAlignment="Center" />
+
+                    <!-- Package Manager Selector -->
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,12,0">
+                        <TextBlock Text="Package Manager:" VerticalAlignment="Center" Margin="0,0,8,0"
+                                   FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}" />
                         <ComboBox ItemsSource="{Binding AvailablePackageManagers}"
                                   SelectedItem="{Binding PackageManager, Mode=TwoWay}"
                                   AutomationProperties.Name="Package Manager"
-                                  Width="130" Margin="0,0,8,0" VerticalAlignment="Center" />
-                        <Border Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="6" Padding="8,3" VerticalAlignment="Center">
-                            <StackPanel Orientation="Horizontal">
-                                <ui:SymbolIcon Symbol="CheckmarkCircle24" Foreground="#38BDF8" FontSize="12" Margin="0,0,4,0" VerticalAlignment="Center" />
-                                <TextBlock Text="{Binding PackageManagerStatus}" FontSize="11" Foreground="#38BDF8" FontWeight="SemiBold" VerticalAlignment="Center" />
-                            </StackPanel>
-                        </Border>
+                                  Width="120" VerticalAlignment="Center" />
                     </StackPanel>
 
-                    <!-- Action Buttons -->
-                    <ui:Button AutomationProperties.AutomationId="InstallSelectedButton"
-                               AutomationProperties.Name="Install Selected Apps"
-                               Appearance="Primary" Icon="{ui:SymbolIcon ArrowDownload24}"
-                               Content="Install Selected" Command="{Binding InstallSelectedCommand}"
-                               Margin="0,0,8,0" Padding="14,6" FontWeight="SemiBold" />
-
-                    <ui:Button AutomationProperties.AutomationId="UninstallSelectedButton"
-                               AutomationProperties.Name="Uninstall Selected Apps"
-                               Appearance="Secondary" Icon="{ui:SymbolIcon Delete24}"
-                               Content="Uninstall Selected" Command="{Binding UninstallSelectedCommand}"
-                               Margin="0,0,8,0" Padding="14,6" />
-
+                    <!-- Upgrade All Button -->
                     <ui:Button AutomationProperties.AutomationId="UpgradeAllButton"
                                AutomationProperties.Name="Upgrade All Apps"
-                               Appearance="Transparent" Icon="{ui:SymbolIcon ArrowSync24}"
-                               Content="Upgrade All" Command="{Binding UpgradeAllCommand}"
-                               Margin="0,0,8,0" Padding="12,6" />
+                               Appearance="Secondary" Icon="{ui:SymbolIcon ArrowSync24}"
+                               Content="Upgrade all" Command="{Binding UpgradeAllCommand}"
+                               VerticalAlignment="Center" Margin="0,0,8,0" Padding="12,5" />
+                </WrapPanel>
 
-                    <ui:Button AutomationProperties.AutomationId="ClearAppSelectionButton"
-                               AutomationProperties.Name="Clear App Selection"
-                               Appearance="Transparent" Icon="{ui:SymbolIcon Dismiss24}"
-                               Content="Clear Selection" Command="{Binding ClearSelectionCommand}"
-                               Padding="10,6" />
+                <!-- Right: Active Status / Apps Count -->
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center">
+                    <Border Background="{DynamicResource StatusDefaultBgBrush}" CornerRadius="10" Padding="10,3" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding FilteredApps.Count, StringFormat='{}{0} apps'}"
+                                   FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" FontWeight="SemiBold" />
+                    </Border>
                 </StackPanel>
-
-                <!-- Selected Counter Badge -->
-                <Border DockPanel.Dock="Right" Background="{DynamicResource AccentPrimaryBrush}"
-                        CornerRadius="12" Padding="12,4" VerticalAlignment="Center">
-                    <TextBlock Text="{Binding SelectedCount, StringFormat='{}Selected: {0}'}"
-                               Foreground="White" FontWeight="Bold" FontSize="12" />
-                </Border>
             </DockPanel>
         </Border>
 
-        <!-- Category Filter Chips / Bar -->
-        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" Margin="0,0,0,12">
-            <ItemsControl ItemsSource="{Binding Categories}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <StackPanel Orientation="Horizontal" />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <ui:Button Content="{Binding}" Margin="0,0,8,0" Padding="14,6"
-                                   AutomationProperties.Name="{Binding StringFormat='Category: {0}'}"
-                                   Command="{Binding DataContext.SelectCategoryCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                   CommandParameter="{Binding}" />
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </ScrollViewer>
+        <!-- Category Filter Bar -->
+        <Border Grid.Row="1" Background="{DynamicResource BgCardBrush}"
+                BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="0,0,0,1"
+                Padding="16,8">
+            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                <ItemsControl ItemsSource="{Binding Categories}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <ui:Button Content="{Binding}" Margin="0,0,6,0" Padding="12,4"
+                                       AutomationProperties.Name="{Binding StringFormat='Category: {0}'}"
+                                       Command="{Binding DataContext.SelectCategoryCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                       CommandParameter="{Binding}" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Border>
 
-        <!-- Apps List (Clean Multi-Column Grid of 36 Famous Software Cards) -->
-        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="0,0,0,10">
+        <!-- Apps List: Responsive Grid that never scrolls horizontally -->
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="16,12">
             <ItemsControl ItemsSource="{Binding FilteredApps}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <WrapPanel Orientation="Horizontal" ItemWidth="300" />
+                        <controls:ResponsiveUniformGrid MinItemWidth="280" />
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Border Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
-                                BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
-                                BorderThickness="1" CornerRadius="10" Margin="5" Padding="12,10"
+                        <Border Background="{DynamicResource BgCardBrush}"
+                                BorderBrush="{DynamicResource BorderSubtleBrush}"
+                                BorderThickness="1" CornerRadius="8" Margin="4" Padding="12,10"
                                 ToolTip="{Binding Description}">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="BorderBrush" Value="{DynamicResource BorderHoverBrush}" />
+                                            <Setter Property="Background" Value="{DynamicResource BgCardHoverBrush}" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" /> <!-- Checkbox -->
-                                    <ColumnDefinition Width="Auto" /> <!-- Colorful Icon Tile -->
-                                    <ColumnDefinition Width="*" />    <!-- Name, Category, Badges -->
+                                    <ColumnDefinition Width="Auto" /> <!-- Icon Tile -->
+                                    <ColumnDefinition Width="*" />    <!-- Name, Category, State Badge -->
                                     <ColumnDefinition Width="Auto" /> <!-- Action / Link -->
                                 </Grid.ColumnDefinitions>
 
-                                <!-- App Checkbox -->
+                                <!-- Selection Checkbox -->
                                 <CheckBox Grid.Column="0" IsChecked="{Binding IsSelected, Mode=TwoWay}"
                                           AutomationProperties.AutomationId="{Binding Key, StringFormat='AppCheck_{0}'}"
                                           AutomationProperties.Name="{Binding Name, StringFormat='Select {0}'}"
+                                          Style="{DynamicResource ModernCheckBox}"
                                           VerticalAlignment="Center" Margin="0,0,10,0" />
 
-                                <!-- 3-Tier Real Program Icon Tile -->
+                                <!-- App Icon Tile -->
                                 <Border Grid.Column="1" Background="{Binding IconBackground}"
                                         BorderBrush="{Binding IconBorder}" BorderThickness="1"
-                                        CornerRadius="10" Width="42" Height="42" Margin="0,0,12,0"
+                                        CornerRadius="8" Width="40" Height="40" Margin="0,0,10,0"
                                         VerticalAlignment="Center" ClipToBounds="True">
                                     <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
-                                        <!-- Tier 1: Real Extracted Windows Exe Icon from Disk -->
-                                        <Image Source="{Binding IconImage}" Width="30" Height="30"
+                                        <!-- Real Extracted Windows Exe Icon from Disk -->
+                                        <Image Source="{Binding IconImage}" Width="28" Height="28"
                                                RenderOptions.BitmapScalingMode="HighQuality"
                                                Visibility="{Binding HasIconImage, Converter={StaticResource BoolToVis}}" />
 
-                                        <!-- Tier 2: Authentic Branded SVG Vector Logo -->
-                                        <Viewbox Width="24" Height="24"
+                                        <!-- Authentic SVG Vector Logo -->
+                                        <Viewbox Width="22" Height="22"
                                                  Visibility="{Binding HasSvgIcon, Converter={StaticResource BoolToVis}}">
                                             <Path Data="{Binding SvgIconPath}" Fill="White" Stretch="Uniform" />
                                         </Viewbox>
 
-                                        <!-- Tier 3: Vector Symbol Icon Fallback -->
-                                        <ui:SymbolIcon Symbol="{Binding IconSymbol}" Foreground="White" FontSize="20"
+                                        <!-- Vector Symbol Fallback -->
+                                        <ui:SymbolIcon Symbol="{Binding IconSymbol}" Foreground="White" FontSize="18"
                                                        Visibility="{Binding HasSymbolIcon, Converter={StaticResource BoolToVis}}" />
                                     </Grid>
                                 </Border>
 
-                                <!-- App Name, Category & Status Badge -->
+                                <!-- App Name, Category & State Badge -->
                                 <StackPanel Grid.Column="2" VerticalAlignment="Center">
                                     <DockPanel LastChildFill="False">
-                                        <TextBlock DockPanel.Dock="Left" Text="{Binding Name}" FontWeight="Bold" FontSize="13"
-                                                   Foreground="{DynamicResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis" MaxWidth="150" />
+                                        <TextBlock DockPanel.Dock="Left" Text="{Binding Name}" FontWeight="SemiBold" FontSize="13"
+                                                   Foreground="{DynamicResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis" MaxWidth="140" />
 
-                                        <!-- Installed Badge -->
-                                        <Border DockPanel.Dock="Right" Visibility="{Binding IsInstalled, Converter={StaticResource BoolToVis}}"
-                                                Background="#064E3B" BorderBrush="#059669" BorderThickness="1"
-                                                CornerRadius="8" Padding="6,1" Margin="6,0,0,0" VerticalAlignment="Center">
-                                            <TextBlock Text="INSTALLED" FontSize="9" FontWeight="ExtraBold" Foreground="#10B981" />
+                                        <!-- State Badge: Installed / Not installed / Update available -->
+                                        <Border DockPanel.Dock="Right"
+                                                Background="{Binding StateBadgeBackground}"
+                                                BorderBrush="{Binding StateBadgeBorder}"
+                                                BorderThickness="1"
+                                                CornerRadius="8" Padding="6,2" Margin="6,0,0,0" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding StateText}" FontSize="9" FontWeight="Bold"
+                                                       Foreground="{Binding StateBadgeForeground}" />
                                         </Border>
                                     </DockPanel>
 
-                                    <DockPanel LastChildFill="False" Margin="0,3,0,0">
-                                        <TextBlock DockPanel.Dock="Left" Text="{Binding Category}" FontSize="11"
-                                                   Foreground="{DynamicResource TextSecondaryBrush}" />
-                                        <TextBlock DockPanel.Dock="Right" Text="{Binding StatusText}" FontSize="10"
-                                                   Foreground="{DynamicResource TextMutedBrush}" />
-                                    </DockPanel>
+                                    <TextBlock Text="{Binding Category}" FontSize="11"
+                                               Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0" />
                                 </StackPanel>
 
-                                <!-- Website / Info Link Button -->
-                                <ui:Button Grid.Column="3" Appearance="Transparent" Padding="5" Margin="4,0,0,0"
+                                <!-- Official Website Link Button -->
+                                <ui:Button Grid.Column="3" Appearance="Transparent" Padding="4" Margin="4,0,0,0"
                                            AutomationProperties.Name="{Binding Name, StringFormat='Visit website for {0}'}"
                                            Icon="{ui:SymbolIcon Globe20}" ToolTip="Visit official website"
                                            Command="{Binding DataContext.OpenAppWebsiteCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
@@ -178,18 +179,38 @@
             </ItemsControl>
         </ScrollViewer>
 
-        <!-- Progress and Output Log Bar -->
-        <Border Grid.Row="3" Background="{DynamicResource ControlFillColorSecondaryBrush}"
-                BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
-                BorderThickness="1" CornerRadius="8" Padding="12,8">
-            <StackPanel>
-                <Grid Margin="0,0,0,4">
-                    <TextBlock Text="{Binding StatusMessage}" FontSize="12" FontWeight="SemiBold"
-                               Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" />
-                    <ProgressBar HorizontalAlignment="Right" Width="180" Height="8"
-                                 Value="{Binding ProgressPercent}" Maximum="100" />
-                </Grid>
-            </StackPanel>
+        <!-- Sticky Selection Bar (Appears ONLY when there is a selection) -->
+        <Border Grid.Row="3" Background="{DynamicResource BgCardBrush}"
+                BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="0,1,0,0"
+                Padding="16,10"
+                Visibility="{Binding HasSelection, Converter={StaticResource BoolToVis}}">
+            <DockPanel LastChildFill="False">
+                <!-- Left: Selected Count Text -->
+                <TextBlock DockPanel.Dock="Left" Text="{Binding SelectionStatusText}"
+                           FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"
+                           VerticalAlignment="Center" />
+
+                <!-- Right: Action Buttons -->
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center">
+                    <ui:Button AutomationProperties.AutomationId="InstallSelectedButton"
+                               AutomationProperties.Name="Install Selected Apps"
+                               Appearance="Primary" Icon="{ui:SymbolIcon ArrowDownload24}"
+                               Content="{Binding SelectionStatusText}" Command="{Binding InstallSelectedCommand}"
+                               Margin="0,0,8,0" Padding="14,6" FontWeight="SemiBold" />
+
+                    <ui:Button AutomationProperties.AutomationId="UninstallSelectedButton"
+                               AutomationProperties.Name="Uninstall Selected Apps"
+                               Appearance="Secondary" Icon="{ui:SymbolIcon Delete24}"
+                               Content="Uninstall selected" Command="{Binding UninstallSelectedCommand}"
+                               Margin="0,0,8,0" Padding="12,6" />
+
+                    <Button Style="{DynamicResource ModernGhostBtn}"
+                            AutomationProperties.AutomationId="ClearAppSelectionButton"
+                            AutomationProperties.Name="Clear App Selection"
+                            Content="Clear" Command="{Binding ClearSelectionCommand}"
+                            Padding="8,4" VerticalAlignment="Center" />
+                </StackPanel>
+            </DockPanel>
         </Border>
     </Grid>
 </UserControl>

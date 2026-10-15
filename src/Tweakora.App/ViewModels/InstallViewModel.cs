@@ -52,7 +52,12 @@ public sealed partial class InstallViewModel : ObservableObject
     private string _statusMessage = "Select applications to install or manage.";
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasSelection))]
+    [NotifyPropertyChangedFor(nameof(SelectionStatusText))]
     private int _selectedCount;
+
+    public bool HasSelection => SelectedCount > 0;
+    public string SelectionStatusText => $"{SelectedCount} selected — Install";
 
     public InstallViewModel(IAppInstallService installService, IOperationRunner runner)
     {
