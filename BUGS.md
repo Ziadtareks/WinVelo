@@ -492,4 +492,23 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
      - Added comprehensive filter controls: Risk filter, State filter, Search box, Category selector, "Recommended only", and "Show experimental".
      - Standardized state badge labels and risk color chips across collapsed and expanded cards.
   3. Integrated `UnifiedExecutionDialogView` into `MainWindow.xaml` and wired it into `DashboardViewModel`, `TweaksViewModel`, and `MainViewModel`.
-  4. Updated unit and engine tests to validate new status badge strings and execution flows.
+---
+
+## BUG-032: History Page Gaps: Missing Unified Rollback Integration, Unsorted Sessions, and Buried System Restore Points
+- **Component**: `src/Tweakora.App/ViewModels/HistoryViewModel.cs`, `src/Tweakora.App/Views/HistoryTabView.xaml`, `src/Tweakora.Core/Interfaces/IPlatformServices.cs`, `src/Tweakora.Platform/WindowsRestoreService.cs`, `src/Tweakora.Simulation/SimulationServices.cs`, `src/Tweakora.App/ViewModels/MainViewModel.cs`, `src/Tweakora.Tests/HistoryPageTests.cs`
+- **Finding**:
+  1. The History page did not guarantee that journal sessions were sorted newest first, creating confusion when tracking recent modifications.
+  2. The page displayed raw, ungrouped journal action records without categorizing them by tweak name or surfacing tweak-level status (Active vs Reverted).
+  3. Rollback operations (single tweak undo, session rollback, and "Undo all WinVelo changes") executed without integrating into the unified preview/result dialog workflow, and "Undo all WinVelo changes" lacked the explicit notice that modifications by other tools are not covered.
+  4. System restore points were only displayed as a raw count in a small footer rather than as a dedicated, inspectable read-only list with timestamps, sequence numbers, and descriptions.
+  5. Session log export did not persist to local disk exports directory with accessible viewing.
+- **Root Cause**: History page was treated as a basic log viewer rather than a comprehensive, safe, and transparent rollback management center.
+- **Fix**:
+  1. Updated `HistoryViewModel` to sort all journal sessions strictly newest first (`OrderByDescending(s => s.StartedAtUtc)`).
+  2. Implemented `HistoryTweakItemModel` grouping action records per tweak with distinct status badges (`Active`, `Reverted`), action counts, and individual "Undo Tweak" buttons.
+  3. Integrated all rollback actions (`UndoTweak`, `UndoSession`, and `UndoAllChanges`) with `UnifiedExecutionDialogViewModel`:
+     - Added explicit preview/confirm dialog with safety notice ("This will revert all tweaks recorded in the WinVelo rollback journal. Changes made by other tools or Windows Settings are not covered.").
+     - Unified execution reporting with itemized results and servicing health verification.
+  4. Extended `ISystemRestoreService`, `WindowsRestoreService`, `FakeRestoreService`, and `NullRestoreService` with `GetRestorePoints()` returning `RestorePointItem` objects; added a dedicated read-only restore points view on the History tab.
+  5. Enhanced session log export to generate clean `.txt` files in `%LOCALAPPDATA%\WinVelo\Exports\` alongside an in-app viewer dialog.
+  6. Added unit test coverage in `HistoryPageTests.cs` validating newest-first ordering, trigger source detection, grouped tweak statuses, unified preview workflows, restore point lists, and text export formatting.

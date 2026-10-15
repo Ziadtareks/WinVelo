@@ -150,4 +150,74 @@ public sealed class WindowsRestoreService : ISystemRestoreService
             };
         }
     }
+
+    public IReadOnlyList<RestorePointItem> GetRestorePoints()
+    {
+        EnsureNotTestMode();
+        try
+        {
+            using var process = Process.Start(new ProcessStartInfo
+            {
+                FileName = "powershell.exe",
+                Arguments = "-NoProfile -NonInteractive -Command \"@(Get-ComputerRestorePoint | Select-Object SequenceNumber, Description, @{Name='CreationTimeString';Expression={$_.CreationTime.ToString('o')}}, RestorePointType) | ConvertTo-Json -Compress\"",
+                CreateNoWindow = true,
+                UseShellExecute = false,
+                RedirectStandardOutput = true
+            });
+            string output = process?.StandardOutput.ReadToEnd()?.Trim() ?? string.Empty;
+            process?.WaitForExit(5000);
+
+            if (string.IsNullOrWhiteSpace(output) || output == "null")
+            {
+                return Array.Empty<RestorePointItem>();
+            }
+
+            using var doc = System.Text.Json.JsonDocument.Parse(output);
+            var list = new List<RestorePointItem>();
+
+            if (doc.RootElement.ValueKind == System.Text.Json.JsonValueKind.Array)
+            {
+                foreach (var el in doc.RootElement.EnumerateArray())
+                {
+                    list.Add(ParseRestorePointElement(el));
+                }
+            }
+            else if (doc.RootElement.ValueKind == System.Text.Json.JsonValueKind.Object)
+            {
+                list.Add(ParseRestorePointElement(doc.RootElement));
+            }
+
+            return list.OrderByDescending(r => r.CreationTime ?? DateTime.MinValue).ToList();
+        }
+        catch
+        {
+            return Array.Empty<RestorePointItem>();
+        }
+    }
+
+    private static RestorePointItem ParseRestorePointElement(System.Text.Json.JsonElement el)
+    {
+        long seq = 0;
+        if (el.TryGetProperty("SequenceNumber", out var seqProp) && seqProp.TryGetInt64(out var s))
+        {
+            seq = s;
+        }
+
+        string desc = el.TryGetProperty("Description", out var descProp) ? (descProp.GetString() ?? string.Empty) : string.Empty;
+        string type = el.TryGetProperty("RestorePointType", out var typeProp) ? (typeProp.GetString() ?? "MODIFY_SETTINGS") : "MODIFY_SETTINGS";
+
+        DateTime? dt = null;
+        if (el.TryGetProperty("CreationTimeString", out var dtProp) && DateTime.TryParse(dtProp.GetString(), out var parsedDt))
+        {
+            dt = parsedDt;
+        }
+
+        return new RestorePointItem
+        {
+            SequenceNumber = seq,
+            Description = desc,
+            CreationTime = dt,
+            RestorePointType = type
+        };
+    }
 }

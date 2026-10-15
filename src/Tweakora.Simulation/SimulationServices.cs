@@ -303,6 +303,31 @@ public sealed class FakeRestoreService : ISystemRestoreService
     public int RestorePointsCount { get; set; } = 3;
     public DateTime? LatestRestorePointDate { get; set; } = new DateTime(2026, 10, 14, 12, 0, 0);
 
+    public List<RestorePointItem> FakeRestorePoints { get; } = new()
+    {
+        new RestorePointItem
+        {
+            SequenceNumber = 101,
+            Description = "Windows Update Checkpoint",
+            CreationTime = new DateTime(2026, 10, 12, 10, 30, 0),
+            RestorePointType = "APPLICATION_INSTALL"
+        },
+        new RestorePointItem
+        {
+            SequenceNumber = 102,
+            Description = "Driver Installation Checkpoint",
+            CreationTime = new DateTime(2026, 10, 13, 15, 45, 0),
+            RestorePointType = "DEVICE_DRIVER_INSTALL"
+        },
+        new RestorePointItem
+        {
+            SequenceNumber = 103,
+            Description = "WinVelo Baseline Checkpoint",
+            CreationTime = new DateTime(2026, 10, 14, 12, 0, 0),
+            RestorePointType = "MODIFY_SETTINGS"
+        }
+    };
+
     public bool IsSystemRestoreEnabled() => IsEnabled;
 
     public bool EnableSystemRestore(string drive = "C:\\")
@@ -311,9 +336,11 @@ public sealed class FakeRestoreService : ISystemRestoreService
         return true;
     }
 
-    public int GetRestorePointCount() => RestorePointsCount;
+    public int GetRestorePointCount() => FakeRestorePoints.Count;
 
-    public DateTime? GetLatestRestorePointDate() => LatestRestorePointDate;
+    public DateTime? GetLatestRestorePointDate() => FakeRestorePoints.OrderByDescending(r => r.CreationTime).FirstOrDefault()?.CreationTime ?? LatestRestorePointDate;
+
+    public IReadOnlyList<RestorePointItem> GetRestorePoints() => FakeRestorePoints.OrderByDescending(r => r.CreationTime ?? DateTime.MinValue).ToList();
 
     public RestorePointResult CreateRestorePoint(string description)
     {
@@ -328,7 +355,17 @@ public sealed class FakeRestoreService : ISystemRestoreService
         }
 
         RestorePointsCount++;
-        return new RestorePointResult { Success = true, SequenceNumber = RestorePointsCount };
+        var newPoint = new RestorePointItem
+        {
+            SequenceNumber = RestorePointsCount + 100,
+            Description = description,
+            CreationTime = DateTime.UtcNow,
+            RestorePointType = "MODIFY_SETTINGS"
+        };
+        FakeRestorePoints.Add(newPoint);
+        LatestRestorePointDate = newPoint.CreationTime;
+
+        return new RestorePointResult { Success = true, SequenceNumber = newPoint.SequenceNumber };
     }
 }
 

@@ -144,12 +144,11 @@ public sealed partial class MainViewModel : ObservableObject
         _activityTracker = activityTracker;
         _tweakService = tweakService;
 
-        ToolsVM = toolsVM ?? new ToolsViewModel(startupVM, updatesVM, configVM, toolboxVM, null);
-        HistoryVM = historyVM ?? new HistoryViewModel(tweakService, null);
-        ExecutionDialogVM = executionDialogVM ?? new UnifiedExecutionDialogViewModel(tweakService, null, activityTracker);
-
         _appSettings = appSettings ?? new AppSettingsService();
         var resSvc = restoreService ?? new NullRestoreService();
+        ExecutionDialogVM = executionDialogVM ?? new UnifiedExecutionDialogViewModel(tweakService, null, activityTracker);
+        ToolsVM = toolsVM ?? new ToolsViewModel(startupVM, updatesVM, configVM, toolboxVM, resSvc);
+        HistoryVM = historyVM ?? new HistoryViewModel(tweakService, resSvc, null, ExecutionDialogVM);
         WizardVM = wizardVM ?? new FirstRunWizardViewModel(resSvc, _appSettings);
         WizardVM.WizardCompleted += OnWizardCompleted;
 
@@ -571,5 +570,6 @@ file sealed class NullRestoreService : ISystemRestoreService
     public int GetRestorePointCount() => 0;
     public DateTime? GetLatestRestorePointDate() => null;
     public RestorePointResult CreateRestorePoint(string description) => new() { Success = true };
+    public IReadOnlyList<RestorePointItem> GetRestorePoints() => Array.Empty<RestorePointItem>();
 }
 

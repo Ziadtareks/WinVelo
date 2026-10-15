@@ -16,18 +16,34 @@ using Tweakora.Modules.Tweaks;
 
 namespace Tweakora.App.ViewModels;
 
+public sealed class HistoryTweakItemModel
+{
+    public required string TweakId { get; init; }
+    public required string TweakName { get; init; }
+    public required int ActionCount { get; init; }
+    public required bool IsReverted { get; init; }
+    public string StatusText => IsReverted ? "Reverted" : "Active";
+    public string StatusBg => IsReverted ? "#374151" : "#064E3B";
+    public string StatusFg => IsReverted ? "#9CA3AF" : "#10B981";
+    public required IReadOnlyList<JournalActionRecord> Records { get; init; }
+}
+
 public sealed class HistorySessionCardModel
 {
     public required string SessionId { get; init; }
     public required DateTime StartedAtUtc { get; init; }
     public string StartedAtDisplay => StartedAtUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss");
     public required bool IsCompleted { get; init; }
-    public string TriggerSource { get; init; } = "WinVelo Engine";
+    public string TriggerSource { get; init; } = "Manual";
     public required IReadOnlyList<JournalActionRecord> Records { get; init; }
+    public required IReadOnlyList<HistoryTweakItemModel> Tweaks { get; init; }
     public int TotalActions => Records.Count;
     public int ActiveActions => Records.Count(r => !r.IsReverted);
     public int RevertedActions => Records.Count(r => r.IsReverted);
-    public string DistinctTweaksSummary => string.Join(", ", Records.Select(r => r.TweakId).Where(id => !string.IsNullOrEmpty(id)).Distinct());
+    public string StatusText => ActiveActions == 0 ? "Reverted" : (RevertedActions > 0 ? "Partially Reverted" : (IsCompleted ? "Active" : "Unfinished"));
+    public string StatusBg => ActiveActions == 0 ? "#374151" : (RevertedActions > 0 ? "#451A03" : "#064E3B");
+    public string StatusFg => ActiveActions == 0 ? "#9CA3AF" : (RevertedActions > 0 ? "#FBBF24" : "#10B981");
+    public string DistinctTweaksSummary => string.Join(", ", Tweaks.Select(t => t.TweakName));
 }
 
 public sealed partial class HistoryViewModel : ObservableObject
@@ -35,8 +51,10 @@ public sealed partial class HistoryViewModel : ObservableObject
     private readonly ITweakService? _tweakService;
     private readonly ISystemRestoreService? _restoreService;
     private readonly IOperationRunner _runner;
+    private readonly UnifiedExecutionDialogViewModel? _executionDialog;
 
     public ObservableCollection<HistorySessionCardModel> Sessions { get; } = new();
+    public ObservableCollection<RestorePointItem> RestorePoints { get; } = new();
     public ObservableCollection<BackupSnapshotInfo> Snapshots { get; } = new();
 
     [ObservableProperty]
@@ -66,11 +84,13 @@ public sealed partial class HistoryViewModel : ObservableObject
     public HistoryViewModel(
         ITweakService? tweakService = null,
         ISystemRestoreService? restoreService = null,
-        IOperationRunner? runner = null)
+        IOperationRunner? runner = null,
+        UnifiedExecutionDialogViewModel? executionDialog = null)
     {
         _tweakService = tweakService;
         _restoreService = restoreService;
         _runner = runner ?? new OperationRunner();
+        _executionDialog = executionDialog;
 
         RefreshHistory();
     }
@@ -79,6 +99,7 @@ public sealed partial class HistoryViewModel : ObservableObject
     public void RefreshHistory()
     {
         Sessions.Clear();
+        RestorePoints.Clear();
         Snapshots.Clear();
 
         if (_tweakService == null)
@@ -89,18 +110,45 @@ public sealed partial class HistoryViewModel : ObservableObject
 
         try
         {
-            var sessions = _tweakService.GetAllSessions();
-            foreach (var s in sessions)
+            var catalog = _tweakService.LoadCatalog();
+            var tweakDict = catalog.ToDictionary(t => t.Id, t => t.Name, StringComparer.OrdinalIgnoreCase);
+
+            var rawSessions = _tweakService.GetAllSessions()
+                .OrderByDescending(s => s.StartedAtUtc)
+                .ToList();
+
+            foreach (var s in rawSessions)
             {
-                string trigger = "Manual Apply";
-                if (s.Records.Any(r => r.TweakId.Contains("gaming", StringComparison.OrdinalIgnoreCase)))
+                string trigger = "Manual";
+                if (s.SessionId.StartsWith("cli", StringComparison.OrdinalIgnoreCase) ||
+                    s.SessionId.Contains("_cli", StringComparison.OrdinalIgnoreCase))
                 {
-                    trigger = "Preset / Gaming";
+                    trigger = "CLI";
+                }
+                else if (s.Records.Any(r => r.TweakId.Contains("gaming", StringComparison.OrdinalIgnoreCase)))
+                {
+                    trigger = "Preset (Gaming)";
                 }
                 else if (s.Records.Any(r => r.TweakId.Contains("privacy", StringComparison.OrdinalIgnoreCase)))
                 {
-                    trigger = "Preset / Privacy";
+                    trigger = "Preset (Privacy)";
                 }
+                else if (s.Records.Any(r => r.TweakId.Contains("recommended", StringComparison.OrdinalIgnoreCase)))
+                {
+                    trigger = "Preset (Recommended)";
+                }
+
+                var tweakGroups = s.Records
+                    .GroupBy(r => r.TweakId)
+                    .Select(g => new HistoryTweakItemModel
+                    {
+                        TweakId = g.Key,
+                        TweakName = tweakDict.TryGetValue(g.Key, out var name) ? name : g.Key,
+                        ActionCount = g.Count(),
+                        IsReverted = g.All(r => r.IsReverted),
+                        Records = g.ToList()
+                    })
+                    .ToList();
 
                 Sessions.Add(new HistorySessionCardModel
                 {
@@ -108,13 +156,25 @@ public sealed partial class HistoryViewModel : ObservableObject
                     StartedAtUtc = s.StartedAtUtc,
                     IsCompleted = s.IsCompleted,
                     TriggerSource = trigger,
-                    Records = s.Records.ToList()
+                    Records = s.Records.ToList(),
+                    Tweaks = tweakGroups
                 });
             }
 
             if (Sessions.Count > 0)
             {
                 SelectedSession = Sessions[0];
+            }
+
+            if (_restoreService != null)
+            {
+                IsRestoreEnabled = _restoreService.IsSystemRestoreEnabled();
+                RestorePointCount = _restoreService.GetRestorePointCount();
+                var points = _restoreService.GetRestorePoints();
+                foreach (var p in points)
+                {
+                    RestorePoints.Add(p);
+                }
             }
 
             var backups = _tweakService.BackupManager?.GetAvailableBackups() ?? Array.Empty<BackupSnapshotInfo>();
@@ -128,13 +188,7 @@ public sealed partial class HistoryViewModel : ObservableObject
                 SelectedSnapshot = Snapshots[0];
             }
 
-            if (_restoreService != null)
-            {
-                IsRestoreEnabled = _restoreService.IsSystemRestoreEnabled();
-                RestorePointCount = _restoreService.GetRestorePointCount();
-            }
-
-            StatusMessage = $"Loaded {Sessions.Count} journal session(s) and {Snapshots.Count} backup snapshot(s).";
+            StatusMessage = $"Loaded {Sessions.Count} journal session(s) and {RestorePoints.Count} restore point(s).";
         }
         catch (Exception ex)
         {
@@ -164,6 +218,49 @@ public sealed partial class HistoryViewModel : ObservableObject
             return;
         }
 
+        var catalog = _tweakService.LoadCatalog();
+        var tweakIds = session.Records.Select(r => r.TweakId).Where(id => !string.IsNullOrEmpty(id)).Distinct();
+        var sessionTweaks = catalog.Where(t => tweakIds.Contains(t.Id, StringComparer.OrdinalIgnoreCase)).ToList();
+
+        if (_executionDialog != null && sessionTweaks.Count > 0)
+        {
+            await _executionDialog.OpenPreviewAsync(
+                title: $"Undo Session — {session.SessionId}",
+                description: $"Revert all {session.TotalActions} actions across {sessionTweaks.Count} tweak(s) recorded in this session.",
+                notice: "All baseline registry values and service configurations from this session will be restored.",
+                confirmText: "Confirm & Revert Session",
+                tweaks: sessionTweaks,
+                isUndo: true,
+                onConfirmed: async (_) =>
+                {
+                    var underlying = new RollbackJournalSession
+                    {
+                        SessionId = session.SessionId,
+                        StartedAtUtc = session.StartedAtUtc,
+                        IsCompleted = session.IsCompleted,
+                        Records = session.Records.ToList()
+                    };
+                    var result = await _tweakService.RollbackSessionAsync(underlying);
+                    var healthReport = await _tweakService.CheckServicingHealthAsync();
+                    var report = new OperationExecutionReport
+                    {
+                        Title = $"Undo Session {session.SessionId}",
+                        StartTime = DateTime.UtcNow,
+                        EndTime = DateTime.UtcNow,
+                        Results = sessionTweaks.Select(t => new OperationItemResult
+                        {
+                            Id = t.Id,
+                            Name = t.Name,
+                            Status = result.Success ? OperationItemStatus.Restored : OperationItemStatus.Failed,
+                            Reason = result.Message
+                        }).ToList()
+                    };
+                    _executionDialog.ShowResult(sessionTweaks, report, healthReport, isUndo: true);
+                    RefreshHistory();
+                });
+            return;
+        }
+
         IsBusy = true;
         StatusMessage = $"Reverting changes from session {session.SessionId}...";
         await Task.Yield();
@@ -179,14 +276,9 @@ public sealed partial class HistoryViewModel : ObservableObject
             };
 
             var result = await _tweakService.RollbackSessionAsync(underlying);
-            if (result.Success)
-            {
-                StatusMessage = $"Session {session.SessionId} reverted successfully.";
-            }
-            else
-            {
-                StatusMessage = $"Session undo partially failed: {result.Message ?? "Some actions could not be reverted"}";
-            }
+            StatusMessage = result.Success
+                ? $"Session {session.SessionId} reverted successfully."
+                : $"Session undo partially failed: {result.Message ?? "Some actions could not be reverted"}";
 
             RefreshHistory();
         }
@@ -217,29 +309,41 @@ public sealed partial class HistoryViewModel : ObservableObject
             return;
         }
 
+        var catalog = _tweakService.LoadCatalog();
+        var tweak = catalog.FirstOrDefault(t => string.Equals(t.Id, tweakId, StringComparison.OrdinalIgnoreCase));
+        if (tweak == null)
+        {
+            StatusMessage = $"Tweak '{tweakId}' not found in catalog.";
+            return;
+        }
+
+        if (_executionDialog != null)
+        {
+            await _executionDialog.OpenPreviewAsync(
+                title: $"Undo Tweak — {tweak.Name}",
+                description: $"Revert '{tweak.Name}' to its pre-WinVelo baseline state.",
+                notice: "WinVelo will restore the pre-application registry and service baseline values.",
+                confirmText: "Confirm & Revert",
+                tweaks: new[] { tweak },
+                isUndo: true,
+                onConfirmed: async (confirmedTweaks) =>
+                {
+                    await _executionDialog.ExecuteAndShowResultAsync(confirmedTweaks, isUndo: true);
+                    RefreshHistory();
+                });
+            return;
+        }
+
         IsBusy = true;
         StatusMessage = $"Undoing tweak {tweakId}...";
         await Task.Yield();
 
         try
         {
-            var catalog = _tweakService.LoadCatalog();
-            var tweak = catalog.FirstOrDefault(t => string.Equals(t.Id, tweakId, StringComparison.OrdinalIgnoreCase));
-            if (tweak == null)
-            {
-                StatusMessage = $"Tweak '{tweakId}' not found in catalog.";
-                return;
-            }
-
             var report = await _tweakService.UndoTweaksAsync(new[] { tweak }, _runner);
-            if (report.FailedCount == 0)
-            {
-                StatusMessage = $"Tweak '{tweak.Name}' reverted successfully.";
-            }
-            else
-            {
-                StatusMessage = $"Undo failed for '{tweak.Name}': {report.Summary}";
-            }
+            StatusMessage = report.FailedCount == 0
+                ? $"Tweak '{tweak.Name}' reverted successfully."
+                : $"Undo failed for '{tweak.Name}': {report.Summary}";
 
             RefreshHistory();
         }
@@ -272,6 +376,23 @@ public sealed partial class HistoryViewModel : ObservableObject
         if (activeTweaks.Count == 0)
         {
             StatusMessage = "No active WinVelo changes found in the journal.";
+            return;
+        }
+
+        if (_executionDialog != null)
+        {
+            await _executionDialog.OpenPreviewAsync(
+                title: "Undo All WinVelo Changes",
+                description: $"Revert all {activeTweaks.Count} tweak(s) recorded in the WinVelo rollback journal.",
+                notice: "This will revert all tweaks recorded in the WinVelo rollback journal. Changes made by other tools or Windows Settings are not covered.",
+                confirmText: "Confirm & Revert All",
+                tweaks: activeTweaks,
+                isUndo: true,
+                onConfirmed: async (confirmedTweaks) =>
+                {
+                    await _executionDialog.ExecuteAndShowResultAsync(confirmedTweaks, isUndo: true);
+                    RefreshHistory();
+                });
             return;
         }
 
@@ -310,7 +431,7 @@ public sealed partial class HistoryViewModel : ObservableObject
         sb.AppendLine("================================================================================");
         sb.AppendLine($"Started (Local):   {session.StartedAtDisplay}");
         sb.AppendLine($"Trigger Source:    {session.TriggerSource}");
-        sb.AppendLine($"Status:            {(session.IsCompleted ? "Completed" : "Interrupted / Unfinished")}");
+        sb.AppendLine($"Status:            {session.StatusText}");
         sb.AppendLine($"Total Actions:     {session.TotalActions} (Active: {session.ActiveActions}, Reverted: {session.RevertedActions})");
         sb.AppendLine($"Touched Tweaks:    {session.DistinctTweaksSummary}");
         sb.AppendLine("--------------------------------------------------------------------------------");
@@ -379,6 +500,11 @@ public sealed partial class HistoryViewModel : ObservableObject
 
             IsRestoreEnabled = _restoreService.IsSystemRestoreEnabled();
             RestorePointCount = _restoreService.GetRestorePointCount();
+            RestorePoints.Clear();
+            foreach (var p in _restoreService.GetRestorePoints())
+            {
+                RestorePoints.Add(p);
+            }
         }
         catch (Exception ex)
         {

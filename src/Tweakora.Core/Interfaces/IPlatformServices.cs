@@ -44,6 +44,15 @@ public sealed class RestorePointResult
     public long SequenceNumber { get; init; }
 }
 
+public sealed class RestorePointItem
+{
+    public long SequenceNumber { get; init; }
+    public string Description { get; init; } = string.Empty;
+    public DateTime? CreationTime { get; init; }
+    public string CreationTimeDisplay => CreationTime?.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss") ?? "Unknown";
+    public string RestorePointType { get; init; } = "MODIFY_SETTINGS";
+}
+
 public interface ISystemRestoreService
 {
     bool IsSystemRestoreEnabled();
@@ -51,6 +60,7 @@ public interface ISystemRestoreService
     int GetRestorePointCount();
     DateTime? GetLatestRestorePointDate();
     RestorePointResult CreateRestorePoint(string description);
+    IReadOnlyList<RestorePointItem> GetRestorePoints();
 }
 
 public interface IShellService
