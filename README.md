@@ -3,73 +3,87 @@
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)]()
 [![.NET Version](https://img.shields.io/badge/.NET-10.0%20LTS-purple.svg)](https://dotnet.microsoft.com/)
 [![Windows Target](https://img.shields.io/badge/Windows-10%20%7C%2011-blue.svg)]()
-[![Verified Tweaks](https://img.shields.io/badge/verified%20tweaks-149-success.svg)]()
+[![Verified Tweaks](https://img.shields.io/badge/catalog%20tweaks-149-success.svg)]()
 [![Winget Apps](https://img.shields.io/badge/curated%20apps-36%20essential-blue.svg)]()
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Safety](https://img.shields.io/badge/safety-reversible%20by%20design-blueviolet.svg)](docs/SAFETY.md)
 
-**WinVelo** (Windows Velocity) is a modern, high-performance, open-source Windows 10/11 system configuration center, debloater, and essential package manager. Built with C# and .NET 10 LTS, it pairs the full tweak catalog of Chris Titus Tech's WinUtil with a beginner-friendly 1-click optimization dashboard, write-ahead rollback safety journal, dry-run diff preview, and curated software installer.
-
-> **Credits**: Based on tweak specifications and upstream research from [ChrisTitusTech/winutil](https://github.com/ChrisTitusTech/winutil) (MIT License).
+**WinVelo** is a transparent, calm, open-source Windows 10/11 configuration utility and package manager. Built with C# and .NET 10 LTS in the design philosophy of O&O ShutUp10++, it provides full visibility into system settings with exact registry keys, cited vendor documentation, direct Windows Settings equivalents, and write-ahead rollback safety.
 
 ---
 
 ## 📸 Visual Showcase
 
-### Home (Easy Boost) Dashboard
-Real-time hardware metrics (Physical RAM usage, CPU model, Windows build), 4 one-click optimization profiles, and 8 instant quick toggles.
-![WinVelo Dashboard](docs/screenshots/dashboard.png)
+### Home (System Status)
+Calm status overview showing administrator privilege, System Restore state with latest restore point date, exact count of tweaks applied by WinVelo, Windows servicing health result, and preset cards.
+![WinVelo Home](docs/screenshots/dashboard.png)
 
-### All Tweaks & Debloating (Beginner & Pro Modes)
-149 verified system tweaks with 1-click direct toggle switches, Beginner Mode filter, multi-selection, and safety caution cards.
+### Tweaks (Catalog & Exact Changes)
+149 verified tweaks categorized by risk (Safe, Low, Medium, High) with honest state badges (Applied, Partial, Not applied, Can't verify), auto-generated exact changes, and cited source documentation.
 ![WinVelo Tweaks](docs/screenshots/tweaks.png)
 
-### Curated Essential Apps Installer (Winget)
-36 everyday essential applications with official branded color tiles, live installation status, and package upgrade support.
-![WinVelo App Installer](docs/screenshots/install.png)
+### Apps (Curated Winget Manager)
+Curated package installer across Browsers, Social, Media, Utilities, Gaming, and Development with live installation progress.
+![WinVelo Apps](docs/screenshots/install.png)
+
+### Tools (Consolidated System Hub)
+Consolidated toolkit housing Startup Apps, Windows Services, System Cleaner, DNS switcher, Windows Fixes, Windows Updates mode, Optional Features, and Restore Points.
+![WinVelo Tools](docs/screenshots/tools.png)
+
+### History & Rollback Journal
+Complete rollback journal listing sessions newest first, grouped tweak statuses, single-click session and tweak undo, "Undo all WinVelo changes", `.txt` log exports, and read-only System Restore points.
+![WinVelo History](docs/screenshots/history.png)
 
 ---
 
-## 🌟 Key Features & Tabs
+## 🌟 Key Features & 5-Tab Architecture
 
-### 1. 🚀 Home (Easy Boost)
-- **Live System Health**: Physical RAM usage bar via Win32 `GlobalMemoryStatusEx`, CPU model detection, OS edition, Hostname, and Administrator status.
-- **4 Smart 1-Click Profiles**:
-  - `Everyday Speed & Clean Setup`: Recommended daily boost for general responsiveness.
-  - `Gaming & Max FPS Boost`: Latency reduction, GPU priority, GameDVR disable.
-  - `Privacy & Anti-Spyware Shield`: Comprehensive telemetry and activity tracking lockdown.
-  - `Restore Windows Defaults`: 1-click safe rollback to factory Windows behavior.
-- **8 Instant Quick Toggles**: Classic Context Menu, Disable Bing in Search, Show File Extensions, Disable Telemetry, Disable Spotlight Ads, End Task on Taskbar, Disable Background Apps, System Dark Mode.
+### 1. 🏠 Home
+- **Calm System Status Tiles**:
+  - Administrator Privilege indicator.
+  - System Restore status tile with date of latest restore point.
+  - Neutral count of active tweaks applied by WinVelo with no gamified scores or meters.
+  - Windows Servicing Health state (Component-Based Servicing integrity check).
+- **Pending Action Banners**: Prominent contextual alerts for pending reboots or explorer restarts.
+- **Preset Cards**: Preset profiles (Recommended, Gaming, Privacy) opening the unified preview dialog.
 
-### 2. ⚡ All Tweaks (149 Tweaks)
-- **Beginner Mode vs Pro Mode**: Switch between recommended safe optimizations or access all 149 granular system tweaks.
-- **Direct 1-Click Toggles**: Flip individual settings immediately or select multiple tweaks for batch application.
-- **Dry-Run Diff Preview**: Inspect exact registry keys and services that will change before touching anything.
-- **Safety Cards**: Amber alert badges for caution items (e.g. BitLocker, Edge removal) with explicit confirmation requirements.
+### 2. ⚡ Tweaks
+- **Experience Modes**:
+  - **Simple Mode**: Displays only Recommended settings (Safe or Low risk, reversible, documented or UI equivalent).
+  - **Advanced Mode**: Displays the entire catalog with Experimental settings behind a dedicated toggle.
+- **Transparent Information Panel**:
+  - Direct Windows location for `ui-equivalent` tweaks (e.g., *Settings › Personalization › Colors*).
+  - Cited vendor documentation with exact quoted strings for `documented` tweaks.
+  - Auto-generated "Exact changes" section detailing hives, keys, values, and service configurations.
+- **Honest Execution Flow**:
+  - Safe and Low tweaks apply immediately with an instant undo toast notification.
+  - Medium and High tweaks require explicit preview and confirmation in a shared dialog.
+  - Unified Preview and Result modal dialogs with Windows servicing health verification.
 
-### 3. 📦 Install Apps (Curated Package Manager)
-- 36 popular applications curated across Browsers, Social, Media, Utilities, Gaming, and Dev (Chrome, Firefox, Brave, Discord, Spotify, VLC, Steam, VS Code, 7-Zip, Git, etc.).
-- Official brand-colored icon badges with installed state detection.
-- Asynchronous Winget execution with live output log and progress tracking.
+### 3. 📦 Apps
+- 36 popular packages curated across Browsers, Social, Media, Utilities, Gaming, and Dev.
+- Asynchronous Winget execution with installed status detection and live logging.
 
-### 4. 🔧 System Config & Fixes
-- 14 Legacy Windows Control Panel shortcuts (Control Panel, Network Connections, Device Manager, Sound, etc.).
-- Quick Fixes: Reset Windows Update, Reset Network / Winsock, DISM & SFC Scan, NTP Time Sync, Reinstall Winget, Autologin helper.
-- Windows Optional Features (WSL, Hyper-V, Sandbox, .NET Framework 3.5, etc.).
+### 4. 🧰 Tools
+A single consolidated hub for system utilities:
+- **Startup Apps**: Inspect and manage programs configured to run on Windows logon.
+- **Windows Services**: Inspect system service startup types and running states.
+- **System Cleaner**: Safe temporary file and cache cleaning (%TEMP%, Windows Update cache).
+- **DNS Switcher**: Configure encrypted DNS resolvers (Cloudflare, Quad9, Google, AdGuard).
+- **Windows Fixes**: SFC and DISM servicing repairs, network resets, time synchronization, and Windows shortcuts.
+- **Windows Updates Mode**: Choose between Default, Security Only (Recommended), or Disabled (requires typed confirmation).
+- **Optional Features**: Manage optional platform components (WSL, Hyper-V, Windows Sandbox).
+- **Restore Points**: View and create Windows System Restore points.
 
-### 5. 🔄 Windows Updates Manager
-- **Default (Out of Box)**: Restores Microsoft standard update behavior.
-- **Security Only (Recommended)**: Delays disruptive feature upgrades while applying essential security patches.
-- **Disable All Updates**: Halts all update services (requires typed "I understand" confirmation).
-
-### 6. 🧰 Toolbox & Built-in Utilities
-- Safe Cache & Junk Cleaner (%TEMP%, Windows Update cache).
-- Startup Programs manager, Windows Services manager, and DNS switcher (Cloudflare, Quad9, Google, AdGuard).
-
-### 7. 🛡️ Backups & Snapshots
-- Write-Ahead Rollback Journal: Automatically records original system state to `%APPDATA%\WinVelo\Journal`.
-- System Restore Points: 1-click creation of official Windows System Restore points.
-- Revert snapshots with a single click.
+### 5. 🛡️ History & Rollback Journal
+- **Session History (Newest First)**: Inspect past WinVelo modification sessions with timestamps, trigger source (Preset, Manual, CLI), and touch status.
+- **Grouped Tweak Statuses**: View touched tweaks with active vs reverted states and exact action records.
+- **Rollback Actions**:
+  - Undo individual tweaks.
+  - Undo entire sessions.
+  - **Undo All WinVelo Changes**: Reverts all changes recorded in the WinVelo rollback journal.
+- **Session Export**: Export complete session audit logs as plaintext files (`.txt`).
+- **Read-Only Restore Points**: Inspect all system restore points on the machine.
 
 ---
 
@@ -80,29 +94,27 @@ Real-time hardware metrics (Physical RAM usage, CPU model, Windows build), 4 one
 | **[WinVelo-v1.0.0-win-x64-portable.zip](dist/WinVelo-v1.0.0-win-x64-portable.zip)** | Standalone Portable (Includes .NET Runtime) | ~95 MB | See [dist/SHA256SUMS.txt](dist/SHA256SUMS.txt) |
 | **[WinVelo-v1.0.0-win-x64-small.zip](dist/WinVelo-v1.0.0-win-x64-small.zip)** | Framework Dependent (Requires .NET 10) | ~3.6 MB | See [dist/SHA256SUMS.txt](dist/SHA256SUMS.txt) |
 
-> 🔒 **Integrity Verification**: Checksum signatures for all packages are published in [dist/SHA256SUMS.txt](dist/SHA256SUMS.txt). Verify on PowerShell with: `Get-FileHash dist/WinVelo-v1.0.0-win-x64-portable.zip`
-
 ---
 
 ## ⌨️ Command-Line Interface (`winvelo-cli`)
 
-WinVelo includes a dedicated headless automation CLI (`winvelo-cli.exe`):
+WinVelo includes a dedicated automation CLI (`winvelo-cli.exe`):
 
 ```powershell
-# Run HKCU-safe automated self-test with rollback verification
-winvelo-cli.exe --self-test --level 1
+# Run simulated self-test with rollback verification
+winvelo-cli.exe --test-mode --self-test --level 1
 
-# List all available tweaks
+# List available catalog tweaks
 winvelo-cli.exe --list
+
+# Inspect exact changes and documentation for a tweak
+winvelo-cli.exe --info "ui.explorer.classic-context-menu"
 
 # Apply or preview an exported configuration JSON
 winvelo-cli.exe --config my-setup.json --run
 winvelo-cli.exe --config my-setup.json --dry-run
 
-# Apply a specific tweak
-winvelo-cli.exe --apply "ui.explorer.classic-context-menu"
-
-# Undo a specific tweak
+# Revert a specific tweak
 winvelo-cli.exe --undo "ui.explorer.classic-context-menu"
 ```
 
@@ -122,17 +134,14 @@ cd winvelo
 # Build solution
 dotnet build Tweakora.sln
 
-# Run unit test suite (147 tests)
+# Run unit tests (200 tests)
 dotnet test src/Tweakora.Tests/Tweakora.Tests.csproj
 
-# Run UI automation test suite (FlaUI)
+# Run UI tests in simulated test mode
 dotnet test src/Tweakora.UiTests/Tweakora.UiTests.csproj
 
 # Run application in safe simulated test mode
 dotnet run --project src/Tweakora.App/Tweakora.App.csproj -- --test-mode
-
-# Create reproducible release packages (Portable & Small)
-pwsh -File build/publish.ps1
 ```
 
 ---
@@ -145,4 +154,4 @@ WinVelo was previously developed under the project name **Tweakora**. To avoid b
 
 ## 📄 License
 
-WinVelo is released under the **[MIT License](LICENSE)**. Feel free to use, modify, and distribute it freely.
+WinVelo is released under the **[MIT License](LICENSE)**.

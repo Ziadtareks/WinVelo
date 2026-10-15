@@ -306,11 +306,15 @@
 
                 <!-- Right Buttons: Skip / Next / Finish -->
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
-                    <Button Content="Skip Setup" Style="{DynamicResource ModernGhostBtn}"
+                    <Button AutomationProperties.AutomationId="SkipWizardButton"
+                            AutomationProperties.Name="Skip Setup"
+                            Content="Skip Setup" Style="{DynamicResource ModernGhostBtn}"
                             Command="{Binding FinishCommand}" Margin="0,0,10,0" Padding="14,8" />
 
                     <!-- Next Step Button (Steps 1 & 2) -->
-                    <ui:Button Appearance="Primary" Content="Next Step"
+                    <ui:Button AutomationProperties.AutomationId="WizardNextButton"
+                               AutomationProperties.Name="Next Step"
+                               Appearance="Primary" Content="Next Step"
                                Command="{Binding NextStepCommand}" Padding="20,8" FontWeight="SemiBold">
                         <ui:Button.Style>
                             <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
@@ -325,7 +329,9 @@
                     </ui:Button>
 
                     <!-- Finish Button (Step 3) -->
-                    <ui:Button Appearance="Primary" Content="Get Started"
+                    <ui:Button AutomationProperties.AutomationId="WizardFinishButton"
+                               AutomationProperties.Name="Get Started"
+                               Appearance="Primary" Content="Get Started"
                                Command="{Binding FinishCommand}" Padding="20,8" FontWeight="SemiBold">
                         <ui:Button.Style>
                             <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">

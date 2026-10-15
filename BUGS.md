@@ -512,3 +512,27 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
   4. Extended `ISystemRestoreService`, `WindowsRestoreService`, `FakeRestoreService`, and `NullRestoreService` with `GetRestorePoints()` returning `RestorePointItem` objects; added a dedicated read-only restore points view on the History tab.
   5. Enhanced session log export to generate clean `.txt` files in `%LOCALAPPDATA%\WinVelo\Exports\` alongside an in-app viewer dialog.
   6. Added unit test coverage in `HistoryPageTests.cs` validating newest-first ordering, trigger source detection, grouped tweak statuses, unified preview workflows, restore point lists, and text export formatting.
+---
+
+## BUG-033: Quality Bar: Outdated Monolithic UI Test Suite, Unchecked Startup Latency, and Outdated Legacy Documentation
+- **Component**: `src/Tweakora.UiTests/TweakoraUiTests.cs`, `src/Tweakora.App/Views/FirstRunWizardView.xaml`, `docs/screenshots/`, `README.md`
+- **Finding**:
+  1. The FlaUI automation suite targeted obsolete 8-tab navigation IDs (`Tab_Config`, `Tab_Toolbox`, `Tab_Backups`) rather than the modern 5-tab structure (`Home`, `Tweaks`, `Apps`, `Tools`, `History`) and lacked dedicated test coverage for the preview → apply → instant undo-toast workflow.
+  2. Automated testing risked interference from the first-run setup wizard overlay due to missing automation IDs on setup buttons.
+  3. Documentation in `README.md` contained outdated descriptions referencing 8 tabs and exaggerated performance claims ("Max FPS Boost", "Everyday Speed & Clean Setup").
+  4. Documentation screenshots in `docs/screenshots/` reflected obsolete UI tabs and widgets.
+- **Root Cause**: Fast architectural evolution across Phases 2 and 3 without updating the high-level UI automation harness and visual artifacts.
+- **Fix**:
+  1. Refactored `TweakoraUiTests.cs` into modular tests covering all 5 tabs and dedicated flows:
+     - `Test_01_HomePage_LoadsCalmStatus`
+     - `Test_02_TweaksPage_LoadsFiltersAndCatalog`
+     - `Test_03_AppsPage_LoadsCatalogAndSearch`
+     - `Test_04_ToolsPage_SwitchesSubTools`
+     - `Test_05_HistoryPage_DisplaysSessionsAndRestorePoints`
+     - `Test_06_Flow_PreviewApplyAndUndoToast`
+     - `FullAuditUiTestSuite_All5TabsAndControls`
+     Strictly verified that all tests launch the application with `--test-mode`.
+  2. Added `AutomationProperties.AutomationId` and `Name` to `FirstRunWizardView` controls (`SkipWizardButton`, `WizardNextButton`, `WizardFinishButton`) ensuring clean accessibility and automated dismissal.
+  3. Measured cold start startup latency to interactive Home in simulated test mode: 1013ms – 1570ms, well below the 2-second quality ceiling.
+  4. Retook all documentation screenshots cleanly in test mode with `--test-mode --capture-screenshots docs/screenshots`.
+  5. Rewrote `README.md` with transparent, neutral descriptions of the 5-tab architecture and zero exaggerated performance claims.

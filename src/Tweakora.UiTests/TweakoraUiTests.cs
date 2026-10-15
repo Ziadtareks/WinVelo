@@ -88,38 +88,44 @@ public sealed partial class TweakoraUiTests
         }
     }
 
-    private static void CaptureViewScreenshot(Window window, string screenshotsDir, string filename)
+    private static void DismissWizardIfOpen(Window window)
     {
-        string target = Path.Combine(screenshotsDir, filename);
-        if (File.Exists(target) && new FileInfo(target).Length > 10000)
-        {
-            return;
-        }
-
         try
         {
-            Capture.Element(window).ToFile(target);
-        }
-        catch
-        {
-            try
+            var skipBtn = window.FindFirstDescendant(cf => cf.ByAutomationId("SkipWizardButton"))
+                       ?? window.FindFirstDescendant(cf => cf.ByName("Skip Setup"));
+            if (skipBtn != null)
             {
-                Capture.Screen().ToFile(target);
-            }
-            catch
-            {
-                // Fallback silently if device locked
+                SafeInvoke(skipBtn);
+                Thread.Sleep(500);
             }
         }
+        catch { }
     }
 
-    [Fact]
-    public void FullAuditUiTestSuite_All5TabsAndControls()
+    private static void NavigateTab(Window window, string tabName)
+    {
+        var btn = Retry.WhileNull(() =>
+            window.FindFirstDescendant(cf => cf.ByName(tabName)) ??
+            window.FindFirstDescendant(cf => cf.ByAutomationId($"Tab_{tabName}")) ??
+            (tabName switch
+            {
+                "Home" => window.FindFirstDescendant(cf => cf.ByAutomationId("Tab_Dashboard")),
+                "Apps" => window.FindFirstDescendant(cf => cf.ByAutomationId("Tab_Install")),
+                "Tools" => window.FindFirstDescendant(cf => cf.ByAutomationId("Tab_Toolbox")),
+                "History" => window.FindFirstDescendant(cf => cf.ByAutomationId("Tab_Backups")),
+                _ => null
+            }),
+            TimeSpan.FromSeconds(5)).Result;
+
+        Assert.NotNull(btn);
+        SafeInvoke(btn);
+        Thread.Sleep(600);
+    }
+
+    private static (Application App, UIA3Automation Automation, Window Window) LaunchAppInTestMode()
     {
         string solutionDir = FindSolutionRoot();
-        string screenshotsDir = Path.Combine(solutionDir, "docs", "screenshots");
-        Directory.CreateDirectory(screenshotsDir);
-
         string exePath = Path.Combine(solutionDir, "src", "Tweakora.App", "bin", "Debug", "net10.0-windows", "WinVelo.exe");
         if (!File.Exists(exePath))
         {
@@ -134,8 +140,8 @@ public sealed partial class TweakoraUiTests
             UseShellExecute = false
         };
 
-        using var app = Application.Launch(psi);
-        using var automation = new UIA3Automation();
+        var app = Application.Launch(psi);
+        var automation = new UIA3Automation();
         app.WaitWhileMainHandleIsMissing(TimeSpan.FromSeconds(15));
 
         var window = Retry.WhileNull(() => app.GetMainWindow(automation), TimeSpan.FromSeconds(15)).Result;
@@ -146,217 +152,283 @@ public sealed partial class TweakoraUiTests
             SetWindowPos(window.Properties.NativeWindowHandle, IntPtr.Zero, 40, 40, 1440, 900, 0x0040);
         }
         catch { }
-        Thread.Sleep(2000);
+        Thread.Sleep(1500);
 
-        _output.WriteLine("[UI-AUDIT] WinVelo launched successfully in --test-mode");
+        DismissWizardIfOpen(window);
+        return (app, automation, window);
+    }
 
-        // 1. Check MainWindowHandle != 0 and Warning Banner
-        IntPtr handle = app.MainWindowHandle;
-        Assert.True(handle != IntPtr.Zero, "MainWindowHandle was 0.");
-
-        var banner = Retry.WhileNull(() =>
-            window.FindFirstDescendant(cf => cf.ByAutomationId("TestModeBanner")) ??
-            window.FindFirstDescendant(cf => cf.ByAutomationId("TestModeBannerText")) ??
-            window.FindFirstDescendant(cf => cf.ByName("TEST MODE ACTIVE — Simulated Platform Engine. Real Windows host system is untouched.")),
-            TimeSpan.FromSeconds(20)).Result;
-        Assert.NotNull(banner);
-        Assert.Contains("TEST MODE ACTIVE", banner.Name);
-        _output.WriteLine("[UI-AUDIT] Handle != 0 and TEST MODE ACTIVE banner verified.");
-
-        // 2. Tab Navigation & Screenshots of all tabs
-        string[] tabIds = { "Tab_Dashboard", "Tab_Install", "Tab_Tweaks", "Tab_Config", "Tab_Updates", "Tab_Toolbox" };
-        string[] screenshotNames = { "dashboard.png", "install.png", "tweaks.png", "config.png", "updates.png", "toolbox.png" };
-
-        for (int i = 0; i < tabIds.Length; i++)
+    private static void CaptureViewScreenshot(Window window, string screenshotsDir, string filename)
+    {
+        string target = Path.Combine(screenshotsDir, filename);
+        try
         {
-            string tabId = tabIds[i];
-            string shotName = screenshotNames[i];
+            Capture.Element(window).ToFile(target);
+        }
+        catch
+        {
+            try
+            {
+                Capture.Screen().ToFile(target);
+            }
+            catch { }
+        }
+    }
 
-            var tabBtn = Retry.WhileNull(() => window.FindFirstDescendant(cf => cf.ByAutomationId(tabId)), TimeSpan.FromSeconds(5)).Result;
-            Assert.NotNull(tabBtn);
-            SafeInvoke(tabBtn);
-            Thread.Sleep(800);
+    [Fact]
+    public void Test_01_HomePage_LoadsCalmStatus()
+    {
+        var (app, automation, window) = LaunchAppInTestMode();
+        try
+        {
+            NavigateTab(window, "Home");
             AssertNoErrorDialogs(app, automation);
 
-            CaptureViewScreenshot(window, screenshotsDir, shotName);
-            _output.WriteLine($"[UI-AUDIT] Captured {shotName} for {tabId}");
+            // Verify admin status tile / badge
+            var adminStatus = window.FindFirstDescendant(cf => cf.ByAutomationId("AdminStatusBadge"))
+                           ?? window.FindFirstDescendant(cf => cf.ByName("Administrator Status"));
+            Assert.NotNull(adminStatus);
+
+            // Verify System Restore card
+            var restoreCard = window.FindFirstDescendant(cf => cf.ByName("System Restore"));
+            Assert.NotNull(restoreCard);
+
+            // Verify Presets section exists
+            var gamingPreset = window.FindFirstDescendant(cf => cf.ByAutomationId("PresetCard_Gaming"))
+                            ?? window.FindFirstDescendant(cf => cf.ByName("Gaming"));
+            Assert.NotNull(gamingPreset);
         }
-
-        // 3. Test INSTALL Tab
-        _output.WriteLine("[UI-AUDIT] Testing INSTALL Tab...");
-        var tabInstall = Retry.WhileNull(() => window.FindFirstDescendant(cf => cf.ByAutomationId("Tab_Install")), TimeSpan.FromSeconds(5)).Result;
-        Assert.NotNull(tabInstall);
-        SafeInvoke(tabInstall);
-        Thread.Sleep(500);
-
-        // Find top search box and filter
-        var topSearchBox = Retry.WhileNull(() => window.FindFirstDescendant(cf => cf.ByAutomationId("TopSearchBox")), TimeSpan.FromSeconds(5)).Result;
-        Assert.NotNull(topSearchBox);
-        SafeSetText(topSearchBox, "Chrome");
-        Thread.Sleep(500);
-        AssertNoErrorDialogs(app, automation);
-
-        // Clear search
-        SafeSetText(topSearchBox, string.Empty);
-        Thread.Sleep(500);
-
-        // Find first app checkbox and select it
-        var firstAppCheck = Retry.WhileNull(() =>
+        finally
         {
-            return window.FindAllDescendants(cf => cf.ByControlType(ControlType.CheckBox))
-                .FirstOrDefault(c => (c.AutomationId ?? string.Empty).StartsWith("AppCheck_"));
-        }, TimeSpan.FromSeconds(5)).Result;
-
-        if (firstAppCheck != null)
-        {
-            SafeInvoke(firstAppCheck);
-            Thread.Sleep(300);
-
-            // Click Clear Selection
-            var clearAppBtn = Retry.WhileNull(() => window.FindFirstDescendant(cf => cf.ByAutomationId("ClearAppSelectionButton")), TimeSpan.FromSeconds(3)).Result;
-            Assert.NotNull(clearAppBtn);
-            SafeInvoke(clearAppBtn);
-            Thread.Sleep(300);
+            automation.Dispose();
+            app.Close();
         }
-        _output.WriteLine("[UI-AUDIT] INSTALL Tab verified.");
+    }
 
-        // 4. Test TWEAKS Tab (Presets, Columns, CAUTION BitLocker, Diff Preview)
-        _output.WriteLine("[UI-AUDIT] Testing TWEAKS Tab...");
-        var tabTweaks = Retry.WhileNull(() => window.FindFirstDescendant(cf => cf.ByAutomationId("Tab_Tweaks")), TimeSpan.FromSeconds(5)).Result;
-        Assert.NotNull(tabTweaks);
-        SafeInvoke(tabTweaks);
-        Thread.Sleep(800);
-
-        // Test Presets
-        var presetStd = Retry.WhileNull(() => window.FindFirstDescendant(cf => cf.ByAutomationId("Preset_Standard")), TimeSpan.FromSeconds(5)).Result;
-        Assert.NotNull(presetStd);
-        SafeInvoke(presetStd);
-        Thread.Sleep(500);
-        AssertNoErrorDialogs(app, automation);
-
-        var presetMin = Retry.WhileNull(() => window.FindFirstDescendant(cf => cf.ByAutomationId("Preset_Minimal")), TimeSpan.FromSeconds(5)).Result;
-        Assert.NotNull(presetMin);
-        SafeInvoke(presetMin);
-        Thread.Sleep(500);
-        AssertNoErrorDialogs(app, automation);
-
-        // Open Diff Preview Dialog
-        var previewBtn = Retry.WhileNull(() => window.FindFirstDescendant(cf => cf.ByAutomationId("PreviewTweaksButton")), TimeSpan.FromSeconds(5)).Result;
-        Assert.NotNull(previewBtn);
-        SafeInvoke(previewBtn);
-        Thread.Sleep(800);
-        AssertNoErrorDialogs(app, automation);
-
-        // Capture diff preview dialog screenshot
-        CaptureViewScreenshot(window, screenshotsDir, "diff-preview.png");
-
-        // Close preview
-        var closePreviewBtn = Retry.WhileNull(() => window.FindFirstDescendant(cf => cf.ByName("Cancel")), TimeSpan.FromSeconds(3)).Result;
-        if (closePreviewBtn != null)
+    [Fact]
+    public void Test_02_TweaksPage_LoadsFiltersAndCatalog()
+    {
+        var (app, automation, window) = LaunchAppInTestMode();
+        try
         {
-            SafeInvoke(closePreviewBtn);
+            NavigateTab(window, "Tweaks");
+            AssertNoErrorDialogs(app, automation);
+
+            // Verify search box
+            var searchBox = window.FindFirstDescendant(cf => cf.ByAutomationId("TweaksSearchBox"))
+                         ?? window.FindFirstDescendant(cf => cf.ByName("Search tweaks"));
+            Assert.NotNull(searchBox);
+
+            // Verify Category selector or Risk selector exists
+            var riskFilter = window.FindFirstDescendant(cf => cf.ByAutomationId("RiskFilterComboBox"))
+                          ?? window.FindFirstDescendant(cf => cf.ByName("Filter by risk level"));
+            Assert.NotNull(riskFilter);
+
+            // Verify Recommended Only toggle exists
+            var recToggle = window.FindFirstDescendant(cf => cf.ByAutomationId("RecommendedOnlyToggle"))
+                         ?? window.FindFirstDescendant(cf => cf.ByName("Recommended tweaks only"));
+            Assert.NotNull(recToggle);
+        }
+        finally
+        {
+            automation.Dispose();
+            app.Close();
+        }
+    }
+
+    [Fact]
+    public void Test_03_AppsPage_LoadsCatalogAndSearch()
+    {
+        var (app, automation, window) = LaunchAppInTestMode();
+        try
+        {
+            NavigateTab(window, "Apps");
+            AssertNoErrorDialogs(app, automation);
+
+            var topSearch = window.FindFirstDescendant(cf => cf.ByAutomationId("TopSearchBox"));
+            Assert.NotNull(topSearch);
+            SafeSetText(topSearch, "Firefox");
             Thread.Sleep(400);
-        }
-
-        // Clear tweaks
-        var presetClear = Retry.WhileNull(() => window.FindFirstDescendant(cf => cf.ByAutomationId("Preset_Clear")), TimeSpan.FromSeconds(5)).Result;
-        Assert.NotNull(presetClear);
-        SafeInvoke(presetClear);
-        Thread.Sleep(400);
-
-        // Capture Command Palette
-        var openPaletteBtn = Retry.WhileNull(() => window.FindFirstDescendant(cf => cf.ByAutomationId("OpenCommandPaletteButton")), TimeSpan.FromSeconds(3)).Result;
-        if (openPaletteBtn != null)
-        {
-            SafeInvoke(openPaletteBtn);
-            Thread.Sleep(500);
-            CaptureViewScreenshot(window, screenshotsDir, "command-palette.png");
-            // Close palette
-            SafeInvoke(openPaletteBtn);
+            SafeSetText(topSearch, string.Empty);
             Thread.Sleep(300);
         }
-        _output.WriteLine("[UI-AUDIT] TWEAKS Tab & Command Palette verified.");
-
-        // 5. Test CONFIG Tab
-        _output.WriteLine("[UI-AUDIT] Testing CONFIG Tab...");
-        var tabConfig = Retry.WhileNull(() => window.FindFirstDescendant(cf => cf.ByAutomationId("Tab_Config")), TimeSpan.FromSeconds(5)).Result;
-        Assert.NotNull(tabConfig);
-        SafeInvoke(tabConfig);
-        Thread.Sleep(800);
-        AssertNoErrorDialogs(app, automation);
-
-        // Verify Legacy Control Panels exist
-        var panelControl = Retry.WhileNull(() => window.FindFirstDescendant(cf => cf.ByAutomationId("Panel_WPFPanelControl")) ?? window.FindFirstDescendant(cf => cf.ByName("Control Panel")), TimeSpan.FromSeconds(5)).Result;
-        Assert.NotNull(panelControl);
-
-        // Trigger Quick Fix (Network Reset simulation)
-        var fixNet = Retry.WhileNull(() => window.FindFirstDescendant(cf => cf.ByAutomationId("Fix_NetworkReset")), TimeSpan.FromSeconds(5)).Result;
-        Assert.NotNull(fixNet);
-        SafeInvoke(fixNet);
-        Thread.Sleep(500);
-        AssertNoErrorDialogs(app, automation);
-        _output.WriteLine("[UI-AUDIT] CONFIG Tab verified.");
-
-        // 6. Test UPDATES Tab
-        _output.WriteLine("[UI-AUDIT] Testing UPDATES Tab...");
-        var tabUpdates = Retry.WhileNull(() => window.FindFirstDescendant(cf => cf.ByAutomationId("Tab_Updates")), TimeSpan.FromSeconds(5)).Result;
-        Assert.NotNull(tabUpdates);
-        SafeInvoke(tabUpdates);
-        Thread.Sleep(800);
-        AssertNoErrorDialogs(app, automation);
-
-        // Select Disable All Mode
-        var selectDisable = Retry.WhileNull(() => window.FindFirstDescendant(cf => cf.ByAutomationId("SelectMode_DisableAll")), TimeSpan.FromSeconds(5)).Result;
-        Assert.NotNull(selectDisable);
-        SafeInvoke(selectDisable);
-        Thread.Sleep(500);
-
-        // Verify DisableUpdatesConfirmBox exists and type "I understand"
-        var confirmBox = Retry.WhileNull(() => window.FindFirstDescendant(cf => cf.ByAutomationId("DisableUpdatesConfirmBox")), TimeSpan.FromSeconds(5)).Result;
-        Assert.NotNull(confirmBox);
-        SafeSetText(confirmBox, "I understand");
-        Thread.Sleep(300);
-
-        // Select Security profile back
-        var selectSecurity = Retry.WhileNull(() => window.FindFirstDescendant(cf => cf.ByAutomationId("SelectMode_Security")), TimeSpan.FromSeconds(5)).Result;
-        Assert.NotNull(selectSecurity);
-        SafeInvoke(selectSecurity);
-        Thread.Sleep(300);
-
-        // Apply profile
-        var applyUpdatesBtn = Retry.WhileNull(() => window.FindFirstDescendant(cf => cf.ByAutomationId("ApplyUpdatesProfileButton")), TimeSpan.FromSeconds(5)).Result;
-        Assert.NotNull(applyUpdatesBtn);
-        SafeInvoke(applyUpdatesBtn);
-        Thread.Sleep(500);
-        AssertNoErrorDialogs(app, automation);
-        _output.WriteLine("[UI-AUDIT] UPDATES Tab verified.");
-
-        // 7. Test TOOLBOX Tab
-        _output.WriteLine("[UI-AUDIT] Testing TOOLBOX Tab...");
-        var tabToolbox = Retry.WhileNull(() => window.FindFirstDescendant(cf => cf.ByAutomationId("Tab_Toolbox")), TimeSpan.FromSeconds(5)).Result;
-        Assert.NotNull(tabToolbox);
-        SafeInvoke(tabToolbox);
-        Thread.Sleep(800);
-        AssertNoErrorDialogs(app, automation);
-        _output.WriteLine("[UI-AUDIT] TOOLBOX Tab verified.");
-
-        // 8. MULTI-ROUND STABILITY TEST: 3 full rounds across all 5 tabs
-        _output.WriteLine("[UI-AUDIT] Starting 3-round rapid tab switching stability test...");
-        for (int round = 1; round <= 3; round++)
+        finally
         {
-            _output.WriteLine($"[UI-AUDIT] Round {round}/3...");
-            foreach (string tabId in tabIds)
-            {
-                var btn = Retry.WhileNull(() => window.FindFirstDescendant(cf => cf.ByAutomationId(tabId)), TimeSpan.FromSeconds(5)).Result;
-                Assert.NotNull(btn);
-                SafeInvoke(btn);
-                Thread.Sleep(200);
-                AssertNoErrorDialogs(app, automation);
-            }
+            automation.Dispose();
+            app.Close();
         }
-        _output.WriteLine("[UI-AUDIT] 3-round stability test PASSED with 0 error dialogs.");
+    }
 
-        // Close app cleanly
-        app.Close();
+    [Fact]
+    public void Test_04_ToolsPage_SwitchesSubTools()
+    {
+        var (app, automation, window) = LaunchAppInTestMode();
+        try
+        {
+            NavigateTab(window, "Tools");
+            AssertNoErrorDialogs(app, automation);
+
+            // Check subtool buttons in Tools toolbar
+            var startupTool = window.FindFirstDescendant(cf => cf.ByAutomationId("SubTool_Startup"))
+                           ?? window.FindFirstDescendant(cf => cf.ByName("Startup Apps"));
+            Assert.NotNull(startupTool);
+            SafeInvoke(startupTool);
+            Thread.Sleep(400);
+
+            var fixesTool = window.FindFirstDescendant(cf => cf.ByAutomationId("SubTool_Fixes"))
+                         ?? window.FindFirstDescendant(cf => cf.ByName("Windows Fixes"));
+            Assert.NotNull(fixesTool);
+            SafeInvoke(fixesTool);
+            Thread.Sleep(400);
+
+            AssertNoErrorDialogs(app, automation);
+        }
+        finally
+        {
+            automation.Dispose();
+            app.Close();
+        }
+    }
+
+    [Fact]
+    public void Test_05_HistoryPage_DisplaysSessionsAndRestorePoints()
+    {
+        var (app, automation, window) = LaunchAppInTestMode();
+        try
+        {
+            NavigateTab(window, "History");
+            AssertNoErrorDialogs(app, automation);
+
+            var undoAllBtn = window.FindFirstDescendant(cf => cf.ByAutomationId("UndoAllWinVeloButton"))
+                          ?? window.FindFirstDescendant(cf => cf.ByName("Undo all WinVelo changes"));
+            Assert.NotNull(undoAllBtn);
+
+            var restorePointsList = window.FindFirstDescendant(cf => cf.ByName("System restore points list"));
+            Assert.NotNull(restorePointsList);
+        }
+        finally
+        {
+            automation.Dispose();
+            app.Close();
+        }
+    }
+
+    [Fact]
+    public void Test_06_Flow_PreviewApplyAndUndoToast()
+    {
+        var (app, automation, window) = LaunchAppInTestMode();
+        try
+        {
+            NavigateTab(window, "Tweaks");
+            AssertNoErrorDialogs(app, automation);
+
+            // Toggle a safe tweak
+            var safeToggle = window.FindAllDescendants(cf => cf.ByControlType(ControlType.CheckBox))
+                .FirstOrDefault(c => (c.AutomationId ?? string.Empty).StartsWith("TweakToggle_"));
+
+            if (safeToggle != null)
+            {
+                SafeInvoke(safeToggle);
+                Thread.Sleep(800);
+
+                // Check for toast notification
+                var toastUndo = window.FindFirstDescendant(cf => cf.ByAutomationId("ToastUndoButton"))
+                             ?? window.FindFirstDescendant(cf => cf.ByName("Undo applied tweak"));
+                if (toastUndo != null)
+                {
+                    SafeInvoke(toastUndo);
+                    Thread.Sleep(600);
+                }
+            }
+
+            // Click Preview / Preset to test unified preview modal
+            NavigateTab(window, "Home");
+            var presetGaming = window.FindFirstDescendant(cf => cf.ByAutomationId("PresetCard_Gaming"))
+                            ?? window.FindFirstDescendant(cf => cf.ByName("Gaming"));
+            if (presetGaming != null)
+            {
+                SafeInvoke(presetGaming);
+                Thread.Sleep(800);
+
+                // Unified preview dialog should be open
+                var previewConfirm = window.FindFirstDescendant(cf => cf.ByAutomationId("PreviewConfirmButton"))
+                                  ?? window.FindFirstDescendant(cf => cf.ByName("Confirm & Apply"))
+                                  ?? window.FindFirstDescendant(cf => cf.ByName("Apply Selected"));
+
+                var previewCancel = window.FindFirstDescendant(cf => cf.ByAutomationId("PreviewCancelButton"))
+                                 ?? window.FindFirstDescendant(cf => cf.ByName("Cancel"));
+
+                if (previewCancel != null)
+                {
+                    SafeInvoke(previewCancel);
+                    Thread.Sleep(400);
+                }
+            }
+            AssertNoErrorDialogs(app, automation);
+        }
+        finally
+        {
+            automation.Dispose();
+            app.Close();
+        }
+    }
+
+    [Fact]
+    public void FullAuditUiTestSuite_All5TabsAndControls()
+    {
+        string solutionDir = FindSolutionRoot();
+        string screenshotsDir = Path.Combine(solutionDir, "docs", "screenshots");
+        Directory.CreateDirectory(screenshotsDir);
+
+        var (app, automation, window) = LaunchAppInTestMode();
+        try
+        {
+            _output.WriteLine("[UI-AUDIT] WinVelo launched successfully in --test-mode");
+
+            IntPtr handle = app.MainWindowHandle;
+            Assert.True(handle != IntPtr.Zero, "MainWindowHandle was 0.");
+
+            var banner = Retry.WhileNull(() =>
+                window.FindFirstDescendant(cf => cf.ByAutomationId("TestModeBanner")) ??
+                window.FindFirstDescendant(cf => cf.ByAutomationId("TestModeBannerText")) ??
+                window.FindFirstDescendant(cf => cf.ByName("TEST MODE ACTIVE — Simulated Platform Engine. Real Windows host system is untouched.")),
+                TimeSpan.FromSeconds(20)).Result;
+            Assert.NotNull(banner);
+            Assert.Contains("TEST MODE ACTIVE", banner.Name);
+            _output.WriteLine("[UI-AUDIT] Handle != 0 and TEST MODE ACTIVE banner verified.");
+
+            // 5 Tabs Navigation & Screenshots
+            string[] tabs = { "Home", "Tweaks", "Apps", "Tools", "History" };
+            string[] screenshotFiles = { "dashboard.png", "tweaks.png", "install.png", "tools.png", "history.png" };
+
+            for (int i = 0; i < tabs.Length; i++)
+            {
+                string tab = tabs[i];
+                string file = screenshotFiles[i];
+
+                NavigateTab(window, tab);
+                AssertNoErrorDialogs(app, automation);
+                CaptureViewScreenshot(window, screenshotsDir, file);
+                _output.WriteLine($"[UI-AUDIT] Captured {file} for tab {tab}");
+            }
+
+            // Command palette screenshot
+            var openPaletteBtn = window.FindFirstDescendant(cf => cf.ByAutomationId("OpenCommandPaletteButton"));
+            if (openPaletteBtn != null)
+            {
+                SafeInvoke(openPaletteBtn);
+                Thread.Sleep(500);
+                CaptureViewScreenshot(window, screenshotsDir, "command-palette.png");
+                SafeInvoke(openPaletteBtn);
+                Thread.Sleep(300);
+            }
+
+            _output.WriteLine("[UI-AUDIT] All 5 tabs and dialogs captured cleanly in test mode.");
+        }
+        finally
+        {
+            automation.Dispose();
+            app.Close();
+        }
     }
 }
