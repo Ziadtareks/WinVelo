@@ -142,4 +142,31 @@ public sealed class HomeCalmStatusTests
                 $"DashboardViewModel should not declare DispatcherTimer fields (polling for decoration removed). Found: {f.Name}");
         }
     }
+
+    [Fact]
+    public void QuickToggleCardModel_StatusBadgeText_ReflectsRealStateNotDefault()
+    {
+        var model = new QuickToggleCardModel
+        {
+            Id = "test.toggle",
+            Title = "Test Toggle",
+            Description = "Test toggle description",
+            IconSymbol = "Apps24"
+        };
+
+        // Initial / NotApplied state
+        Assert.Equal(TweakState.NotApplied, model.State);
+        Assert.False(model.IsActive);
+        Assert.Equal("Off", model.StatusBadgeText);
+
+        // Applied state
+        model.State = TweakState.Applied;
+        Assert.True(model.IsActive);
+        Assert.Equal("On", model.StatusBadgeText);
+
+        // Partial state
+        model.State = TweakState.Partial;
+        Assert.False(model.IsActive);
+        Assert.Equal("Partial", model.StatusBadgeText);
+    }
 }

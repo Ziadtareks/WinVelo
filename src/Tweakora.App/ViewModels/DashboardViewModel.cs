@@ -32,7 +32,14 @@ public sealed partial class QuickToggleCardModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(StatusBadgeBackground))]
     [NotifyPropertyChangedFor(nameof(StatusBadgeForeground))]
     [NotifyPropertyChangedFor(nameof(StatusBadgeBorder))]
-    private bool _isActive;
+    [NotifyPropertyChangedFor(nameof(IsActive))]
+    private TweakState _state = TweakState.NotApplied;
+
+    public bool IsActive
+    {
+        get => State == TweakState.Applied;
+        set => State = value ? TweakState.Applied : TweakState.NotApplied;
+    }
 
     [ObservableProperty]
     private bool _isBusy;
@@ -47,10 +54,61 @@ public sealed partial class QuickToggleCardModel : ObservableObject
 
     public bool IsNotApplying => !IsApplying;
 
-    public string StatusBadgeText => IsApplying ? "APPLYING..." : (IsActive ? "APPLIED ✓" : "DEFAULT");
-    public string StatusBadgeBackground => IsApplying ? "#1E3A8A" : (IsActive ? "#064E3B" : "#1E222D");
-    public string StatusBadgeForeground => IsApplying ? "#60A5FA" : (IsActive ? "#10B981" : "#94A3B8");
-    public string StatusBadgeBorder => IsApplying ? "#3B82F6" : (IsActive ? "#059669" : "#334155");
+    public string StatusBadgeText
+    {
+        get
+        {
+            if (IsApplying) return "Applying...";
+            return State switch
+            {
+                TweakState.Applied => "On",
+                TweakState.Partial => "Partial",
+                _ => "Off"
+            };
+        }
+    }
+
+    public string StatusBadgeBackground
+    {
+        get
+        {
+            if (IsApplying) return "#1E3A8A";
+            return State switch
+            {
+                TweakState.Applied => "#064E3B",
+                TweakState.Partial => "#451A03",
+                _ => "#1E222D"
+            };
+        }
+    }
+
+    public string StatusBadgeForeground
+    {
+        get
+        {
+            if (IsApplying) return "#60A5FA";
+            return State switch
+            {
+                TweakState.Applied => "#10B981",
+                TweakState.Partial => "#F59E0B",
+                _ => "#94A3B8"
+            };
+        }
+    }
+
+    public string StatusBadgeBorder
+    {
+        get
+        {
+            if (IsApplying) return "#3B82F6";
+            return State switch
+            {
+                TweakState.Applied => "#059669",
+                TweakState.Partial => "#D97706",
+                _ => "#334155"
+            };
+        }
+    }
 
     public Func<QuickToggleCardModel, bool?, Task>? OnToggleAsync { get; set; }
 
@@ -1002,7 +1060,7 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
         {
             var updates = await Task.Run(async () =>
             {
-                var list = new List<(QuickToggleCardModel Toggle, bool Active)>();
+                var list = new List<(QuickToggleCardModel Toggle, TweakState State)>();
                 foreach (var toggle in QuickToggles)
                 {
                     var tweak = FindTweak(toggle.OriginKey);
@@ -1010,8 +1068,8 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
                     {
                         try
                         {
-                            bool active = await _tweakService.DetectStateAsync(tweak);
-                            list.Add((toggle, active));
+                            var state = await _tweakService.DetectTweakStateAsync(tweak);
+                            list.Add((toggle, state));
                         }
                         catch { }
                     }
@@ -1021,9 +1079,9 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
 
             Application.Current?.Dispatcher?.Invoke(() =>
             {
-                foreach (var (toggle, active) in updates)
+                foreach (var (toggle, state) in updates)
                 {
-                    toggle.IsActive = active;
+                    toggle.State = state;
                 }
             });
         }
@@ -1066,7 +1124,7 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
 
         try
         {
-            var (report, actualActive) = await Task.Run(async () =>
+            var (report, actualState) = await Task.Run(async () =>
             {
                 OperationExecutionReport rep;
                 if (targetState)
@@ -1079,20 +1137,20 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
                 }
 
                 _ = WindowsSettingNotifier.NotifySettingsChangedAsync();
-                bool active = await _tweakService.DetectStateAsync(tweak);
-                return (rep, active);
+                var state = await _tweakService.DetectTweakStateAsync(tweak);
+                return (rep, state);
             });
 
             Application.Current?.Dispatcher?.Invoke(() =>
             {
-                model.IsActive = actualActive;
+                model.State = actualState;
             });
 
             var res = report.Results.FirstOrDefault();
             bool succeeded = res != null && (res.Status is OperationItemStatus.Succeeded or OperationItemStatus.Applied or OperationItemStatus.Restored);
             if (succeeded)
             {
-                GlobalStatusMessage = $"{model.Title} is now {(actualActive ? "enabled" : "reverted to default")}.";
+                GlobalStatusMessage = $"{model.Title} is now {(actualState == TweakState.Applied ? "enabled" : (actualState == TweakState.Partial ? "partially enabled" : "reverted to default"))}.";
                 HasFailedDetails = false;
             }
             else
