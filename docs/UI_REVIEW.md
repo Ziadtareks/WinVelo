@@ -2,30 +2,24 @@
 
 ## 1. Executive Summary
 
-This document records the visual inspection, responsive layout verification, screenshot integrity audit, and design token contrast validation for **WinVelo v0.9.0-beta** following the Phase 4 UI Rework and Visual Fix Pass.
+This document records the visual inspection, responsive layout verification, screenshot integrity audit, and design token contrast validation for **WinVelo v0.9.0-beta** following the Phase 4 UI Rework and UI Polish Pass.
 
-All defect items have been addressed, verified, and validated with zero regressions:
-- **Item 0 (Test-Mode Journal Isolation)**: Test mode redirects all journals, settings, and logs to `%TEMP%\WinVelo-TestMode`, ensuring zero pollution of production `%APPDATA%\WinVelo`.
-- **Item 1 (Screenshot Pipeline Root Cause Fix)**: 
-  - Isolated the test runner screenshot directory in `FullAuditUiTestSuite` to a temp directory (`WinVelo-Audit-Screenshots`), eliminating the root cause of the 6,773-byte black captures (`tweaks.png`, `tools.png`, `history.png`).
-  - Set `vm.IsWizardOpen = false` prior to capturing tab pages, preventing the wizard modal overlay from obscuring underlying pages.
-  - Implemented real Unified Execution Preview Dialog capture via Home preset Review (`vm.DashboardVM.Profiles[0].ApplyCommand`), ensuring `preview.png` and `wizard.png` are distinct views.
-  - Updated `Test_09` to enforce size >= 20KB, pixel variance > 25.0, and strict MD5 hash uniqueness across all screenshots.
-- **Item 2 (Tweaks List Layout)**:
-  - Enforced left-aligned rows with shared column definitions (`[52px toggle/checkbox] [* name + summary] [76px risk chip] [94px state badge] [34px chevron]`). Removed centered text by binding `ModernGhostBtn` template to `HorizontalContentAlignment`.
-  - Replaced per-row multi-select checkboxes with a dedicated "Select multiple" toggle button that smoothly swaps toggles for checkboxes.
-  - Explicitly labeled filter dropdowns ("Risk: All", "Status: All").
-  - Moved the scanning progress indicator to a sleek indeterminate progress line directly underneath the toolbar.
-- **Item 3 (Light Theme Contrast & CheckBoxes)**:
-  - Repaired `ModernCheckBox` style by binding background to `{DynamicResource BgCardBrush}` (clean white in light mode, dark card in dark mode).
-  - Elevated inactive sidebar navigation item contrast to meet WCAG AA requirements (`#374151` on `#E5E7EB` yielding 8.2:1 contrast). Only the active tab receives the accent indicator.
-- **Item 4 (Apps Grid Layout)**:
-  - Relocated app status badges ("Not installed", "Installed", "Update available") to their own line underneath the application name.
-  - Added tooltip and text wrapping to eliminate any risk of text truncation.
-- **Item 5 (Home Servicing Health Status)**:
-  - Replaced verbose status strings with clean short status ("All OK" or "N issues") on Card 3, exposing comprehensive details via hover tooltip.
-- **Item 6 (Self-Review & Automated Regression)**:
-  - Inspected all screenshots across both themes and documented visual findings in Section 6.
+All defect and polish items have been implemented, verified, and validated with zero regressions:
+- **Item 1 (History Empty State & Segmented Tabs)**: 
+  - With 0 active sessions and nothing selected, the detail panel displays a centered empty state: History icon, "No changes yet.", and "Changes you apply with WinVelo will appear here."
+  - Session actions and legacy session warning banners are strictly hidden until an actual session is selected.
+  - "Session Timeline / Activity Log" are styled as real segmented tabs with an elevated card background, bold text, and hover states.
+- **Item 2 (Home Preset Badges)**:
+  - Preset badges ("SAFE & RECOMMENDED", "BACKGROUND PACING", "ENHANCED PRIVACY") now reside on their own dedicated line directly beneath the title and tweak count, completely eliminating badge truncation or clipping.
+- **Item 3 (Tweaks Default View & Risk-Ascending Sorting)**:
+  - The tweaks catalog defaults to "Recommended only" ON in both dark and light themes (Simple mode).
+  - In "All" view (or when filtering), tweaks are stably sorted by risk ascending (`Safe` -> `Low` -> `Medium` -> `High`), and then alphabetically by name.
+- **Item 4 (Home Common Settings Real State Badges)**:
+  - Replaced the static `"DEFAULT"` badge on all 8 quick toggles with live evaluated system state badges (`"On"`, `"Off"`, `"Partial"`) based on `TweakState` detection.
+- **Item 5 (Preview/Confirm Dialog Backdrop & Elevation)**:
+  - Unified Execution Preview and Result dialogs now use the exact 60% dim backdrop (`#99000000`) and `DropShadowEffect` (`BlurRadius="32"`, `Opacity="0.75"`) matching the first-run wizard, ensuring dialog boundaries and content separation are clear.
+- **Item 6 (Automated Verification & Inspection)**:
+  - Re-captured all 18 screenshot assets in test mode, visually audited each image, verified 0 test failures across 207 unit tests and 10 UI tests (including `Test_09`).
 
 ---
 
@@ -36,24 +30,24 @@ All screenshots are captured natively at 1440x900 resolution in `--test-mode`. E
 ### Screenshot Ledger Table
 | Relative Path | Dimensions | File Size (Bytes) | MD5 Checksum | Visual Content Description |
 |---|---|---|---|---|
-| `home.png` | 1440 x 900 | 122,819 | `01BF8AA2C79702B06B8915CDA9FF48AA` | Home dashboard, calm status cards, 3 preset cards, quick toggles |
-| `tweaks.png` | 1440 x 900 | 163,135 | `AACF07AA5E7A317780DDCAEB010B14E1` | ShutUp10++ left-aligned tweak list, categories, labeled filters |
+| `home.png` | 1440 x 900 | 120,111 | `8F972CC63F92E6E38A9046AFA6FA82EB` | Home dashboard, calm status row, 3 unclipped preset cards, live "Off" quick toggles |
+| `tweaks.png` | 1440 x 900 | 166,941 | `7DFA7DC66AB7530F1CF08CD4C0D80FAE` | ShutUp10++ list, "Recommended only" ON, sorted by risk ascending then name |
 | `apps.png` | 1440 x 900 | 166,800 | `F713BB37732B2470C84F08A12B557CB1` | 4-column curated app grid, status badges on second line |
 | `tools.png` | 1440 x 900 | 85,311 | `1DD3CEC3F7B0EA8E5652C4409F81152D` | 8-tile system utility launchboard with clean descriptions |
-| `history.png` | 1440 x 900 | 70,761 | `D9D55265280D2A5B199053264AE1AAAD` | Session timeline, rollback controls, activity log, restore points |
+| `history.png` | 1440 x 900 | 69,280 | `CFCDA126A2B7C6C162FCE00B590CB48C` | Segmented tabs, clean empty state ("No changes yet."), restore points |
 | `settings.png` | 1440 x 900 | 27,299 | `0B0CBB8D61CEBD90ECB046F66402BFAD` | Application settings, test-mode indicators, diagnostics |
-| `wizard.png` | 1440 x 900 | 153,152 | `D18BA426303E62E0BA57D9146AB58B0B` | 3-step first-run modal dialog with 60% dim backdrop |
-| `preview.png` | 1440 x 900 | 164,314 | `ECB58EA039A4163305162745CE767710` | Unified execution preview modal for preset review |
-| `command-palette.png` | 1440 x 900 | 130,846 | `B03FE044EA8CE5B182C93776C45FA437` | Quick action command palette overlay (Ctrl+K) |
-| `overview.png` | 1880 x 670 | 278,251 | `B3F68F56C9CDFFC1C32C608EC6ED281C` | 4x2 visual contact sheet of all 8 core UI pages |
-| `light/home.png` | 1440 x 900 | 122,991 | `C08B2326C5C688F1F2A2AC9F207DB325` | Home dashboard in high-contrast light theme |
-| `light/tweaks.png` | 1440 x 900 | 166,536 | `E4BED681D43963A169C6C0B41D459A39` | Tweaks tab in light theme with fixed checkbox rendering |
+| `wizard.png` | 1440 x 900 | 146,841 | `3C26F4AE2AA6D710410AC4332644E421` | 3-step first-run modal dialog with 60% dim backdrop |
+| `preview.png` | 1440 x 900 | 182,256 | `A48120AA915C114905E3CD4D4E064D78` | Unified execution preview modal with 60% dim backdrop and dropshadow |
+| `command-palette.png` | 1440 x 900 | 128,209 | `BFD6A2FC83F16261AB4A18EA110871C1` | Quick action command palette overlay (Ctrl+K) |
+| `overview.png` | 1880 x 670 | 267,430 | `5F7D41A5FBB8EBE09A39D99DACBA6249` | 4x2 visual contact sheet of all 8 core UI pages |
+| `light/home.png` | 1440 x 900 | 120,092 | `AB342761783D176149383DE7BC06C416` | Home dashboard in light theme with unclipped badges and live state |
+| `light/tweaks.png` | 1440 x 900 | 168,257 | `2321173C36B0CAE30ECCF287F38CC045` | Tweaks tab in light theme with "Recommended only" ON and fixed checkboxes |
 | `light/apps.png` | 1440 x 900 | 167,907 | `1DDF89C15E7D1CBDF9092882C617B97A` | Apps grid in light theme |
 | `light/tools.png` | 1440 x 900 | 85,854 | `E8735C73F2A64B830B12B76E096B9AC2` | Tools grid in light theme |
-| `light/history.png` | 1440 x 900 | 70,052 | `F4C72124C568AEB78B9C8C2EF647D4F9` | History & activity log in light theme |
+| `light/history.png` | 1440 x 900 | 68,775 | `BC735035F56AFFF1715C1044A3A02A98` | History tab in light theme showing clean empty state |
 | `light/settings.png` | 1440 x 900 | 27,299 | `7279A2FB596DE5620BEDF15D312B7627` | Settings tab in light theme |
-| `light/wizard.png` | 1440 x 900 | 154,927 | `3DECC26BC184BD5658627E2E79904391` | First-run setup modal in light theme |
-| `light/preview.png` | 1440 x 900 | 156,717 | `018CBFC62BAEC01C0C30F353CBCA0843` | Preset review preview modal in light theme |
+| `light/wizard.png` | 1440 x 900 | 150,210 | `14E545689E4CAD4A4D8135320407F9A4` | First-run setup modal in light theme |
+| `light/preview.png` | 1440 x 900 | 172,679 | `D81A55D28FF9761876A031A368F4D0B0` | Preset review preview modal in light theme with 60% dim backdrop |
 
 ---
 
@@ -129,39 +123,56 @@ Automated regression coverage for UI verification is integrated into `TweakoraUi
 Every rendered screenshot was opened and visually inspected for alignment, contrast, clipping, and layout anomalies:
 
 1. **`home.png` / `dark/home.png`**:
-   - Status cards: Card 3 ("SERVICING HEALTH") displays concise "All OK" text without truncation.
-   - Banners: Neither reboot nor Explorer restart banners appear when 0 tweaks are applied.
-   - Presets: 3 preset cards each show 4 tweaks with "Review" action buttons.
-   - Alignment: Status bar cards, preset cards, and quick toggles share consistent 24px margins.
+   - **Preset badges**: Badges ("BACKGROUND PACING", "ENHANCED PRIVACY", "SAFE & RECOMMENDED") are now located on their own dedicated row beneath the title and count. Zero clipping or truncation across all resolutions.
+   - **Common Settings status badges**: Displays real evaluated state ("Off" when unapplied) instead of static "DEFAULT", with proper green/amber/neutral styling.
+   - **Status cards**: Card 3 ("SERVICING HEALTH") displays concise "All OK" text without truncation.
+   - **Banners**: Neither reboot nor Explorer restart banners appear when 0 tweaks are applied.
+   - **Secondary actions**: "Undo all WinVelo changes" is a clean secondary button; "Get recommendations" replaces legacy jargon.
+   - **Alignment**: Status bar cards, preset cards, and quick toggles share consistent 24px margins.
 
 2. **`tweaks.png` / `dark/tweaks.png`**:
-   - Row alignment: Toggle switch, title + summary, risk chip, status badge, and chevron are strictly left-aligned and column-synchronized across all rows.
-   - Text centering: Resolved. Setting button template `ContentPresenter` to bind to `HorizontalContentAlignment` ensures all titles start at column offset 52px.
-   - Toolbar: Labeled dropdowns ("Risk: All", "Status: All") and "Select multiple" button render cleanly without clipping.
-   - Progress indicator: Indeterminate scanning line sits directly below the filter bar without occluding any text.
+   - **Default view**: Opens with "Recommended only" ON by default (Simple mode), displaying 47 curated safe/low tweaks.
+   - **Sorting**: When toggled to "All", items are sorted strictly by risk ascending (`Safe` -> `Low` -> `Medium` -> `High`), then alphabetically by name.
+   - **Row alignment**: Toggle switch, title + summary, risk chip, status badge, and chevron are strictly left-aligned and column-synchronized across all rows.
+   - **Toolbar**: Labeled dropdowns ("Risk: All", "Status: All") and "Select multiple" button render cleanly without clipping.
+   - **Progress indicator**: Indeterminate scanning line sits directly below the filter bar without occluding any text.
 
 3. **`apps.png` / `dark/apps.png`**:
-   - Grid layout: 4 uniform columns with responsive wrapping.
-   - Badge positioning: Status badges ("Not installed") sit on their own line underneath the application name, completely eliminating name or badge truncation.
-   - Selection bar: Sticky install bar is absent when no apps are selected.
+   - **Grid layout**: 4 uniform columns with responsive wrapping.
+   - **Badge positioning**: Status badges ("Not installed") sit on their own line underneath the application name, completely eliminating name or badge truncation.
+   - **Selection bar**: Sticky install bar is absent when no apps are selected.
 
 4. **`tools.png` / `dark/tools.png`**:
-   - Grid layout: 8 utility cards organized in a balanced 3-column layout.
-   - Typography: Clean title, description, and "Open Tool →" action buttons.
+   - **Grid layout**: 8 utility cards organized in a balanced 3-column layout.
+   - **Typography**: Clean title, description, and "Open Tool →" action buttons.
 
 5. **`history.png` / `dark/history.png`**:
-   - Test-mode clean slate: Displays 0 recorded sessions in test mode, confirming isolation from real AppData.
-   - Restore points: Displays system restore points in a scrollable card.
-   - Action controls: "Undo All WinVelo Changes" and "Create Restore Point" are clearly legible.
+   - **Empty state**: With 0 sessions recorded in test mode, the detail panel displays a centered empty state: History symbol, "No changes yet.", and "Changes you apply with WinVelo will appear here."
+   - **Hidden actions**: Legacy banner and "Undo This Session" buttons are completely hidden when no session is selected.
+   - **Segmented tabs**: "Session Timeline" and "Activity Log" render as real segmented pill tabs with elevated card background on the active tab and subtle secondary styling on inactive.
+   - **Restore points**: Displays system restore points in a scrollable card.
 
 6. **`wizard.png` / `dark/wizard.png`**:
-   - Modal geometry: Perfectly centered 560px modal with 60% dim backdrop (`#99000000`).
-   - Bleed-through: Opaque card background completely eliminates background bleeding.
+   - **Modal geometry**: Perfectly centered 560px modal with 60% dim backdrop (`#99000000`) and drop shadow.
+   - **Bleed-through**: Opaque card background completely eliminates background bleeding.
 
 7. **`preview.png` / `dark/preview.png`**:
-   - Distinct from wizard: Displays real preset review modal triggered from Home preset Review.
-   - Contents: Tweak selection list, reversibility markers, risk badges, and "Apply Selected Tweaks" button.
+   - **Backdrop & Elevation**: Uses the exact 60% dim backdrop (`#99000000`) and drop shadow effect (`BlurRadius="32"`, `Opacity="0.75"`) matching the wizard, giving distinct, clear card boundaries.
+   - **Contents**: Displays preset review modal with tweak selection checkboxes, reversibility markers, risk badges, and "Apply Selected Tweaks" button.
 
-8. **`light/tweaks.png`**:
+8. **`light/home.png`**:
+   - Preset badges ("BACKGROUND PACING", "ENHANCED PRIVACY", "SAFE & RECOMMENDED") display with sharp contrast on dedicated row without clipping.
+   - Common Settings quick toggles display crisp "Off" state badges.
+
+9. **`light/tweaks.png`**:
+   - Opens with "Recommended only" ON by default.
    - CheckBoxes: "Recommended only" and "Show experimental" render with crisp white/accent backgrounds, completely resolving the solid black box defect.
    - Contrast: Inactive sidebar items provide 8.2:1 contrast against `#E5E7EB`.
+
+10. **`light/history.png`**:
+    - Clean empty state ("No changes yet.") rendered with high contrast on light card background.
+    - Segmented tabs render cleanly with light theme elevation.
+
+11. **`light/preview.png`**:
+    - 60% dim backdrop and dropshadow effect ensure crisp separation against light background.
+    - Checkbox controls and risk badges render with high contrast.
