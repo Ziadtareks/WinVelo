@@ -1,0 +1,138 @@
+name: Release Pipeline
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+
+jobs:
+  release:
+    name: Build, Attest & Draft Release
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract Release Version
+        id: version_step
+        shell: pwsh
+        run: |
+          $rawTag = "${{ github.ref_name }}"
+          $cleanVersion = $rawTag.TrimStart('v')
+          Write-Host "Releasing version: $cleanVersion (Tag: $rawTag)"
+          echo "version=$cleanVersion" >> $env:GITHUB_OUTPUT
+          echo "tag=$rawTag" >> $env:GITHUB_OUTPUT
+
+      - name: Setup .NET 10 (LTS)
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore Dependencies
+        run: dotnet restore Tweakora.sln
+
+      - name: Validate Catalog Schema & Sources
+        run: dotnet run --project tools/CatalogValidator/CatalogValidator.csproj
+
+      - name: Build Release Binaries
+        run: dotnet build Tweakora.sln --configuration Release --no-restore
+
+      - name: Run Unit Tests
+        run: dotnet test src/Tweakora.Tests/Tweakora.Tests.csproj --configuration Release --no-build --verbosity normal
+
+      - name: Check Code Signing Configuration
+        id: signing_check
+        shell: pwsh
+        env:
+          SIGNPATH_TOKEN: ${{ secrets.SIGNPATH_API_TOKEN }}
+          AZURE_SIGNING_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+        run: |
+          if (-not [string]::IsNullOrWhiteSpace($env:SIGNPATH_TOKEN)) {
+            Write-Host "SignPath API token detected. Signing will be enabled."
+            echo "can_sign=true" >> $env:GITHUB_OUTPUT
+            echo "signing_provider=signpath" >> $env:GITHUB_OUTPUT
+          } elseif (-not [string]::IsNullOrWhiteSpace($env:AZURE_SIGNING_CLIENT_ID)) {
+            Write-Host "Azure Trusted Signing credentials detected. Signing will be enabled."
+            echo "can_sign=true" >> $env:GITHUB_OUTPUT
+            echo "signing_provider=azure" >> $env:GITHUB_OUTPUT
+          } else {
+            Write-Host "No signing secrets detected in repository environment. Release binaries will be published unsigned."
+            echo "can_sign=false" >> $env:GITHUB_OUTPUT
+            echo "signing_provider=none" >> $env:GITHUB_OUTPUT
+          }
+
+      - name: Execute SignPath Code Signing
+        if: steps.signing_check.outputs.signing_provider == 'signpath'
+        uses: SignPath/github-action-submit-signing-request@v1
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          org-id: ${{ secrets.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ secrets.SIGNPATH_PROJECT_SLUG }}
+          signing-policy-slug: ${{ secrets.SIGNPATH_SIGNING_POLICY_SLUG }}
+          artifact-path: 'src/Tweakora.App/bin/Release/net10.0-windows/win-x64/publish/WinVelo.exe'
+          output-path: 'src/Tweakora.App/bin/Release/net10.0-windows/win-x64/publish/WinVelo.exe'
+
+      - name: Package Release Archives (Portable & Small)
+        shell: pwsh
+        run: |
+          .\build\publish.ps1 -Version "${{ steps.version_step.outputs.version }}"
+
+      - name: Attest Build Provenance
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-path: |
+            dist/WinVelo-*-win-x64-portable.zip
+            dist/WinVelo-*-win-x64-small.zip
+
+      - name: Create Draft GitHub Release
+        id: create_release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $tag = "${{ steps.version_step.outputs.tag }}"
+          $ver = "${{ steps.version_step.outputs.version }}"
+          $canSign = "${{ steps.signing_check.outputs.can_sign }}"
+          
+          $signingNotice = if ($canSign -eq "true") {
+            "✅ **Code Signing**: All binaries in this release are digitally signed."
+          } else {
+            "⚠️ **Code Signing**: This beta release is currently **unsigned**. Windows SmartScreen may present an 'Unknown Publisher' alert. You can verify SHA-256 hashes against `SHA256SUMS.txt` or inspect the SLSA build provenance attestation."
+          }
+
+          $notes = @"
+          ## WinVelo $tag (Beta Release)
+
+          WinVelo is an honest, calm, open-source Windows 10/11 configuration utility with write-ahead rollback journaling, verified evidence, and zero placebos.
+
+          ### 📦 Packages Included
+          - `WinVelo-v$ver-win-x64-portable.zip` — Standalone portable bundle (includes .NET 10 runtime, no installation required).
+          - `WinVelo-v$ver-win-x64-small.zip` — Framework-dependent package (requires [.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/10.0)).
+          - `SHA256SUMS.txt` — SHA-256 checksums for package integrity verification.
+
+          ### 🛡️ Verification & Security
+          $signingNotice
+
+          See [docs/SIGNING.md](https://github.com/winvelo/winvelo/blob/main/docs/SIGNING.md) for verification instructions and code signing details.
+          "@
+
+          $portable = Get-Item "dist\WinVelo-*-win-x64-portable.zip" | Select-Object -First 1
+          $small = Get-Item "dist\WinVelo-*-win-x64-small.zip" | Select-Object -First 1
+          $shaSums = Get-Item "dist\SHA256SUMS.txt"
+
+          gh release create $tag `
+            --draft `
+            --prerelease `
+            --title "WinVelo $tag" `
+            --notes $notes `
+            "$($portable.FullName)" `
+            "$($small.FullName)" `
+            "$($shaSums.FullName)"
