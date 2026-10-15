@@ -11,10 +11,12 @@ using CommunityToolkit.Mvvm.Input;
 using Serilog;
 using Tweakora.App.Localization;
 using Tweakora.App.Services;
+using Tweakora.Core.Interfaces;
 using Tweakora.Core.Models;
 using Tweakora.Core.Operations;
 using Tweakora.Core.Safety;
 using Tweakora.Modules.Tweaks;
+using Tweakora.Platform;
 using Wpf.Ui.Appearance;
 
 namespace Tweakora.App.ViewModels;
@@ -98,7 +100,12 @@ public sealed partial class MainViewModel : ObservableObject
     public BackupsViewModel BackupsVM { get; }
     public ToolsViewModel ToolsVM { get; }
     public HistoryViewModel HistoryVM { get; }
+    public FirstRunWizardViewModel WizardVM { get; }
 
+    [ObservableProperty]
+    private bool _isWizardOpen;
+
+    private readonly IAppSettingsService _appSettings;
     private readonly List<PaletteItem> _allPaletteItems = new();
     public ObservableCollection<PaletteItem> PaletteResults { get; } = new();
 
@@ -119,7 +126,10 @@ public sealed partial class MainViewModel : ObservableObject
         ToolsViewModel? toolsVM = null,
         HistoryViewModel? historyVM = null,
         IActivityTracker? activityTracker = null,
-        ITweakService? tweakService = null)
+        ITweakService? tweakService = null,
+        IAppSettingsService? appSettings = null,
+        ISystemRestoreService? restoreService = null,
+        FirstRunWizardViewModel? wizardVM = null)
     {
         DashboardVM = dashboardVM;
         InstallVM = installVM;
@@ -134,6 +144,17 @@ public sealed partial class MainViewModel : ObservableObject
 
         ToolsVM = toolsVM ?? new ToolsViewModel(startupVM, updatesVM, configVM, toolboxVM, null);
         HistoryVM = historyVM ?? new HistoryViewModel(tweakService, null);
+
+        _appSettings = appSettings ?? new AppSettingsService();
+        var resSvc = restoreService ?? new NullRestoreService();
+        WizardVM = wizardVM ?? new FirstRunWizardViewModel(resSvc, _appSettings);
+        WizardVM.WizardCompleted += OnWizardCompleted;
+
+        var userSettings = _appSettings.GetSettings();
+        if (!userSettings.HasCompletedFirstRunWizard)
+        {
+            _isWizardOpen = true;
+        }
 
         _currentPage = DashboardVM;
         _activeTab = "Home";
@@ -403,6 +424,7 @@ public sealed partial class MainViewModel : ObservableObject
         _allPaletteItems.Add(new PaletteItem { Title = "Apps", Subtitle = "WinGet software installer and package manager", Category = "Page", IconSymbol = "ArrowDownload24", ActionToExecute = () => SwitchTab("Apps") });
         _allPaletteItems.Add(new PaletteItem { Title = "Tools", Subtitle = "System maintenance, diagnostic repairs, and service manager", Category = "Page", IconSymbol = "Toolbox24", ActionToExecute = () => SwitchTab("Tools") });
         _allPaletteItems.Add(new PaletteItem { Title = "History", Subtitle = "Review journal sessions, rollback tweaks, and restore points", Category = "Page", IconSymbol = "Clock24", ActionToExecute = () => SwitchTab("History") });
+        _allPaletteItems.Add(new PaletteItem { Title = "First-Run Setup Wizard", Subtitle = "Configure WinVelo catalog mode and verify system restore", Category = "Settings", IconSymbol = "Settings24", ActionToExecute = OpenFirstRunWizard });
 
         // 8 Integrated Tools
         _allPaletteItems.Add(new PaletteItem { Title = "Startup Apps Manager", Subtitle = "Control Windows boot applications and startup impact", Category = "Tool", IconSymbol = "Rocket24", ActionToExecute = () => SwitchTab("Startup") });
@@ -515,4 +537,35 @@ public sealed partial class MainViewModel : ObservableObject
         IsRecoveryDialogOpen = false;
         _unfinishedSessions.Clear();
     }
+
+    private void OnWizardCompleted(string mode)
+    {
+        IsWizardOpen = false;
+        if (string.Equals(mode, "Simple", StringComparison.OrdinalIgnoreCase))
+        {
+            TweaksVM.IsRecommendedOnly = true;
+            TweaksVM.ShowExperimentalTweaks = false;
+        }
+        else
+        {
+            TweaksVM.IsRecommendedOnly = false;
+        }
+        _ = TweaksVM.RefreshActiveStatesAsync();
+    }
+
+    [RelayCommand]
+    public void OpenFirstRunWizard()
+    {
+        WizardVM.Reset();
+        IsWizardOpen = true;
+    }
+}
+
+file sealed class NullRestoreService : ISystemRestoreService
+{
+    public bool IsSystemRestoreEnabled() => false;
+    public bool EnableSystemRestore(string drive = "C:\\") => false;
+    public int GetRestorePointCount() => 0;
+    public DateTime? GetLatestRestorePointDate() => null;
+    public RestorePointResult CreateRestorePoint(string description) => new() { Success = true };
 }

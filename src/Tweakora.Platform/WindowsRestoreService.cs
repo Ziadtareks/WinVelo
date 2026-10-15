@@ -41,6 +41,27 @@ public sealed class WindowsRestoreService : ISystemRestoreService
         }
     }
 
+    public bool EnableSystemRestore(string drive = "C:\\")
+    {
+        EnsureNotTestMode();
+        try
+        {
+            using var process = Process.Start(new ProcessStartInfo
+            {
+                FileName = "powershell.exe",
+                Arguments = $"-NoProfile -NonInteractive -Command \"Enable-ComputerRestore -Drive '{drive}'\"",
+                CreateNoWindow = true,
+                UseShellExecute = false
+            });
+            process?.WaitForExit(15000);
+            return process?.ExitCode == 0;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
     public int GetRestorePointCount()
     {
         EnsureNotTestMode();

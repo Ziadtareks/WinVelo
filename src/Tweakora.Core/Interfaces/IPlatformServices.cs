@@ -47,6 +47,7 @@ public sealed class RestorePointResult
 public interface ISystemRestoreService
 {
     bool IsSystemRestoreEnabled();
+    bool EnableSystemRestore(string drive = "C:\\");
     int GetRestorePointCount();
     DateTime? GetLatestRestorePointDate();
     RestorePointResult CreateRestorePoint(string description);

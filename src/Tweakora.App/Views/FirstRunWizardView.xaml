@@ -1,0 +1,345 @@
+<UserControl x:Class="Tweakora.App.Views.FirstRunWizardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:vm="clr-namespace:Tweakora.App.ViewModels"
+             AutomationProperties.AutomationId="FirstRunWizardView"
+             AutomationProperties.Name="First-Run Setup Wizard">
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisConverter" />
+    </UserControl.Resources>
+
+    <Border Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+            BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+            BorderThickness="1" CornerRadius="12" Width="680" MinHeight="520"
+            HorizontalAlignment="Center" VerticalAlignment="Center" Padding="28">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" /> <!-- Top Header & Step Indicator -->
+                <RowDefinition Height="*" />    <!-- Step Content -->
+                <RowDefinition Height="Auto" /> <!-- Navigation Buttons -->
+            </Grid.RowDefinitions>
+
+            <!-- TOP HEADER & PROGRESS -->
+            <DockPanel Grid.Row="0" LastChildFill="False" Margin="0,0,0,20">
+                <StackPanel DockPanel.Dock="Left">
+                    <TextBlock Text="{Binding StepTitle}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" />
+                    <TextBlock Text="{Binding StepDescription}" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,3,0,0" />
+                </StackPanel>
+
+                <!-- Step Counter / Indicator -->
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Background="{DynamicResource AccentPrimaryBrush}" CornerRadius="10" Padding="10,3">
+                        <TextBlock Text="{Binding CurrentStep, StringFormat='Step {0} of 3'}" FontSize="11" FontWeight="Bold" Foreground="White" />
+                    </Border>
+                </StackPanel>
+            </DockPanel>
+
+            <!-- ==================== STEP 1: WHAT WINVELO DOES AND DOES NOT DO ==================== -->
+            <StackPanel Grid.Row="1" Margin="0,10,0,20">
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding CurrentStep}" Value="1">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+
+                <TextBlock Text="WinVelo is built on transparency, safety, and strict verification."
+                           FontSize="13" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,16" />
+
+                <!-- Bullet 1: Transparent Tuning -->
+                <Border Background="{DynamicResource ControlFillColorDefaultBrush}" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                        BorderThickness="1" CornerRadius="8" Padding="16,12" Margin="0,0,0,10">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border Grid.Column="0" Background="#064E3B" CornerRadius="6" Width="36" Height="36" Margin="0,0,14,0" VerticalAlignment="Center">
+                            <ui:SymbolIcon Symbol="CheckmarkStarburst24" Foreground="#10B981" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock Text="Transparent, Evidence-Based Tuning" FontWeight="Bold" FontSize="13" Foreground="{DynamicResource TextPrimaryBrush}" />
+                            <TextBlock Text="Settings are backed by documented Microsoft vendor sources or direct Windows Settings equivalents. No placebo RAM cleaners or unproven claims."
+                                       FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,2,0,0" LineHeight="16" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- Bullet 2: Non-Destructive Rollbacks -->
+                <Border Background="{DynamicResource ControlFillColorDefaultBrush}" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                        BorderThickness="1" CornerRadius="8" Padding="16,12" Margin="0,0,0,10">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border Grid.Column="0" Background="#1E3A8A" CornerRadius="6" Width="36" Height="36" Margin="0,0,14,0" VerticalAlignment="Center">
+                            <ui:SymbolIcon Symbol="History24" Foreground="#60A5FA" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock Text="Non-Destructive Safety &amp; Full Rollbacks" FontWeight="Bold" FontSize="13" Foreground="{DynamicResource TextPrimaryBrush}" />
+                            <TextBlock Text="Every applied change records baseline values in an ACID write-ahead rollback journal. You can undo any individual tweak or all WinVelo changes in 1 click."
+                                       FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,2,0,0" LineHeight="16" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- Bullet 3: Servicing Protection -->
+                <Border Background="{DynamicResource ControlFillColorDefaultBrush}" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                        BorderThickness="1" CornerRadius="8" Padding="16,12" Margin="0,0,0,10">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border Grid.Column="0" Background="#78350F" CornerRadius="6" Width="36" Height="36" Margin="0,0,14,0" VerticalAlignment="Center">
+                            <ui:SymbolIcon Symbol="ShieldCheckmark24" Foreground="#FBBF24" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock Text="Protects Windows Update &amp; Store Servicing" FontWeight="Bold" FontSize="13" Foreground="{DynamicResource TextPrimaryBrush}" />
+                            <TextBlock Text="Servicing components (Windows Update, BITS, Microsoft Store, Windows Defender) are strictly protected and never disabled."
+                                       FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,2,0,0" LineHeight="16" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </StackPanel>
+
+            <!-- ==================== STEP 2: SYSTEM RESTORE PROTECTION ==================== -->
+            <StackPanel Grid.Row="1" Margin="0,10,0,20">
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding CurrentStep}" Value="2">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+
+                <!-- Status Banner -->
+                <Border Background="{DynamicResource ControlFillColorDefaultBrush}" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                        BorderThickness="1" CornerRadius="8" Padding="16,14" Margin="0,0,0,16">
+                    <StackPanel>
+                        <DockPanel LastChildFill="False" Margin="0,0,0,6">
+                            <TextBlock Text="CURRENT STATUS" FontWeight="Bold" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" DockPanel.Dock="Left" />
+                        </DockPanel>
+                        <TextBlock Text="{Binding RestoreStatusMessage}" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" TextWrapping="Wrap" LineHeight="18" />
+
+                        <!-- Enable Button (if disabled) -->
+                        <Button Content="Turn On System Restore (Drive C:\)"
+                                Command="{Binding EnableSystemRestoreCommand}"
+                                IsEnabled="{Binding IsSystemRestoreEnabled, Converter={StaticResource BoolToVisConverter}}"
+                                Margin="0,12,0,0" HorizontalAlignment="Left" Padding="12,6" FontSize="12">
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource ModernSecondaryBtn}">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsSystemRestoreEnabled}" Value="False">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </StackPanel>
+                </Border>
+
+                <!-- Create & Verify Restore Point Card -->
+                <Border Background="{DynamicResource ControlFillColorDefaultBrush}" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                        BorderThickness="1" CornerRadius="8" Padding="16,14" Margin="0,0,0,10">
+                    <StackPanel>
+                        <TextBlock Text="SYSTEM RESTORE POINT VERIFICATION" FontWeight="Bold" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,6" />
+                        <TextBlock Text="Create a fresh restore point before configuring tweaks. WinVelo verifies its existence directly against Windows."
+                                   FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,0,0,14" LineHeight="16" />
+
+                        <DockPanel LastChildFill="False">
+                            <ui:Button DockPanel.Dock="Left"
+                                       Appearance="Primary"
+                                       Command="{Binding CreateAndVerifyRestorePointCommand}"
+                                       IsEnabled="{Binding IsCreatingRestorePoint, Converter={StaticResource BoolToVisConverter}}"
+                                       Padding="14,8">
+                                <StackPanel Orientation="Horizontal">
+                                    <ui:SymbolIcon Symbol="AddCircle24" Margin="0,0,6,0" FontSize="16" />
+                                    <TextBlock Text="Create &amp; Verify Restore Point" FontWeight="SemiBold" />
+                                </StackPanel>
+                            </ui:Button>
+                        </DockPanel>
+
+                        <!-- Verified / Honest Result Message -->
+                        <Border Background="#0F172A" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                                BorderThickness="1" CornerRadius="6" Padding="12,8" Margin="0,12,0,0">
+                            <TextBlock Text="{Binding RestoreVerificationMessage}" FontSize="12"
+                                       Foreground="#38BDF8" TextWrapping="Wrap" LineHeight="16" />
+                        </Border>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+
+            <!-- ==================== STEP 3: CHOOSE A MODE ==================== -->
+            <StackPanel Grid.Row="1" Margin="0,10,0,20">
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding CurrentStep}" Value="3">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+
+                <TextBlock Text="Select how much of the tweak catalog you wish to see. You can change this at any time in Tweaks or Settings."
+                           FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,16" />
+
+                <!-- Simple Mode Card -->
+                <Border BorderThickness="2" CornerRadius="8" Padding="18,14" Margin="0,0,0,12" Cursor="Hand"
+                        Background="{DynamicResource ControlFillColorDefaultBrush}">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="BorderBrush" Value="{DynamicResource ControlStrokeColorDefaultBrush}" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsSimpleMode}" Value="True">
+                                    <Setter Property="BorderBrush" Value="{DynamicResource AccentPrimaryBrush}" />
+                                    <Setter Property="Background" Value="#0A2540" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                    <Border.InputBindings>
+                        <MouseBinding Gesture="LeftClick" Command="{Binding SelectSimpleModeCommand}" />
+                    </Border.InputBindings>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <RadioButton Grid.Column="0" IsChecked="{Binding IsSimpleMode, Mode=TwoWay}"
+                                     GroupName="ModeGroup" VerticalAlignment="Center" Margin="0,0,14,0" />
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <DockPanel LastChildFill="False">
+                                <TextBlock Text="Simple Mode (Recommended)" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource TextPrimaryBrush}" DockPanel.Dock="Left" />
+                                <Border Background="#064E3B" CornerRadius="4" Padding="6,1" Margin="8,0,0,0" DockPanel.Dock="Left" VerticalAlignment="Center">
+                                    <TextBlock Text="RECOMMENDED" FontSize="9" FontWeight="Bold" Foreground="#10B981" />
+                                </Border>
+                            </DockPanel>
+                            <TextBlock Text="Only Recommended tweaks are visible (Safe &amp; Low risk, documented or UI-equivalent with verified sources). Perfect for standard users who want a clean, stable system."
+                                       FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,4,0,0" LineHeight="16" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- Advanced Mode Card -->
+                <Border BorderThickness="2" CornerRadius="8" Padding="18,14" Margin="0,0,0,12" Cursor="Hand"
+                        Background="{DynamicResource ControlFillColorDefaultBrush}">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="BorderBrush" Value="{DynamicResource ControlStrokeColorDefaultBrush}" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsSimpleMode}" Value="False">
+                                    <Setter Property="BorderBrush" Value="{DynamicResource AccentPrimaryBrush}" />
+                                    <Setter Property="Background" Value="#0A2540" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                    <Border.InputBindings>
+                        <MouseBinding Gesture="LeftClick" Command="{Binding SelectAdvancedModeCommand}" />
+                    </Border.InputBindings>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <RadioButton Grid.Column="0" IsChecked="{Binding IsSimpleMode, Converter={StaticResource BoolToVisConverter}}"
+                                     GroupName="ModeGroup" VerticalAlignment="Center" Margin="0,0,14,0">
+                            <RadioButton.Style>
+                                <Style TargetType="RadioButton">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsSimpleMode}" Value="False">
+                                            <Setter Property="IsChecked" Value="True" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding IsSimpleMode}" Value="True">
+                                            <Setter Property="IsChecked" Value="False" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </RadioButton.Style>
+                        </RadioButton>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <DockPanel LastChildFill="False">
+                                <TextBlock Text="Advanced Mode" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource TextPrimaryBrush}" DockPanel.Dock="Left" />
+                                <Border Background="#1E293B" CornerRadius="4" Padding="6,1" Margin="8,0,0,0" DockPanel.Dock="Left" VerticalAlignment="Center">
+                                    <TextBlock Text="ALL TWEAKS" FontSize="9" FontWeight="Bold" Foreground="#94A3B8" />
+                                </Border>
+                            </DockPanel>
+                            <TextBlock Text="Full catalog (all 149 tweaks) across all risk tiers. Experimental tweaks remain protected behind their own toggle. For power users and system administrators."
+                                       FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,4,0,0" LineHeight="16" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </StackPanel>
+
+            <!-- ==================== NAVIGATION BUTTONS ==================== -->
+            <DockPanel Grid.Row="2" LastChildFill="False" Margin="0,10,0,0">
+                <!-- Back Button -->
+                <Button DockPanel.Dock="Left" Content="Back"
+                        Command="{Binding PreviousStepCommand}" Padding="16,8">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource ModernGhostBtn}">
+                            <Setter Property="Visibility" Value="Visible" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding CurrentStep}" Value="1">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+
+                <!-- Right Buttons: Skip / Next / Finish -->
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                    <Button Content="Skip Setup" Style="{DynamicResource ModernGhostBtn}"
+                            Command="{Binding FinishCommand}" Margin="0,0,10,0" Padding="14,8" />
+
+                    <!-- Next Step Button (Steps 1 & 2) -->
+                    <ui:Button Appearance="Primary" Content="Next Step"
+                               Command="{Binding NextStepCommand}" Padding="20,8" FontWeight="SemiBold">
+                        <ui:Button.Style>
+                            <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+                                <Setter Property="Visibility" Value="Visible" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding CurrentStep}" Value="3">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ui:Button.Style>
+                    </ui:Button>
+
+                    <!-- Finish Button (Step 3) -->
+                    <ui:Button Appearance="Primary" Content="Get Started"
+                               Command="{Binding FinishCommand}" Padding="20,8" FontWeight="SemiBold">
+                        <ui:Button.Style>
+                            <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding CurrentStep}" Value="3">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ui:Button.Style>
+                    </ui:Button>
+                </StackPanel>
+            </DockPanel>
+        </Grid>
+    </Border>
+</UserControl>

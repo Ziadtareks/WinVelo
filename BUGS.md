@@ -452,4 +452,24 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
   5. Completely removed the 1-second background `_ramMonitorTimer`, pulsing animations, RAM progress bar / meters, and the RAM purge button.
   6. Added comprehensive unit test coverage in `HomeCalmStatusTests.cs`.
 
+---
+
+## BUG-030: Absence of First-Run Onboarding Wizard, Unverified System Restore Baseline, and Lack of Simple vs Advanced Modes
+- **Component**: `src/Tweakora.Core/Models/UserSettings.cs`, `src/Tweakora.Core/Interfaces/IAppSettingsService.cs`, `src/Tweakora.Platform/AppSettingsService.cs`, `src/Tweakora.App/ViewModels/FirstRunWizardViewModel.cs`, `src/Tweakora.App/Views/FirstRunWizardView.xaml`, `src/Tweakora.App/ViewModels/MainViewModel.cs`, `src/Tweakora.App/Views/MainWindow.xaml`, `src/Tweakora.Core/Interfaces/IPlatformServices.cs`, `src/Tweakora.Platform/WindowsRestoreService.cs`, `src/Tweakora.Simulation/SimulationServices.cs`, `src/Tweakora.Tests/FirstRunWizardTests.cs`
+- **Finding**:
+  1. The application launched directly into the full tweaking surface without explaining what WinVelo does and does not do, creating confusion for new or non-technical users.
+  2. Users lacked an upfront onboarding safety check to enable System Restore and create a verified baseline restore point before applying system changes.
+  3. No option existed to choose between a curated "Simple" mode (only recommended tweaks displayed) and an "Advanced" mode (all tweaks with experimental settings behind a dedicated toggle).
+  4. Preferences and first-run completion status were not persisted in settings.
+- **Root Cause**: Missing dedicated first-run onboarding wizard flow and absence of persistent user settings model.
+- **Fix**:
+  1. Implemented `UserSettings` model and `IAppSettingsService` / `AppSettingsService` persisting configuration to `%APPDATA%\WinVelo\settings.json` (or sandboxed path in test mode).
+  2. Implemented `FirstRunWizardViewModel` and `FirstRunWizardView.xaml` with 3 clear steps:
+     - Step 1: Plain language summary of what WinVelo does and does not do (3 short honest bullets).
+     - Step 2: System Restore detection, enabling for C:\ if disabled (`EnableSystemRestore`), and creating/verifying restore point creation against the system restore point list.
+     - Step 3: Experience mode selection ("Simple" for Recommended tweaks only vs "Advanced" for full catalog with experimental toggles).
+  3. Integrated wizard modal overlay in `MainWindow.xaml` and `MainViewModel.cs`, auto-displaying on first run and accessible on demand via a "Setup Wizard" button in the navigation sidebar.
+  4. Added `EnableSystemRestore(string driveLetter)` to `ISystemRestoreService`, `WindowsRestoreService` (via PowerShell `Enable-ComputerRestore`), and `FakeRestoreService`.
+  5. Added comprehensive test coverage in `FirstRunWizardTests.cs` covering all wizard steps, restoration validation, mode selection, and reopenability.
+
 

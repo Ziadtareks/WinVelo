@@ -181,6 +181,7 @@ public sealed class ArchitectureIntegrityTests
         services.AddSingleton<ITaskSchedulerService, FakeTaskSchedulerService>();
         services.AddSingleton<ISystemRestoreService, FakeRestoreService>();
         services.AddSingleton<IShellService, FakeShellService>();
+        services.AddSingleton<IAppSettingsService, FakeAppSettingsService>();
 
         services.AddSingleton(new RollbackJournalManager(Path.Combine(Path.GetTempPath(), "Tweakora_ArchTest_Journal")));
         services.AddSingleton<IOperationRunner, OperationRunner>();
@@ -208,6 +209,7 @@ public sealed class ArchitectureIntegrityTests
         services.AddSingleton<BackupsViewModel>();
         services.AddSingleton<ToolsViewModel>();
         services.AddSingleton<HistoryViewModel>();
+        services.AddSingleton<FirstRunWizardViewModel>();
         services.AddSingleton<MainViewModel>();
 
         var provider = services.BuildServiceProvider();
@@ -224,6 +226,7 @@ public sealed class ArchitectureIntegrityTests
             typeof(BackupsViewModel),
             typeof(ToolsViewModel),
             typeof(HistoryViewModel),
+            typeof(FirstRunWizardViewModel),
             typeof(MainViewModel)
         };
 

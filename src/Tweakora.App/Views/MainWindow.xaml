@@ -243,6 +243,19 @@
                                     </Border>
                                 </DockPanel>
                             </Button>
+
+                            <!-- Setup Wizard (Reopenable from Settings) -->
+                            <Button AutomationProperties.AutomationId="Btn_OpenWizard"
+                                    AutomationProperties.Name="Setup Wizard"
+                                    Style="{DynamicResource SidebarNavBtn}"
+                                    Command="{Binding OpenFirstRunWizardCommand}" Margin="0,0,0,6">
+                                <DockPanel LastChildFill="False">
+                                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                                        <ui:SymbolIcon Symbol="Settings24" FontSize="16" Margin="0,0,10,0" Foreground="{DynamicResource AccentPrimaryBrush}" />
+                                        <TextBlock Text="Setup Wizard" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" />
+                                    </StackPanel>
+                                </DockPanel>
+                            </Button>
                         </StackPanel>
                     </ScrollViewer>
 
@@ -629,5 +642,13 @@
                            VerticalAlignment="Center" />
             </StackPanel>
         </Border>
+
+        <!-- FIRST-RUN WIZARD MODAL OVERLAY -->
+        <Grid Grid.Row="0" Grid.RowSpan="4"
+              Background="#B0000000"
+              Panel.ZIndex="2000"
+              Visibility="{Binding IsWizardOpen, Converter={StaticResource BoolToVisConverter}}">
+            <views:FirstRunWizardView DataContext="{Binding WizardVM}" />
+        </Grid>
     </Grid>
 </ui:FluentWindow>

@@ -77,6 +77,7 @@ public partial class App : Application
                     services.AddSingleton<ITaskSchedulerService, FakeTaskSchedulerService>();
                     services.AddSingleton<ISystemRestoreService, FakeRestoreService>();
                     services.AddSingleton<IShellService, FakeShellService>();
+                    services.AddSingleton<IAppSettingsService, FakeAppSettingsService>();
                 }
                 else
                 {
@@ -85,6 +86,7 @@ public partial class App : Application
                     services.AddSingleton<ITaskSchedulerService, WindowsTaskSchedulerService>();
                     services.AddSingleton<ISystemRestoreService, WindowsRestoreService>();
                     services.AddSingleton<IShellService, WindowsShellService>();
+                    services.AddSingleton<IAppSettingsService, AppSettingsService>();
                 }
 
                 // Core Engine and Operation Infrastructure
@@ -125,6 +127,7 @@ public partial class App : Application
                 services.AddSingleton<BackupsViewModel>();
                 services.AddSingleton<ToolsViewModel>();
                 services.AddSingleton<HistoryViewModel>();
+                services.AddSingleton<FirstRunWizardViewModel>();
                 services.AddSingleton<MainViewModel>();
 
                 // Views

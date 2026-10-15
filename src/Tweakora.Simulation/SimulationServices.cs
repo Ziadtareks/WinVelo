@@ -305,6 +305,12 @@ public sealed class FakeRestoreService : ISystemRestoreService
 
     public bool IsSystemRestoreEnabled() => IsEnabled;
 
+    public bool EnableSystemRestore(string drive = "C:\\")
+    {
+        IsEnabled = true;
+        return true;
+    }
+
     public int GetRestorePointCount() => RestorePointsCount;
 
     public DateTime? GetLatestRestorePointDate() => LatestRestorePointDate;
@@ -365,4 +371,11 @@ public sealed class FakeShellService : IShellService
     {
         LaunchedApplets.Add(appletCommand);
     }
+}
+
+public sealed class FakeAppSettingsService : IAppSettingsService
+{
+    public UserSettings Settings { get; set; } = new();
+    public UserSettings GetSettings() => Settings;
+    public void SaveSettings(UserSettings settings) => Settings = settings;
 }
