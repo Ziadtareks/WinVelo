@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.1.6.0.schema.json
+
+PackageIdentifier: WinVelo.WinVelo
+PackageVersion: 0.9.0-beta
+PackageLocale: en-US
+Publisher: WinVelo Team
+PublisherUrl: https://github.com/winvelo/winvelo
+PublisherSupportUrl: https://github.com/winvelo/winvelo/issues
+Author: WinVelo Contributors
+PackageName: WinVelo
+PackageUrl: https://github.com/winvelo/winvelo
+License: MIT
+LicenseUrl: https://github.com/winvelo/winvelo/blob/main/LICENSE
+Copyright: Copyright (c) 2026 WinVelo Contributors
+ShortDescription: Honest, calm Windows 10/11 configuration utility and package manager.
+Description: WinVelo is a transparent, calm Windows 10/11 configuration utility with write-ahead rollback journaling, verified evidence, exact registry keys, and zero placebos.
+Moniker: winvelo
+Tags:
+  - windows
+  - tweaks
+  - privacy
+  - performance
+  - configuration
+  - winget
+  - open-source
+ReleaseNotesUrl: https://github.com/winvelo/winvelo/releases/tag/v0.9.0-beta
+ManifestType: defaultLocale
+ManifestVersion: 1.6.0
