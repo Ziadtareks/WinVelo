@@ -96,6 +96,17 @@ public sealed partial class HistoryViewModel : ObservableObject
     [ObservableProperty]
     private bool _isExportDialogOpen;
 
+    public ObservableCollection<LogEntryItem> ActivityLogs { get; } = new();
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsTimelineView))]
+    private bool _isActivityLogView;
+
+    public bool IsTimelineView => !IsActivityLogView;
+
+    [ObservableProperty]
+    private string _activeHistoryView = "Sessions"; // "Sessions" or "ActivityLog"
+
     public HistoryViewModel(
         ITweakService? tweakService = null,
         ISystemRestoreService? restoreService = null,
@@ -107,7 +118,82 @@ public sealed partial class HistoryViewModel : ObservableObject
         _runner = runner ?? new OperationRunner();
         _executionDialog = executionDialog;
 
+        _runner.OnLog += msg =>
+        {
+            Application.Current?.Dispatcher?.Invoke(() =>
+            {
+                ActivityLogs.Insert(0, new LogEntryItem
+                {
+                    Timestamp = DateTime.Now.ToString("HH:mm:ss"),
+                    Level = "INFO",
+                    Message = msg
+                });
+                if (ActivityLogs.Count > 300) ActivityLogs.RemoveAt(ActivityLogs.Count - 1);
+            });
+        };
+
         RefreshHistory();
+        LoadActivityLogs();
+    }
+
+    [RelayCommand]
+    public void SetHistoryView(string view)
+    {
+        ActiveHistoryView = view;
+        IsActivityLogView = string.Equals(view, "ActivityLog", StringComparison.OrdinalIgnoreCase);
+        if (IsActivityLogView)
+        {
+            LoadActivityLogs();
+        }
+    }
+
+    [RelayCommand]
+    public void RefreshActivityLogs()
+    {
+        LoadActivityLogs();
+    }
+
+    [RelayCommand]
+    public void ClearActivityLogs()
+    {
+        ActivityLogs.Clear();
+    }
+
+    public void LoadActivityLogs()
+    {
+        ActivityLogs.Clear();
+        try
+        {
+            string logsDir = WinVeloStoragePaths.GetLogsDirectory(TestModeManager.IsTestMode);
+            if (Directory.Exists(logsDir))
+            {
+                var latestLog = Directory.GetFiles(logsDir, "*.log")
+                    .OrderByDescending(File.GetLastWriteTimeUtc)
+                    .FirstOrDefault();
+
+                if (latestLog != null)
+                {
+                    var lines = File.ReadAllLines(latestLog);
+                    var recent = lines.TakeLast(100).Reverse();
+                    foreach (var line in recent)
+                    {
+                        if (string.IsNullOrWhiteSpace(line)) continue;
+                        string level = "INFO";
+                        if (line.Contains("[ERR]") || line.Contains("ERROR")) level = "ERR";
+                        else if (line.Contains("[WARN]")) level = "WARN";
+                        else if (line.Contains("[OK]")) level = "OK";
+
+                        ActivityLogs.Add(new LogEntryItem
+                        {
+                            Timestamp = DateTime.Now.ToString("HH:mm:ss"),
+                            Level = level,
+                            Message = line
+                        });
+                    }
+                }
+            }
+        }
+        catch { }
     }
 
     [RelayCommand]

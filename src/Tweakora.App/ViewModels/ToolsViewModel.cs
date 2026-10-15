@@ -17,7 +17,12 @@ public sealed partial class ToolsViewModel : ObservableObject
     public ToolboxViewModel ToolboxVM { get; }
 
     [ObservableProperty]
-    private string _activeTool = "Startup"; // Startup, Services, Cleaner, DNS, Fixes, Updates, Features, RestorePoints
+    [NotifyPropertyChangedFor(nameof(IsOverview))]
+    [NotifyPropertyChangedFor(nameof(IsSubtoolOpen))]
+    private string _activeTool = ""; // Empty = overview tile grid
+
+    public bool IsOverview => string.IsNullOrEmpty(ActiveTool);
+    public bool IsSubtoolOpen => !string.IsNullOrEmpty(ActiveTool);
 
     [ObservableProperty]
     private string _restorePointDescription = "WinVelo Checkpoint";
@@ -51,9 +56,13 @@ public sealed partial class ToolsViewModel : ObservableObject
     }
 
     [RelayCommand]
-    public void SelectTool(string toolName)
+    public void SelectTool(string? toolName)
     {
-        if (string.IsNullOrWhiteSpace(toolName)) return;
+        if (string.IsNullOrWhiteSpace(toolName) || string.Equals(toolName, "Overview", StringComparison.OrdinalIgnoreCase))
+        {
+            ActiveTool = "";
+            return;
+        }
 
         ActiveTool = toolName switch
         {
@@ -72,6 +81,12 @@ public sealed partial class ToolsViewModel : ObservableObject
         {
             RefreshRestoreInfo();
         }
+    }
+
+    [RelayCommand]
+    public void BackToOverview()
+    {
+        ActiveTool = "";
     }
 
     public void RefreshRestoreInfo()

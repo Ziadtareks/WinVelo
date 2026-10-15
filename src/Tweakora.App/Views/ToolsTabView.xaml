@@ -12,46 +12,235 @@
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="24" MaxWidth="1180" HorizontalAlignment="Stretch">
-            <!-- Header -->
-            <TextBlock Text="System Tools &amp; Diagnostics"
-                       FontSize="24" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,4" />
-            <TextBlock Text="Integrated Windows maintenance, service controls, network tuning, and repair utilities."
-                       FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,16" />
+            <!-- OVERVIEW: Grid of Tool Tiles (Visible when no subtool is active) -->
+            <Border Visibility="{Binding IsOverview, Converter={StaticResource BoolToVisConverter}}">
+                <StackPanel>
+                    <TextBlock Text="System Tools &amp; Diagnostics"
+                               FontSize="24" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,4" />
+                    <TextBlock Text="Integrated Windows maintenance, service controls, network tuning, and repair utilities."
+                               FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,20" />
 
-            <!-- 8 Tool Navigation Buttons (WrapPanel) -->
-            <WrapPanel Margin="0,0,0,20">
-                <Button AutomationProperties.AutomationId="Tool_Startup" AutomationProperties.Name="Startup Applications"
-                        Content="Startup Apps" Style="{DynamicResource ModernSecondaryBtn}" Margin="0,0,8,8"
-                        Command="{Binding SelectToolCommand}" CommandParameter="Startup" />
+                    <!-- Grid of 8 Tool Tiles -->
+                    <UniformGrid Columns="3" Margin="0,0,0,24">
+                        <!-- 1. Startup Apps -->
+                        <Border Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
+                                BorderThickness="1" CornerRadius="8" Padding="16" Margin="6">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Border Grid.Row="0" Width="38" Height="38" CornerRadius="8" Background="{DynamicResource AccentSubtleBrush}" HorizontalAlignment="Left" Margin="0,0,0,10">
+                                    <ui:SymbolIcon Symbol="Apps24" Foreground="{DynamicResource AccentBrush}" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Border>
+                                <TextBlock Grid.Row="1" Text="Startup Apps" FontSize="15" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,4" />
+                                <TextBlock Grid.Row="2" Text="Inspect apps that launch automatically on login. Disabling unnecessary items speeds up boot."
+                                           FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,0,0,14" />
+                                <Button Grid.Row="3" AutomationProperties.AutomationId="Tool_Startup" AutomationProperties.Name="Startup Applications"
+                                        Content="Open Tool →" Style="{DynamicResource ModernSecondaryBtn}"
+                                        Command="{Binding SelectToolCommand}" CommandParameter="Startup" HorizontalAlignment="Left" Padding="12,5" />
+                            </Grid>
+                        </Border>
 
-                <Button AutomationProperties.AutomationId="Tool_Services" AutomationProperties.Name="Windows Services"
-                        Content="Services" Style="{DynamicResource ModernSecondaryBtn}" Margin="0,0,8,8"
-                        Command="{Binding SelectToolCommand}" CommandParameter="Services" />
+                        <!-- 2. Windows Services -->
+                        <Border Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
+                                BorderThickness="1" CornerRadius="8" Padding="16" Margin="6">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Border Grid.Row="0" Width="38" Height="38" CornerRadius="8" Background="{DynamicResource AccentSubtleBrush}" HorizontalAlignment="Left" Margin="0,0,0,10">
+                                    <ui:SymbolIcon Symbol="Server24" Foreground="{DynamicResource AccentBrush}" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Border>
+                                <TextBlock Grid.Row="1" Text="Windows Services" FontSize="15" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,4" />
+                                <TextBlock Grid.Row="2" Text="Audit system background services with safety shielding against disabling essential components."
+                                           FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,0,0,14" />
+                                <Button Grid.Row="3" AutomationProperties.AutomationId="Tool_Services" AutomationProperties.Name="Windows Services"
+                                        Content="Open Tool →" Style="{DynamicResource ModernSecondaryBtn}"
+                                        Command="{Binding SelectToolCommand}" CommandParameter="Services" HorizontalAlignment="Left" Padding="12,5" />
+                            </Grid>
+                        </Border>
 
-                <Button AutomationProperties.AutomationId="Tool_Cleaner" AutomationProperties.Name="Safe Cache Cleaner"
-                        Content="Cleaner" Style="{DynamicResource ModernSecondaryBtn}" Margin="0,0,8,8"
-                        Command="{Binding SelectToolCommand}" CommandParameter="Cleaner" />
+                        <!-- 3. Safe Cache Cleaner -->
+                        <Border Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
+                                BorderThickness="1" CornerRadius="8" Padding="16" Margin="6">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Border Grid.Row="0" Width="38" Height="38" CornerRadius="8" Background="{DynamicResource AccentSubtleBrush}" HorizontalAlignment="Left" Margin="0,0,0,10">
+                                    <ui:SymbolIcon Symbol="Broom24" Foreground="{DynamicResource AccentBrush}" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Border>
+                                <TextBlock Grid.Row="1" Text="Cleaner" FontSize="15" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,4" />
+                                <TextBlock Grid.Row="2" Text="Safely remove temporary clutter, Windows update caches, and application logs to reclaim space."
+                                           FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,0,0,14" />
+                                <Button Grid.Row="3" AutomationProperties.AutomationId="Tool_Cleaner" AutomationProperties.Name="Safe Cache Cleaner"
+                                        Content="Open Tool →" Style="{DynamicResource ModernSecondaryBtn}"
+                                        Command="{Binding SelectToolCommand}" CommandParameter="Cleaner" HorizontalAlignment="Left" Padding="12,5" />
+                            </Grid>
+                        </Border>
 
-                <Button AutomationProperties.AutomationId="Tool_DNS" AutomationProperties.Name="DNS Switcher"
-                        Content="DNS &amp; Network" Style="{DynamicResource ModernSecondaryBtn}" Margin="0,0,8,8"
-                        Command="{Binding SelectToolCommand}" CommandParameter="DNS" />
+                        <!-- 4. DNS Switcher -->
+                        <Border Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
+                                BorderThickness="1" CornerRadius="8" Padding="16" Margin="6">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Border Grid.Row="0" Width="38" Height="38" CornerRadius="8" Background="{DynamicResource AccentSubtleBrush}" HorizontalAlignment="Left" Margin="0,0,0,10">
+                                    <ui:SymbolIcon Symbol="Globe24" Foreground="{DynamicResource AccentBrush}" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Border>
+                                <TextBlock Grid.Row="1" Text="DNS &amp; Network" FontSize="15" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,4" />
+                                <TextBlock Grid.Row="2" Text="Benchmark response latency across privacy-first DNS providers and switch adapters with one click."
+                                           FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,0,0,14" />
+                                <Button Grid.Row="3" AutomationProperties.AutomationId="Tool_DNS" AutomationProperties.Name="DNS Switcher"
+                                        Content="Open Tool →" Style="{DynamicResource ModernSecondaryBtn}"
+                                        Command="{Binding SelectToolCommand}" CommandParameter="DNS" HorizontalAlignment="Left" Padding="12,5" />
+                            </Grid>
+                        </Border>
 
-                <Button AutomationProperties.AutomationId="Tool_Fixes" AutomationProperties.Name="Quick System Fixes"
-                        Content="Fixes &amp; Repairs" Style="{DynamicResource ModernSecondaryBtn}" Margin="0,0,8,8"
-                        Command="{Binding SelectToolCommand}" CommandParameter="Fixes" />
+                        <!-- 5. Quick Fixes -->
+                        <Border Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
+                                BorderThickness="1" CornerRadius="8" Padding="16" Margin="6">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Border Grid.Row="0" Width="38" Height="38" CornerRadius="8" Background="{DynamicResource AccentSubtleBrush}" HorizontalAlignment="Left" Margin="0,0,0,10">
+                                    <ui:SymbolIcon Symbol="Wrench24" Foreground="{DynamicResource AccentBrush}" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Border>
+                                <TextBlock Grid.Row="1" Text="Fixes &amp; Repairs" FontSize="15" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,4" />
+                                <TextBlock Grid.Row="2" Text="One-click diagnosis and repair for common Windows issues: search indexing, print spooler, and network."
+                                           FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,0,0,14" />
+                                <Button Grid.Row="3" AutomationProperties.AutomationId="Tool_Fixes" AutomationProperties.Name="Quick System Fixes"
+                                        Content="Open Tool →" Style="{DynamicResource ModernSecondaryBtn}"
+                                        Command="{Binding SelectToolCommand}" CommandParameter="Fixes" HorizontalAlignment="Left" Padding="12,5" />
+                            </Grid>
+                        </Border>
 
-                <Button AutomationProperties.AutomationId="Tool_Updates" AutomationProperties.Name="Windows Updates Mode"
-                        Content="Windows Updates" Style="{DynamicResource ModernSecondaryBtn}" Margin="0,0,8,8"
-                        Command="{Binding SelectToolCommand}" CommandParameter="Updates" />
+                        <!-- 6. Windows Updates -->
+                        <Border Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
+                                BorderThickness="1" CornerRadius="8" Padding="16" Margin="6">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Border Grid.Row="0" Width="38" Height="38" CornerRadius="8" Background="{DynamicResource AccentSubtleBrush}" HorizontalAlignment="Left" Margin="0,0,0,10">
+                                    <ui:SymbolIcon Symbol="ArrowSync24" Foreground="{DynamicResource AccentBrush}" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Border>
+                                <TextBlock Grid.Row="1" Text="Windows Updates" FontSize="15" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,4" />
+                                <TextBlock Grid.Row="2" Text="Control update policies, driver exclusions, and reboot notification behavior without breaking security patches."
+                                           FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,0,0,14" />
+                                <Button Grid.Row="3" AutomationProperties.AutomationId="Tool_Updates" AutomationProperties.Name="Windows Updates Mode"
+                                        Content="Open Tool →" Style="{DynamicResource ModernSecondaryBtn}"
+                                        Command="{Binding SelectToolCommand}" CommandParameter="Updates" HorizontalAlignment="Left" Padding="12,5" />
+                            </Grid>
+                        </Border>
 
-                <Button AutomationProperties.AutomationId="Tool_Features" AutomationProperties.Name="Optional Features"
-                        Content="Optional Features" Style="{DynamicResource ModernSecondaryBtn}" Margin="0,0,8,8"
-                        Command="{Binding SelectToolCommand}" CommandParameter="Features" />
+                        <!-- 7. Optional Features -->
+                        <Border Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
+                                BorderThickness="1" CornerRadius="8" Padding="16" Margin="6">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Border Grid.Row="0" Width="38" Height="38" CornerRadius="8" Background="{DynamicResource AccentSubtleBrush}" HorizontalAlignment="Left" Margin="0,0,0,10">
+                                    <ui:SymbolIcon Symbol="CheckboxChecked24" Foreground="{DynamicResource AccentBrush}" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Border>
+                                <TextBlock Grid.Row="1" Text="Optional Features" FontSize="15" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,4" />
+                                <TextBlock Grid.Row="2" Text="Enable or remove Windows optional components like Hyper-V, WSL, and legacy subsystems."
+                                           FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,0,0,14" />
+                                <Button Grid.Row="3" AutomationProperties.AutomationId="Tool_Features" AutomationProperties.Name="Optional Features"
+                                        Content="Open Tool →" Style="{DynamicResource ModernSecondaryBtn}"
+                                        Command="{Binding SelectToolCommand}" CommandParameter="Features" HorizontalAlignment="Left" Padding="12,5" />
+                            </Grid>
+                        </Border>
 
-                <Button AutomationProperties.AutomationId="Tool_RestorePoints" AutomationProperties.Name="Restore Points"
-                        Content="Restore Points" Style="{DynamicResource ModernSecondaryBtn}" Margin="0,0,8,8"
-                        Command="{Binding SelectToolCommand}" CommandParameter="RestorePoints" />
-            </WrapPanel>
+                        <!-- 8. Restore Points -->
+                        <Border Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
+                                BorderThickness="1" CornerRadius="8" Padding="16" Margin="6">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Border Grid.Row="0" Width="38" Height="38" CornerRadius="8" Background="{DynamicResource AccentSubtleBrush}" HorizontalAlignment="Left" Margin="0,0,0,10">
+                                    <ui:SymbolIcon Symbol="History24" Foreground="{DynamicResource AccentBrush}" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Border>
+                                <TextBlock Grid.Row="1" Text="Restore Points" FontSize="15" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,4" />
+                                <TextBlock Grid.Row="2" Text="Create and inspect Windows System Protection checkpoints to safeguard your PC."
+                                           FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,0,0,14" />
+                                <Button Grid.Row="3" AutomationProperties.AutomationId="Tool_RestorePoints" AutomationProperties.Name="Restore Points"
+                                        Content="Open Tool →" Style="{DynamicResource ModernSecondaryBtn}"
+                                        Command="{Binding SelectToolCommand}" CommandParameter="RestorePoints" HorizontalAlignment="Left" Padding="12,5" />
+                            </Grid>
+                        </Border>
+                    </UniformGrid>
+                </StackPanel>
+            </Border>
+
+            <!-- SUBTOOL VIEW: Header with Back button and Quick Switcher (Visible when inside a tool) -->
+            <Border Visibility="{Binding IsSubtoolOpen, Converter={StaticResource BoolToVisConverter}}" Margin="0,0,0,16">
+                <Border Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
+                        BorderThickness="1" CornerRadius="8" Padding="14,10">
+                    <DockPanel LastChildFill="False">
+                        <!-- Back Button -->
+                        <Button DockPanel.Dock="Left" AutomationProperties.Name="Back to Tools"
+                                Content="← Back to Tools" Style="{DynamicResource ModernSecondaryBtn}"
+                                Command="{Binding BackToOverviewCommand}" Margin="0,0,16,0" Padding="14,6" VerticalAlignment="Center" />
+
+                        <!-- Compact Tool Switcher Bar -->
+                        <WrapPanel DockPanel.Dock="Left" VerticalAlignment="Center">
+                            <Button AutomationProperties.Name="Startup Applications"
+                                    Content="Startup Apps" Style="{DynamicResource ModernGhostBtn}" Margin="0,0,4,0"
+                                    Command="{Binding SelectToolCommand}" CommandParameter="Startup" />
+                            <Button AutomationProperties.Name="Windows Services"
+                                    Content="Services" Style="{DynamicResource ModernGhostBtn}" Margin="0,0,4,0"
+                                    Command="{Binding SelectToolCommand}" CommandParameter="Services" />
+                            <Button AutomationProperties.Name="Safe Cache Cleaner"
+                                    Content="Cleaner" Style="{DynamicResource ModernGhostBtn}" Margin="0,0,4,0"
+                                    Command="{Binding SelectToolCommand}" CommandParameter="Cleaner" />
+                            <Button AutomationProperties.Name="DNS Switcher"
+                                    Content="DNS &amp; Network" Style="{DynamicResource ModernGhostBtn}" Margin="0,0,4,0"
+                                    Command="{Binding SelectToolCommand}" CommandParameter="DNS" />
+                            <Button AutomationProperties.Name="Quick System Fixes"
+                                    Content="Fixes &amp; Repairs" Style="{DynamicResource ModernGhostBtn}" Margin="0,0,4,0"
+                                    Command="{Binding SelectToolCommand}" CommandParameter="Fixes" />
+                            <Button AutomationProperties.Name="Windows Updates Mode"
+                                    Content="Updates" Style="{DynamicResource ModernGhostBtn}" Margin="0,0,4,0"
+                                    Command="{Binding SelectToolCommand}" CommandParameter="Updates" />
+                            <Button AutomationProperties.Name="Optional Features"
+                                    Content="Features" Style="{DynamicResource ModernGhostBtn}" Margin="0,0,4,0"
+                                    Command="{Binding SelectToolCommand}" CommandParameter="Features" />
+                            <Button AutomationProperties.Name="Restore Points"
+                                    Content="Restore Points" Style="{DynamicResource ModernGhostBtn}"
+                                    Command="{Binding SelectToolCommand}" CommandParameter="RestorePoints" />
+                        </WrapPanel>
+                    </DockPanel>
+                </Border>
+            </Border>
 
             <!-- ==================== 1. STARTUP APPS ==================== -->
             <Border>

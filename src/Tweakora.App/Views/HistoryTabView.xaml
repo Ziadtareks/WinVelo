@@ -28,6 +28,18 @@
             </StackPanel>
 
             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                <!-- View Switcher -->
+                <Border Background="{DynamicResource BgDeepBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="1" CornerRadius="6" Padding="2" Margin="0,0,12,0">
+                    <StackPanel Orientation="Horizontal">
+                        <Button AutomationProperties.Name="View session timeline" Content="Session Timeline"
+                                Command="{Binding SetHistoryViewCommand}" CommandParameter="Sessions"
+                                Style="{DynamicResource ModernGhostBtn}" Padding="10,5" FontSize="11" />
+                        <Button AutomationProperties.Name="View activity log" Content="Activity Log"
+                                Command="{Binding SetHistoryViewCommand}" CommandParameter="ActivityLog"
+                                Style="{DynamicResource ModernGhostBtn}" Padding="10,5" FontSize="11" />
+                    </StackPanel>
+                </Border>
+
                 <!-- Undo All WinVelo Changes -->
                 <Button AutomationProperties.AutomationId="UndoAllWinVeloButton"
                         AutomationProperties.Name="Undo all WinVelo changes"
@@ -48,12 +60,14 @@
             </StackPanel>
         </DockPanel>
 
-        <!-- MAIN 2-COLUMN WORKSPACE -->
+        <!-- MAIN WORKSPACE -->
         <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="380" /> <!-- Left: Sessions & Restore Points -->
-                <ColumnDefinition Width="*" />   <!-- Right: Selected Session Details & Tweaks -->
-            </Grid.ColumnDefinitions>
+            <!-- 1. SESSIONS TIMELINE (2-COLUMN) -->
+            <Grid Visibility="{Binding IsTimelineView, Converter={StaticResource BoolToVisConverter}}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="380" /> <!-- Left: Sessions & Restore Points -->
+                    <ColumnDefinition Width="*" />   <!-- Right: Selected Session Details & Tweaks -->
+                </Grid.ColumnDefinitions>
 
             <!-- LEFT: SESSIONS LIST & RESTORE POINTS -->
             <Grid Grid.Column="0" Margin="0,0,16,0">
@@ -359,6 +373,63 @@
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                     </ListBox>
+                </Grid>
+            </Border>
+            </Grid>
+
+            <!-- 2. ACTIVITY LOG (FULL WIDTH) -->
+            <Border Visibility="{Binding IsActivityLogView, Converter={StaticResource BoolToVisConverter}}"
+                    Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
+                    BorderThickness="1" CornerRadius="8" Padding="16">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <DockPanel Grid.Row="0" Margin="0,0,0,12" LastChildFill="False">
+                        <StackPanel DockPanel.Dock="Left">
+                            <TextBlock Text="Activity &amp; Diagnostics Log" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" />
+                            <TextBlock Text="Live diagnostic activity stream and engine execution log."
+                                       FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0" />
+                        </StackPanel>
+                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                            <Button Content="Refresh Log" Style="{DynamicResource ModernGhostBtn}"
+                                    AutomationProperties.Name="Refresh activity log"
+                                    Command="{Binding RefreshActivityLogsCommand}" Margin="0,0,8,0" Padding="10,5" FontSize="12" />
+                            <Button Content="Clear View" Style="{DynamicResource ModernGhostBtn}"
+                                    AutomationProperties.Name="Clear activity log"
+                                    Command="{Binding ClearActivityLogsCommand}" Padding="10,5" FontSize="12" />
+                        </StackPanel>
+                    </DockPanel>
+
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                        <ItemsControl ItemsSource="{Binding ActivityLogs}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="{x:Type vm:LogEntryItem}">
+                                    <Border Background="{DynamicResource BgDeepBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
+                                            BorderThickness="1" CornerRadius="4" Padding="10,6" Margin="0,0,0,4">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="{Binding Timestamp}"
+                                                       FontFamily="Consolas, Cascadia Code, Courier New" FontSize="11"
+                                                       Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" Margin="0,0,8,0" />
+                                            <Border Grid.Column="1" Background="{Binding BadgeBg}" CornerRadius="3" Padding="5,1" Margin="0,0,8,0" VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding Level}" FontSize="10" FontWeight="Bold" Foreground="{Binding BadgeFg}" />
+                                            </Border>
+                                            <TextBlock Grid.Column="2" Text="{Binding Message}"
+                                                       FontFamily="Consolas, Cascadia Code, Courier New" FontSize="11"
+                                                       Foreground="{DynamicResource TextPrimaryBrush}" TextWrapping="Wrap" VerticalAlignment="Center" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
                 </Grid>
             </Border>
         </Grid>
