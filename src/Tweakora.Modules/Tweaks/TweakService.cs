@@ -236,6 +236,16 @@ public sealed class TweakService : ITweakService
             {
                 result.Add(tweak);
             }
+            else
+            {
+                result.Add(new TweakDefinition
+                {
+                    Id = id,
+                    Name = id,
+                    Category = "Custom",
+                    Risk = "Safe"
+                });
+            }
         }
 
         return result;
@@ -390,13 +400,6 @@ public sealed class TweakService : ITweakService
     {
         try
         {
-            if (_registry.ValueExists("HKLM", @"SYSTEM\CurrentControlSet\Control\Session Manager", "PendingFileRenameOperations"))
-                return true;
-            if (_registry.KeyExists("HKLM", @"SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\RebootPending"))
-                return true;
-            if (_registry.KeyExists("HKLM", @"SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired"))
-                return true;
-
             var active = GetActiveJournalTweaks();
             return active.Any(t => t.RequiresReboot);
         }

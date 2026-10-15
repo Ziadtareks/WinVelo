@@ -222,8 +222,8 @@ public sealed class FinalQaDiagnosticTests
             Assert.True(found, $"QuickToggle '{toggle.Title}' with key '{toggle.OriginKey}' was not found in catalog!");
         }
 
-        // 2. Check all 4 Profiles exist
-        Assert.Equal(4, dvm.Profiles.Count);
+        // 2. Check all 3 Profiles exist
+        Assert.Equal(3, dvm.Profiles.Count);
         foreach (var profile in dvm.Profiles)
         {
             Assert.NotNull(profile.OnApplyAsync);

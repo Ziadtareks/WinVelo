@@ -75,6 +75,8 @@ public sealed partial class ProfileCardModel : ObservableObject
     public required string ImpactText { get; init; }
     public required string ButtonText { get; init; }
     public required string IconSymbol { get; init; }
+    public IReadOnlyList<string> PreviewTweaks { get; init; } = Array.Empty<string>();
+    public string PreviewTweakSummary { get; init; } = string.Empty;
 
     [ObservableProperty]
     private bool _isBusy;
@@ -834,6 +836,10 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
                 _ => "Sparkle24"
             };
 
+            var previewList = tweaks.Take(5).Select(t => t.Name).ToList();
+            int remainingCount = tweaks.Count - previewList.Count;
+            string previewSummary = string.Join(", ", previewList) + (remainingCount > 0 ? $", and {remainingCount} more" : "");
+
             Profiles.Add(new ProfileCardModel
             {
                 Id = preset.Id,
@@ -844,8 +850,10 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
                 BadgeFg = badgeFg,
                 TweakCountText = $"{tweaks.Count} Tweaks",
                 ImpactText = "Curated Configuration",
-                ButtonText = "Review & Apply",
+                ButtonText = "Review",
                 IconSymbol = icon,
+                PreviewTweaks = previewList,
+                PreviewTweakSummary = previewSummary,
                 OnApplyAsync = async (card) =>
                 {
                     await OpenProfilePreviewAsync(
@@ -859,42 +867,6 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
                 }
             });
         }
-
-        // 4. Undo all WinVelo changes
-        Profiles.Add(new ProfileCardModel
-        {
-            Id = "undo-all",
-            Title = "Undo all WinVelo changes",
-            Description = "Safely undo all tweaks previously applied by WinVelo using active journal records (newest first). Note: Changes made by other tools or Windows updates are not covered.",
-            BadgeText = "JOURNAL ROLLBACK",
-            BadgeBg = "#374151",
-            BadgeFg = "#E5E7EB",
-            TweakCountText = "Active Changes",
-            ImpactText = "Safe Journal Reversal",
-            ButtonText = "Review & Revert",
-            IconSymbol = "ArrowCounterclockwise24",
-            OnApplyAsync = async (card) =>
-            {
-                var activeTweaks = _tweakService.GetActiveJournalTweaks();
-                if (activeTweaks.Count == 0)
-                {
-                    card.HasFailures = false;
-                    card.StatusColor = "#34D399";
-                    card.StatusMessage = "No active changes in journal.";
-                    GlobalStatusMessage = "No active tweaks found in WinVelo journal to revert. Changes made by other tools are not covered.";
-                    return;
-                }
-
-                await OpenProfilePreviewAsync(
-                    "Undo all WinVelo changes",
-                    "Revert applied tweaks recorded in the write-ahead journal (newest first).",
-                    "Only tweaks modified and tracked by WinVelo are restored. Changes made by other tools or Windows updates are not covered.",
-                    "Revert Selected Tweaks",
-                    activeTweaks,
-                    isUndo: true,
-                    card);
-            }
-        });
 
         foreach (var p in Profiles)
         {
@@ -1245,13 +1217,39 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
     }
 
     [RelayCommand]
+    public async Task UndoAllChangesAsync()
+    {
+        var activeTweaks = _tweakService.GetActiveJournalTweaks();
+        if (activeTweaks.Count == 0)
+        {
+            GlobalStatusMessage = "No active tweaks found in WinVelo journal to undo. Changes made by other tools are not covered.";
+            return;
+        }
+
+        await OpenProfilePreviewAsync(
+            "Undo all WinVelo changes",
+            "Revert applied tweaks recorded in the journal (newest first).",
+            "Only tweaks modified and tracked by WinVelo are restored. Changes made by other tools or Windows updates are not covered.",
+            "Revert Selected Tweaks",
+            activeTweaks,
+            isUndo: true,
+            card: null);
+    }
+
+    [RelayCommand]
+    public async Task GetRecommendationsAsync()
+    {
+        await SmartAnalyzeAndOptimizeAsync();
+    }
+
+    [RelayCommand]
     private async Task SmartAnalyzeAndOptimizeAsync()
     {
         if (IsSmartOptimizing) return;
         IsSmartOptimizing = true;
-        GlobalStatusMessage = "Analyzing hardware profile and generating tailored recommendations...";
+        GlobalStatusMessage = "Analyzing system profile and generating recommendations...";
 
-        using var activity = _activityTracker?.BeginActivity("Analyzing Smart Recommendations...");
+        using var activity = _activityTracker?.BeginActivity("Generating recommendations...");
         await Task.Yield();
 
         try
@@ -1259,24 +1257,24 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
             var recommended = await Task.Run(() => _advisorService.GetSmartRecommendationsAsync(_catalog, _tweakService));
             if (recommended.Count == 0)
             {
-                GlobalStatusMessage = "Smart Analysis: All recommended optimizations are already active on this system.";
+                GlobalStatusMessage = "All recommended settings are already applied on this PC.";
                 return;
             }
 
             await OpenProfilePreviewAsync(
-                "Smart Hardware Recommendations",
-                "Based on your hardware profile and telemetry assessment, the following optimizations are recommended for review.",
+                "Hardware Recommendations",
+                "Based on your hardware profile and system assessment, the following tweaks are recommended for review.",
                 "Already applied tweaks are skipped. You may untick any settings before applying.",
                 "Apply Recommended Tweaks",
                 recommended,
                 isUndo: false,
                 card: null);
 
-            GlobalStatusMessage = $"Smart Analysis: {recommended.Count} optimizations staged for review.";
+            GlobalStatusMessage = $"{recommended.Count} recommendations ready for review.";
         }
         catch (Exception ex)
         {
-            GlobalStatusMessage = $"Smart Analysis Notice: {ex.Message}";
+            GlobalStatusMessage = $"Recommendations notice: {ex.Message}";
         }
         finally
         {

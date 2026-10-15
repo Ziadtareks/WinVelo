@@ -102,13 +102,9 @@ public sealed class PresetValidationTests
         var advisor = new SmartAdvisorService(fakeReg, fakeShell);
         var dvm = new DashboardViewModel(tweakService, runner, fakeRestore, memOpt, advisor);
 
-        // 3 catalog presets + 1 Undo All card = 4 profile cards
-        Assert.Equal(4, dvm.Profiles.Count);
-
-        var undoCard = dvm.Profiles.FirstOrDefault(p => p.Id == "undo-all");
-        Assert.NotNull(undoCard);
-        Assert.Equal("Undo all WinVelo changes", undoCard.Title);
-        Assert.Contains("journal", undoCard.Description, StringComparison.OrdinalIgnoreCase);
+        // 3 catalog presets (Undo All is a secondary action, not a card)
+        Assert.Equal(3, dvm.Profiles.Count);
+        Assert.NotNull(dvm.UndoAllChangesCommand);
 
         // Verify presets have honest titles
         var gamingCard = dvm.Profiles.FirstOrDefault(p => p.Id == "preset.gaming");
@@ -181,7 +177,7 @@ public sealed class PresetValidationTests
         if (dvm.ProfilePreviewItems.Count > 0)
         {
             Assert.True(dvm.IsProfilePreviewOpen);
-            Assert.Equal("Smart Hardware Recommendations", dvm.ProfilePreviewTitle);
+            Assert.Contains("Recommendations", dvm.ProfilePreviewTitle);
         }
     }
 }

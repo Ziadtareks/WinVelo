@@ -21,7 +21,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" /> <!-- Header & Badges -->
                         <RowDefinition Height="Auto" /> <!-- Pending Alert Banners -->
-                        <RowDefinition Height="Auto" /> <!-- Calm Status Cards (4 Columns) -->
+                        <RowDefinition Height="Auto" /> <!-- Calm Status Cards (3 Columns) -->
                     </Grid.RowDefinitions>
 
                     <!-- Row 0: Header & Quick Status Pills -->
@@ -31,8 +31,8 @@
                                 <ui:SymbolIcon Symbol="ShieldCheckmark24" Foreground="White" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
                             </Border>
                             <StackPanel VerticalAlignment="Center">
-                                <TextBlock Text="System Overview &amp; Curated Profiles" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" />
-                                <TextBlock Text="Calm, transparent system tuning with write-ahead journal rollbacks." FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" />
+                                <TextBlock Text="Overview" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" />
+                                <TextBlock Text="System protection status, tracked changes, and curated presets." FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" />
                             </StackPanel>
                         </StackPanel>
 
@@ -61,7 +61,7 @@
                         </StackPanel>
                     </DockPanel>
 
-                    <!-- Row 1: Pending Alerts Banners (Reboot, Explorer, Servicing Warning) -->
+                    <!-- Row 1: Pending Alerts Banners (Reboot, Explorer) -->
                     <StackPanel Grid.Row="1" Margin="0,0,0,14">
                         <!-- Pending Reboot Alert -->
                         <Border Background="#78350F" BorderBrush="#D97706" BorderThickness="1" CornerRadius="6" Padding="12,8" Margin="0,0,0,8"
@@ -69,7 +69,7 @@
                             <DockPanel LastChildFill="False">
                                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" VerticalAlignment="Center">
                                     <ui:SymbolIcon Symbol="ArrowClockwise24" Foreground="#FDE68A" FontSize="16" Margin="0,0,8,0" VerticalAlignment="Center" />
-                                    <TextBlock Text="System reboot required to complete active modifications." FontWeight="SemiBold" FontSize="12" Foreground="#FEF3C7" VerticalAlignment="Center" />
+                                    <TextBlock Text="System reboot required to complete active WinVelo modifications." FontWeight="SemiBold" FontSize="12" Foreground="#FEF3C7" VerticalAlignment="Center" />
                                 </StackPanel>
                             </DockPanel>
                         </Border>
@@ -89,63 +89,48 @@
                         </Border>
                     </StackPanel>
 
-                    <!-- Row 2: 4 Calm Status Cards -->
+                    <!-- Row 2: 3 Compact Status Cards -->
                     <Grid Grid.Row="2">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
 
-                        <!-- Card 1: Admin Status -->
-                        <Border Grid.Column="0" Background="{DynamicResource ControlFillColorDefaultBrush}"
-                                BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
-                                BorderThickness="1" CornerRadius="8" Padding="14,12" Margin="0,0,6,0">
-                            <StackPanel>
-                                <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
-                                    <ui:SymbolIcon Symbol="Shield24" Foreground="{Binding AdminBadgeFg}" FontSize="16" Margin="0,0,8,0" VerticalAlignment="Center" />
-                                    <TextBlock Text="PRIVILEGES" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" />
-                                </StackPanel>
-                                <TextBlock Text="{Binding AdminStatusText}" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis" />
-                                <TextBlock Text="Full UAC access active" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0" />
-                            </StackPanel>
-                        </Border>
-
-                        <!-- Card 2: System Restore -->
-                        <Border Grid.Column="1" AutomationProperties.AutomationId="SystemRestoreCard"
+                        <!-- Card 1: System Restore -->
+                        <Border Grid.Column="0" AutomationProperties.AutomationId="SystemRestoreCard"
                                 AutomationProperties.Name="System Restore Status"
                                 Background="{DynamicResource ControlFillColorDefaultBrush}"
                                 BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
-                                BorderThickness="1" CornerRadius="8" Padding="14,12" Margin="3,0,3,0">
+                                BorderThickness="1" CornerRadius="8" Padding="14,12" Margin="0,0,6,0">
                             <StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
                                     <ui:SymbolIcon Symbol="History24" Foreground="{Binding SystemRestoreBadgeFg}" FontSize="16" Margin="0,0,8,0" VerticalAlignment="Center" />
                                     <TextBlock AutomationProperties.AutomationId="SystemRestoreHeader"
                                                AutomationProperties.Name="System Restore"
-                                               Text="SYSTEM RESTORE" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" />
+                                               Text="RESTORE PROTECTION" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" />
                                 </StackPanel>
                                 <TextBlock Text="{Binding SystemRestoreStatusText}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis" />
                                 <TextBlock Text="{Binding RestorePointStatus}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0" TextTrimming="CharacterEllipsis" />
                             </StackPanel>
                         </Border>
 
-                        <!-- Card 3: Applied by WinVelo -->
-                        <Border Grid.Column="2" Background="{DynamicResource ControlFillColorDefaultBrush}"
+                        <!-- Card 2: Changes made by WinVelo -->
+                        <Border Grid.Column="1" Background="{DynamicResource ControlFillColorDefaultBrush}"
                                 BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
                                 BorderThickness="1" CornerRadius="8" Padding="14,12" Margin="3,0,3,0">
                             <StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
                                     <ui:SymbolIcon Symbol="CheckmarkStarburst24" Foreground="#38BDF8" FontSize="16" Margin="0,0,8,0" VerticalAlignment="Center" />
-                                    <TextBlock Text="WINVELO TWEAKS" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" />
+                                    <TextBlock Text="WINVELO CHANGES" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" />
                                 </StackPanel>
                                 <TextBlock Text="{Binding AppliedTweaksSummaryText}" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis" />
                                 <TextBlock Text="Tracked in rollback journal" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0" />
                             </StackPanel>
                         </Border>
 
-                        <!-- Card 4: Servicing Health -->
-                        <Border Grid.Column="3" Background="{DynamicResource ControlFillColorDefaultBrush}"
+                        <!-- Card 3: Servicing Health -->
+                        <Border Grid.Column="2" Background="{DynamicResource ControlFillColorDefaultBrush}"
                                 BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
                                 BorderThickness="1" CornerRadius="8" Padding="14,12" Margin="6,0,0,0">
                             <StackPanel>
@@ -161,44 +146,18 @@
                 </Grid>
             </Border>
 
-            <!-- Global Status Bar Message (if any) -->
-            <Border Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="6" Padding="14,8" Margin="0,0,0,24">
-                <DockPanel LastChildFill="False">
-                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" VerticalAlignment="Center">
-                        <ui:SymbolIcon Symbol="Info24" Foreground="{DynamicResource AccentPrimaryBrush}" FontSize="16" Margin="0,0,8,0" VerticalAlignment="Center" />
-                        <TextBlock Text="{Binding GlobalStatusMessage}" FontSize="12" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" />
-                        <Button Style="{DynamicResource ModernGhostBtn}"
-                                AutomationProperties.Name="Show Global Error Details"
-                                Padding="4,1" Margin="6,0,0,0"
-                                Visibility="{Binding HasFailedDetails, Converter={StaticResource BoolToVisConverter}}"
-                                Command="{Binding ShowDetailsDialogCommand}">
-                            <TextBlock Text="(details)" FontSize="11" Foreground="#60A5FA" TextDecorations="Underline" />
-                        </Button>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center">
-                        <ui:Button AutomationProperties.AutomationId="SmartAnalyzeOptimizeButton"
-                                   AutomationProperties.Name="Run Smart Advisor"
-                                   Appearance="Secondary"
-                                   Command="{Binding SmartAnalyzeAndOptimizeCommand}"
-                                   IsEnabled="{Binding IsNotSmartOptimizing}"
-                                   Padding="10,4" FontSize="11">
-                            <StackPanel Orientation="Horizontal">
-                                <ui:SymbolIcon Symbol="Sparkle20" Margin="0,0,6,0" FontSize="14" />
-                                <TextBlock Text="Smart Advisor" />
-                            </StackPanel>
-                        </ui:Button>
-                    </StackPanel>
-                </DockPanel>
-            </Border>
+            <!-- ==================== PRESETS SECTION (3 CURATED PRESETS) ==================== -->
+            <DockPanel LastChildFill="False" Margin="2,0,0,12">
+                <StackPanel DockPanel.Dock="Left">
+                    <TextBlock Text="Presets" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" />
+                    <TextBlock Text="Curated tweak collections. Review before applying to verify exact changes." FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" />
+                </StackPanel>
+            </DockPanel>
 
-            <!-- ==================== 1-CLICK PROFILES SECTION ==================== -->
-            <TextBlock Text="1-CLICK SMART OPTIMIZATION PROFILES" FontSize="14" FontWeight="ExtraBold"
-                       Foreground="{DynamicResource TextPrimaryBrush}" Margin="2,0,0,12" />
-
-            <ItemsControl ItemsSource="{Binding Profiles}" Margin="0,0,0,28">
+            <ItemsControl ItemsSource="{Binding Profiles}" Margin="0,0,0,16">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <UniformGrid Columns="2" Rows="2" />
+                        <UniformGrid Columns="3" Rows="1" />
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
@@ -207,12 +166,12 @@
                                 AutomationProperties.Name="{Binding Title}"
                                 Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
                                 BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
-                                BorderThickness="1" CornerRadius="10" Padding="18,16" Margin="6">
+                                BorderThickness="1" CornerRadius="10" Padding="18,16" Margin="4">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto" /> <!-- Header: Icon, Title, Badge -->
-                                    <RowDefinition Height="*" />    <!-- Description -->
-                                    <RowDefinition Height="Auto" /> <!-- Impact / Tweak Count -->
+                                    <RowDefinition Height="Auto" /> <!-- Description -->
+                                    <RowDefinition Height="*" />    <!-- Included Tweaks Preview -->
                                     <RowDefinition Height="Auto" /> <!-- Action Button & Status -->
                                 </Grid.RowDefinitions>
 
@@ -237,15 +196,17 @@
 
                                 <!-- Description -->
                                 <TextBlock Grid.Row="1" Text="{Binding Description}" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}"
-                                           TextWrapping="Wrap" Margin="0,0,0,12" LineHeight="18" />
+                                           TextWrapping="Wrap" Margin="0,0,0,10" MinHeight="36" LineHeight="18" />
 
-                                <!-- Impact Badge -->
-                                <DockPanel Grid.Row="2" Margin="0,0,0,14" LastChildFill="False">
-                                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
-                                        <ui:SymbolIcon Symbol="Sparkle20" Foreground="#FBBF24" FontSize="14" Margin="0,0,6,0" VerticalAlignment="Center" />
-                                        <TextBlock Text="{Binding ImpactText}" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" />
+                                <!-- Included Tweaks Preview -->
+                                <Border Grid.Row="2" Background="{DynamicResource BgDeepBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
+                                        BorderThickness="1" CornerRadius="6" Padding="10,8" Margin="0,0,0,14">
+                                    <StackPanel>
+                                        <TextBlock Text="Included tweaks:" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,4" />
+                                        <TextBlock Text="{Binding PreviewTweakSummary}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"
+                                                   TextWrapping="Wrap" LineHeight="16" MaxHeight="52" TextTrimming="CharacterEllipsis" />
                                     </StackPanel>
-                                </DockPanel>
+                                </Border>
 
                                 <!-- Button & Status Message -->
                                 <DockPanel Grid.Row="3" LastChildFill="False">
@@ -275,11 +236,47 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
 
-            <!-- ==================== TOP 8 INSTANT QUICK-TOGGLES ==================== -->
+            <!-- Secondary Actions Row: Undo All & Get Recommendations -->
+            <Border Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
+                    BorderThickness="1" CornerRadius="8" Padding="14,10" Margin="0,0,0,24">
+                <DockPanel LastChildFill="False">
+                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" VerticalAlignment="Center">
+                        <!-- Undo all WinVelo changes as a secondary text button -->
+                        <Button AutomationProperties.AutomationId="UndoAllWinVeloButton"
+                                AutomationProperties.Name="Undo all WinVelo changes"
+                                Content="Undo all WinVelo changes"
+                                Style="{DynamicResource ModernSecondaryBtn}"
+                                Command="{Binding UndoAllChangesCommand}"
+                                Padding="12,6" FontSize="12" Margin="0,0,10,0" />
+
+                        <!-- Get recommendations as a secondary text button -->
+                        <Button AutomationProperties.AutomationId="SmartAnalyzeOptimizeButton"
+                                AutomationProperties.Name="Get recommendations"
+                                Content="Get recommendations"
+                                Style="{DynamicResource ModernGhostBtn}"
+                                Command="{Binding GetRecommendationsCommand}"
+                                IsEnabled="{Binding IsNotSmartOptimizing}"
+                                Padding="12,6" FontSize="12" />
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding GlobalStatusMessage}" FontSize="12" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" />
+                        <Button Style="{DynamicResource ModernGhostBtn}"
+                                AutomationProperties.Name="Show Global Error Details"
+                                Padding="4,1" Margin="6,0,0,0"
+                                Visibility="{Binding HasFailedDetails, Converter={StaticResource BoolToVisConverter}}"
+                                Command="{Binding ShowDetailsDialogCommand}">
+                            <TextBlock Text="(details)" FontSize="11" Foreground="#60A5FA" TextDecorations="Underline" />
+                        </Button>
+                    </StackPanel>
+                </DockPanel>
+            </Border>
+
+            <!-- ==================== COMMON SETTINGS (8 QUICK-TOGGLES) ==================== -->
             <DockPanel LastChildFill="False" Margin="2,0,0,12">
-                <TextBlock DockPanel.Dock="Left" Text="INSTANT QUICK-TOGGLES" FontSize="14" FontWeight="ExtraBold"
+                <TextBlock DockPanel.Dock="Left" Text="Common Settings" FontSize="16" FontWeight="Bold"
                            Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" />
-                <TextBlock DockPanel.Dock="Right" Text="1-click instant system toggles" FontSize="11"
+                <TextBlock DockPanel.Dock="Right" Text="Toggle individual Windows settings" FontSize="11"
                            Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" />
             </DockPanel>
 

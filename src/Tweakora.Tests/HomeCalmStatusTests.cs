@@ -6,6 +6,7 @@ using System.Windows.Threading;
 using Tweakora.App.ViewModels;
 using Tweakora.Core.Engine;
 using Tweakora.Core.Engine.Runners;
+using Tweakora.Core.Models;
 using Tweakora.Core.Operations;
 using Tweakora.Modules.Advisor;
 using Tweakora.Modules.Memory;
@@ -103,13 +104,20 @@ public sealed class HomeCalmStatusTests
     [Fact]
     public async Task DashboardViewModel_PendingRebootAndExplorerRestart_DetectionAndCommand()
     {
-        var (vm, _, shell, reg, _) = CreateFixture();
+        var (vm, _, shell, reg, tweakSvc) = CreateFixture();
         using (vm)
         {
-            // Simulate pending reboot in registry
+            // When 0 tweaks applied, even if Windows has generic pending renames, WinVelo banner is NOT shown
             reg.SetValue("HKLM", @"SYSTEM\CurrentControlSet\Control\Session Manager", "PendingFileRenameOperations", new[] { "temp.dll" }, "MultiString");
             await vm.RefreshCalmStatusAsync();
+            Assert.False(vm.IsRebootPending);
 
+            // When a WinVelo tweak requiring reboot is applied, banner is shown
+            var catalog = tweakSvc.LoadCatalog();
+            var rebootTweak = catalog.FirstOrDefault(t => t.RequiresReboot);
+            Assert.NotNull(rebootTweak);
+            await tweakSvc.ApplyTweaksAsync(new[] { rebootTweak }, new OperationRunner());
+            await vm.RefreshCalmStatusAsync();
             Assert.True(vm.IsRebootPending);
 
             // Simulate explorer restart pending
