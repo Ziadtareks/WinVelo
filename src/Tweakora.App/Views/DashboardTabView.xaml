@@ -538,7 +538,8 @@
                                                     <TextBlock Text="{Binding ReversibleText, StringFormat='Reversible: {0}'}" FontSize="11" Foreground="#94A3B8" Margin="0,0,10,0" />
                                                     <TextBlock Text="Reboot Required" FontSize="11" Foreground="#F59E0B" Margin="0,0,10,0"
                                                                Visibility="{Binding RequiresReboot, Converter={StaticResource BoolToVisConverter}}" />
-                                                    <TextBlock Text="Explorer Restart" FontSize="11" Foreground="#38BDF8"
+                                                    <TextBlock Text="Restarts Explorer" FontSize="11" Foreground="#38BDF8"
+                                                               ToolTip="Windows Explorer will be restarted automatically when this tweak is applied or undone"
                                                                Visibility="{Binding RequiresExplorerRestart, Converter={StaticResource BoolToVisConverter}}" />
                                                 </StackPanel>
                                             </StackPanel>
