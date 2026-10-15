@@ -327,8 +327,26 @@ public sealed partial class TweaksViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(SelectionStatusText))]
     private int _selectedCount;
 
-    public bool HasSelection => SelectedCount > 0;
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasSelection))]
+    [NotifyPropertyChangedFor(nameof(MultiSelectButtonText))]
+    [NotifyPropertyChangedFor(nameof(IsMultiSelectActive))]
+    private bool _isMultiSelectMode;
+
+    public bool HasSelection => IsMultiSelectMode && SelectedCount > 0;
     public string SelectionStatusText => $"{SelectedCount} selected — Review & apply";
+    public string MultiSelectButtonText => IsMultiSelectMode ? "Done Selecting" : "Select multiple";
+    public bool IsMultiSelectActive => IsMultiSelectMode;
+
+    [RelayCommand]
+    public void ToggleMultiSelectMode()
+    {
+        IsMultiSelectMode = !IsMultiSelectMode;
+        if (!IsMultiSelectMode)
+        {
+            ClearSelection();
+        }
+    }
 
     [ObservableProperty]
     private int _appliedCount;
