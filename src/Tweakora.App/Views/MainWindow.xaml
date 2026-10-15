@@ -177,12 +177,44 @@
                             <!-- 1. Home -->
                             <Button AutomationProperties.AutomationId="Tab_Dashboard"
                                     AutomationProperties.Name="Home"
-                                    Style="{DynamicResource SidebarNavBtn}"
                                     Command="{Binding SwitchTabCommand}" CommandParameter="Home" Margin="0,0,0,6">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource SidebarNavBtn}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsHomeActive}" Value="True">
+                                                <Setter Property="Background" Value="{DynamicResource BgCardHoverBrush}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
                                 <DockPanel LastChildFill="False">
                                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
-                                        <ui:SymbolIcon Symbol="Home24" FontSize="16" Margin="0,0,10,0" Foreground="{DynamicResource AccentPrimaryBrush}" VerticalAlignment="Center" />
-                                        <TextBlock Text="Home" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                        <ui:SymbolIcon Symbol="Home24" FontSize="16" Margin="0,0,10,0" VerticalAlignment="Center">
+                                            <ui:SymbolIcon.Style>
+                                                <Style TargetType="ui:SymbolIcon">
+                                                    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsHomeActive}" Value="True">
+                                                            <Setter Property="Foreground" Value="{DynamicResource AccentPrimaryBrush}" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </ui:SymbolIcon.Style>
+                                        </ui:SymbolIcon>
+                                        <TextBlock Text="Home" FontSize="13" VerticalAlignment="Center">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+                                                    <Setter Property="FontWeight" Value="SemiBold" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsHomeActive}" Value="True">
+                                                            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+                                                            <Setter Property="FontWeight" Value="Bold" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
                                     </StackPanel>
                                 </DockPanel>
                             </Button>
@@ -190,12 +222,44 @@
                             <!-- 2. Tweaks -->
                             <Button AutomationProperties.AutomationId="Tab_Tweaks"
                                     AutomationProperties.Name="Tweaks"
-                                    Style="{DynamicResource SidebarNavBtn}"
                                     Command="{Binding SwitchTabCommand}" CommandParameter="Tweaks" Margin="0,0,0,6">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource SidebarNavBtn}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsTweaksActive}" Value="True">
+                                                <Setter Property="Background" Value="{DynamicResource BgCardHoverBrush}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
                                 <DockPanel LastChildFill="False">
                                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
-                                        <ui:SymbolIcon Symbol="Apps24" FontSize="16" Margin="0,0,10,0" Foreground="{DynamicResource AccentPrimaryBrush}" VerticalAlignment="Center" />
-                                        <TextBlock Text="Tweaks" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                        <ui:SymbolIcon Symbol="Apps24" FontSize="16" Margin="0,0,10,0" VerticalAlignment="Center">
+                                            <ui:SymbolIcon.Style>
+                                                <Style TargetType="ui:SymbolIcon">
+                                                    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsTweaksActive}" Value="True">
+                                                            <Setter Property="Foreground" Value="{DynamicResource AccentPrimaryBrush}" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </ui:SymbolIcon.Style>
+                                        </ui:SymbolIcon>
+                                        <TextBlock Text="Tweaks" FontSize="13" VerticalAlignment="Center">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+                                                    <Setter Property="FontWeight" Value="SemiBold" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsTweaksActive}" Value="True">
+                                                            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+                                                            <Setter Property="FontWeight" Value="Bold" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
                                     </StackPanel>
                                     <Border DockPanel.Dock="Right" Background="{DynamicResource StatusDefaultBgBrush}" CornerRadius="8" Padding="6,1" VerticalAlignment="Center">
                                         <TextBlock Text="{Binding TweaksVM.AllCount}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" />
@@ -206,12 +270,44 @@
                             <!-- 3. Apps -->
                             <Button AutomationProperties.AutomationId="Tab_Install"
                                     AutomationProperties.Name="Apps"
-                                    Style="{DynamicResource SidebarNavBtn}"
                                     Command="{Binding SwitchTabCommand}" CommandParameter="Apps" Margin="0,0,0,6">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource SidebarNavBtn}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsAppsActive}" Value="True">
+                                                <Setter Property="Background" Value="{DynamicResource BgCardHoverBrush}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
                                 <DockPanel LastChildFill="False">
                                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
-                                        <ui:SymbolIcon Symbol="ArrowDownload24" FontSize="16" Margin="0,0,10,0" Foreground="{DynamicResource AccentPrimaryBrush}" VerticalAlignment="Center" />
-                                        <TextBlock Text="Apps" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                        <ui:SymbolIcon Symbol="ArrowDownload24" FontSize="16" Margin="0,0,10,0" VerticalAlignment="Center">
+                                            <ui:SymbolIcon.Style>
+                                                <Style TargetType="ui:SymbolIcon">
+                                                    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsAppsActive}" Value="True">
+                                                            <Setter Property="Foreground" Value="{DynamicResource AccentPrimaryBrush}" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </ui:SymbolIcon.Style>
+                                        </ui:SymbolIcon>
+                                        <TextBlock Text="Apps" FontSize="13" VerticalAlignment="Center">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+                                                    <Setter Property="FontWeight" Value="SemiBold" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsAppsActive}" Value="True">
+                                                            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+                                                            <Setter Property="FontWeight" Value="Bold" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
                                     </StackPanel>
                                 </DockPanel>
                             </Button>
@@ -219,12 +315,44 @@
                             <!-- 4. Tools -->
                             <Button AutomationProperties.AutomationId="Tab_Toolbox"
                                     AutomationProperties.Name="Tools"
-                                    Style="{DynamicResource SidebarNavBtn}"
                                     Command="{Binding SwitchTabCommand}" CommandParameter="Tools" Margin="0,0,0,6">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource SidebarNavBtn}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsToolsActive}" Value="True">
+                                                <Setter Property="Background" Value="{DynamicResource BgCardHoverBrush}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
                                 <DockPanel LastChildFill="False">
                                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
-                                        <ui:SymbolIcon Symbol="Toolbox24" FontSize="16" Margin="0,0,10,0" Foreground="{DynamicResource AccentPrimaryBrush}" VerticalAlignment="Center" />
-                                        <TextBlock Text="Tools" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                        <ui:SymbolIcon Symbol="Toolbox24" FontSize="16" Margin="0,0,10,0" VerticalAlignment="Center">
+                                            <ui:SymbolIcon.Style>
+                                                <Style TargetType="ui:SymbolIcon">
+                                                    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsToolsActive}" Value="True">
+                                                            <Setter Property="Foreground" Value="{DynamicResource AccentPrimaryBrush}" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </ui:SymbolIcon.Style>
+                                        </ui:SymbolIcon>
+                                        <TextBlock Text="Tools" FontSize="13" VerticalAlignment="Center">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+                                                    <Setter Property="FontWeight" Value="SemiBold" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsToolsActive}" Value="True">
+                                                            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+                                                            <Setter Property="FontWeight" Value="Bold" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
                                     </StackPanel>
                                 </DockPanel>
                             </Button>
@@ -232,12 +360,44 @@
                             <!-- 5. History -->
                             <Button AutomationProperties.AutomationId="Tab_Backups"
                                     AutomationProperties.Name="History"
-                                    Style="{DynamicResource SidebarNavBtn}"
                                     Command="{Binding SwitchTabCommand}" CommandParameter="History" Margin="0,0,0,6">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource SidebarNavBtn}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsHistoryActive}" Value="True">
+                                                <Setter Property="Background" Value="{DynamicResource BgCardHoverBrush}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
                                 <DockPanel LastChildFill="False">
                                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
-                                        <ui:SymbolIcon Symbol="Clock24" FontSize="16" Margin="0,0,10,0" Foreground="{DynamicResource AccentPrimaryBrush}" VerticalAlignment="Center" />
-                                        <TextBlock Text="History" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                        <ui:SymbolIcon Symbol="Clock24" FontSize="16" Margin="0,0,10,0" VerticalAlignment="Center">
+                                            <ui:SymbolIcon.Style>
+                                                <Style TargetType="ui:SymbolIcon">
+                                                    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsHistoryActive}" Value="True">
+                                                            <Setter Property="Foreground" Value="{DynamicResource AccentPrimaryBrush}" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </ui:SymbolIcon.Style>
+                                        </ui:SymbolIcon>
+                                        <TextBlock Text="History" FontSize="13" VerticalAlignment="Center">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+                                                    <Setter Property="FontWeight" Value="SemiBold" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsHistoryActive}" Value="True">
+                                                            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+                                                            <Setter Property="FontWeight" Value="Bold" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
                                     </StackPanel>
                                     <Border DockPanel.Dock="Right" Background="{DynamicResource StatusDefaultBgBrush}" CornerRadius="8" Padding="6,1" VerticalAlignment="Center">
                                         <TextBlock Text="{Binding HistoryVM.Sessions.Count}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" />
@@ -251,12 +411,44 @@
                     <Border Grid.Row="2" BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="0,1,0,0" Padding="0,10,0,0">
                         <Button AutomationProperties.AutomationId="Tab_Settings"
                                 AutomationProperties.Name="Settings"
-                                Style="{DynamicResource SidebarNavBtn}"
                                 Command="{Binding SwitchTabCommand}" CommandParameter="Settings">
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource SidebarNavBtn}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsSettingsActive}" Value="True">
+                                            <Setter Property="Background" Value="{DynamicResource BgCardHoverBrush}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
                             <DockPanel LastChildFill="False">
                                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
-                                    <ui:SymbolIcon Symbol="Settings24" FontSize="16" Margin="0,0,10,0" Foreground="{DynamicResource AccentPrimaryBrush}" VerticalAlignment="Center" />
-                                    <TextBlock Text="Settings" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                    <ui:SymbolIcon Symbol="Settings24" FontSize="16" Margin="0,0,10,0" VerticalAlignment="Center">
+                                        <ui:SymbolIcon.Style>
+                                            <Style TargetType="ui:SymbolIcon">
+                                                <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsSettingsActive}" Value="True">
+                                                        <Setter Property="Foreground" Value="{DynamicResource AccentPrimaryBrush}" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </ui:SymbolIcon.Style>
+                                    </ui:SymbolIcon>
+                                    <TextBlock Text="Settings" FontSize="13" VerticalAlignment="Center">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+                                                <Setter Property="FontWeight" Value="SemiBold" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsSettingsActive}" Value="True">
+                                                        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+                                                        <Setter Property="FontWeight" Value="Bold" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
                                 </StackPanel>
                             </DockPanel>
                         </Button>

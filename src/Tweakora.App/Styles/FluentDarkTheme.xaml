@@ -116,7 +116,7 @@
 
     <!-- ==================== MODERN CHECKBOX ==================== -->
     <Style x:Key="ModernCheckBox" TargetType="{x:Type CheckBox}">
-        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
         <Setter Property="FontSize" Value="13" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Template">
@@ -125,8 +125,8 @@
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                         <Grid Width="18" Height="18" VerticalAlignment="Center" Margin="0,0,8,0">
                             <Border x:Name="BoxBorder" CornerRadius="4" BorderThickness="1.5"
-                                    BorderBrush="{StaticResource BorderHoverBrush}"
-                                    Background="{StaticResource BgDeepBrush}" />
+                                    BorderBrush="{DynamicResource BorderHoverBrush}"
+                                    Background="{DynamicResource BgCardBrush}" />
                             <Path x:Name="CheckMark" Data="M3,9 L7,13 L15,4" Stroke="White" StrokeThickness="2"
                                   StrokeStartLineCap="Round" StrokeEndLineCap="Round"
                                   Visibility="Collapsed" Margin="1" />
@@ -135,18 +135,20 @@
                     </StackPanel>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsChecked" Value="True">
-                            <Setter TargetName="BoxBorder" Property="Background" Value="{StaticResource AccentPrimaryBrush}" />
-                            <Setter TargetName="BoxBorder" Property="BorderBrush" Value="{StaticResource AccentPrimaryBrush}" />
+                            <Setter TargetName="BoxBorder" Property="Background" Value="{DynamicResource AccentPrimaryBrush}" />
+                            <Setter TargetName="BoxBorder" Property="BorderBrush" Value="{DynamicResource AccentPrimaryBrush}" />
                             <Setter TargetName="CheckMark" Property="Visibility" Value="Visible" />
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="BoxBorder" Property="BorderBrush" Value="{StaticResource AccentPrimaryBrush}" />
+                            <Setter TargetName="BoxBorder" Property="BorderBrush" Value="{DynamicResource AccentPrimaryBrush}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
+
+    <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource ModernCheckBox}" />
 
     <!-- ==================== MODERN BUTTONS ==================== -->
     <Style x:Key="ModernPrimaryBtn" TargetType="{x:Type Button}">
@@ -268,7 +270,7 @@
 
     <Style x:Key="SidebarNavBtn" TargetType="{x:Type Button}">
         <Setter Property="Background" Value="Transparent" />
-        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="Padding" Value="10,8" />
@@ -283,8 +285,8 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="NavBorder" Property="Background" Value="{StaticResource BgCardBrush}" />
-                            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+                            <Setter TargetName="NavBorder" Property="Background" Value="{DynamicResource BgCardHoverBrush}" />
+                            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

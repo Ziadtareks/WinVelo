@@ -36,7 +36,20 @@ public sealed partial class MainViewModel : ObservableObject
     private object _currentPage;
 
     [ObservableProperty]
-    private string _activeTab = "Tweaks"; // Default to Tweaks view
+    [NotifyPropertyChangedFor(nameof(IsHomeActive))]
+    [NotifyPropertyChangedFor(nameof(IsTweaksActive))]
+    [NotifyPropertyChangedFor(nameof(IsAppsActive))]
+    [NotifyPropertyChangedFor(nameof(IsToolsActive))]
+    [NotifyPropertyChangedFor(nameof(IsHistoryActive))]
+    [NotifyPropertyChangedFor(nameof(IsSettingsActive))]
+    private string _activeTab = "Home";
+
+    public bool IsHomeActive => ActiveTab == "Home";
+    public bool IsTweaksActive => ActiveTab == "Tweaks";
+    public bool IsAppsActive => ActiveTab == "Apps";
+    public bool IsToolsActive => ActiveTab == "Tools";
+    public bool IsHistoryActive => ActiveTab == "History";
+    public bool IsSettingsActive => ActiveTab == "Settings";
 
     [ObservableProperty]
     private string _topSearchText = string.Empty;
