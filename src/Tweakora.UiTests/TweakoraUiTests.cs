@@ -412,7 +412,7 @@ public sealed partial class TweakoraUiTests
     public void FullAuditUiTestSuite_All5TabsAndControls()
     {
         string solutionDir = FindSolutionRoot();
-        string screenshotsDir = Path.Combine(solutionDir, "docs", "screenshots");
+        string screenshotsDir = Path.Combine(Path.GetTempPath(), "WinVelo-Audit-Screenshots");
         Directory.CreateDirectory(screenshotsDir);
 
         var (app, automation, window) = LaunchAppInTestMode();
@@ -603,7 +603,7 @@ public sealed partial class TweakoraUiTests
         string solutionDir = FindSolutionRoot();
         string screenshotsDir = Path.Combine(solutionDir, "docs", "screenshots");
 
-        // ==================== 1. SCREENSHOT INTEGRITY (>= 20KB & NOT PURE BLACK) ====================
+        // ==================== 1. SCREENSHOT INTEGRITY (>= 20KB, VARIANCE > 25, NO DUPLICATE MD5) ====================
         string[] requiredScreenshots =
         {
             "home.png", "tweaks.png", "apps.png", "tools.png", "history.png", "settings.png", "wizard.png", "preview.png", "overview.png",
@@ -617,6 +617,8 @@ public sealed partial class TweakoraUiTests
             Path.Combine("light", "preview.png")
         };
 
+        var seenHashes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
         foreach (var file in requiredScreenshots)
         {
             string path = Path.Combine(screenshotsDir, file);
@@ -624,7 +626,18 @@ public sealed partial class TweakoraUiTests
             var fi = new FileInfo(path);
             Assert.True(fi.Length >= 20480, $"Screenshot {file} is suspiciously small ({fi.Length} bytes < 20KB limit)");
 
-            // Check not pure black
+            // Verify unique MD5 hash (no two screenshots can be identical duplicates)
+            using (var md5 = System.Security.Cryptography.MD5.Create())
+            using (var stream = File.OpenRead(path))
+            {
+                byte[] hashBytes = md5.ComputeHash(stream);
+                string hash = Convert.ToHexString(hashBytes);
+                Assert.False(seenHashes.ContainsKey(hash),
+                    $"Duplicate screenshot detected! '{file}' has identical MD5 hash {hash} as '{seenHashes.GetValueOrDefault(hash)}'");
+                seenHashes[hash] = file;
+            }
+
+            // Check not pure black and has pixel variance
             var decoder = BitmapDecoder.Create(new Uri(path, UriKind.Absolute), BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
             var frame = decoder.Frames[0];
             var converted = new FormatConvertedBitmap(frame, PixelFormats.Bgra32, null, 0);
@@ -633,6 +646,8 @@ public sealed partial class TweakoraUiTests
             converted.CopyPixels(pixels, stride, 0);
 
             int maxBrightness = 0;
+            double sumLuma = 0;
+            int sampleCount = 0;
             // Sample every 16th pixel for speed
             for (int i = 0; i < pixels.Length; i += 64)
             {
@@ -641,9 +656,26 @@ public sealed partial class TweakoraUiTests
                 int r = pixels[i + 2];
                 int brightness = Math.Max(r, Math.Max(g, b));
                 if (brightness > maxBrightness) maxBrightness = brightness;
-                if (maxBrightness > 80) break;
+                double luma = 0.299 * r + 0.587 * g + 0.114 * b;
+                sumLuma += luma;
+                sampleCount++;
             }
+
+            double meanLuma = sumLuma / sampleCount;
+            double sumVariance = 0;
+            for (int i = 0; i < pixels.Length; i += 64)
+            {
+                int b = pixels[i];
+                int g = pixels[i + 1];
+                int r = pixels[i + 2];
+                double luma = 0.299 * r + 0.587 * g + 0.114 * b;
+                double diff = luma - meanLuma;
+                sumVariance += diff * diff;
+            }
+            double variance = sumVariance / sampleCount;
+
             Assert.True(maxBrightness > 80, $"Screenshot {file} appears completely black (max brightness {maxBrightness} <= 80)");
+            Assert.True(variance > 25.0, $"Screenshot {file} has suspiciously low pixel variance ({variance:F2} <= 25.0), indicating a blank or uniform image");
         }
 
         // ==================== 2. TEXT CONTRAST (WCAG AA >= 4.5:1 ON BODY TEXT) ====================

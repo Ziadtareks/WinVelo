@@ -255,6 +255,9 @@ public partial class App : Application
             FlushUi(window);
 
             var vm = (MainViewModel)window.DataContext;
+            // Dismiss wizard initially so all page captures are clean
+            vm.IsWizardOpen = false;
+            FlushUi(window);
 
             // ==================== 1. DARK THEME CAPTURES ====================
             Wpf.Ui.Appearance.ApplicationThemeManager.Apply(Wpf.Ui.Appearance.ApplicationTheme.Dark);
@@ -299,18 +302,21 @@ public partial class App : Application
             SaveVisualToPng(window, 1440, 900, Path.Combine(darkDir, "settings.png"));
             SaveVisualToPng(window, 1440, 900, Path.Combine(targetDir, "settings.png"));
 
-            // Diff Preview Overlay
-            vm.SwitchTabCommand.Execute("Tweaks");
-            vm.TweaksVM.ApplyPresetCommand.Execute("preset.recommended");
+            // Unified Execution Preview Dialog (Home -> Review on a Preset)
+            vm.SwitchTabCommand.Execute("Home");
             FlushUi(window);
-            vm.TweaksVM.OpenDiffPreviewCommand.Execute(null);
-            FlushUi(window);
-            SaveVisualToPng(window, 1440, 900, Path.Combine(darkDir, "preview.png"));
-            SaveVisualToPng(window, 1440, 900, Path.Combine(targetDir, "preview.png"));
-            SaveVisualToPng(window, 1440, 900, Path.Combine(targetDir, "diff-preview.png"));
-            vm.TweaksVM.CloseDiffPreviewCommand.Execute(null);
-            vm.TweaksVM.ClearSelectionCommand.Execute(null);
-            FlushUi(window);
+            if (vm.DashboardVM.Profiles.Count > 0)
+            {
+                vm.DashboardVM.Profiles[0].ApplyCommand.Execute(null);
+                FlushUi(window);
+                System.Threading.Thread.Sleep(300);
+                FlushUi(window);
+                SaveVisualToPng(window, 1440, 900, Path.Combine(darkDir, "preview.png"));
+                SaveVisualToPng(window, 1440, 900, Path.Combine(targetDir, "preview.png"));
+                SaveVisualToPng(window, 1440, 900, Path.Combine(targetDir, "diff-preview.png"));
+                vm.ExecutionDialogVM.CancelPreview();
+                FlushUi(window);
+            }
 
             // Command Palette Overlay
             vm.ToggleCommandPaletteCommand.Execute(null);
@@ -320,12 +326,13 @@ public partial class App : Application
             vm.ToggleCommandPaletteCommand.Execute(null);
             FlushUi(window);
 
-            // First-Run Wizard Overlay
+            // First-Run Wizard Overlay (Opaque modal surface, 60% dim backdrop)
             vm.OpenFirstRunWizard();
             FlushUi(window);
             SaveVisualToPng(window, 1440, 900, Path.Combine(darkDir, "wizard.png"));
             SaveVisualToPng(window, 1440, 900, Path.Combine(targetDir, "wizard.png"));
             vm.WizardVM.FinishCommand.Execute(null);
+            vm.IsWizardOpen = false;
             FlushUi(window);
 
             // ==================== 2. LIGHT THEME CAPTURES ====================
@@ -363,22 +370,26 @@ public partial class App : Application
             FlushUi(window);
             SaveVisualToPng(window, 1440, 900, Path.Combine(lightDir, "settings.png"));
 
-            // Diff Preview (Light)
-            vm.SwitchTabCommand.Execute("Tweaks");
-            vm.TweaksVM.ApplyPresetCommand.Execute("preset.recommended");
+            // Preview (Light - Home -> Review on a Preset)
+            vm.SwitchTabCommand.Execute("Home");
             FlushUi(window);
-            vm.TweaksVM.OpenDiffPreviewCommand.Execute(null);
-            FlushUi(window);
-            SaveVisualToPng(window, 1440, 900, Path.Combine(lightDir, "preview.png"));
-            vm.TweaksVM.CloseDiffPreviewCommand.Execute(null);
-            vm.TweaksVM.ClearSelectionCommand.Execute(null);
-            FlushUi(window);
+            if (vm.DashboardVM.Profiles.Count > 0)
+            {
+                vm.DashboardVM.Profiles[0].ApplyCommand.Execute(null);
+                FlushUi(window);
+                System.Threading.Thread.Sleep(300);
+                FlushUi(window);
+                SaveVisualToPng(window, 1440, 900, Path.Combine(lightDir, "preview.png"));
+                vm.ExecutionDialogVM.CancelPreview();
+                FlushUi(window);
+            }
 
             // First-Run Wizard (Light)
             vm.OpenFirstRunWizard();
             FlushUi(window);
             SaveVisualToPng(window, 1440, 900, Path.Combine(lightDir, "wizard.png"));
             vm.WizardVM.FinishCommand.Execute(null);
+            vm.IsWizardOpen = false;
             FlushUi(window);
 
             // Restore Dark Theme default
