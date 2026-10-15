@@ -9,9 +9,9 @@
     <Color x:Key="BorderSubtleColor">#2A303C</Color>
     <Color x:Key="BorderHoverColor">#3B4252</Color>
 
-    <Color x:Key="TextPrimaryColor">#F3F4F6</Color>
-    <Color x:Key="TextSecondaryColor">#9CA3AF</Color>
-    <Color x:Key="TextMutedColor">#6B7280</Color>
+    <Color x:Key="TextPrimaryColor">#F9FAFB</Color>
+    <Color x:Key="TextSecondaryColor">#D1D5DB</Color>
+    <Color x:Key="TextMutedColor">#9CA3AF</Color>
 
     <Color x:Key="AccentPrimaryColor">#3B82F6</Color>
     <Color x:Key="AccentHoverColor">#2563EB</Color>
@@ -47,16 +47,29 @@
     <SolidColorBrush x:Key="StatusAppliedBorderBrush" Color="#059669" />
 
     <SolidColorBrush x:Key="StatusDefaultBgBrush" Color="#1F2937" />
-    <SolidColorBrush x:Key="StatusDefaultFgBrush" Color="#9CA3AF" />
+    <SolidColorBrush x:Key="StatusDefaultFgBrush" Color="#D1D5DB" />
     <SolidColorBrush x:Key="StatusDefaultBorderBrush" Color="#374151" />
 
     <!-- Risk Badges -->
     <SolidColorBrush x:Key="RiskSafeBgBrush" Color="#064E3B" />
     <SolidColorBrush x:Key="RiskSafeFgBrush" Color="#34D399" />
-    <SolidColorBrush x:Key="RiskModerateBgBrush" Color="#78350F" />
-    <SolidColorBrush x:Key="RiskModerateFgBrush" Color="#FBBF24" />
-    <SolidColorBrush x:Key="RiskCautionBgBrush" Color="#7F1D1D" />
-    <SolidColorBrush x:Key="RiskCautionFgBrush" Color="#F87171" />
+    <SolidColorBrush x:Key="RiskSafeBorderBrush" Color="#059669" />
+
+    <SolidColorBrush x:Key="RiskLowBgBrush" Color="#1E3A8A" />
+    <SolidColorBrush x:Key="RiskLowFgBrush" Color="#93C5FD" />
+    <SolidColorBrush x:Key="RiskLowBorderBrush" Color="#3B82F6" />
+
+    <SolidColorBrush x:Key="RiskModerateBgBrush" Color="#451A03" />
+    <SolidColorBrush x:Key="RiskModerateFgBrush" Color="#FCD34D" />
+    <SolidColorBrush x:Key="RiskModerateBorderBrush" Color="#D97706" />
+    <SolidColorBrush x:Key="RiskMediumBgBrush" Color="#451A03" />
+    <SolidColorBrush x:Key="RiskMediumFgBrush" Color="#FCD34D" />
+
+    <SolidColorBrush x:Key="RiskCautionBgBrush" Color="#450A0A" />
+    <SolidColorBrush x:Key="RiskCautionFgBrush" Color="#FCA5A5" />
+    <SolidColorBrush x:Key="RiskCautionBorderBrush" Color="#DC2626" />
+    <SolidColorBrush x:Key="RiskHighBgBrush" Color="#450A0A" />
+    <SolidColorBrush x:Key="RiskHighFgBrush" Color="#FCA5A5" />
 
     <!-- ==================== MODERN SCROLLBAR ==================== -->
     <Style x:Key="ScrollBarThumb" TargetType="{x:Type Thumb}">

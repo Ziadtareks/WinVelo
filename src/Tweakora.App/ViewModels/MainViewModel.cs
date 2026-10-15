@@ -349,6 +349,7 @@ public sealed partial class MainViewModel : ObservableObject
         var current = ApplicationThemeManager.GetAppTheme();
         var next = current == ApplicationTheme.Dark ? ApplicationTheme.Light : ApplicationTheme.Dark;
         ApplicationThemeManager.Apply(next);
+        DesignThemeManager.ApplyTheme(next);
         CurrentThemeName = next.ToString();
     }
 

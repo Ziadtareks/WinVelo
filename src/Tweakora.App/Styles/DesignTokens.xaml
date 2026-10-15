@@ -1,0 +1,124 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!-- ========================================================================= -->
+    <!-- WINVELO DESIGN TOKENS (Centralized ResourceDictionary)                   -->
+    <!-- ========================================================================= -->
+
+    <!-- ==================== TYPE SCALE ==================== -->
+    <!-- Type scale: 12 / 14 / 16 / 20 / 28; body text at least 14 -->
+    <sys:Double x:Key="FontSizeCaption">12</sys:Double>
+    <sys:Double x:Key="FontSizeBody">14</sys:Double>
+    <sys:Double x:Key="FontSizeSubtitle">16</sys:Double>
+    <sys:Double x:Key="FontSizeTitle">20</sys:Double>
+    <sys:Double x:Key="FontSizeHeader">28</sys:Double>
+
+    <!-- ==================== SPACING SCALE ==================== -->
+    <!-- Spacing scale: 4 / 8 / 12 / 16 / 24 / 32 -->
+    <sys:Double x:Key="Spacing4">4</sys:Double>
+    <sys:Double x:Key="Spacing8">8</sys:Double>
+    <sys:Double x:Key="Spacing12">12</sys:Double>
+    <sys:Double x:Key="Spacing16">16</sys:Double>
+    <sys:Double x:Key="Spacing24">24</sys:Double>
+    <sys:Double x:Key="Spacing32">32</sys:Double>
+
+    <!-- Thickness tokens for padding/margins -->
+    <Thickness x:Key="Thickness4">4</Thickness>
+    <Thickness x:Key="Thickness8">8</Thickness>
+    <Thickness x:Key="Thickness12">12</Thickness>
+    <Thickness x:Key="Thickness16">16</Thickness>
+    <Thickness x:Key="Thickness24">24</Thickness>
+    <Thickness x:Key="Thickness32">32</Thickness>
+
+    <!-- Convenient Margin Tokens -->
+    <Thickness x:Key="MarginBottom4">0,0,0,4</Thickness>
+    <Thickness x:Key="MarginBottom8">0,0,0,8</Thickness>
+    <Thickness x:Key="MarginBottom12">0,0,0,12</Thickness>
+    <Thickness x:Key="MarginBottom16">0,0,0,16</Thickness>
+    <Thickness x:Key="MarginBottom24">0,0,0,24</Thickness>
+    <Thickness x:Key="MarginBottom32">0,0,0,32</Thickness>
+
+    <Thickness x:Key="MarginRight4">0,0,4,0</Thickness>
+    <Thickness x:Key="MarginRight8">0,0,8,0</Thickness>
+    <Thickness x:Key="MarginRight12">0,0,12,0</Thickness>
+    <Thickness x:Key="MarginRight16">0,0,16,0</Thickness>
+
+    <!-- ==================== SEMANTIC COLOR PALETTE (DARK DEFAULT) ==================== -->
+    <!-- All text colors have contrast ratio >= 4.5:1 against dark surfaces -->
+    <Color x:Key="BgDeepColor">#0F1117</Color>
+    <Color x:Key="BgSidebarColor">#161922</Color>
+    <Color x:Key="BgCardColor">#1E222D</Color>
+    <Color x:Key="BgCardHoverColor">#262B38</Color>
+    <Color x:Key="BorderSubtleColor">#2A303C</Color>
+    <Color x:Key="BorderHoverColor">#3B4252</Color>
+
+    <Color x:Key="TextPrimaryColor">#F9FAFB</Color>    <!-- Contrast > 14:1 -->
+    <Color x:Key="TextSecondaryColor">#D1D5DB</Color>  <!-- Contrast > 8.5:1 -->
+    <Color x:Key="TextMutedColor">#9CA3AF</Color>      <!-- Contrast >= 4.8:1 -->
+
+    <Color x:Key="AccentPrimaryColor">#3B82F6</Color>
+    <Color x:Key="AccentHoverColor">#60A5FA</Color>
+    <Color x:Key="AccentPressedColor">#2563EB</Color>
+
+    <Color x:Key="SuccessGreenColor">#10B981</Color>
+    <Color x:Key="WarningAmberColor">#F59E0B</Color>
+    <Color x:Key="CautionRedColor">#EF4444</Color>
+
+    <!-- Semantic Brushes -->
+    <SolidColorBrush x:Key="BgDeepBrush" Color="{StaticResource BgDeepColor}" />
+    <SolidColorBrush x:Key="BgSidebarBrush" Color="{StaticResource BgSidebarColor}" />
+    <SolidColorBrush x:Key="BgCardBrush" Color="{StaticResource BgCardColor}" />
+    <SolidColorBrush x:Key="BgCardHoverBrush" Color="{StaticResource BgCardHoverColor}" />
+    <SolidColorBrush x:Key="BorderSubtleBrush" Color="{StaticResource BorderSubtleColor}" />
+    <SolidColorBrush x:Key="BorderHoverBrush" Color="{StaticResource BorderHoverColor}" />
+
+    <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource TextPrimaryColor}" />
+    <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource TextSecondaryColor}" />
+    <SolidColorBrush x:Key="TextMutedBrush" Color="{StaticResource TextMutedColor}" />
+
+    <SolidColorBrush x:Key="AccentPrimaryBrush" Color="{StaticResource AccentPrimaryColor}" />
+    <SolidColorBrush x:Key="AccentHoverBrush" Color="{StaticResource AccentHoverColor}" />
+    <SolidColorBrush x:Key="AccentPressedBrush" Color="{StaticResource AccentPressedColor}" />
+
+    <SolidColorBrush x:Key="SuccessGreenBrush" Color="{StaticResource SuccessGreenColor}" />
+    <SolidColorBrush x:Key="WarningAmberBrush" Color="{StaticResource WarningAmberColor}" />
+    <SolidColorBrush x:Key="CautionRedBrush" Color="{StaticResource CautionRedColor}" />
+
+    <!-- Status Badges -->
+    <SolidColorBrush x:Key="StatusAppliedBgBrush" Color="#064E3B" />
+    <SolidColorBrush x:Key="StatusAppliedFgBrush" Color="#34D399" />
+    <SolidColorBrush x:Key="StatusAppliedBorderBrush" Color="#059669" />
+
+    <SolidColorBrush x:Key="StatusDefaultBgBrush" Color="#1F2937" />
+    <SolidColorBrush x:Key="StatusDefaultFgBrush" Color="#D1D5DB" />
+    <SolidColorBrush x:Key="StatusDefaultBorderBrush" Color="#374151" />
+
+    <!-- ==================== RISK LEVEL PALETTES (Safe, Low, Medium, High) ==================== -->
+    <!-- Safe Risk -->
+    <SolidColorBrush x:Key="RiskSafeBgBrush" Color="#064E3B" />
+    <SolidColorBrush x:Key="RiskSafeFgBrush" Color="#34D399" />
+    <SolidColorBrush x:Key="RiskSafeBorderBrush" Color="#059669" />
+
+    <!-- Low Risk -->
+    <SolidColorBrush x:Key="RiskLowBgBrush" Color="#1E3A8A" />
+    <SolidColorBrush x:Key="RiskLowFgBrush" Color="#93C5FD" />
+    <SolidColorBrush x:Key="RiskLowBorderBrush" Color="#3B82F6" />
+
+    <!-- Medium Risk (Moderate) -->
+    <SolidColorBrush x:Key="RiskModerateBgBrush" Color="#451A03" />
+    <SolidColorBrush x:Key="RiskModerateFgBrush" Color="#FCD34D" />
+    <SolidColorBrush x:Key="RiskModerateBorderBrush" Color="#D97706" />
+    <SolidColorBrush x:Key="RiskMediumBgBrush" Color="#451A03" />
+    <SolidColorBrush x:Key="RiskMediumFgBrush" Color="#FCD34D" />
+    <SolidColorBrush x:Key="RiskMediumBorderBrush" Color="#D97706" />
+
+    <!-- High Risk (Caution) -->
+    <SolidColorBrush x:Key="RiskCautionBgBrush" Color="#450A0A" />
+    <SolidColorBrush x:Key="RiskCautionFgBrush" Color="#FCA5A5" />
+    <SolidColorBrush x:Key="RiskCautionBorderBrush" Color="#DC2626" />
+    <SolidColorBrush x:Key="RiskHighBgBrush" Color="#450A0A" />
+    <SolidColorBrush x:Key="RiskHighFgBrush" Color="#FCA5A5" />
+    <SolidColorBrush x:Key="RiskHighBorderBrush" Color="#DC2626" />
+
+</ResourceDictionary>
