@@ -127,6 +127,12 @@ public sealed class TweakDefinition
     [JsonPropertyName("conflictsWith")]
     public List<string>? ConflictsWith { get; set; }
 
+    [JsonPropertyName("aliases")]
+    public List<string>? Aliases { get; set; }
+
+    [JsonPropertyName("relatedTweaks")]
+    public List<string>? RelatedTweaks { get; set; }
+
     [JsonPropertyName("windows")]
     public WindowsRequirements Windows { get; set; } = new();
 

@@ -54,7 +54,7 @@ public sealed class PlaceboAndClaimScrubTests
             }
         }
 
-        Assert.Equal(149, count);
+        Assert.Equal(134, count);
     }
 
     [Fact]
@@ -142,14 +142,9 @@ public sealed class PlaceboAndClaimScrubTests
         var mouseAcc1 = allTweaks["gaming.input.disable-mouse-acceleration"];
         Assert.Equal("preferences", mouseAcc1.Category);
         Assert.Equal("ui-equivalent", mouseAcc1.Evidence);
-
-        var mouseAcc2 = allTweaks["performance.input.raw-mouse"];
-        Assert.Equal("preferences", mouseAcc2.Category);
-        Assert.Equal("ui-equivalent", mouseAcc2.Evidence);
-
-        var mouseAcc3 = allTweaks["pref.mouseacceleration"];
-        Assert.Equal("preferences", mouseAcc3.Category);
-        Assert.Equal("ui-equivalent", mouseAcc3.Evidence);
+        Assert.NotNull(mouseAcc1.Aliases);
+        Assert.Contains("performance.input.raw-mouse", mouseAcc1.Aliases);
+        Assert.Contains("pref.mouseacceleration", mouseAcc1.Aliases);
 
         var hags = allTweaks["performance.gpu.hags"];
         Assert.Equal("preferences", hags.Category);

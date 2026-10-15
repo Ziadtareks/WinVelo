@@ -320,6 +320,16 @@
                                                 </StackPanel>
                                             </Border>
 
+                                            <!-- Related Tweaks / Overlaps -->
+                                            <Border Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
+                                                    BorderThickness="1" CornerRadius="4" Padding="8,6" Margin="0,0,0,8"
+                                                    Visibility="{Binding HasRelatedTweaks, Converter={StaticResource BoolToVis}}">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="🔄 Overlaps with: " FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" />
+                                                    <TextBlock Text="{Binding RelatedTweaksText}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" VerticalAlignment="Center" />
+                                                </StackPanel>
+                                            </Border>
+
                                             <!-- Exact Changes (Registry paths, values, policies) -->
                                             <StackPanel Margin="0,0,0,8" Visibility="{Binding HasExactChanges, Converter={StaticResource BoolToVis}}">
                                                 <TextBlock Text="EXACT CHANGES" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" Margin="0,0,0,3" />

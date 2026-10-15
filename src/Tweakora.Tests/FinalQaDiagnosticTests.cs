@@ -92,7 +92,7 @@ public sealed class FinalQaDiagnosticTests
 
         Assert.Empty(duplicates);
         Assert.Empty(missingUndo);
-        Assert.True(totalTweaks >= 140, $"Expected >= 140 tweaks, found {totalTweaks}");
+        Assert.True(totalTweaks >= 130, $"Expected >= 130 tweaks, found {totalTweaks}");
     }
 
     [Fact]
@@ -208,6 +208,7 @@ public sealed class FinalQaDiagnosticTests
         var catalog = tweakService.LoadCatalog();
         var catalogIds = new HashSet<string>(catalog.Select(t => t.Id), StringComparer.OrdinalIgnoreCase);
         var catalogOrigins = new HashSet<string>(catalog.Where(t => t.Origin != null).Select(t => t.Origin!), StringComparer.OrdinalIgnoreCase);
+        var catalogAliases = new HashSet<string>(catalog.Where(t => t.Aliases != null).SelectMany(t => t.Aliases!), StringComparer.OrdinalIgnoreCase);
 
         var memOpt = new MemoryOptimizerService();
         var advisor = new SmartAdvisorService(fakeReg, fakeShell);
@@ -218,7 +219,7 @@ public sealed class FinalQaDiagnosticTests
         foreach (var toggle in dvm.QuickToggles)
         {
             Assert.NotNull(toggle.OriginKey);
-            bool found = catalogOrigins.Contains(toggle.OriginKey) || catalogIds.Contains(toggle.OriginKey);
+            bool found = catalogOrigins.Contains(toggle.OriginKey) || catalogIds.Contains(toggle.OriginKey) || catalogAliases.Contains(toggle.OriginKey);
             Assert.True(found, $"QuickToggle '{toggle.Title}' with key '{toggle.OriginKey}' was not found in catalog!");
         }
 

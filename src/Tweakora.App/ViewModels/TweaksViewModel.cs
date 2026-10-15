@@ -232,6 +232,8 @@ public sealed partial class TweakCardModel : ObservableObject
 
     public IReadOnlyList<string> ExactChanges => TweakActionFormatter.FormatExactChanges(Tweak);
     public bool HasExactChanges => ExactChanges.Count > 0;
+    public bool HasRelatedTweaks => Tweak.RelatedTweaks != null && Tweak.RelatedTweaks.Count > 0;
+    public string RelatedTweaksText => Tweak.RelatedTweaks != null ? string.Join(", ", Tweak.RelatedTweaks) : string.Empty;
 
     [ObservableProperty]
     private bool _isExpanded;

@@ -403,6 +403,8 @@ public static class Program
             }
         }
 
+        ValidateNoExactDuplicates(tweakMap, ref errorCount);
+
         Console.WriteLine("\n----------------------------------------");
         Console.WriteLine($"Summary: {totalTweaks} tweak(s) and {totalPresets} preset(s) validated. {errorCount} error(s).");
         Console.WriteLine("----------------------------------------");
@@ -657,5 +659,83 @@ public static class Program
             }
         }
     }
+
+    private static void ValidateNoExactDuplicates(Dictionary<string, JsonNode> tweakMap, ref int errorCount)
+    {
+        Console.WriteLine("\n[CHECKING DUPLICATES] Validating that catalog contains zero exact duplicates...");
+        var actionSignatures = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var (id, item) in tweakMap)
+        {
+            var applyArray = item["apply"]?.AsArray();
+            if (applyArray == null || applyArray.Count == 0) continue;
+
+            var targets = new List<string>();
+            foreach (var action in applyArray)
+            {
+                if (action == null) continue;
+                string? hive = action["hive"]?.ToString();
+                string? key = action["key"]?.ToString();
+                string? val = action["valueName"]?.ToString();
+                string? svc = action["serviceName"]?.ToString();
+
+                if (!string.IsNullOrWhiteSpace(hive) || !string.IsNullOrWhiteSpace(key))
+                {
+                    string h = (hive ?? "").ToUpperInvariant().Replace("HKEY_LOCAL_MACHINE", "HKLM").Replace("HKEY_CURRENT_USER", "HKCU");
+                    string k = (key ?? "").Trim('\\').ToUpperInvariant();
+                    string v = string.IsNullOrWhiteSpace(val) ? "@DEFAULT" : val.ToUpperInvariant();
+                    string data = action["data"]?.ToString() ?? "";
+                    targets.Add($"REG:{h}\\{k}\\{v}={data}");
+                }
+                else if (!string.IsNullOrWhiteSpace(svc))
+                {
+                    string s = svc.ToUpperInvariant();
+                    string startup = action["startupType"]?.ToString() ?? "";
+                    targets.Add($"SVC:{s}={startup}");
+                }
+                else
+                {
+                    string? type = action["type"]?.ToString();
+                    string? script = action["script"]?.ToString();
+                    if (string.Equals(type, "PowerShell", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrWhiteSpace(script))
+                    {
+                        targets.Add($"PS:{script.Trim()}");
+                    }
+                }
+            }
+
+            targets.Sort(StringComparer.Ordinal);
+            string signature = string.Join(";", targets);
+            if (string.IsNullOrWhiteSpace(signature)) continue;
+
+            if (!actionSignatures.TryGetValue(signature, out var list))
+            {
+                list = new List<string>();
+                actionSignatures[signature] = list;
+            }
+            list.Add(id);
+        }
+
+        int duplicateCount = 0;
+        foreach (var (sig, ids) in actionSignatures)
+        {
+            if (ids.Count > 1)
+            {
+                duplicateCount++;
+                errorCount++;
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"  [FAIL] Exact duplicate tweaks detected: [{string.Join(", ", ids)}] perform identical actions: {sig}");
+                Console.ResetColor();
+            }
+        }
+
+        if (duplicateCount == 0)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("  [PASS] Zero exact duplicate tweaks found.");
+            Console.ResetColor();
+        }
+    }
 }
+
 

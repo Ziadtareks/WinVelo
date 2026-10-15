@@ -443,7 +443,10 @@ public sealed partial class HistoryViewModel : ObservableObject
         }
 
         var catalog = _tweakService.LoadCatalog();
-        var tweak = catalog.FirstOrDefault(t => string.Equals(t.Id, tweakId, StringComparison.OrdinalIgnoreCase));
+        var tweak = catalog.FirstOrDefault(t =>
+            string.Equals(t.Id, tweakId, StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(t.Origin, tweakId, StringComparison.OrdinalIgnoreCase) ||
+            (t.Aliases != null && t.Aliases.Any(a => string.Equals(a, tweakId, StringComparison.OrdinalIgnoreCase))));
         if (tweak == null)
         {
             StatusMessage = $"Tweak '{tweakId}' not found in catalog.";

@@ -41,6 +41,7 @@ public sealed class UpstreamPortComparisonTests
 
         HashSet<string> ourOrigins = new(ourTweaks.Where(t => t.Origin != null).Select(t => t.Origin!), StringComparer.OrdinalIgnoreCase);
         HashSet<string> ourIds = new(ourTweaks.Select(t => t.Id), StringComparer.OrdinalIgnoreCase);
+        HashSet<string> ourAliases = new(ourTweaks.Where(t => t.Aliases != null).SelectMany(t => t.Aliases!), StringComparer.OrdinalIgnoreCase);
 
         string overridesPath = FindFileUpwards(baseDir, Path.Combine("Catalog", "overrides.json"));
         Assert.True(File.Exists(overridesPath), $"Catalog/overrides.json missing at {overridesPath}");
@@ -52,7 +53,7 @@ public sealed class UpstreamPortComparisonTests
         foreach (var prop in upstreamDocJson.RootElement.EnumerateObject())
         {
             string key = prop.Name;
-            bool isPorted = ourOrigins.Contains(key) || ourIds.Contains(key);
+            bool isPorted = ourOrigins.Contains(key) || ourIds.Contains(key) || ourAliases.Contains(key);
             bool isDocumented = upstreamDoc.Contains(key, StringComparison.OrdinalIgnoreCase);
 
             if (!isPorted && !isDocumented)

@@ -188,7 +188,10 @@ public sealed class SmartOptimizationTests
 
         foreach (var id in expectedSmartIds)
         {
-            var tweak = catalog.FirstOrDefault(t => string.Equals(t.Id, id, StringComparison.OrdinalIgnoreCase));
+            var tweak = catalog.FirstOrDefault(t =>
+                string.Equals(t.Id, id, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(t.Origin, id, StringComparison.OrdinalIgnoreCase) ||
+                (t.Aliases != null && t.Aliases.Any(a => string.Equals(a, id, StringComparison.OrdinalIgnoreCase))));
             Assert.NotNull(tweak);
             Assert.NotEmpty(tweak.Apply);
             Assert.NotEmpty(tweak.Undo);

@@ -74,6 +74,14 @@
       "type": "array",
       "items": { "type": "string" }
     },
+    "aliases": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "relatedTweaks": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
     "windows": {
       "type": "object",
       "additionalProperties": false,

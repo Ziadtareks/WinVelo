@@ -1049,7 +1049,8 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
 
         return _catalog.FirstOrDefault(t =>
             string.Equals(t.Origin, originOrId, StringComparison.OrdinalIgnoreCase) ||
-            string.Equals(t.Id, originOrId, StringComparison.OrdinalIgnoreCase));
+            string.Equals(t.Id, originOrId, StringComparison.OrdinalIgnoreCase) ||
+            (t.Aliases != null && t.Aliases.Any(a => string.Equals(a, originOrId, StringComparison.OrdinalIgnoreCase))));
     }
 
     public async Task RefreshAllToggleStatesAsync()

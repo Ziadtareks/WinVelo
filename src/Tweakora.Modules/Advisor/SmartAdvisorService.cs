@@ -247,7 +247,10 @@ public sealed class SmartAdvisorService : ISmartAdvisorService
 
         foreach (var id in targetIds)
         {
-            var tweak = catalog.FirstOrDefault(t => string.Equals(t.Id, id, StringComparison.OrdinalIgnoreCase));
+            var tweak = catalog.FirstOrDefault(t =>
+                string.Equals(t.Id, id, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(t.Origin, id, StringComparison.OrdinalIgnoreCase) ||
+                (t.Aliases != null && t.Aliases.Any(a => string.Equals(a, id, StringComparison.OrdinalIgnoreCase))));
             if (tweak != null)
             {
                 try

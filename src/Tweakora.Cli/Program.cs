@@ -129,7 +129,10 @@ public static class Program
                 return 1;
             }
 
-            var tweak = catalog.FirstOrDefault(t => string.Equals(t.Id, targetId, StringComparison.OrdinalIgnoreCase));
+            var tweak = catalog.FirstOrDefault(t =>
+                string.Equals(t.Id, targetId, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(t.Origin, targetId, StringComparison.OrdinalIgnoreCase) ||
+                (t.Aliases != null && t.Aliases.Any(a => string.Equals(a, targetId, StringComparison.OrdinalIgnoreCase))));
             if (tweak == null)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
@@ -376,7 +379,8 @@ public static class Program
             {
                 var target = catalog.FirstOrDefault(t =>
                     string.Equals(t.Id, id, StringComparison.OrdinalIgnoreCase) ||
-                    string.Equals(t.Origin, id, StringComparison.OrdinalIgnoreCase));
+                    string.Equals(t.Origin, id, StringComparison.OrdinalIgnoreCase) ||
+                    (t.Aliases != null && t.Aliases.Any(a => string.Equals(a, id, StringComparison.OrdinalIgnoreCase))));
                 if (target != null)
                 {
                     targetTweaks.Add(target);
