@@ -155,7 +155,7 @@
                                    FontWeight="SemiBold" FontSize="{StaticResource FontSizeBody}" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,4" />
                         <TextBlock Text="{Binding OsDescription, StringFormat='Operating System: {0}'}"
                                    FontSize="{StaticResource FontSizeCaption}" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,8" />
-                        <TextBlock Text="WinVelo does not promise magical speed boosts or clean invisible junk. It transparently applies cataloged Windows tweaks with pre-flight previews, write-ahead rollback journal protection, and non-destructive reversal."
+                        <TextBlock Text="WinVelo does not promise unverified performance gains or make hidden modifications. It transparently applies cataloged Windows settings with change previews, rollback journal tracking, and non-destructive reversal."
                                    FontSize="{StaticResource FontSizeCaption}" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,0,0,8" />
                         <TextBlock Text="Catalog derived from Chris Titus Tech WinUtil (MIT License)."
                                    FontSize="{StaticResource FontSizeCaption}" Foreground="{DynamicResource TextMutedBrush}" />

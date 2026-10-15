@@ -40,16 +40,16 @@
                         </StackPanel>
                     </StackPanel>
 
-                    <!-- Top Action: 1-Click Optimize Startup -->
+                    <!-- Top Action: Optimize Startup Apps -->
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center">
                         <ui:Button AutomationProperties.AutomationId="OptimizeStartupButton"
-                                   AutomationProperties.Name="1-Click Optimize Startup"
+                                   AutomationProperties.Name="Optimize Startup Apps"
                                    Appearance="Primary"
                                    Icon="{ui:SymbolIcon Flash24}"
-                                   Content="1-Click Optimize Startup"
+                                   Content="Optimize Startup Apps"
                                    Command="{Binding OptimizeStartupCommand}"
                                    Padding="14,8" FontWeight="Bold" FontSize="12" Margin="0,0,8,0"
-                                   ToolTip="Disable heavy non-essential apps to accelerate Windows boot time" />
+                                   ToolTip="Disable non-essential apps to reduce Windows boot delay" />
 
                         <ui:Button AutomationProperties.AutomationId="RefreshStartupButton"
                                    AutomationProperties.Name="Refresh Startup Apps"

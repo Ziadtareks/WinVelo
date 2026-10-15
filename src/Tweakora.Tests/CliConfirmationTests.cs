@@ -56,7 +56,7 @@ public sealed class CliConfirmationTests
 
             string output = sw.ToString();
             Assert.Contains("TWEAK INFORMATION: performance.cpu.priority-separation", output);
-            Assert.Contains("EXACT CHANGES (ENGINE SPECIFICATION):", output);
+            Assert.Contains("EXACT CHANGES:", output);
             Assert.Contains("Win32PrioritySeparation = 38 (DWord)", output);
             Assert.Contains("WHAT IT DOES:", output);
         }

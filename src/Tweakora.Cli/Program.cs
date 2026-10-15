@@ -1378,7 +1378,7 @@ public static class Program
             Console.WriteLine($"\nWHERE TO FIND THIS IN WINDOWS:\n  {tweak.UiEquivalentLocation}");
         }
 
-        Console.WriteLine("\nEXACT CHANGES (ENGINE SPECIFICATION):");
+        Console.WriteLine("\nEXACT CHANGES:");
         var exactChanges = TweakActionFormatter.FormatExactChanges(tweak);
         if (exactChanges.Count > 0)
         {

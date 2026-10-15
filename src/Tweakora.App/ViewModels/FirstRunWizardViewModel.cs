@@ -154,14 +154,14 @@ public sealed partial class FirstRunWizardViewModel : ObservableObject
             else
             {
                 HasVerifiedRestorePoint = false;
-                RestoreVerificationMessage = $"Notice: Restore point creation could not be verified ({res.ErrorMessage ?? "Standard Windows policy"}). WinVelo's write-ahead rollback journal will track all changes.";
+                RestoreVerificationMessage = $"Notice: Restore point creation could not be verified ({res.ErrorMessage ?? "Standard Windows policy"}). WinVelo's rollback journal will track all changes.";
             }
 
             IsSystemRestoreEnabled = _restoreService.IsSystemRestoreEnabled();
         }
         catch (Exception ex)
         {
-            RestoreVerificationMessage = $"Notice: {ex.Message}. WinVelo's write-ahead rollback journal will track all changes.";
+            RestoreVerificationMessage = $"Notice: {ex.Message}. WinVelo's rollback journal will track all changes.";
         }
         finally
         {

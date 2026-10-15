@@ -263,8 +263,8 @@
                                 <TextBlock Text="Review apps that launch automatically when you sign in. Disabling unused startup items reduces login delay."
                                            Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,2,0,0" />
                             </StackPanel>
-                            <Button DockPanel.Dock="Right" Content="1-Click Optimize"
-                                    AutomationProperties.Name="1-Click Optimize Startup"
+                            <Button DockPanel.Dock="Right" Content="Optimize Startup Apps"
+                                    AutomationProperties.Name="Optimize Startup Apps"
                                     Style="{DynamicResource ModernPrimaryBtn}"
                                     Command="{Binding StartupVM.OptimizeStartupCommand}" VerticalAlignment="Center" />
                         </DockPanel>

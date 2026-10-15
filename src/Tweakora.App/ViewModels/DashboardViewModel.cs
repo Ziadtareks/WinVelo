@@ -242,7 +242,7 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
     private bool _isCreatingRestorePoint;
 
     [ObservableProperty]
-    private string _globalStatusMessage = "Ready. Select a 1-Click Profile or toggle individual optimizations below.";
+    private string _globalStatusMessage = "Ready. Select a preset or review individual settings below.";
 
     [ObservableProperty]
     private bool _isDetailsDialogOpen;
@@ -808,7 +808,7 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
             {
                 "preset.recommended" => "SAFE & RECOMMENDED",
                 "preset.gaming" => "BACKGROUND PACING",
-                "preset.privacy" => "MAX PRIVACY",
+                "preset.privacy" => "ENHANCED PRIVACY",
                 _ => "CURATED PRESET"
             };
 
