@@ -166,6 +166,41 @@ public static class Program
 
         AppDataMigrator.Migrate();
 
+        int diagIdx = Array.FindIndex(args, a => string.Equals(a, "--diagnostics", StringComparison.OrdinalIgnoreCase) || a.StartsWith("--diagnostics=", StringComparison.OrdinalIgnoreCase));
+        if (diagIdx >= 0)
+        {
+            string? outZip = null;
+            if (args[diagIdx].StartsWith("--diagnostics=", StringComparison.OrdinalIgnoreCase))
+            {
+                outZip = args[diagIdx].Substring("--diagnostics=".Length);
+            }
+            else if (diagIdx + 1 < args.Length && !args[diagIdx + 1].StartsWith("--"))
+            {
+                outZip = args[diagIdx + 1];
+            }
+
+            if (string.IsNullOrWhiteSpace(outZip))
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("[WARN] Please specify an output zip path: winvelo-cli --diagnostics <out.zip>");
+                Console.ResetColor();
+                return 1;
+            }
+
+            Console.WriteLine("[DIAGNOSTICS] Collecting system information, tweak states, and sanitized logs...");
+            var collector = new Tweakora.Core.Diagnostics.DiagnosticsCollector();
+            var result = await collector.CollectDiagnosticsAsync(outZip, registry, services, tasks, catalog);
+
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"[SUCCESS] Diagnostic archive created: {result.OutputPath}");
+            Console.WriteLine($"  • Total tweaks scanned: {result.TotalTweaksScanned}");
+            Console.WriteLine($"  • Journal sessions summarized: {result.JournalSessionsCount}");
+            Console.WriteLine($"  • Logs packaged (sanitized): {result.LogsPackagedCount}");
+            Console.WriteLine($"  • Archive size: {result.ArchiveSizeBytes / 1024} KB");
+            Console.ResetColor();
+            return 0;
+        }
+
         string journalDir = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
             "WinVelo", "Journal");
@@ -1404,6 +1439,7 @@ public static class Program
         Console.WriteLine("  winvelo-cli --update-mode <mode>         Set update mode (Default, Security, DisableAll)");
         Console.WriteLine("  winvelo-cli --fix <id>                   Execute a system maintenance fix");
         Console.WriteLine("  winvelo-cli --config <path> --run        Apply configuration profile (protected by journal)");
+        Console.WriteLine("  winvelo-cli --diagnostics <out.zip>      Export read-only diagnostic bundle for bug reports");
         Console.WriteLine("  winvelo-cli --yes / -y                   Bypass interactive confirmation for modifying commands");
         Console.WriteLine("  winvelo-cli --real-mode                  Use real Windows drivers (default is simulation)");
     }

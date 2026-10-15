@@ -3973,7 +3973,7 @@
       "minBuild": 19041
     },
     "requiresReboot": false,
-    "requiresExplorerRestart": false,
+    "requiresExplorerRestart": true,
     "detect": {
       "type": "Registry",
       "hive": "HKLM",
