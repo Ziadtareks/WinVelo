@@ -10,357 +10,381 @@
     </UserControl.Resources>
 
     <Grid Background="Transparent">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" /> <!-- Sub-header / Filter summary -->
-            <RowDefinition Height="*" />    <!-- Scrollable Cards List -->
-        </Grid.RowDefinitions>
+        <!-- 2-column layout: Left = Categories, Right = Content & Sticky Selection Footer -->
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
 
-        <!-- Filters & Results Status Bar -->
-        <Border Grid.Row="0" Background="{DynamicResource BgCardBrush}"
-                BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="0,0,0,1"
-                Padding="16,10" Margin="0,0,0,8">
-            <DockPanel LastChildFill="False">
-                <!-- Left: Full Filter Controls Suite -->
-                <WrapPanel Orientation="Horizontal" DockPanel.Dock="Left" VerticalAlignment="Center">
-                    <!-- Search Input -->
-                    <ui:TextBox AutomationProperties.AutomationId="TweaksSearchBox"
-                                AutomationProperties.Name="Search tweaks"
-                                PlaceholderText="Search tweaks..."
-                                Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                Width="180" Margin="0,0,8,0" VerticalAlignment="Center" />
+        <!-- LEFT COLUMN: Categories Sidebar -->
+        <Border Grid.Column="0" Background="{DynamicResource BgCardBrush}"
+                BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="0,0,1,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
 
-                    <!-- Category Dropdown -->
-                    <ComboBox AutomationProperties.Name="Filter by category"
-                              ItemsSource="{Binding CategoryOptions}"
-                              SelectedItem="{Binding SelectedCategory, Mode=TwoWay}"
-                              Width="120" Margin="0,0,8,0" VerticalAlignment="Center" />
+                <Border Grid.Row="0" Padding="16,14,16,10" BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="0,0,0,1">
+                    <TextBlock Text="CATEGORIES" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" />
+                </Border>
 
-                    <!-- Risk Dropdown -->
-                    <ComboBox AutomationProperties.AutomationId="RiskFilterComboBox"
-                              AutomationProperties.Name="Filter by risk level"
-                              ItemsSource="{Binding RiskOptions}"
-                              SelectedItem="{Binding SelectedRisk, Mode=TwoWay}"
-                              Width="95" Margin="0,0,8,0" VerticalAlignment="Center" />
-
-                    <!-- State Dropdown -->
-                    <ComboBox AutomationProperties.Name="Filter by state"
-                              ItemsSource="{Binding StateOptions}"
-                              SelectedItem="{Binding SelectedState, Mode=TwoWay}"
-                              Width="110" Margin="0,0,12,0" VerticalAlignment="Center" />
-
-                    <!-- Recommended Only Toggle -->
-                    <CheckBox AutomationProperties.AutomationId="RecommendedOnlyToggle"
-                              AutomationProperties.Name="Recommended only"
-                              Content="Recommended only"
-                              IsChecked="{Binding IsRecommendedOnly, Mode=TwoWay}"
-                              Margin="0,0,12,0" VerticalAlignment="Center"
-                              FontSize="11" Foreground="#34D399" FontWeight="SemiBold"
-                              ToolTip="Filter to conservative, well-documented, reversible settings (Safe and Low risk only)" />
-
-                    <!-- Show Experimental Tweaks Toggle -->
-                    <CheckBox AutomationProperties.AutomationId="ShowExperimentalTweaksCheckBox"
-                              AutomationProperties.Name="Show experimental"
-                              Content="Show experimental"
-                              IsChecked="{Binding ShowExperimentalTweaks, Mode=TwoWay}"
-                              Margin="0,0,8,0" VerticalAlignment="Center"
-                              FontSize="11" Foreground="#94A3B8"
-                              ToolTip="Display unproven community-lore tweaks (quarantined from presets)" />
-                </WrapPanel>
-
-                <!-- Right: Scan Status and Available Count -->
-                <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center">
-                    <Border Background="{DynamicResource StatusDefaultBgBrush}" CornerRadius="10" Padding="8,3" Margin="0,0,12,0" VerticalAlignment="Center">
-                        <TextBlock Text="{Binding FilteredTweaks.Count, StringFormat='{}{0} available'}"
-                                   FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" FontWeight="SemiBold" />
-                    </Border>
-
-                    <!-- Progress scanning indicator -->
-                    <StackPanel Orientation="Horizontal" Visibility="{Binding IsScanning, Converter={StaticResource BoolToVis}}" Margin="0,0,12,0">
-                        <ProgressBar IsIndeterminate="True" Width="70" Height="4" Margin="0,0,6,0" VerticalAlignment="Center" />
-                        <TextBlock Text="{Binding ScanStatusText}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" />
-                    </StackPanel>
-                </StackPanel>
-            </DockPanel>
+                <ListBox Grid.Row="1" ItemsSource="{Binding CategoryOptions}"
+                         SelectedItem="{Binding SelectedCategory, Mode=TwoWay}"
+                         AutomationProperties.Name="Filter by category"
+                         Background="Transparent" BorderThickness="0"
+                         Padding="6,8" Margin="0"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Padding" Value="12,10" />
+                            <Setter Property="Margin" Value="0,2" />
+                            <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+                            <Setter Property="FontSize" Value="13" />
+                            <Setter Property="Cursor" Value="Hand" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <Border x:Name="Bd" CornerRadius="6" Background="Transparent" Padding="{TemplateBinding Padding}">
+                                            <ContentPresenter VerticalAlignment="Center" />
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource BgCardHoverBrush}" />
+                                                <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+                                            </Trigger>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource AccentSubtleBrush}" />
+                                                <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+                                                <Setter Property="FontWeight" Value="SemiBold" />
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                </ListBox>
+            </Grid>
         </Border>
 
-        <!-- Center Scrollable Tweak Cards List -->
-        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="16,4,16,16">
-            <ItemsControl ItemsSource="{Binding FilteredTweaks}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate DataType="{x:Type vm:TweakCardModel}">
-                        <!-- TWEAK CARD -->
-                        <Border Background="{DynamicResource BgCardBrush}"
-                                BorderBrush="{DynamicResource BorderSubtleBrush}"
-                                BorderThickness="1" CornerRadius="8"
-                                Padding="14,12" Margin="0,0,0,10">
-                            <Border.Style>
-                                <Style TargetType="Border">
-                                    <Style.Triggers>
-                                        <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter Property="BorderBrush" Value="{DynamicResource BorderHoverBrush}" />
-                                            <Setter Property="Background" Value="{DynamicResource BgCardHoverBrush}" />
-                                        </Trigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Border.Style>
+        <!-- RIGHT COLUMN: Filters Bar, O&O ShutUp10++ List, Sticky Selection Footer -->
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" /> <!-- Top filter chips bar -->
+                <RowDefinition Height="*" />    <!-- Compact O&O ShutUp10++ list -->
+                <RowDefinition Height="Auto" /> <!-- Sticky selection footer -->
+            </Grid.RowDefinitions>
 
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto" /> <!-- Top Header Row: Checkbox, Title, Badges -->
-                                    <RowDefinition Height="Auto" /> <!-- Description -->
-                                    <RowDefinition Height="Auto" /> <!-- Warnings (if any) -->
-                                    <RowDefinition Height="Auto" /> <!-- Effect Note (if any) -->
-                                    <RowDefinition Height="Auto" /> <!-- Metadata footer tags & Details button -->
-                                    <RowDefinition Height="Auto" /> <!-- Expandable Info Drawer -->
-                                </Grid.RowDefinitions>
+            <!-- Top Filter Chips Bar -->
+            <Border Grid.Row="0" Background="{DynamicResource BgCardBrush}"
+                    BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="0,0,0,1"
+                    Padding="16,10">
+                <DockPanel LastChildFill="False">
+                    <!-- Left: Search & Filter Controls -->
+                    <WrapPanel Orientation="Horizontal" DockPanel.Dock="Left" VerticalAlignment="Center">
+                        <!-- Search Box -->
+                        <ui:TextBox AutomationProperties.AutomationId="TweaksSearchBox"
+                                    AutomationProperties.Name="Search tweaks"
+                                    PlaceholderText="Search tweaks..."
+                                    Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                    Width="180" Margin="0,0,10,0" VerticalAlignment="Center" />
 
-                                <!-- Top Header Row (Collapsed card essentials) -->
-                                <DockPanel Grid.Row="0" LastChildFill="False">
-                                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" VerticalAlignment="Center">
+                        <!-- Recommended Only Toggle -->
+                        <CheckBox AutomationProperties.AutomationId="RecommendedOnlyToggle"
+                                  AutomationProperties.Name="Recommended only"
+                                  Content="Recommended only"
+                                  IsChecked="{Binding IsRecommendedOnly, Mode=TwoWay}"
+                                  Margin="0,0,12,0" VerticalAlignment="Center"
+                                  FontSize="12" Foreground="{DynamicResource RiskSafeFgBrush}" FontWeight="SemiBold"
+                                  ToolTip="Show only safe, reversible, well-tested tweaks" />
+
+                        <!-- Risk Filter Dropdown -->
+                        <ComboBox AutomationProperties.AutomationId="RiskFilterComboBox"
+                                  AutomationProperties.Name="Filter by risk level"
+                                  ItemsSource="{Binding RiskOptions}"
+                                  SelectedItem="{Binding SelectedRisk, Mode=TwoWay}"
+                                  Width="100" Margin="0,0,10,0" VerticalAlignment="Center" />
+
+                        <!-- State Filter Dropdown -->
+                        <ComboBox AutomationProperties.Name="Filter by state"
+                                  ItemsSource="{Binding StateOptions}"
+                                  SelectedItem="{Binding SelectedState, Mode=TwoWay}"
+                                  Width="110" Margin="0,0,10,0" VerticalAlignment="Center" />
+
+                        <!-- Show Experimental Tweaks CheckBox -->
+                        <CheckBox AutomationProperties.AutomationId="ShowExperimentalTweaksCheckBox"
+                                  AutomationProperties.Name="Show experimental"
+                                  Content="Show experimental"
+                                  IsChecked="{Binding ShowExperimentalTweaks, Mode=TwoWay}"
+                                  Margin="0,0,8,0" VerticalAlignment="Center"
+                                  FontSize="12" Foreground="{DynamicResource TextMutedBrush}"
+                                  ToolTip="Display unproven community tweaks" />
+                    </WrapPanel>
+
+                    <!-- Right: Count & Scanning Indicator -->
+                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center">
+                        <Border Background="{DynamicResource StatusDefaultBgBrush}" CornerRadius="10" Padding="10,3" Margin="0,0,8,0" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding FilteredTweaks.Count, StringFormat='{}{0} tweaks'}"
+                                       FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" FontWeight="SemiBold" />
+                        </Border>
+
+                        <StackPanel Orientation="Horizontal" Visibility="{Binding IsScanning, Converter={StaticResource BoolToVis}}" Margin="0,0,8,0" VerticalAlignment="Center">
+                            <ProgressBar IsIndeterminate="True" Width="60" Height="4" Margin="0,0,6,0" VerticalAlignment="Center" />
+                            <TextBlock Text="{Binding ScanStatusText}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </StackPanel>
+                </DockPanel>
+            </Border>
+
+            <!-- Center Compact List (O&O ShutUp10++ Style) -->
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="16,10">
+                <ItemsControl ItemsSource="{Binding FilteredTweaks}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type vm:TweakCardModel}">
+                            <Border Background="{DynamicResource BgCardBrush}"
+                                    BorderBrush="{DynamicResource BorderSubtleBrush}"
+                                    BorderThickness="1" CornerRadius="6"
+                                    Margin="0,0,0,6" Padding="12,8">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="BorderBrush" Value="{DynamicResource BorderHoverBrush}" />
+                                                <Setter Property="Background" Value="{DynamicResource BgCardHoverBrush}" />
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" /> <!-- Main compact row -->
+                                        <RowDefinition Height="Auto" /> <!-- Expanded details drawer -->
+                                    </Grid.RowDefinitions>
+
+                                    <!-- Main Row: Checkbox | Toggle | Name + One-line Summary | Badges & Chevron -->
+                                    <Grid Grid.Row="0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" /> <!-- Selection Checkbox -->
+                                            <ColumnDefinition Width="Auto" /> <!-- Toggle Switch -->
+                                            <ColumnDefinition Width="*" />    <!-- Name and one-line summary -->
+                                            <ColumnDefinition Width="Auto" /> <!-- Risk, State badge, and Details button -->
+                                        </Grid.ColumnDefinitions>
+
                                         <!-- Selection Checkbox -->
-                                        <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                        <CheckBox Grid.Column="0" IsChecked="{Binding IsSelected, Mode=TwoWay}"
                                                   AutomationProperties.Name="{Binding Title, StringFormat='Select {0}'}"
                                                   Style="{DynamicResource ModernCheckBox}"
                                                   VerticalAlignment="Center" Margin="0,0,10,0" />
-                                        <!-- Bold Title -->
-                                        <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="14"
-                                                   Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" Margin="0,0,10,0" />
 
-                                        <!-- Reboot Requirement Icon -->
-                                        <Border Background="#450A0A" BorderBrush="#DC2626" BorderThickness="1" CornerRadius="4" Padding="5,2" Margin="0,0,6,0"
-                                                Visibility="{Binding RequiresReboot, Converter={StaticResource BoolToVis}}"
-                                                ToolTip="Requires system reboot to take effect">
-                                            <StackPanel Orientation="Horizontal">
-                                                <ui:SymbolIcon Symbol="ArrowSync24" Foreground="#F87171" FontSize="11" Margin="0,0,3,0" VerticalAlignment="Center" />
-                                                <TextBlock Text="Reboot" FontSize="10" FontWeight="Bold" Foreground="#F87171" VerticalAlignment="Center" />
-                                            </StackPanel>
-                                        </Border>
-
-                                        <!-- Explorer Restart Icon -->
-                                        <Border Background="#1E3A8A" BorderBrush="#3B82F6" BorderThickness="1" CornerRadius="4" Padding="5,2" Margin="0,0,6,0"
-                                                Visibility="{Binding RequiresExplorerRestart, Converter={StaticResource BoolToVis}}"
-                                                ToolTip="Requires Windows Explorer restart to take effect">
-                                            <StackPanel Orientation="Horizontal">
-                                                <ui:SymbolIcon Symbol="ArrowCounterclockwise24" Foreground="#60A5FA" FontSize="11" Margin="0,0,3,0" VerticalAlignment="Center" />
-                                                <TextBlock Text="Explorer" FontSize="10" FontWeight="Bold" Foreground="#60A5FA" VerticalAlignment="Center" />
-                                            </StackPanel>
-                                        </Border>
-                                    </StackPanel>
-
-                                    <!-- Right Badges & Direct 1-Click Toggle -->
-                                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center">
-                                        <!-- Inline Busy Indicator -->
-                                        <ui:ProgressRing Width="16" Height="16" IsIndeterminate="True"
-                                                         Visibility="{Binding IsApplying, Converter={StaticResource BoolToVis}}"
-                                                         Margin="0,0,8,0" VerticalAlignment="Center" />
-
-                                        <!-- Direct 1-Click Toggle Switch -->
-                                        <ui:ToggleSwitch AutomationProperties.AutomationId="{Binding Id, StringFormat='TweakToggle_{0}'}"
+                                        <!-- Direct Toggle Switch -->
+                                        <ui:ToggleSwitch Grid.Column="1"
+                                                         AutomationProperties.AutomationId="{Binding Id, StringFormat='TweakToggle_{0}'}"
                                                          AutomationProperties.Name="{Binding Title, StringFormat='Toggle {0}'}"
                                                          IsChecked="{Binding ToggleCheckedState, Mode=OneWay}"
                                                          IsEnabled="{Binding IsNotApplying}"
                                                          Command="{Binding DataContext.ToggleTweakCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                          CommandParameter="{Binding}"
-                                                         Margin="0,0,10,0" VerticalAlignment="Center" />
+                                                         Margin="0,0,12,0" VerticalAlignment="Center" />
 
-                                        <!-- Real System State Status Badge (Applied / Partial / Not applied / Can't verify) -->
-                                        <Border Background="{Binding StatusBadgeBackground}"
-                                                BorderBrush="{Binding StatusBadgeBorder}"
-                                                BorderThickness="1" CornerRadius="10" Padding="8,3" Margin="0,0,6,0">
-                                            <TextBlock Text="{Binding StatusBadgeText}"
-                                                       Foreground="{Binding StatusBadgeForeground}"
-                                                       FontSize="10" FontWeight="ExtraBold" />
-                                        </Border>
+                                        <!-- Name & One-line Summary (Clickable to expand) -->
+                                        <Button Grid.Column="2" Command="{Binding ToggleExpandCommand}"
+                                                AutomationProperties.Name="{Binding Title, StringFormat='Expand details for {0}'}"
+                                                Style="{DynamicResource ModernGhostBtn}"
+                                                HorizontalContentAlignment="Left" VerticalContentAlignment="Center"
+                                                Padding="0" Margin="0" Background="Transparent" BorderThickness="0">
+                                            <StackPanel VerticalAlignment="Center">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="13"
+                                                               Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" Margin="0,0,8,0" />
 
-                                        <!-- Risk Color Chip (Safe green / Low blue / Medium amber / High red) -->
-                                        <Border Background="{Binding RiskBadgeBackground}"
-                                                BorderBrush="{Binding RiskBadgeBorder}"
-                                                BorderThickness="1" CornerRadius="10" Padding="8,3">
-                                            <TextBlock Text="{Binding Risk}"
-                                                       Foreground="{Binding RiskBadgeForeground}"
-                                                       FontSize="10" FontWeight="Bold" />
-                                        </Border>
-                                    </StackPanel>
-                                </DockPanel>
+                                                    <!-- Reboot badge icon if needed -->
+                                                    <Border Background="{DynamicResource RiskCautionBgBrush}" CornerRadius="3" Padding="4,1" Margin="0,0,6,0"
+                                                            Visibility="{Binding RequiresReboot, Converter={StaticResource BoolToVis}}" VerticalAlignment="Center">
+                                                        <TextBlock Text="Reboot" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource RiskCautionFgBrush}" />
+                                                    </Border>
 
-                                <!-- Clean Wrap-enabled Description -->
-                                <TextBlock Grid.Row="1" Text="{Binding Description}"
-                                           Foreground="{DynamicResource TextSecondaryBrush}"
-                                           FontSize="12" LineHeight="18" TextWrapping="Wrap"
-                                           Margin="28,6,0,0" />
+                                                    <!-- Explorer restart badge icon if needed -->
+                                                    <Border Background="{DynamicResource RiskLowBgBrush}" CornerRadius="3" Padding="4,1" Margin="0,0,6,0"
+                                                            Visibility="{Binding RequiresExplorerRestart, Converter={StaticResource BoolToVis}}" VerticalAlignment="Center">
+                                                        <TextBlock Text="Explorer" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource RiskLowFgBrush}" />
+                                                    </Border>
+                                                </StackPanel>
 
-                                <!-- Warning Notice Box (if applicable) -->
-                                <Border Grid.Row="2" Background="{DynamicResource RiskModerateBgBrush}"
-                                        BorderBrush="{DynamicResource RiskModerateFgBrush}"
-                                        BorderThickness="1" CornerRadius="4" Padding="8,5" Margin="28,8,0,0"
-                                        Visibility="{Binding HasWarning, Converter={StaticResource BoolToVis}}">
-                                    <TextBlock Text="{Binding Warnings, StringFormat='⚠️ {0}'}"
-                                               Foreground="{DynamicResource RiskModerateFgBrush}"
-                                               FontSize="11" TextWrapping="Wrap" />
-                                </Border>
-
-                                <!-- Effect Note (if applicable) -->
-                                <Border Grid.Row="3" Background="{DynamicResource StatusDefaultBgBrush}"
-                                        BorderBrush="{DynamicResource BorderSubtleBrush}"
-                                        BorderThickness="1" CornerRadius="4" Padding="8,5" Margin="28,6,0,0"
-                                        Visibility="{Binding HasEffectNote, Converter={StaticResource BoolToVis}}">
-                                    <TextBlock Text="{Binding EffectNote, StringFormat='ℹ️ {0}'}"
-                                               Foreground="{DynamicResource TextSecondaryBrush}"
-                                               FontSize="11" TextWrapping="Wrap" />
-                                </Border>
-
-                                <!-- Metadata / Category / Reboot Tags Footer & Details Toggle -->
-                                <DockPanel Grid.Row="4" Margin="28,8,0,0" LastChildFill="False">
-                                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" VerticalAlignment="Center">
-                                        <!-- ID Badge -->
-                                        <Border Background="{DynamicResource BgDeepBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
-                                                BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,6,0">
-                                            <TextBlock Text="{Binding Id}" FontSize="10" FontFamily="Consolas, Cascadia Code, Courier New"
-                                                       Foreground="{DynamicResource TextMutedBrush}" />
-                                        </Border>
-
-                                        <!-- Category Group Badge -->
-                                        <Border Background="{DynamicResource BgDeepBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
-                                                BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,6,0">
-                                            <TextBlock Text="{Binding CategoryGroup}" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}" />
-                                        </Border>
-
-                                        <!-- Evidence Badge -->
-                                        <Border Background="#1E293B" CornerRadius="4" Padding="6,2" Margin="0,0,6,0">
-                                            <TextBlock Text="{Binding Evidence}" FontSize="10" Foreground="#94A3B8" />
-                                        </Border>
-
-                                        <!-- Needs Review Badge -->
-                                        <Border Background="#451A03" BorderBrush="#D97706" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,6,0"
-                                                Visibility="{Binding NeedsReview, Converter={StaticResource BoolToVis}}">
-                                            <TextBlock Text="NEEDS REVIEW ⚠️" FontSize="10" FontWeight="Bold" Foreground="#FBBF24" />
-                                        </Border>
-
-                                        <!-- Reboot Requirement Badge -->
-                                        <Border Background="{DynamicResource RiskCautionBgBrush}" CornerRadius="4" Padding="6,2" Margin="0,0,6,0"
-                                                Visibility="{Binding RequiresReboot, Converter={StaticResource BoolToVis}}">
-                                            <TextBlock Text="Reboot Required" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource RiskCautionFgBrush}" />
-                                        </Border>
-
-                                        <!-- Explorer Restart Badge -->
-                                        <Border Background="#1E3A8A" CornerRadius="4" Padding="6,2"
-                                                Visibility="{Binding RequiresExplorerRestart, Converter={StaticResource BoolToVis}}">
-                                            <TextBlock Text="Explorer Restart" FontSize="10" FontWeight="SemiBold" Foreground="#60A5FA" />
-                                        </Border>
-                                    </StackPanel>
-
-                                    <!-- Details Toggle Button -->
-                                    <Button DockPanel.Dock="Right"
-                                            AutomationProperties.AutomationId="{Binding Id, StringFormat='DetailsButton_{0}'}"
-                                            AutomationProperties.Name="{Binding Name, StringFormat='Details for {0}'}"
-                                            Command="{Binding ToggleExpandCommand}"
-                                            Style="{DynamicResource ModernGhostBtn}"
-                                            Padding="8,2" VerticalAlignment="Center">
-                                        <TextBlock FontSize="11" Foreground="#60A5FA">
-                                            <TextBlock.Style>
-                                                <Style TargetType="TextBlock">
-                                                    <Setter Property="Text" Value="Details ▾" />
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding IsExpanded}" Value="True">
-                                                            <Setter Property="Text" Value="Hide Details ▴" />
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </TextBlock.Style>
-                                        </TextBlock>
-                                    </Button>
-                                </DockPanel>
-
-                                <!-- Expandable Info Drawer (O&O ShutUp10++ style) -->
-                                <Border Grid.Row="5"
-                                        Background="#111827"
-                                        BorderBrush="#1F2937"
-                                        BorderThickness="1"
-                                        CornerRadius="6"
-                                        Padding="14,12"
-                                        Margin="28,10,0,0"
-                                        Visibility="{Binding IsExpanded, Converter={StaticResource BoolToVis}}">
-                                    <StackPanel>
-                                        <!-- What It Does Section -->
-                                        <StackPanel Margin="0,0,0,8">
-                                            <TextBlock Text="WHAT IT DOES" FontSize="10" FontWeight="Bold" Foreground="#94A3B8" Margin="0,0,0,3" />
-                                            <TextBlock Text="{Binding WhatItDoes}" FontSize="12" Foreground="{DynamicResource TextPrimaryBrush}" LineHeight="17" TextWrapping="Wrap" />
-                                        </StackPanel>
-
-                                        <!-- Side Effects Section -->
-                                        <StackPanel Margin="0,0,0,8">
-                                            <TextBlock Text="SIDE EFFECTS / POTENTIAL IMPACT" FontSize="10" FontWeight="Bold" Foreground="#F59E0B" Margin="0,0,0,3" />
-                                            <TextBlock Text="{Binding SideEffects}" FontSize="12" Foreground="#E2E8F0" LineHeight="17" TextWrapping="Wrap" />
-                                        </StackPanel>
-
-                                        <!-- Where to find this in Windows (for UI-equivalent settings) -->
-                                        <Border Background="#064E3B" BorderBrush="#059669" BorderThickness="1" CornerRadius="4" Padding="8,6" Margin="0,0,0,8"
-                                                Visibility="{Binding HasUiEquivalentLocation, Converter={StaticResource BoolToVis}}">
-                                            <StackPanel Orientation="Horizontal">
-                                                <TextBlock Text="⚙️ WHERE TO FIND THIS IN WINDOWS: " FontSize="10" FontWeight="Bold" Foreground="#34D399" VerticalAlignment="Center" />
-                                                <TextBlock Text="{Binding UiEquivalentLocation}" FontSize="11" Foreground="#A7F3D0" TextWrapping="Wrap" VerticalAlignment="Center" />
+                                                <!-- One-line summary (trimmed with ellipsis, clean text) -->
+                                                <TextBlock Text="{Binding Description}"
+                                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                                           FontSize="12" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" Margin="0,2,0,0" />
                                             </StackPanel>
-                                        </Border>
+                                        </Button>
 
-                                        <!-- Exact Changes Section -->
-                                        <StackPanel Margin="0,0,0,8" Visibility="{Binding HasExactChanges, Converter={StaticResource BoolToVis}}">
-                                            <TextBlock Text="EXACT CHANGES (ENGINE SPECIFICATION)" FontSize="10" FontWeight="Bold" Foreground="#38BDF8" Margin="0,0,0,3" />
-                                            <ItemsControl ItemsSource="{Binding ExactChanges}">
-                                                <ItemsControl.ItemTemplate>
-                                                    <DataTemplate>
-                                                        <TextBlock Text="{Binding StringFormat='• {0}'}"
-                                                                   FontFamily="Consolas, Cascadia Code, monospace"
-                                                                   FontSize="11" Foreground="#CBD5E1" LineHeight="16" TextWrapping="Wrap" Margin="0,1,0,1" />
-                                                    </DataTemplate>
-                                                </ItemsControl.ItemTemplate>
-                                            </ItemsControl>
-                                        </StackPanel>
+                                        <!-- Badges & Chevron -->
+                                        <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center" Margin="12,0,0,0">
+                                            <!-- Inline applying spinner -->
+                                            <ui:ProgressRing Width="14" Height="14" IsIndeterminate="True"
+                                                             Visibility="{Binding IsApplying, Converter={StaticResource BoolToVis}}"
+                                                             Margin="0,0,8,0" VerticalAlignment="Center" />
 
-                                        <!-- Needs Review Warning Notice (if applicable) -->
-                                        <Border Background="#451A03" BorderBrush="#D97706" BorderThickness="1" CornerRadius="4" Padding="8,6" Margin="0,0,0,8"
-                                                Visibility="{Binding NeedsReview, Converter={StaticResource BoolToVis}}">
-                                            <TextBlock Text="⚠️ NEEDS REVIEW: The exact behavior or real-world benefit of this tweak requires further validation. Excluded from automated presets."
-                                                       FontSize="11" Foreground="#FBBF24" TextWrapping="Wrap" />
-                                        </Border>
-
-                                        <!-- Sources / Documentation Links -->
-                                        <StackPanel Visibility="{Binding HasSources, Converter={StaticResource BoolToVis}}">
-                                            <TextBlock Text="DOCUMENTATION &amp; SOURCES" FontSize="10" FontWeight="Bold" Foreground="#94A3B8" Margin="0,0,0,4" />
-                                            <!-- Verified Source Quote (if documented) -->
-                                            <Border Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="4" Padding="8,6" Margin="0,0,0,6"
-                                                    Visibility="{Binding HasSourceQuote, Converter={StaticResource BoolToVis}}">
-                                                <TextBlock Text="{Binding SourceQuote, StringFormat='&quot;{0}&quot;'}"
-                                                           FontSize="11" FontStyle="Italic" Foreground="#94A3B8" LineHeight="16" TextWrapping="Wrap" />
+                                            <!-- Risk Chip -->
+                                            <Border Background="{Binding RiskBadgeBackground}"
+                                                    BorderBrush="{Binding RiskBadgeBorder}"
+                                                    BorderThickness="1" CornerRadius="10" Padding="8,2" Margin="0,0,6,0"
+                                                    VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding Risk}"
+                                                           Foreground="{Binding RiskBadgeForeground}"
+                                                           FontSize="10" FontWeight="Bold" />
                                             </Border>
-                                            <ItemsControl ItemsSource="{Binding Sources}">
-                                                <ItemsControl.ItemTemplate>
-                                                    <DataTemplate>
-                                                        <Button Command="{Binding DataContext.OpenUrlCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                                                CommandParameter="{Binding}"
-                                                                AutomationProperties.Name="{Binding Url, StringFormat='Open documentation source {0}'}"
-                                                                Style="{DynamicResource ModernGhostBtn}"
-                                                                HorizontalAlignment="Left"
-                                                                Padding="0,2" Margin="0,1,0,1">
-                                                            <TextBlock Text="{Binding StringFormat='🔗 {0}'}"
-                                                                       FontSize="11" Foreground="#60A5FA" TextDecorations="Underline" />
-                                                        </Button>
-                                                    </DataTemplate>
-                                                </ItemsControl.ItemTemplate>
-                                            </ItemsControl>
+
+                                            <!-- State Badge -->
+                                            <Border Background="{Binding StatusBadgeBackground}"
+                                                    BorderBrush="{Binding StatusBadgeBorder}"
+                                                    BorderThickness="1" CornerRadius="10" Padding="8,2" Margin="0,0,8,0"
+                                                    VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding StatusBadgeText}"
+                                                           Foreground="{Binding StatusBadgeForeground}"
+                                                           FontSize="10" FontWeight="SemiBold" />
+                                            </Border>
+
+                                            <!-- Expand / Collapse Button -->
+                                            <Button AutomationProperties.AutomationId="{Binding Id, StringFormat='DetailsButton_{0}'}"
+                                                    AutomationProperties.Name="{Binding Title, StringFormat='Details for {0}'}"
+                                                    Command="{Binding ToggleExpandCommand}"
+                                                    Style="{DynamicResource ModernGhostBtn}"
+                                                    Padding="6,3" VerticalAlignment="Center">
+                                                <TextBlock FontSize="12" Foreground="{DynamicResource TextMutedBrush}">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Setter Property="Text" Value="▾" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsExpanded}" Value="True">
+                                                                    <Setter Property="Text" Value="▴" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                            </Button>
                                         </StackPanel>
-                                    </StackPanel>
-                                </Border>
-                            </Grid>
-                        </Border>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </ScrollViewer>
+                                    </Grid>
+
+                                    <!-- Expanded Details Drawer (Only visible when IsExpanded is true) -->
+                                    <Border Grid.Row="1"
+                                            Background="{DynamicResource BgDeepBrush}"
+                                            BorderBrush="{DynamicResource BorderSubtleBrush}"
+                                            BorderThickness="1" CornerRadius="6"
+                                            Padding="14,12" Margin="32,8,0,0"
+                                            Visibility="{Binding IsExpanded, Converter={StaticResource BoolToVis}}">
+                                        <StackPanel>
+                                            <!-- What It Does Section -->
+                                            <StackPanel Margin="0,0,0,8">
+                                                <TextBlock Text="WHAT IT DOES" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,3" />
+                                                <TextBlock Text="{Binding WhatItDoes}" FontSize="12" Foreground="{DynamicResource TextPrimaryBrush}" LineHeight="17" TextWrapping="Wrap" />
+                                            </StackPanel>
+
+                                            <!-- Side Effects Section -->
+                                            <StackPanel Margin="0,0,0,8">
+                                                <TextBlock Text="SIDE EFFECTS / POTENTIAL IMPACT" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource RiskModerateFgBrush}" Margin="0,0,0,3" />
+                                                <TextBlock Text="{Binding SideEffects}" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" LineHeight="17" TextWrapping="Wrap" />
+                                            </StackPanel>
+
+                                            <!-- Warning notice if any -->
+                                            <Border Background="{DynamicResource RiskModerateBgBrush}" BorderBrush="{DynamicResource RiskModerateFgBrush}"
+                                                    BorderThickness="1" CornerRadius="4" Padding="8,5" Margin="0,0,0,8"
+                                                    Visibility="{Binding HasWarning, Converter={StaticResource BoolToVis}}">
+                                                <TextBlock Text="{Binding Warnings, StringFormat='⚠️ {0}'}" Foreground="{DynamicResource RiskModerateFgBrush}" FontSize="11" TextWrapping="Wrap" />
+                                            </Border>
+
+                                            <!-- Where to find this in Windows -->
+                                            <Border Background="{DynamicResource RiskSafeBgBrush}" BorderBrush="{DynamicResource RiskSafeFgBrush}"
+                                                    BorderThickness="1" CornerRadius="4" Padding="8,6" Margin="0,0,0,8"
+                                                    Visibility="{Binding HasUiEquivalentLocation, Converter={StaticResource BoolToVis}}">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="⚙️ WHERE TO FIND THIS IN WINDOWS: " FontSize="10" FontWeight="Bold" Foreground="{DynamicResource RiskSafeFgBrush}" VerticalAlignment="Center" />
+                                                    <TextBlock Text="{Binding UiEquivalentLocation}" FontSize="11" Foreground="{DynamicResource TextPrimaryBrush}" TextWrapping="Wrap" VerticalAlignment="Center" />
+                                                </StackPanel>
+                                            </Border>
+
+                                            <!-- Exact Changes (Registry paths, values, policies) -->
+                                            <StackPanel Margin="0,0,0,8" Visibility="{Binding HasExactChanges, Converter={StaticResource BoolToVis}}">
+                                                <TextBlock Text="EXACT CHANGES" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" Margin="0,0,0,3" />
+                                                <ItemsControl ItemsSource="{Binding ExactChanges}">
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <TextBlock Text="{Binding StringFormat='• {0}'}"
+                                                                       FontFamily="Consolas, Cascadia Code, monospace"
+                                                                       FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" LineHeight="16" TextWrapping="Wrap" Margin="0,1,0,1" />
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </StackPanel>
+
+                                            <!-- Sources & Documentation -->
+                                            <StackPanel Visibility="{Binding HasSources, Converter={StaticResource BoolToVis}}">
+                                                <TextBlock Text="DOCUMENTATION &amp; SOURCES" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,4" />
+                                                <Border Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
+                                                        BorderThickness="1" CornerRadius="4" Padding="8,6" Margin="0,0,0,6"
+                                                        Visibility="{Binding HasSourceQuote, Converter={StaticResource BoolToVis}}">
+                                                    <TextBlock Text="{Binding SourceQuote, StringFormat='&quot;{0}&quot;'}"
+                                                               FontSize="11" FontStyle="Italic" Foreground="{DynamicResource TextSecondaryBrush}" LineHeight="16" TextWrapping="Wrap" />
+                                                </Border>
+                                                <ItemsControl ItemsSource="{Binding Sources}">
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <Button Command="{Binding DataContext.OpenUrlCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                                    CommandParameter="{Binding}"
+                                                                    AutomationProperties.Name="{Binding StringFormat='Open documentation source {0}'}"
+                                                                    Style="{DynamicResource ModernGhostBtn}"
+                                                                    HorizontalAlignment="Left"
+                                                                    Padding="0,2" Margin="0,1,0,1">
+                                                                <TextBlock Text="{Binding StringFormat='🔗 {0}'}" FontSize="11" Foreground="{DynamicResource AccentBrush}" TextDecorations="Underline" />
+                                                            </Button>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Border>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+
+            <!-- Sticky Selection Footer -->
+            <Border Grid.Row="2" Background="{DynamicResource BgCardBrush}"
+                    BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="0,1,0,0"
+                    Padding="16,10"
+                    Visibility="{Binding HasSelection, Converter={StaticResource BoolToVis}}">
+                <DockPanel LastChildFill="False">
+                    <!-- Left: Selected Count Text -->
+                    <TextBlock DockPanel.Dock="Left" Text="{Binding SelectionStatusText}"
+                               FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"
+                               VerticalAlignment="Center" />
+
+                    <!-- Right: Action Buttons -->
+                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center">
+                        <ui:Button Appearance="Primary" Command="{Binding ReviewAndApplySelectedCommand}"
+                                   AutomationProperties.Name="Review and apply selected tweaks"
+                                   Content="Review &amp; apply" Margin="0,0,8,0" />
+
+                        <ui:Button Appearance="Secondary" Command="{Binding UndoSelectedTweaksCommand}"
+                                   AutomationProperties.Name="Undo selected tweaks"
+                                   Content="Undo selected" Margin="0,0,8,0" />
+
+                        <Button Style="{DynamicResource ModernGhostBtn}" Command="{Binding ClearSelectionCommand}"
+                                AutomationProperties.Name="Clear selection"
+                                Content="Clear" Padding="8,4" VerticalAlignment="Center" />
+                    </StackPanel>
+                </DockPanel>
+            </Border>
+        </Grid>
 
         <!-- TOAST NOTIFICATION OVERLAY (Safe / Low instant apply + Undo) -->
-        <Border Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+        <Border Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Right" VerticalAlignment="Bottom"
                 Margin="0,0,32,24"
-                Background="#1E293B" BorderBrush="#3B82F6" BorderThickness="1"
+                Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="1"
                 CornerRadius="8" Padding="16,12"
                 Panel.ZIndex="1500"
                 Visibility="{Binding IsToastVisible, Converter={StaticResource BoolToVis}}">
@@ -368,7 +392,7 @@
                 <DropShadowEffect BlurRadius="16" ShadowDepth="4" Direction="270" Color="#000000" Opacity="0.5" />
             </Border.Effect>
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                <ui:SymbolIcon Symbol="CheckmarkCircle24" Foreground="#34D399" FontSize="18" Margin="0,0,10,0" VerticalAlignment="Center" />
+                <ui:SymbolIcon Symbol="CheckmarkCircle24" Foreground="{DynamicResource RiskSafeFgBrush}" FontSize="18" Margin="0,0,10,0" VerticalAlignment="Center" />
                 <TextBlock Text="{Binding ToastMessage}" FontSize="13" FontWeight="SemiBold"
                            Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" Margin="0,0,16,0" />
                 <ui:Button AutomationProperties.AutomationId="ToastUndoButton"
@@ -384,7 +408,7 @@
         </Border>
 
         <!-- EXECUTION DETAILS DIALOG OVERLAY -->
-        <Grid Grid.Row="0" Grid.RowSpan="2" Background="#80000000"
+        <Grid Grid.Column="0" Grid.ColumnSpan="2" Background="#80000000"
               Visibility="{Binding IsDetailsDialogOpen, Converter={StaticResource BoolToVis}}"
               Panel.ZIndex="2000">
             <Border Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
@@ -408,7 +432,7 @@
                         <ItemsControl ItemsSource="{Binding ExecutionDetailsItems}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Border Background="#1E2433" BorderBrush="#334155" BorderThickness="1"
+                                    <Border Background="{DynamicResource BgDeepBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="1"
                                             CornerRadius="6" Padding="12,10" Margin="0,0,0,8">
                                         <Grid>
                                             <Grid.RowDefinitions>
@@ -424,7 +448,7 @@
                                                     <TextBlock Text="{Binding Id, StringFormat=' ({0})'}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" />
                                                 </StackPanel>
                                             </DockPanel>
-                                            <TextBlock Grid.Row="1" Text="{Binding Reason}" FontSize="11" Foreground="#EF4444"
+                                            <TextBlock Grid.Row="1" Text="{Binding Reason}" FontSize="11" Foreground="{DynamicResource RiskHighFgBrush}"
                                                        TextWrapping="Wrap" Margin="0,6,0,0" FontFamily="Consolas, Cascadia Code, Courier New" />
                                         </Grid>
                                     </Border>
@@ -443,11 +467,11 @@
         </Grid>
 
         <!-- IRREVERSIBLE TWEAK WARNING MODAL -->
-        <Grid Grid.Row="0" Grid.RowSpan="2" Background="#80000000"
+        <Grid Grid.Column="0" Grid.ColumnSpan="2" Background="#80000000"
               Visibility="{Binding IsIrreversibleDialogOpen, Converter={StaticResource BoolToVis}}"
               Panel.ZIndex="2100">
             <Border Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
-                    BorderBrush="#EF4444"
+                    BorderBrush="{DynamicResource RiskHighFgBrush}"
                     BorderThickness="1" CornerRadius="10"
                     Width="650" MaxHeight="520" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <Grid Margin="20">
@@ -460,8 +484,8 @@
                     
                     <DockPanel Grid.Row="0" Margin="0,0,0,8">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="⚠" FontSize="18" Foreground="#EF4444" Margin="0,0,8,0" VerticalAlignment="Center" />
-                            <TextBlock Text="{Binding IrreversibleDialogTitle}" FontSize="16" FontWeight="Bold" Foreground="#EF4444" VerticalAlignment="Center" />
+                            <TextBlock Text="⚠" FontSize="18" Foreground="{DynamicResource RiskHighFgBrush}" Margin="0,0,8,0" VerticalAlignment="Center" />
+                            <TextBlock Text="{Binding IrreversibleDialogTitle}" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource RiskHighFgBrush}" VerticalAlignment="Center" />
                         </StackPanel>
                         <Button DockPanel.Dock="Right" Content="✕" Style="{DynamicResource ModernGhostBtn}"
                                 AutomationProperties.Name="Cancel irreversible warning"
@@ -475,12 +499,12 @@
                         <ItemsControl ItemsSource="{Binding IrreversibleWarningItems}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Border Background="#1E1E24" BorderBrush="#DC2626" BorderThickness="1"
+                                    <Border Background="{DynamicResource BgDeepBrush}" BorderBrush="{DynamicResource RiskHighFgBrush}" BorderThickness="1"
                                             CornerRadius="6" Padding="12,10" Margin="0,0,0,8">
                                         <StackPanel>
-                                            <TextBlock Text="{Binding Name}" FontSize="13" FontWeight="Bold" Foreground="#FCA5A5" />
-                                            <TextBlock Text="{Binding Id, StringFormat='ID: {0}'}" FontSize="11" Foreground="#94A3B8" Margin="0,2,0,4" />
-                                            <TextBlock Text="{Binding Reason}" FontSize="12" Foreground="#F87171" TextWrapping="Wrap" />
+                                            <TextBlock Text="{Binding Name}" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource RiskHighFgBrush}" />
+                                            <TextBlock Text="{Binding Id, StringFormat='ID: {0}'}" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" Margin="0,2,0,4" />
+                                            <TextBlock Text="{Binding Reason}" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" />
                                         </StackPanel>
                                     </Border>
                                 </DataTemplate>

@@ -323,7 +323,12 @@ public sealed partial class TweaksViewModel : ObservableObject
     private string _selectedCategory = "All";
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasSelection))]
+    [NotifyPropertyChangedFor(nameof(SelectionStatusText))]
     private int _selectedCount;
+
+    public bool HasSelection => SelectedCount > 0;
+    public string SelectionStatusText => $"{SelectedCount} selected — Review & apply";
 
     [ObservableProperty]
     private int _appliedCount;
@@ -1030,6 +1035,71 @@ public sealed partial class TweaksViewModel : ObservableObject
         UpdateCounts();
         StatusMessage = "Selection cleared.";
         AddLog("INFO", "Cleared all selected tweaks.");
+    }
+
+    [RelayCommand]
+    public async Task ReviewAndApplySelectedAsync()
+    {
+        var selected = _allTweaks.Where(t => t.IsSelected).ToList();
+        if (selected.Count == 0)
+        {
+            StatusMessage = "No tweaks selected to apply.";
+            return;
+        }
+
+        if (!IsDryRun && !AppAdminGuard.EnsureAdmin("apply system tweaks"))
+        {
+            StatusMessage = "Administrator privileges required to apply tweaks.";
+            AddLog("ERR", "Cannot apply tweaks: Administrator privileges are required.");
+            return;
+        }
+
+        if (_executionDialog != null)
+        {
+            var tweakDefs = selected.Select(c => c.Tweak).ToList();
+            await _executionDialog.OpenPreviewAsync(
+                title: "Review & Apply Selected Tweaks",
+                description: $"Review {selected.Count} tweak(s) before applying changes to the system.",
+                notice: "Review the planned modifications below. You can uncheck individual items before confirming.",
+                confirmText: "Apply Selected",
+                tweaks: tweakDefs,
+                isUndo: false,
+                onConfirmed: async (confirmedTweaks) =>
+                {
+                    IsBusy = true;
+                    try
+                    {
+                        var rep = await Task.Run(() => _tweakService.ApplyTweaksAsync(confirmedTweaks, _runner));
+                        _ = WindowsSettingNotifier.NotifySettingsChangedAsync();
+
+                        var succeededIds = new HashSet<string>(
+                            rep.Results.Where(r => r.Status is OperationItemStatus.Succeeded or OperationItemStatus.Applied)
+                                          .Select(r => r.Id),
+                            StringComparer.OrdinalIgnoreCase);
+
+                        foreach (var card in _allTweaks)
+                        {
+                            if (succeededIds.Contains(card.Id) || succeededIds.Contains(card.Tweak.Id) || (card.Tweak.Origin != null && succeededIds.Contains(card.Tweak.Origin)))
+                            {
+                                card.IsActive = true;
+                            }
+                        }
+                        UpdateCounts();
+
+                        ServicingHealthReport? health = null;
+                        try { health = await _tweakService.CheckServicingHealthAsync(); } catch { }
+                        _executionDialog.ShowResult(confirmedTweaks, rep, health, isUndo: false);
+                    }
+                    finally
+                    {
+                        IsBusy = false;
+                    }
+                });
+        }
+        else
+        {
+            await ApplySelectedTweaksAsync();
+        }
     }
 
     [RelayCommand]
