@@ -145,23 +145,23 @@
 
                                 <!-- App Name, Category & State Badge -->
                                 <StackPanel Grid.Column="2" VerticalAlignment="Center">
-                                    <DockPanel LastChildFill="False">
-                                        <TextBlock DockPanel.Dock="Left" Text="{Binding Name}" FontWeight="SemiBold" FontSize="13"
-                                                   Foreground="{DynamicResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis" MaxWidth="140" />
+                                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="13"
+                                               Foreground="{DynamicResource TextPrimaryBrush}"
+                                               ToolTip="{Binding Name}" TextWrapping="Wrap" Margin="0,0,0,4" />
 
+                                    <WrapPanel Orientation="Horizontal" VerticalAlignment="Center">
                                         <!-- State Badge: Installed / Not installed / Update available -->
-                                        <Border DockPanel.Dock="Right"
-                                                Background="{Binding StateBadgeBackground}"
+                                        <Border Background="{Binding StateBadgeBackground}"
                                                 BorderBrush="{Binding StateBadgeBorder}"
                                                 BorderThickness="1"
-                                                CornerRadius="8" Padding="6,2" Margin="6,0,0,0" VerticalAlignment="Center">
+                                                CornerRadius="8" Padding="6,2" Margin="0,0,8,0" VerticalAlignment="Center">
                                             <TextBlock Text="{Binding StateText}" FontSize="9" FontWeight="Bold"
                                                        Foreground="{Binding StateBadgeForeground}" />
                                         </Border>
-                                    </DockPanel>
 
-                                    <TextBlock Text="{Binding Category}" FontSize="11"
-                                               Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0" />
+                                        <TextBlock Text="{Binding Category}" FontSize="11"
+                                                   Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" />
+                                    </WrapPanel>
                                 </StackPanel>
 
                                 <!-- Official Website Link Button -->
