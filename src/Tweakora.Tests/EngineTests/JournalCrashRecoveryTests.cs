@@ -239,7 +239,9 @@ public sealed class JournalCrashRecoveryTests : IDisposable
         {
             SessionId = DateTime.UtcNow.ToString("yyyyMMdd_HHmmss_") + "sess2",
             StartedAtUtc = DateTime.UtcNow,
-            IsCompleted = false
+            IsCompleted = false,
+            Mode = "real",
+            AppVersion = "0.9.0-beta"
         };
         s2.Records.Add(new JournalActionRecord
         {

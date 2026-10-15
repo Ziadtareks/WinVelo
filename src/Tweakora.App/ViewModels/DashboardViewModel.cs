@@ -743,7 +743,8 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
                 if (health.IsHealthy)
                 {
                     ServicingHealthShortStatus = "All OK";
-                    ServicingHealthDetails = "Windows Update, BITS, Microsoft Store, and Defender are operational.";
+                    ServicingHealthDetails = "Normal — Windows Update, BITS, Microsoft Store, and Defender are operational.";
+                    ServicingHealthSummary = "Normal — Windows Update, BITS, Microsoft Store, and Defender are operational.";
                 }
                 else
                 {
@@ -752,8 +753,8 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
                     ServicingHealthDetails = health.Warnings != null && health.Warnings.Count > 0
                         ? string.Join("\n", health.Warnings)
                         : health.SummaryText;
+                    ServicingHealthSummary = health.SummaryText;
                 }
-                ServicingHealthSummary = ServicingHealthShortStatus;
                 ServicingHealthBadgeBg = health.IsHealthy ? "#064E3B" : "#78350F";
                 ServicingHealthBadgeFg = health.IsHealthy ? "#10B981" : "#FBBF24";
 
