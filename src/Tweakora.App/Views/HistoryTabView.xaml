@@ -318,6 +318,7 @@
                                 Command="{Binding CloseExportDialogCommand}" />
                     </DockPanel>
                     <TextBox Grid.Row="1" Text="{Binding ExportedLogContent}"
+                             AutomationProperties.Name="Exported Log Content Text"
                              IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"
                              Background="{DynamicResource BgDeepBrush}" Foreground="{DynamicResource TextPrimaryBrush}"
                              BorderBrush="{DynamicResource BorderSubtleBrush}" FontFamily="Consolas, Cascadia Code" FontSize="11" Padding="10" />

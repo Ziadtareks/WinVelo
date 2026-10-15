@@ -97,7 +97,6 @@ public sealed partial class MainViewModel : ObservableObject
     public UpdatesViewModel UpdatesVM { get; }
     public ToolboxViewModel ToolboxVM { get; }
     public StartupViewModel StartupVM { get; }
-    public BackupsViewModel BackupsVM { get; }
     public ToolsViewModel ToolsVM { get; }
     public HistoryViewModel HistoryVM { get; }
     public FirstRunWizardViewModel WizardVM { get; }
@@ -123,7 +122,6 @@ public sealed partial class MainViewModel : ObservableObject
         UpdatesViewModel updatesVM,
         ToolboxViewModel toolboxVM,
         StartupViewModel startupVM,
-        BackupsViewModel backupsVM,
         ToolsViewModel? toolsVM = null,
         HistoryViewModel? historyVM = null,
         IActivityTracker? activityTracker = null,
@@ -140,7 +138,6 @@ public sealed partial class MainViewModel : ObservableObject
         UpdatesVM = updatesVM;
         ToolboxVM = toolboxVM;
         StartupVM = startupVM;
-        BackupsVM = backupsVM;
         _activityTracker = activityTracker;
         _tweakService = tweakService;
 

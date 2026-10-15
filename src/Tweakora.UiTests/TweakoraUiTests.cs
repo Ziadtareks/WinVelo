@@ -49,14 +49,25 @@ public sealed partial class TweakoraUiTests
         if (element.Patterns.Invoke.IsSupported)
         {
             element.Patterns.Invoke.Pattern.Invoke();
+            return;
         }
-        else if (element.Patterns.Toggle.IsSupported)
+        if (element.Patterns.Toggle.IsSupported)
         {
             element.Patterns.Toggle.Pattern.Toggle();
+            return;
         }
-        else
+        if (element.Patterns.SelectionItem.IsSupported)
+        {
+            element.Patterns.SelectionItem.Pattern.Select();
+            return;
+        }
+        try
         {
             element.Click();
+        }
+        catch (System.ComponentModel.Win32Exception)
+        {
+            // Fallback if desktop input injection is restricted by UIPI
         }
     }
 
@@ -186,16 +197,24 @@ public sealed partial class TweakoraUiTests
 
             // Verify admin status tile / badge
             var adminStatus = window.FindFirstDescendant(cf => cf.ByAutomationId("AdminStatusBadge"))
-                           ?? window.FindFirstDescendant(cf => cf.ByName("Administrator Status"));
+                           ?? window.FindFirstDescendant(cf => cf.ByName("Administrator Status"))
+                           ?? window.FindFirstDescendant(cf => cf.ByName("Admin (Full Privileges)"))
+                           ?? window.FindFirstDescendant(cf => cf.ByName("Standard User (Elevation Recommended)"));
             Assert.NotNull(adminStatus);
 
             // Verify System Restore card
-            var restoreCard = window.FindFirstDescendant(cf => cf.ByName("System Restore"));
+            var restoreCard = window.FindFirstDescendant(cf => cf.ByAutomationId("SystemRestoreCard"))
+                           ?? window.FindFirstDescendant(cf => cf.ByAutomationId("SystemRestoreHeader"))
+                           ?? window.FindFirstDescendant(cf => cf.ByName("System Restore"))
+                           ?? window.FindFirstDescendant(cf => cf.ByName("SYSTEM RESTORE"));
             Assert.NotNull(restoreCard);
 
             // Verify Presets section exists
-            var gamingPreset = window.FindFirstDescendant(cf => cf.ByAutomationId("PresetCard_Gaming"))
-                            ?? window.FindFirstDescendant(cf => cf.ByName("Gaming"));
+            var gamingPreset = window.FindFirstDescendant(cf => cf.ByAutomationId("PresetCard_preset.gaming"))
+                            ?? window.FindFirstDescendant(cf => cf.ByAutomationId("ProfileBtn_preset.gaming"))
+                            ?? window.FindFirstDescendant(cf => cf.ByAutomationId("PresetCard_Gaming"))
+                            ?? window.FindFirstDescendant(cf => cf.ByName("Gaming"))
+                            ?? window.FindFirstDescendant(cf => cf.ByName("Apply Gaming Profile"));
             Assert.NotNull(gamingPreset);
         }
         finally
@@ -226,6 +245,7 @@ public sealed partial class TweakoraUiTests
 
             // Verify Recommended Only toggle exists
             var recToggle = window.FindFirstDescendant(cf => cf.ByAutomationId("RecommendedOnlyToggle"))
+                         ?? window.FindFirstDescendant(cf => cf.ByName("Recommended only"))
                          ?? window.FindFirstDescendant(cf => cf.ByName("Recommended tweaks only"));
             Assert.NotNull(recToggle);
         }
@@ -269,14 +289,16 @@ public sealed partial class TweakoraUiTests
             AssertNoErrorDialogs(app, automation);
 
             // Check subtool buttons in Tools toolbar
-            var startupTool = window.FindFirstDescendant(cf => cf.ByAutomationId("SubTool_Startup"))
+            var startupTool = window.FindFirstDescendant(cf => cf.ByAutomationId("Tool_Startup"))
+                           ?? window.FindFirstDescendant(cf => cf.ByName("Startup Applications"))
                            ?? window.FindFirstDescendant(cf => cf.ByName("Startup Apps"));
             Assert.NotNull(startupTool);
             SafeInvoke(startupTool);
             Thread.Sleep(400);
 
-            var fixesTool = window.FindFirstDescendant(cf => cf.ByAutomationId("SubTool_Fixes"))
-                         ?? window.FindFirstDescendant(cf => cf.ByName("Windows Fixes"));
+            var fixesTool = window.FindFirstDescendant(cf => cf.ByAutomationId("Tool_Fixes"))
+                         ?? window.FindFirstDescendant(cf => cf.ByName("Quick System Fixes"))
+                         ?? window.FindFirstDescendant(cf => cf.ByName("Fixes & Repairs"));
             Assert.NotNull(fixesTool);
             SafeInvoke(fixesTool);
             Thread.Sleep(400);
@@ -343,8 +365,11 @@ public sealed partial class TweakoraUiTests
 
             // Click Preview / Preset to test unified preview modal
             NavigateTab(window, "Home");
-            var presetGaming = window.FindFirstDescendant(cf => cf.ByAutomationId("PresetCard_Gaming"))
-                            ?? window.FindFirstDescendant(cf => cf.ByName("Gaming"));
+            var presetGaming = window.FindFirstDescendant(cf => cf.ByAutomationId("PresetCard_preset.gaming"))
+                            ?? window.FindFirstDescendant(cf => cf.ByAutomationId("ProfileBtn_preset.gaming"))
+                            ?? window.FindFirstDescendant(cf => cf.ByAutomationId("PresetCard_Gaming"))
+                            ?? window.FindFirstDescendant(cf => cf.ByName("Gaming"))
+                            ?? window.FindFirstDescendant(cf => cf.ByName("Apply Gaming Profile"));
             if (presetGaming != null)
             {
                 SafeInvoke(presetGaming);
@@ -424,6 +449,69 @@ public sealed partial class TweakoraUiTests
             }
 
             _output.WriteLine("[UI-AUDIT] All 5 tabs and dialogs captured cleanly in test mode.");
+        }
+        finally
+        {
+            automation.Dispose();
+            app.Close();
+        }
+    }
+
+    [Fact]
+    public void Test_07_Accessibility_InteractiveControlsHaveAutomationName()
+    {
+        var (app, automation, window) = LaunchAppInTestMode();
+        try
+        {
+            // Verify across all 5 navigation tabs
+            string[] tabs = { "Home", "Tweaks", "Apps", "Tools", "History" };
+            var missingInteractiveNames = new System.Collections.Generic.List<string>();
+
+            foreach (var tab in tabs)
+            {
+                NavigateTab(window, tab);
+                var interactiveElements = window.FindAllDescendants(cf =>
+                    cf.ByControlType(ControlType.Button)
+                    .Or(cf.ByControlType(ControlType.CheckBox))
+                    .Or(cf.ByControlType(ControlType.Edit))
+                    .Or(cf.ByControlType(ControlType.RadioButton)));
+
+                foreach (var el in interactiveElements)
+                {
+                    // Filter out standard internal WPF templated components
+                    if (el.ClassName == "Thumb" || el.ClassName == "RepeatButton" || el.ClassName.Contains("ScrollViewer"))
+                        continue;
+
+                    if (string.IsNullOrWhiteSpace(el.Name) && string.IsNullOrWhiteSpace(el.AutomationId) && string.IsNullOrWhiteSpace(el.HelpText))
+                    {
+                        missingInteractiveNames.Add($"Tab: {tab}, ControlType: {el.ControlType}, ClassName: {el.ClassName}");
+                    }
+                }
+            }
+
+            // Also check all XAML views to guarantee full structural coverage
+            string solutionDir = FindSolutionRoot();
+            string viewsDir = Path.Combine(solutionDir, "src", "Tweakora.App", "Views");
+            foreach (var file in Directory.GetFiles(viewsDir, "*.xaml"))
+            {
+                var xml = new System.Xml.XmlDocument();
+                xml.Load(file);
+                var nodes = xml.SelectNodes("//*[local-name()='Button' or local-name()='CheckBox' or local-name()='TextBox' or local-name()='RadioButton' or local-name()='ToggleSwitch']");
+                if (nodes != null)
+                {
+                    foreach (System.Xml.XmlNode node in nodes)
+                    {
+                        string? name = node.Attributes?["AutomationProperties.Name"]?.Value;
+                        if (string.IsNullOrWhiteSpace(name))
+                        {
+                            missingInteractiveNames.Add($"XAML {Path.GetFileName(file)}: {node.OuterXml}");
+                        }
+                    }
+                }
+            }
+
+            Assert.True(missingInteractiveNames.Count == 0,
+                $"UI Accessibility violation: Interactive elements missing automation name:\n{string.Join("\n", missingInteractiveNames)}");
         }
         finally
         {

@@ -36,7 +36,8 @@
                               Width="120" Margin="0,0,8,0" VerticalAlignment="Center" />
 
                     <!-- Risk Dropdown -->
-                    <ComboBox AutomationProperties.Name="Filter by risk"
+                    <ComboBox AutomationProperties.AutomationId="RiskFilterComboBox"
+                              AutomationProperties.Name="Filter by risk level"
                               ItemsSource="{Binding RiskOptions}"
                               SelectedItem="{Binding SelectedRisk, Mode=TwoWay}"
                               Width="95" Margin="0,0,8,0" VerticalAlignment="Center" />
@@ -48,7 +49,8 @@
                               Width="110" Margin="0,0,12,0" VerticalAlignment="Center" />
 
                     <!-- Recommended Only Toggle -->
-                    <CheckBox AutomationProperties.AutomationId="RecommendedOnlyCheckBox"
+                    <CheckBox AutomationProperties.AutomationId="RecommendedOnlyToggle"
+                              AutomationProperties.Name="Recommended only"
                               Content="Recommended only"
                               IsChecked="{Binding IsRecommendedOnly, Mode=TwoWay}"
                               Margin="0,0,12,0" VerticalAlignment="Center"
@@ -57,6 +59,7 @@
 
                     <!-- Show Experimental Tweaks Toggle -->
                     <CheckBox AutomationProperties.AutomationId="ShowExperimentalTweaksCheckBox"
+                              AutomationProperties.Name="Show experimental"
                               Content="Show experimental"
                               IsChecked="{Binding ShowExperimentalTweaks, Mode=TwoWay}"
                               Margin="0,0,8,0" VerticalAlignment="Center"
@@ -249,6 +252,7 @@
                                     <!-- Details Toggle Button -->
                                     <Button DockPanel.Dock="Right"
                                             AutomationProperties.AutomationId="{Binding Id, StringFormat='DetailsButton_{0}'}"
+                                            AutomationProperties.Name="{Binding Name, StringFormat='Details for {0}'}"
                                             Command="{Binding ToggleExpandCommand}"
                                             Style="{DynamicResource ModernGhostBtn}"
                                             Padding="8,2" VerticalAlignment="Center">
@@ -333,6 +337,7 @@
                                                     <DataTemplate>
                                                         <Button Command="{Binding DataContext.OpenUrlCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                                                 CommandParameter="{Binding}"
+                                                                AutomationProperties.Name="{Binding Url, StringFormat='Open documentation source {0}'}"
                                                                 Style="{DynamicResource ModernGhostBtn}"
                                                                 HorizontalAlignment="Left"
                                                                 Padding="0,2" Margin="0,1,0,1">
@@ -395,6 +400,7 @@
                     <DockPanel Grid.Row="0" Margin="0,0,0,12">
                         <TextBlock Text="{Binding DetailsDialogTitle}" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" />
                         <Button DockPanel.Dock="Right" Content="✕" Style="{DynamicResource ModernGhostBtn}"
+                                AutomationProperties.Name="Close execution details"
                                 Command="{Binding CloseDetailsDialogCommand}" />
                     </DockPanel>
 
@@ -429,6 +435,7 @@
 
                     <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,14,0,0">
                         <ui:Button Content="Close" Appearance="Secondary"
+                                   AutomationProperties.Name="Close execution details dialog"
                                    Command="{Binding CloseDetailsDialogCommand}" />
                     </StackPanel>
                 </Grid>
@@ -457,6 +464,7 @@
                             <TextBlock Text="{Binding IrreversibleDialogTitle}" FontSize="16" FontWeight="Bold" Foreground="#EF4444" VerticalAlignment="Center" />
                         </StackPanel>
                         <Button DockPanel.Dock="Right" Content="✕" Style="{DynamicResource ModernGhostBtn}"
+                                AutomationProperties.Name="Cancel irreversible warning"
                                 Command="{Binding CancelIrreversibleCommand}" />
                     </DockPanel>
 
@@ -482,8 +490,10 @@
 
                     <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
                         <ui:Button Content="Cancel" Appearance="Secondary" Margin="0,0,10,0"
+                                   AutomationProperties.Name="Cancel irreversible tweaks"
                                    Command="{Binding CancelIrreversibleCommand}" />
                         <ui:Button Content="I Understand, Apply Changes" Appearance="Danger"
+                                   AutomationProperties.Name="Confirm irreversible tweaks"
                                    Command="{Binding ConfirmIrreversibleCommand}" />
                     </StackPanel>
                 </Grid>

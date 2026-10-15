@@ -391,11 +391,7 @@ public sealed class FinalQaDiagnosticTests
         var updatesVm = new UpdatesViewModel(updateMode, runner);
         Assert.NotNull(updatesVm.ActiveModeTitle);
 
-        // 8. BackupsViewModel
-        var backupsVm = new BackupsViewModel(tweakService);
-        Assert.NotNull(backupsVm.Backups);
-
-        // 9. MainViewModel
+        // 8. MainViewModel
         var mainVm = new MainViewModel(
             dashboardVm,
             installVm,
@@ -403,8 +399,7 @@ public sealed class FinalQaDiagnosticTests
             configVm,
             updatesVm,
             toolboxVm,
-            startupVm,
-            backupsVm);
+            startupVm);
 
         Assert.NotNull(mainVm.CurrentPage);
         Assert.True(mainVm.ActiveTab is "Home" or "Dashboard");

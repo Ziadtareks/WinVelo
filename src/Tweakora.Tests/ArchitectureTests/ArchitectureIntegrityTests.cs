@@ -206,7 +206,6 @@ public sealed class ArchitectureIntegrityTests
         services.AddSingleton<UpdatesViewModel>();
         services.AddSingleton<ToolboxViewModel>();
         services.AddSingleton<StartupViewModel>();
-        services.AddSingleton<BackupsViewModel>();
         services.AddSingleton<ToolsViewModel>();
         services.AddSingleton<HistoryViewModel>();
         services.AddSingleton<FirstRunWizardViewModel>();
@@ -224,7 +223,6 @@ public sealed class ArchitectureIntegrityTests
             typeof(UpdatesViewModel),
             typeof(ToolboxViewModel),
             typeof(StartupViewModel),
-            typeof(BackupsViewModel),
             typeof(ToolsViewModel),
             typeof(HistoryViewModel),
             typeof(FirstRunWizardViewModel),
@@ -261,6 +259,37 @@ public sealed class ArchitectureIntegrityTests
 
         Assert.True(commandViolations.Count == 0,
             "Architecture violation: Null or invalid ICommand found in ViewModels:\n" + string.Join("\n", commandViolations));
+    }
+
+    [Fact]
+    public void Accessibility_AllInteractiveControlsInViews_HaveAutomationPropertiesName()
+    {
+        string? solutionRoot = FindSolutionRoot();
+        Assert.NotNull(solutionRoot);
+        string viewsDir = Path.Combine(solutionRoot, "src", "Tweakora.App", "Views");
+        Assert.True(Directory.Exists(viewsDir), $"Views directory not found at {viewsDir}");
+
+        List<string> missingControls = new();
+        foreach (var file in Directory.GetFiles(viewsDir, "*.xaml"))
+        {
+            var xml = new System.Xml.XmlDocument();
+            xml.Load(file);
+            var nodes = xml.SelectNodes("//*[local-name()='Button' or local-name()='CheckBox' or local-name()='TextBox' or local-name()='RadioButton' or local-name()='ToggleSwitch']");
+            if (nodes != null)
+            {
+                foreach (System.Xml.XmlNode node in nodes)
+                {
+                    string? name = node.Attributes?["AutomationProperties.Name"]?.Value;
+                    if (string.IsNullOrWhiteSpace(name))
+                    {
+                        missingControls.Add($"{Path.GetFileName(file)}: {node.OuterXml.Substring(0, Math.Min(120, node.OuterXml.Length))}");
+                    }
+                }
+            }
+        }
+
+        Assert.True(missingControls.Count == 0,
+            $"Accessibility violation: The following interactive controls lack AutomationProperties.Name:\n{string.Join("\n", missingControls)}");
     }
 
     private static bool IsForbiddenSimulationType(Type? type)

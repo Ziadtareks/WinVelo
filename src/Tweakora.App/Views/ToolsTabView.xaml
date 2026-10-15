@@ -74,7 +74,9 @@
                                 <TextBlock Text="Review apps that launch automatically when you sign in. Disabling unused startup items reduces login delay."
                                            Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,2,0,0" />
                             </StackPanel>
-                            <Button DockPanel.Dock="Right" Content="1-Click Optimize" Style="{DynamicResource ModernPrimaryBtn}"
+                            <Button DockPanel.Dock="Right" Content="1-Click Optimize"
+                                    AutomationProperties.Name="1-Click Optimize Startup"
+                                    Style="{DynamicResource ModernPrimaryBtn}"
                                     Command="{Binding StartupVM.OptimizeStartupCommand}" VerticalAlignment="Center" />
                         </DockPanel>
                     </Border>
@@ -99,6 +101,7 @@
                                             <TextBlock Text="{Binding Impact, StringFormat='Impact: {0}'}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" />
                                         </Border>
                                         <CheckBox Grid.Column="3" IsChecked="{Binding IsEnabled, Mode=TwoWay}"
+                                                  AutomationProperties.Name="{Binding Name, StringFormat='Toggle startup for {0}'}"
                                                   Style="{DynamicResource ModernCheckBox}"
                                                   Command="{Binding DataContext.StartupVM.ToggleStartupItemCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                   CommandParameter="{Binding}" VerticalAlignment="Center" />
@@ -185,9 +188,9 @@
                                 <TextBlock Text="{Binding ToolboxVM.CleanerStatusText}" FontSize="12" Foreground="{DynamicResource AccentPrimaryBrush}" />
                             </StackPanel>
                             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
-                                <Button Content="Scan Now" Style="{DynamicResource ModernSecondaryBtn}"
+                                <Button Content="Scan Now" AutomationProperties.Name="Scan Cache Now" Style="{DynamicResource ModernSecondaryBtn}"
                                         Command="{Binding ToolboxVM.ScanCleanerCommand}" Margin="0,0,8,0" />
-                                <Button Content="Clean Selected" Style="{DynamicResource ModernPrimaryBtn}"
+                                <Button Content="Clean Selected" AutomationProperties.Name="Clean Selected Items" Style="{DynamicResource ModernPrimaryBtn}"
                                         Command="{Binding ToolboxVM.CleanNowCommand}" />
                             </StackPanel>
                         </DockPanel>
@@ -204,7 +207,7 @@
                                             <ColumnDefinition Width="*" />
                                             <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
-                                        <CheckBox Grid.Column="0" IsChecked="{Binding IsSelected}" Style="{DynamicResource ModernCheckBox}" Margin="0,0,12,0" VerticalAlignment="Center" />
+                                        <CheckBox Grid.Column="0" AutomationProperties.Name="{Binding Name, StringFormat='Select {0}'}" IsChecked="{Binding IsSelected}" Style="{DynamicResource ModernCheckBox}" Margin="0,0,12,0" VerticalAlignment="Center" />
                                         <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                             <TextBlock Text="{Binding Name}" FontSize="14" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" />
                                             <TextBlock Text="{Binding PathDescription}" Foreground="{DynamicResource TextMutedBrush}" FontSize="11" />
@@ -243,11 +246,11 @@
                                 <TextBlock Text="{Binding ToolboxVM.DnsStatusText}" FontSize="12" Foreground="{DynamicResource AccentPrimaryBrush}" />
                             </StackPanel>
                             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
-                                <Button Content="Benchmark All" Style="{DynamicResource ModernSecondaryBtn}"
+                                <Button Content="Benchmark All" AutomationProperties.Name="Benchmark All DNS Providers" Style="{DynamicResource ModernSecondaryBtn}"
                                         Command="{Binding ToolboxVM.BenchmarkAllDnsCommand}" Margin="0,0,8,0" />
-                                <Button Content="Apply Fastest" Style="{DynamicResource ModernPrimaryBtn}"
+                                <Button Content="Apply Fastest" AutomationProperties.Name="Apply Fastest DNS" Style="{DynamicResource ModernPrimaryBtn}"
                                         Command="{Binding ToolboxVM.ApplyFastestDnsCommand}" Margin="0,0,8,0" />
-                                <Button Content="Reset to DHCP" Style="{DynamicResource ModernGhostBtn}"
+                                <Button Content="Reset to DHCP" AutomationProperties.Name="Reset DNS to DHCP" Style="{DynamicResource ModernGhostBtn}"
                                         Command="{Binding ToolboxVM.ResetDnsToDhcpCommand}" />
                             </StackPanel>
                         </DockPanel>
@@ -262,7 +265,7 @@
                                 <TextBlock Text="Sets TcpAckFrequency=1 and TCPNoDelay=1 on network adapters. Note: Most modern games manage TCP_NODELAY per-socket."
                                            Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" Margin="0,2,0,0" />
                             </StackPanel>
-                            <CheckBox DockPanel.Dock="Right" IsChecked="{Binding ToolboxVM.IsNagleDisabled, Mode=TwoWay}"
+                            <CheckBox DockPanel.Dock="Right" AutomationProperties.Name="Disable Nagle's Algorithm Toggle" IsChecked="{Binding ToolboxVM.IsNagleDisabled, Mode=TwoWay}"
                                       Style="{DynamicResource ModernCheckBox}" VerticalAlignment="Center" />
                         </DockPanel>
                     </Border>
@@ -294,10 +297,10 @@
                                                 <TextBlock Text="{Binding PingMs, StringFormat='Latency: {0} ms'}" FontSize="11" Foreground="{DynamicResource AccentPrimaryBrush}" FontWeight="SemiBold" />
                                             </StackPanel>
                                         </StackPanel>
-                                        <Button Grid.Column="1" Content="Ping" Style="{DynamicResource ModernGhostBtn}" VerticalAlignment="Center"
+                                        <Button Grid.Column="1" Content="Ping" AutomationProperties.Name="{Binding Name, StringFormat='Ping {0}'}" Style="{DynamicResource ModernGhostBtn}" VerticalAlignment="Center"
                                                 Command="{Binding DataContext.ToolboxVM.TestDnsLatencyCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                 CommandParameter="{Binding}" />
-                                        <Button Grid.Column="3" Content="Apply" Style="{DynamicResource ModernSecondaryBtn}" VerticalAlignment="Center"
+                                        <Button Grid.Column="3" Content="Apply" AutomationProperties.Name="{Binding Name, StringFormat='Apply {0} DNS'}" Style="{DynamicResource ModernSecondaryBtn}" VerticalAlignment="Center"
                                                 Command="{Binding DataContext.ToolboxVM.ApplyDnsCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                 CommandParameter="{Binding}" />
                                     </Grid>
@@ -352,7 +355,7 @@
                                                 <TextBlock Text="{Binding Script, StringFormat='Command: {0}'}" FontFamily="Consolas, Cascadia Code" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
                                             </Border>
                                         </StackPanel>
-                                        <Button Grid.Column="1" Content="Run Repair" Style="{DynamicResource ModernPrimaryBtn}" VerticalAlignment="Center" Margin="14,0,0,0"
+                                        <Button Grid.Column="1" Content="Run Repair" AutomationProperties.Name="{Binding Title, StringFormat='Run Repair: {0}'}" Style="{DynamicResource ModernPrimaryBtn}" VerticalAlignment="Center" Margin="14,0,0,0"
                                                 Command="{Binding DataContext.ToolboxVM.RunFixCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                 CommandParameter="{Binding}" />
                                     </Grid>
@@ -400,7 +403,7 @@
                                 <TextBlock Text="Standard Microsoft automatic updates." Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" Margin="0,2,0,10" />
                                 <TextBlock Text="• Automatically checks and downloads all updates." FontSize="11" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,4" />
                                 <TextBlock Text="• Driver updates included via Windows Update." FontSize="11" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,14" />
-                                <Button Content="Apply Default Mode" Style="{DynamicResource ModernSecondaryBtn}"
+                                <Button Content="Apply Default Mode" AutomationProperties.Name="Apply Default Update Mode" Style="{DynamicResource ModernSecondaryBtn}"
                                         Command="{Binding UpdatesVM.ApplyModeCommand}" CommandParameter="Default" HorizontalAlignment="Stretch" />
                             </StackPanel>
                         </Border>
@@ -413,7 +416,7 @@
                                 <TextBlock Text="Delays feature updates by 2-3 years while keeping security patches." Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" Margin="0,2,0,10" />
                                 <TextBlock Text="• Critical security patches installed." FontSize="11" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,4" />
                                 <TextBlock Text="• Prevents unexpected reboot interruptions." FontSize="11" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,14" />
-                                <Button Content="Apply Recommended" Style="{DynamicResource ModernPrimaryBtn}"
+                                <Button Content="Apply Recommended" AutomationProperties.Name="Apply Recommended Update Mode" Style="{DynamicResource ModernPrimaryBtn}"
                                         Command="{Binding UpdatesVM.ApplyModeCommand}" CommandParameter="Recommended" HorizontalAlignment="Stretch" />
                             </StackPanel>
                         </Border>
@@ -426,7 +429,7 @@
                                 <TextBlock Text="Pauses automatic checks; updates only when you trigger manually." Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" Margin="0,2,0,10" />
                                 <TextBlock Text="• No background update scans or downloads." FontSize="11" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,4" />
                                 <TextBlock Text="• Servicing stack remains intact and functional." FontSize="11" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,14" />
-                                <Button Content="Apply Suspended" Style="{DynamicResource ModernSecondaryBtn}"
+                                <Button Content="Apply Suspended" AutomationProperties.Name="Apply Suspended Update Mode" Style="{DynamicResource ModernSecondaryBtn}"
                                         Command="{Binding UpdatesVM.ApplyModeCommand}" CommandParameter="Suspended" HorizontalAlignment="Stretch" />
                             </StackPanel>
                         </Border>
@@ -456,9 +459,9 @@
                                            Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,2,0,0" />
                             </StackPanel>
                             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
-                                <Button Content="Enable Selected" Style="{DynamicResource ModernPrimaryBtn}"
+                                <Button Content="Enable Selected" AutomationProperties.Name="Enable Selected Features" Style="{DynamicResource ModernPrimaryBtn}"
                                         Command="{Binding ConfigVM.InstallSelectedFeaturesCommand}" Margin="0,0,8,0" />
-                                <Button Content="Disable Selected" Style="{DynamicResource ModernSecondaryBtn}"
+                                <Button Content="Disable Selected" AutomationProperties.Name="Disable Selected Features" Style="{DynamicResource ModernSecondaryBtn}"
                                         Command="{Binding ConfigVM.UninstallSelectedFeaturesCommand}" />
                             </StackPanel>
                         </DockPanel>
@@ -475,7 +478,7 @@
                                             <ColumnDefinition Width="*" />
                                             <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
-                                        <CheckBox Grid.Column="0" IsChecked="{Binding IsSelected}" Style="{DynamicResource ModernCheckBox}" Margin="0,0,12,0" VerticalAlignment="Center" />
+                                        <CheckBox Grid.Column="0" AutomationProperties.Name="{Binding Name, StringFormat='Select {0}'}" IsChecked="{Binding IsSelected}" Style="{DynamicResource ModernCheckBox}" Margin="0,0,12,0" VerticalAlignment="Center" />
                                         <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                             <TextBlock Text="{Binding Name}" FontSize="14" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" />
                                             <TextBlock Text="{Binding Description}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" />
@@ -524,11 +527,14 @@
 
                             <DockPanel LastChildFill="False">
                                 <TextBox DockPanel.Dock="Left" Width="360"
+                                         AutomationProperties.Name="Restore Point Description Input"
                                          Text="{Binding RestorePointDescription, UpdateSourceTrigger=PropertyChanged}"
                                          Padding="10,6" Margin="0,0,10,0"
                                          Background="{DynamicResource BgDeepBrush}" Foreground="{DynamicResource TextPrimaryBrush}"
                                          BorderBrush="{DynamicResource BorderSubtleBrush}" />
-                                <Button DockPanel.Dock="Left" Content="Create Restore Point" Style="{DynamicResource ModernPrimaryBtn}"
+                                <Button DockPanel.Dock="Left" Content="Create Restore Point"
+                                        AutomationProperties.Name="Create Restore Point"
+                                        Style="{DynamicResource ModernPrimaryBtn}"
                                         Command="{Binding CreateRestorePointCommand}" />
                             </DockPanel>
                         </StackPanel>

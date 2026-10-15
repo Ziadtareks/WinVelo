@@ -155,7 +155,6 @@ public sealed class FirstRunWizardTests
         services.AddSingleton<UpdatesViewModel>();
         services.AddSingleton<ToolboxViewModel>();
         services.AddSingleton<StartupViewModel>();
-        services.AddSingleton<BackupsViewModel>();
         services.AddSingleton<ToolsViewModel>();
         services.AddSingleton<HistoryViewModel>();
         services.AddSingleton<FirstRunWizardViewModel>();

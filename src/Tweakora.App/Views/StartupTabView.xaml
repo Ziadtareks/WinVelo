@@ -43,6 +43,7 @@
                     <!-- Top Action: 1-Click Optimize Startup -->
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center">
                         <ui:Button AutomationProperties.AutomationId="OptimizeStartupButton"
+                                   AutomationProperties.Name="1-Click Optimize Startup"
                                    Appearance="Primary"
                                    Icon="{ui:SymbolIcon Flash24}"
                                    Content="1-Click Optimize Startup"
@@ -51,6 +52,7 @@
                                    ToolTip="Disable heavy non-essential apps to accelerate Windows boot time" />
 
                         <ui:Button AutomationProperties.AutomationId="RefreshStartupButton"
+                                   AutomationProperties.Name="Refresh Startup Apps"
                                    Appearance="Secondary"
                                    Icon="{ui:SymbolIcon ArrowSync24}"
                                    Content="Refresh"
@@ -126,6 +128,7 @@
             <DockPanel LastChildFill="False">
                 <!-- Search Box -->
                 <ui:TextBox AutomationProperties.AutomationId="StartupSearchBox"
+                            AutomationProperties.Name="Search Startup Apps"
                             PlaceholderText="Search startup apps by name, publisher, path, or impact..."
                             Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
                             Icon="{ui:SymbolIcon Search24}"
@@ -134,21 +137,25 @@
                 <!-- Filter Pills -->
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" VerticalAlignment="Center">
                     <ui:Button Content="All"
+                               AutomationProperties.Name="Filter All"
                                Command="{Binding SetFilterCommand}" CommandParameter="All"
                                Appearance="{Binding IsFilterAll, Converter={StaticResource BoolToAppearanceConverter}}"
                                Padding="12,6" FontSize="12" Margin="0,0,6,0" />
 
                     <ui:Button Content="Enabled"
+                               AutomationProperties.Name="Filter Enabled"
                                Command="{Binding SetFilterCommand}" CommandParameter="Enabled"
                                Appearance="{Binding IsFilterEnabled, Converter={StaticResource BoolToAppearanceConverter}}"
                                Padding="12,6" FontSize="12" Margin="0,0,6,0" />
 
                     <ui:Button Content="Disabled"
+                               AutomationProperties.Name="Filter Disabled"
                                Command="{Binding SetFilterCommand}" CommandParameter="Disabled"
                                Appearance="{Binding IsFilterDisabled, Converter={StaticResource BoolToAppearanceConverter}}"
                                Padding="12,6" FontSize="12" Margin="0,0,6,0" />
 
                     <ui:Button Content="High Impact"
+                               AutomationProperties.Name="Filter High Impact"
                                Command="{Binding SetFilterCommand}" CommandParameter="HighImpact"
                                Appearance="{Binding IsFilterHighImpact, Converter={StaticResource BoolToAppearanceConverter}}"
                                Padding="12,6" FontSize="12" Margin="0,0,6,0" />
@@ -328,6 +335,7 @@
 
                                 <!-- Open Folder Action Button -->
                                 <ui:Button Icon="{ui:SymbolIcon FolderOpen24}"
+                                           AutomationProperties.Name="{Binding Name, StringFormat='Open folder for {0}'}"
                                            Appearance="Transparent"
                                            Command="{Binding DataContext.OpenFolderCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                            CommandParameter="{Binding}"
@@ -340,6 +348,7 @@
 
                                 <!-- Toggle Switch -->
                                 <ui:ToggleSwitch AutomationProperties.AutomationId="{Binding Name, StringFormat='Toggle_{0}'}"
+                                                 AutomationProperties.Name="{Binding Name, StringFormat='Toggle {0}'}"
                                                  IsChecked="{Binding IsEnabled, Mode=OneWay}"
                                                  IsEnabled="{Binding IsNotToggling}"
                                                  Command="{Binding DataContext.ToggleAppCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"

@@ -134,6 +134,7 @@
 
                         <!-- Enable Button (if disabled) -->
                         <Button Content="Turn On System Restore (Drive C:\)"
+                                AutomationProperties.Name="Turn On System Restore"
                                 Command="{Binding EnableSystemRestoreCommand}"
                                 IsEnabled="{Binding IsSystemRestoreEnabled, Converter={StaticResource BoolToVisConverter}}"
                                 Margin="0,12,0,0" HorizontalAlignment="Left" Padding="12,6" FontSize="12">
@@ -161,6 +162,7 @@
 
                         <DockPanel LastChildFill="False">
                             <ui:Button DockPanel.Dock="Left"
+                                       AutomationProperties.Name="Create and Verify Restore Point"
                                        Appearance="Primary"
                                        Command="{Binding CreateAndVerifyRestorePointCommand}"
                                        IsEnabled="{Binding IsCreatingRestorePoint, Converter={StaticResource BoolToVisConverter}}"
@@ -222,6 +224,7 @@
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <RadioButton Grid.Column="0" IsChecked="{Binding IsSimpleMode, Mode=TwoWay}"
+                                     AutomationProperties.Name="Select Simple Mode"
                                      GroupName="ModeGroup" VerticalAlignment="Center" Margin="0,0,14,0" />
                         <StackPanel Grid.Column="1" VerticalAlignment="Center">
                             <DockPanel LastChildFill="False">
@@ -259,6 +262,7 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
                         <RadioButton Grid.Column="0" IsChecked="{Binding IsSimpleMode, Converter={StaticResource BoolToVisConverter}}"
+                                     AutomationProperties.Name="Select Advanced Mode"
                                      GroupName="ModeGroup" VerticalAlignment="Center" Margin="0,0,14,0">
                             <RadioButton.Style>
                                 <Style TargetType="RadioButton">
@@ -291,6 +295,7 @@
             <DockPanel Grid.Row="2" LastChildFill="False" Margin="0,10,0,0">
                 <!-- Back Button -->
                 <Button DockPanel.Dock="Left" Content="Back"
+                        AutomationProperties.Name="Previous Wizard Step"
                         Command="{Binding PreviousStepCommand}" Padding="16,8">
                     <Button.Style>
                         <Style TargetType="Button" BasedOn="{StaticResource ModernGhostBtn}">

@@ -40,14 +40,8 @@
         <DataTemplate DataType="{x:Type vm:UpdatesViewModel}">
             <views:UpdatesTabView />
         </DataTemplate>
-        <DataTemplate DataType="{x:Type vm:ToolboxViewModel}">
-            <views:ToolboxPage />
-        </DataTemplate>
         <DataTemplate DataType="{x:Type vm:StartupViewModel}">
             <views:StartupTabView />
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type vm:BackupsViewModel}">
-            <views:BackupsTabView />
         </DataTemplate>
     </Window.Resources>
 
@@ -73,6 +67,7 @@
                 <StackPanel Orientation="Horizontal" Margin="0,0,8,0">
                     <!-- Command Palette Shortcut Button (Ctrl+K) -->
                     <ui:Button AutomationProperties.AutomationId="OpenCommandPaletteButton"
+                               AutomationProperties.Name="Command Palette"
                                Icon="{ui:SymbolIcon Search24}"
                                ToolTip="Command Palette (Ctrl+K)"
                                Command="{Binding ToggleCommandPaletteCommand}"
@@ -80,6 +75,7 @@
 
                     <!-- Theme Toggle Button -->
                     <ui:Button AutomationProperties.AutomationId="ToggleThemeButton"
+                               AutomationProperties.Name="Toggle Theme"
                                Icon="{ui:SymbolIcon DarkTheme24}"
                                ToolTip="Toggle Dark / Light Theme"
                                Command="{Binding ToggleThemeCommand}"
@@ -87,6 +83,7 @@
 
                     <!-- Config / Settings Menu Button -->
                     <ui:Button AutomationProperties.AutomationId="ConfigMenuButton"
+                               AutomationProperties.Name="Options and Settings"
                                Icon="{ui:SymbolIcon Settings24}"
                                ToolTip="Options &amp; About"
                                Appearance="Transparent" Margin="0,0,4,0">
@@ -130,6 +127,7 @@
                 </StackPanel>
                 <Button DockPanel.Dock="Right" Content="Restart as Administrator"
                         AutomationProperties.AutomationId="RestartAsAdminButton"
+                        AutomationProperties.Name="Restart as Administrator"
                         Style="{DynamicResource ModernPrimaryBtn}" Command="{Binding RestartAsAdminCommand}"
                         Padding="12,5" FontSize="12" />
             </DockPanel>
@@ -271,6 +269,7 @@
                                     <TextBlock Text="Dry-Run Mode" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" />
                                 </StackPanel>
                                 <CheckBox DockPanel.Dock="Right" IsChecked="{Binding TweaksVM.IsDryRun, Mode=TwoWay}"
+                                          AutomationProperties.Name="Dry run mode toggle"
                                           Style="{DynamicResource ModernCheckBox}" ToolTip="When ON, actions are simulated without touching system" />
                             </DockPanel>
                         </Border>
@@ -316,6 +315,7 @@
                         <!-- Left: Live Search Box -->
                         <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" VerticalAlignment="Center">
                             <ui:TextBox AutomationProperties.AutomationId="TopSearchBox"
+                                        AutomationProperties.Name="Search Tweaks"
                                         PlaceholderText="Search tweaks by title, ID, or description..."
                                         Text="{Binding TopSearchText, UpdateSourceTrigger=PropertyChanged}"
                                         Icon="{ui:SymbolIcon Search24}"
@@ -327,20 +327,25 @@
                                            Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" Margin="0,0,8,0" />
 
                                 <Button AutomationProperties.AutomationId="Preset_Standard"
+                                        AutomationProperties.Name="Standard Recommended Preset"
                                         Content="Standard (Recommended)" Style="{DynamicResource ModernSecondaryBtn}"
                                         Command="{Binding TweaksVM.ApplyPresetCommand}" CommandParameter="Standard"
                                         Margin="0,0,6,0" Padding="10,6" FontSize="12" />
 
                                 <Button AutomationProperties.AutomationId="Preset_Minimal"
+                                        AutomationProperties.Name="Minimal Safe Preset"
                                         Content="Minimal (Safe)" Style="{DynamicResource ModernSecondaryBtn}"
                                         Command="{Binding TweaksVM.ApplyPresetCommand}" CommandParameter="Minimal"
                                         Margin="0,0,6,0" Padding="10,6" FontSize="12" />
 
-                                <Button Content="Select Applied" Style="{DynamicResource ModernSecondaryBtn}"
+                                <Button Content="Select Applied"
+                                        AutomationProperties.Name="Select Applied Preset"
+                                        Style="{DynamicResource ModernSecondaryBtn}"
                                         Command="{Binding TweaksVM.ApplyPresetCommand}" CommandParameter="SelectApplied"
                                         Margin="0,0,6,0" Padding="10,6" FontSize="12" />
 
                                 <Button AutomationProperties.AutomationId="Preset_Clear"
+                                        AutomationProperties.Name="Clear Preset Selection"
                                         Content="Clear" Style="{DynamicResource ModernGhostBtn}"
                                         Command="{Binding TweaksVM.ClearSelectionCommand}"
                                         Padding="8,6" FontSize="12" />
@@ -364,6 +369,7 @@
 
                             <!-- Diff Preview Dialog Button -->
                             <Button AutomationProperties.AutomationId="PreviewTweaksButton"
+                                    AutomationProperties.Name="Diff Preview"
                                     Content="Diff Preview" Style="{DynamicResource ModernGhostBtn}"
                                     Command="{Binding TweaksVM.OpenDiffPreviewCommand}"
                                     Padding="8,6" FontSize="12" ToolTip="Preview dry-run differences" />
@@ -383,23 +389,29 @@
                         <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" VerticalAlignment="Center">
                             <!-- Apply Selected Tweaks -->
                             <Button AutomationProperties.AutomationId="RunTweaksButton"
+                                    AutomationProperties.Name="Apply Selected Tweaks"
                                     Content="Apply Selected Tweaks" Style="{DynamicResource ModernPrimaryBtn}"
                                     Command="{Binding TweaksVM.ApplySelectedTweaksCommand}"
                                     Padding="18,9" FontSize="13" FontWeight="Bold" Margin="0,0,10,0" />
 
                             <!-- Undo Selected Tweaks -->
                             <Button AutomationProperties.AutomationId="UndoTweaksButton"
+                                    AutomationProperties.Name="Undo Selected Tweaks"
                                     Content="Undo Selected Tweaks" Style="{DynamicResource ModernSecondaryBtn}"
                                     Command="{Binding TweaksVM.UndoSelectedTweaksCommand}"
                                     Padding="14,9" FontSize="13" Margin="0,0,10,0" />
 
                             <!-- Re-Scan System -->
-                            <Button Content="Re-Scan System" Style="{DynamicResource ModernGhostBtn}"
+                            <Button Content="Re-Scan System"
+                                    AutomationProperties.Name="Re-Scan System"
+                                    Style="{DynamicResource ModernGhostBtn}"
                                     Command="{Binding TweaksVM.RescanSystemCommand}"
                                     Padding="10,8" FontSize="12" Margin="0,0,6,0" ToolTip="Check active tweaks against real Windows state" />
 
                             <!-- Create Restore Point -->
-                            <Button Content="Create Restore Point" Style="{DynamicResource ModernGhostBtn}"
+                            <Button Content="Create Restore Point"
+                                    AutomationProperties.Name="Create Restore Point"
+                                    Style="{DynamicResource ModernGhostBtn}"
                                     Command="{Binding TweaksVM.CreateRestorePointCommand}"
                                     Padding="10,8" FontSize="12" ToolTip="Create a Windows System Protection Restore point" />
                         </StackPanel>
@@ -414,6 +426,7 @@
 
                             <!-- Log Console Toggle Button -->
                             <Button AutomationProperties.AutomationId="ToggleLogButton"
+                                    AutomationProperties.Name="Toggle Log Console"
                                     Style="{DynamicResource ModernSecondaryBtn}"
                                     Command="{Binding TweaksVM.ToggleLogDrawerCommand}"
                                     Padding="12,7" FontSize="12">
@@ -448,9 +461,13 @@
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center">
-                                <Button Content="Clear Log" Style="{DynamicResource ModernGhostBtn}"
+                                <Button Content="Clear Log"
+                                        AutomationProperties.Name="Clear Log"
+                                        Style="{DynamicResource ModernGhostBtn}"
                                         Command="{Binding TweaksVM.ClearLogsCommand}" Padding="6,3" FontSize="11" Margin="0,0,8,0" />
-                                <Button Content="Close" Style="{DynamicResource ModernGhostBtn}"
+                                <Button Content="Close"
+                                        AutomationProperties.Name="Close Log Drawer"
+                                        Style="{DynamicResource ModernGhostBtn}"
                                         Command="{Binding TweaksVM.ToggleLogDrawerCommand}" Padding="6,3" FontSize="11" />
                             </StackPanel>
                         </DockPanel>
@@ -498,8 +515,10 @@
                     </Grid.RowDefinitions>
                     <DockPanel Grid.Row="0" Margin="0,0,0,12">
                         <ui:Button DockPanel.Dock="Right" Icon="{ui:SymbolIcon Dismiss16}" Appearance="Transparent"
+                                   AutomationProperties.Name="Close Command Palette"
                                    Command="{Binding ToggleCommandPaletteCommand}" Margin="8,0,0,0" />
                         <ui:TextBox AutomationProperties.AutomationId="CommandPaletteSearchBox"
+                                    AutomationProperties.Name="Command Palette Search Input"
                                     PlaceholderText="Search tweaks, tools, apps, and actions... (Ctrl+K)"
                                     Text="{Binding PaletteQuery, UpdateSourceTrigger=PropertyChanged}"
                                     Icon="{ui:SymbolIcon Search24}">
@@ -556,14 +575,17 @@
                     <DockPanel Grid.Row="0" Margin="0,0,0,12">
                         <TextBlock Text="Dry-Run Diff Preview" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" />
                         <Button DockPanel.Dock="Right" Content="Cancel" Style="{DynamicResource ModernGhostBtn}"
+                                AutomationProperties.Name="Cancel Diff Preview"
                                 Command="{Binding TweaksVM.CloseDiffPreviewCommand}" />
                     </DockPanel>
                     <TextBox Grid.Row="1" Text="{Binding TweaksVM.PreviewReportText}"
+                             AutomationProperties.Name="Diff Preview Report Text"
                              IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"
                              Background="{DynamicResource BgDeepBrush}" Foreground="{DynamicResource TextPrimaryBrush}"
                              BorderBrush="{DynamicResource BorderSubtleBrush}" FontFamily="Consolas, Cascadia Code, Courier New" FontSize="12" Padding="10" />
                     <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
                         <Button Content="Close" Style="{DynamicResource ModernSecondaryBtn}"
+                                AutomationProperties.Name="Close Diff Preview"
                                 Command="{Binding TweaksVM.CloseDiffPreviewCommand}" />
                     </StackPanel>
                 </Grid>
@@ -600,9 +622,13 @@
 
                     <!-- Buttons -->
                     <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">
-                        <ui:Button Content="Keep and mark complete" Appearance="Secondary" Margin="0,0,12,0"
+                        <ui:Button Content="Keep and mark complete"
+                                   AutomationProperties.Name="Keep Recovery Changes"
+                                   Appearance="Secondary" Margin="0,0,12,0"
                                    Command="{Binding KeepRecoveryCommand}" />
-                        <ui:Button Content="Roll back these changes" Appearance="Danger"
+                        <ui:Button Content="Roll back these changes"
+                                   AutomationProperties.Name="Roll Back Recovery Changes"
+                                   Appearance="Danger"
                                    Command="{Binding RollbackRecoveryCommand}" />
                     </StackPanel>
                 </Grid>

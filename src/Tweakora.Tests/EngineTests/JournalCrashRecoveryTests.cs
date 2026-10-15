@@ -312,7 +312,6 @@ public sealed class JournalCrashRecoveryTests : IDisposable
         var installVm = new InstallViewModel(appInstall, opRunner);
         var configVm = new ConfigViewModel(featureService, fixService, opRunner);
         var updatesVm = new UpdatesViewModel(updateMode, opRunner);
-        var backupsVm = new BackupsViewModel(tweakService);
 
         var mainVm = new MainViewModel(
             dashboardVm,
@@ -322,7 +321,6 @@ public sealed class JournalCrashRecoveryTests : IDisposable
             updatesVm,
             toolboxVm,
             startupVm,
-            backupsVm,
             activityTracker: null,
             tweakService: tweakService);
 
@@ -383,7 +381,6 @@ public sealed class JournalCrashRecoveryTests : IDisposable
         var installVm = new InstallViewModel(appInstall, opRunner);
         var configVm = new ConfigViewModel(featureService, fixService, opRunner);
         var updatesVm = new UpdatesViewModel(updateMode, opRunner);
-        var backupsVm = new BackupsViewModel(tweakService);
 
         var mainVm = new MainViewModel(
             dashboardVm,
@@ -393,7 +390,6 @@ public sealed class JournalCrashRecoveryTests : IDisposable
             updatesVm,
             toolboxVm,
             startupVm,
-            backupsVm,
             activityTracker: null,
             tweakService: tweakService);
 

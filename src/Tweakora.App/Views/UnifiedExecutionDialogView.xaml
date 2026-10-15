@@ -35,6 +35,7 @@
                             <TextBlock Text="{Binding PreviewTitle}" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" />
                         </StackPanel>
                         <Button DockPanel.Dock="Right" Content="✕" Style="{DynamicResource ModernGhostBtn}"
+                                AutomationProperties.Name="Close Preview Dialog"
                                 Command="{Binding CancelPreviewCommand}" />
                     </DockPanel>
 
@@ -74,6 +75,7 @@
 
                                                 <!-- Checkbox (disabled if already applied in apply mode) -->
                                                 <CheckBox Grid.Column="0" IsChecked="{Binding IsSelected}"
+                                                          AutomationProperties.Name="{Binding Name, StringFormat='Select {0}'}"
                                                           IsEnabled="{Binding IsSelectable}"
                                                           VerticalAlignment="Center" Margin="0,0,12,0" />
 
@@ -113,8 +115,12 @@
                     <!-- Actions -->
                     <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,18,0,0">
                         <ui:Button Content="Cancel" Appearance="Secondary" Margin="0,0,10,0"
+                                   AutomationProperties.AutomationId="PreviewCancelButton"
+                                   AutomationProperties.Name="Cancel Preview"
                                    Command="{Binding CancelPreviewCommand}" />
                         <ui:Button Content="{Binding PreviewConfirmText}" Appearance="Primary"
+                                   AutomationProperties.AutomationId="PreviewConfirmButton"
+                                   AutomationProperties.Name="{Binding PreviewConfirmText}"
                                    Command="{Binding ConfirmPreviewCommand}" />
                     </StackPanel>
                 </Grid>
@@ -147,6 +153,7 @@
                             <TextBlock Text="{Binding ResultTitle}" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" />
                         </StackPanel>
                         <Button DockPanel.Dock="Right" Content="✕" Style="{DynamicResource ModernGhostBtn}"
+                                AutomationProperties.Name="Close Result Dialog"
                                 Command="{Binding CloseResultCommand}" />
                     </DockPanel>
 
@@ -217,6 +224,7 @@
                     <!-- Actions -->
                     <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
                         <ui:Button Content="Done" Appearance="Primary"
+                                   AutomationProperties.Name="Done and Close Results"
                                    Command="{Binding CloseResultCommand}" />
                     </StackPanel>
                 </Grid>

@@ -35,9 +35,15 @@ namespace Tweakora.App;
 public partial class App : Application
 {
     private readonly IHost _host;
+    private static readonly System.Diagnostics.Stopwatch _startupStopwatch;
     private static int _isShowingDispatcherDialog = 0;
     private static int _isShowingAppDomainDialog = 0;
     private static int _unhandledErrorCount = 0;
+
+    static App()
+    {
+        _startupStopwatch = System.Diagnostics.Stopwatch.StartNew();
+    }
 
     public App()
     {
@@ -124,7 +130,6 @@ public partial class App : Application
                 services.AddSingleton<UpdatesViewModel>();
                 services.AddSingleton<ToolboxViewModel>();
                 services.AddSingleton<StartupViewModel>();
-                services.AddSingleton<BackupsViewModel>();
                 services.AddSingleton<ToolsViewModel>();
                 services.AddSingleton<HistoryViewModel>();
                 services.AddSingleton<FirstRunWizardViewModel>();
@@ -136,6 +141,9 @@ public partial class App : Application
             })
             .Build();
     }
+
+    [System.Runtime.InteropServices.DllImport("kernel32.dll", SetLastError = true)]
+    private static extern bool AttachConsole(int dwProcessId);
 
     protected override async void OnStartup(StartupEventArgs e)
     {
@@ -151,6 +159,44 @@ public partial class App : Application
             window.Show();
 
             Log.Information("WinVelo main window shown successfully.");
+
+            // Item 0b Startup instrumentation: measure time to first Home render
+            await Dispatcher.InvokeAsync(() =>
+            {
+                if (_startupStopwatch.IsRunning)
+                {
+                    _startupStopwatch.Stop();
+                }
+                long elapsedMs = _startupStopwatch.ElapsedMilliseconds;
+                Log.Information("Startup completed to first Home render: {ElapsedMs} ms", elapsedMs);
+
+                if (e.Args.Any(a => string.Equals(a, "--measure-startup", StringComparison.OrdinalIgnoreCase)))
+                {
+                    if (TestModeManager.IsTestMode)
+                    {
+                        AttachConsole(-1);
+                        using var writer = new System.IO.StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true };
+                        Console.SetOut(writer);
+                        Console.WriteLine($"{elapsedMs} ms");
+                        Console.Out.Flush();
+                        Shutdown(0);
+                    }
+                    else
+                    {
+                        AttachConsole(-1);
+                        using var errWriter = new System.IO.StreamWriter(Console.OpenStandardError()) { AutoFlush = true };
+                        Console.SetError(errWriter);
+                        Console.Error.WriteLine("Error: --measure-startup is only supported in --test-mode.");
+                        Console.Error.Flush();
+                        Shutdown(1);
+                    }
+                }
+            }, DispatcherPriority.Loaded);
+
+            if (e.Args.Any(a => string.Equals(a, "--measure-startup", StringComparison.OrdinalIgnoreCase)))
+            {
+                return;
+            }
 
             if (e.Args.Any(a => string.Equals(a, "--capture-screenshots", StringComparison.OrdinalIgnoreCase)))
             {

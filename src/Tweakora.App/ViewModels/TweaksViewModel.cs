@@ -611,9 +611,6 @@ public sealed partial class TweaksViewModel : ObservableObject
     }
 
     [ObservableProperty]
-    private bool _isBeginnerMode = false;
-
-    [ObservableProperty]
     private bool _showExperimentalTweaks = false;
 
     [ObservableProperty]
@@ -651,7 +648,6 @@ public sealed partial class TweaksViewModel : ObservableObject
     partial void OnSelectedCategoryChanged(string value) => ApplyFilter();
     partial void OnSelectedRiskChanged(string value) => ApplyFilter();
     partial void OnSelectedStateChanged(string value) => ApplyFilter();
-    partial void OnIsBeginnerModeChanged(bool value) => ApplyFilter();
     partial void OnShowExperimentalTweaksChanged(bool value) => ApplyFilter();
     partial void OnIsRecommendedOnlyChanged(bool value) => ApplyFilter();
 
@@ -664,7 +660,9 @@ public sealed partial class TweaksViewModel : ObservableObject
     [RelayCommand]
     public void SetMode(string mode)
     {
-        IsBeginnerMode = string.Equals(mode, "Beginner", StringComparison.OrdinalIgnoreCase);
+        // Simple = only Recommended tweaks are visible. Advanced = everything; Experimental stays behind its own toggle.
+        IsRecommendedOnly = string.Equals(mode, "Simple", StringComparison.OrdinalIgnoreCase) ||
+                            string.Equals(mode, "Beginner", StringComparison.OrdinalIgnoreCase);
     }
 
     [RelayCommand]
@@ -705,15 +703,6 @@ public sealed partial class TweaksViewModel : ObservableObject
                                      !card.NeedsReview &&
                                      !string.Equals(card.Category, "Experimental", StringComparison.OrdinalIgnoreCase);
                 if (!isRecommended)
-                {
-                    continue;
-                }
-            }
-
-            // Beginner mode filter: hide caution / high-risk tweaks
-            if (IsBeginnerMode)
-            {
-                if (card.IsHighRisk || string.Equals(card.Risk, "Caution", StringComparison.OrdinalIgnoreCase) || card.CategoryGroup == "Advanced")
                 {
                     continue;
                 }

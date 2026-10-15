@@ -38,31 +38,37 @@
 
                             <UniformGrid Columns="2" Margin="0,0,0,8">
                                 <ui:Button AutomationProperties.AutomationId="Fix_AutoLogon"
+                                           AutomationProperties.Name="AutoLogon (Sysinternals)"
                                            Content="AutoLogon (Sysinternals)" Icon="{ui:SymbolIcon Person24}"
                                            Command="{Binding RunFixCommand}" CommandParameter="autologon"
                                            Margin="3" HorizontalAlignment="Stretch" />
 
                                 <ui:Button AutomationProperties.AutomationId="Fix_UpdateReset"
+                                           AutomationProperties.Name="Reset Windows Update"
                                            Content="Reset Windows Update" Icon="{ui:SymbolIcon ArrowSync24}"
                                            Command="{Binding RunFixCommand}" CommandParameter="update_reset"
                                            Margin="3" HorizontalAlignment="Stretch" />
 
                                 <ui:Button AutomationProperties.AutomationId="Fix_NetworkReset"
+                                           AutomationProperties.Name="Reset Network / Winsock"
                                            Content="Reset Network / Winsock" Icon="{ui:SymbolIcon Globe24}"
                                            Command="{Binding RunFixCommand}" CommandParameter="network_reset"
                                            Margin="3" HorizontalAlignment="Stretch" />
 
                                 <ui:Button AutomationProperties.AutomationId="Fix_DismSfc"
+                                           AutomationProperties.Name="DISM and SFC Scan"
                                            Content="DISM &amp; SFC Scan" Icon="{ui:SymbolIcon ShieldCheckmark24}"
                                            Command="{Binding RunFixCommand}" CommandParameter="dism_sfc"
                                            Margin="3" HorizontalAlignment="Stretch" />
 
                                 <ui:Button AutomationProperties.AutomationId="Fix_WinGetReinstall"
+                                           AutomationProperties.Name="Reinstall WinGet"
                                            Content="Reinstall WinGet" Icon="{ui:SymbolIcon ArrowDownload24}"
                                            Command="{Binding RunFixCommand}" CommandParameter="winget_reinstall"
                                            Margin="3" HorizontalAlignment="Stretch" />
 
                                 <ui:Button AutomationProperties.AutomationId="Fix_SyncTime"
+                                           AutomationProperties.Name="Sync Time (NTP)"
                                            Content="Sync Time (NTP)" Icon="{ui:SymbolIcon Clock24}"
                                            Command="{Binding RunFixCommand}" CommandParameter="sync_time"
                                            Margin="3" HorizontalAlignment="Stretch" />
@@ -79,6 +85,7 @@
                                                    FontSize="11" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
                                     </StackPanel>
                                     <ui:Button DockPanel.Dock="Right" AutomationProperties.AutomationId="OpenSshButton"
+                                               AutomationProperties.Name="Configure OpenSSH"
                                                Content="Configure OpenSSH" Icon="{ui:SymbolIcon LockClosed24}"
                                                Command="{Binding PromptOpenSshCommand}" VerticalAlignment="Center" />
                                 </DockPanel>
@@ -107,6 +114,7 @@
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
                                         <ui:Button AutomationProperties.AutomationId="{Binding Key, StringFormat='{}Panel_{0}'}"
+                                                   AutomationProperties.Name="{Binding Name}"
                                                    Content="{Binding Name}" Margin="3" HorizontalAlignment="Stretch"
                                                    HorizontalContentAlignment="Left" Appearance="Transparent"
                                                    Command="{Binding DataContext.LaunchPanelCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
@@ -133,9 +141,11 @@
                                 <TextBlock Text="{Binding SelectedFeaturesCount, StringFormat='{}Selected: {0}'}"
                                            VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,0,12,0" />
                                 <ui:Button AutomationProperties.AutomationId="InstallFeaturesButton"
+                                           AutomationProperties.Name="Enable Features"
                                            Content="Enable Features" Appearance="Primary" Icon="{ui:SymbolIcon Checkmark24}"
                                            Command="{Binding InstallSelectedFeaturesCommand}" Margin="0,0,6,0" />
                                 <ui:Button AutomationProperties.AutomationId="UninstallFeaturesButton"
+                                           AutomationProperties.Name="Disable Features"
                                            Content="Disable Features" Appearance="Secondary" Icon="{ui:SymbolIcon Dismiss24}"
                                            Command="{Binding UninstallSelectedFeaturesCommand}" />
                             </StackPanel>
@@ -160,6 +170,7 @@
                                             </Grid.ColumnDefinitions>
                                             <CheckBox Grid.Column="0" IsChecked="{Binding IsSelected, Mode=TwoWay}"
                                                       AutomationProperties.AutomationId="{Binding Key, StringFormat='FeatureCheck_{0}'}"
+                                                      AutomationProperties.Name="{Binding Name, StringFormat='Select {0}'}"
                                                       VerticalAlignment="Center" Margin="0,0,8,0" />
                                             <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                                 <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="12" TextTrimming="CharacterEllipsis" />
@@ -183,6 +194,7 @@
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" VerticalAlignment="Center">
                     <TextBlock Text="{Binding StatusMessage}" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center" />
                     <Button Style="{DynamicResource ModernGhostBtn}"
+                            AutomationProperties.Name="Show Failed Details"
                             Padding="4,1" Margin="6,0,0,0"
                             Visibility="{Binding HasFailedDetails, Converter={StaticResource BoolToVis}}"
                             Command="{Binding ShowDetailsDialogCommand}">
@@ -207,8 +219,11 @@
                     <TextBlock Text="Enabling OpenSSH Server installs the sshd service and opens TCP Port 22 in Windows Firewall for incoming connections. Ensure strong user passwords or SSH keys are in place."
                                TextWrapping="Wrap" Margin="0,0,0,16" FontSize="13" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
                     <DockPanel LastChildFill="False">
-                        <ui:Button DockPanel.Dock="Right" Content="Cancel" Command="{Binding CancelOpenSshCommand}" Margin="8,0,0,0" />
+                        <ui:Button DockPanel.Dock="Right" Content="Cancel"
+                                   AutomationProperties.Name="Cancel OpenSSH"
+                                   Command="{Binding CancelOpenSshCommand}" Margin="8,0,0,0" />
                         <ui:Button DockPanel.Dock="Right" Content="Confirm &amp; Enable OpenSSH" Appearance="Primary"
+                                   AutomationProperties.Name="Confirm and Enable OpenSSH"
                                    Command="{Binding ConfirmOpenSshCommand}" />
                     </DockPanel>
                 </StackPanel>
@@ -232,6 +247,7 @@
                     <DockPanel Grid.Row="0" Margin="0,0,0,12">
                         <TextBlock Text="{Binding DetailsDialogTitle}" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" />
                         <Button DockPanel.Dock="Right" Content="✕" Style="{DynamicResource ModernGhostBtn}"
+                                AutomationProperties.Name="Close Execution Details"
                                 Command="{Binding CloseDetailsDialogCommand}" />
                     </DockPanel>
 
@@ -266,6 +282,7 @@
 
                     <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,14,0,0">
                         <ui:Button Content="Close" Appearance="Secondary"
+                                   AutomationProperties.Name="Close Details"
                                    Command="{Binding CloseDetailsDialogCommand}" />
                     </StackPanel>
                 </Grid>

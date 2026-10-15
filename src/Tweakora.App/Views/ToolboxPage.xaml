@@ -17,15 +17,15 @@
 
             <!-- Tool Selection Buttons -->
             <WrapPanel Margin="0,0,0,20">
-                <ui:Button Content="Smart Cleaner" Icon="{ui:SymbolIcon Broom24}" Margin="0,0,8,8"
+                <ui:Button Content="Smart Cleaner" AutomationProperties.Name="Smart Cleaner" Icon="{ui:SymbolIcon Broom24}" Margin="0,0,8,8"
                            Command="{Binding SelectToolCommand}" CommandParameter="Cleaner" />
-                <ui:Button Content="Startup Apps" Icon="{ui:SymbolIcon Apps24}" Margin="0,0,8,8"
+                <ui:Button Content="Startup Apps" AutomationProperties.Name="Startup Apps" Icon="{ui:SymbolIcon Apps24}" Margin="0,0,8,8"
                            Command="{Binding SelectToolCommand}" CommandParameter="Startup" />
-                <ui:Button Content="Services Manager" Icon="{ui:SymbolIcon Settings24}" Margin="0,0,8,8"
+                <ui:Button Content="Services Manager" AutomationProperties.Name="Services Manager" Icon="{ui:SymbolIcon Settings24}" Margin="0,0,8,8"
                            Command="{Binding SelectToolCommand}" CommandParameter="Services" />
-                <ui:Button Content="Fixes Center" Icon="{ui:SymbolIcon Wrench24}" Margin="0,0,8,8"
+                <ui:Button Content="Fixes Center" AutomationProperties.Name="Fixes Center" Icon="{ui:SymbolIcon Wrench24}" Margin="0,0,8,8"
                            Command="{Binding SelectToolCommand}" CommandParameter="Fixes" />
-                <ui:Button Content="DNS Switcher" Icon="{ui:SymbolIcon Globe24}" Margin="0,0,8,8"
+                <ui:Button Content="DNS Switcher" AutomationProperties.Name="DNS Switcher" Icon="{ui:SymbolIcon Globe24}" Margin="0,0,8,8"
                            Command="{Binding SelectToolCommand}" CommandParameter="Network" />
             </WrapPanel>
 
@@ -55,11 +55,11 @@
                                 <TextBlock Text="{Binding CleanerStatusText}" FontWeight="Medium" Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}" FontSize="13" />
                             </StackPanel>
                             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                                <ui:Button Content="Purge RAM" Icon="{ui:SymbolIcon Broom24}" Margin="0,0,8,0"
+                                <ui:Button Content="Purge RAM" AutomationProperties.Name="Purge RAM" Icon="{ui:SymbolIcon Broom24}" Margin="0,0,8,0"
                                            Command="{Binding PurgeRamCommand}" />
-                                <ui:Button Content="Scan Now" Icon="{ui:SymbolIcon Search24}" Margin="0,0,8,0"
+                                <ui:Button Content="Scan Now" AutomationProperties.Name="Scan Cache Now" Icon="{ui:SymbolIcon Search24}" Margin="0,0,8,0"
                                            Command="{Binding ScanCleanerCommand}" />
-                                <ui:Button Content="Clean Selected" Icon="{ui:SymbolIcon Delete24}" Appearance="Primary"
+                                <ui:Button Content="Clean Selected" AutomationProperties.Name="Clean Selected Items" Icon="{ui:SymbolIcon Delete24}" Appearance="Primary"
                                            Command="{Binding CleanNowCommand}" />
                             </StackPanel>
                         </Grid>
@@ -72,11 +72,11 @@
                                 <ui:Card Margin="0,0,0,8" Padding="14">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto" />
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="Auto" />
+                                             <ColumnDefinition Width="Auto" />
+                                             <ColumnDefinition Width="*" />
+                                             <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
-                                        <CheckBox Grid.Column="0" IsChecked="{Binding IsSelected}" VerticalAlignment="Center" Margin="0,0,12,0" />
+                                        <CheckBox Grid.Column="0" AutomationProperties.Name="{Binding Name, StringFormat='Select {0}'}" IsChecked="{Binding IsSelected}" VerticalAlignment="Center" Margin="0,0,12,0" />
                                         <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                             <TextBlock Text="{Binding Name}" FontSize="15" FontWeight="SemiBold" />
                                             <TextBlock Text="{Binding PathDescription}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12" />
@@ -133,7 +133,7 @@
                                                 Background="{DynamicResource ControlFillColorSecondaryBrush}">
                                             <TextBlock Text="{Binding Impact, StringFormat='Impact: {0}'}" FontSize="11" FontWeight="Medium" />
                                         </Border>
-                                        <ui:ToggleSwitch Grid.Column="3" IsChecked="{Binding IsEnabled, Mode=OneWay}"
+                                        <ui:ToggleSwitch Grid.Column="3" AutomationProperties.Name="{Binding Name, StringFormat='Toggle {0}'}" IsChecked="{Binding IsEnabled, Mode=OneWay}"
                                                          Command="{Binding DataContext.ToggleStartupItemCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                          CommandParameter="{Binding}" VerticalAlignment="Center" />
                                     </Grid>
@@ -242,7 +242,7 @@
                                                 <TextBlock Text="{Binding Script, StringFormat='Command: {0}'}" FontFamily="Consolas" FontSize="11" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
                                             </Border>
                                         </StackPanel>
-                                        <ui:Button Grid.Column="1" Content="Run Repair" Icon="{ui:SymbolIcon Play24}" Appearance="Primary" VerticalAlignment="Center" Margin="16,0,0,0"
+                                        <ui:Button Grid.Column="1" Content="Run Repair" AutomationProperties.Name="{Binding Title, StringFormat='Run Repair: {0}'}" Icon="{ui:SymbolIcon Play24}" Appearance="Primary" VerticalAlignment="Center" Margin="16,0,0,0"
                                                    Command="{Binding DataContext.RunFixCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                    CommandParameter="{Binding}" />
                                     </Grid>
@@ -279,11 +279,11 @@
                                 <TextBlock Text="{Binding DnsStatusText}" FontWeight="Medium" Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}" FontSize="13" />
                             </StackPanel>
                             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                                <ui:Button Content="Benchmark All DNS" Icon="{ui:SymbolIcon Globe24}" Margin="0,0,8,0"
+                                <ui:Button Content="Benchmark All DNS" AutomationProperties.Name="Benchmark All DNS Providers" Icon="{ui:SymbolIcon Globe24}" Margin="0,0,8,0"
                                            Command="{Binding BenchmarkAllDnsCommand}" />
-                                <ui:Button Content="Apply Fastest" Icon="{ui:SymbolIcon Sparkle24}" Appearance="Primary" Margin="0,0,8,0"
+                                <ui:Button Content="Apply Fastest" AutomationProperties.Name="Apply Fastest DNS Provider" Icon="{ui:SymbolIcon Sparkle24}" Appearance="Primary" Margin="0,0,8,0"
                                            Command="{Binding ApplyFastestDnsCommand}" />
-                                <ui:Button Content="Reset to DHCP" Icon="{ui:SymbolIcon ArrowCounterclockwise24}"
+                                <ui:Button Content="Reset to DHCP" AutomationProperties.Name="Reset DNS to DHCP" Icon="{ui:SymbolIcon ArrowCounterclockwise24}"
                                            Command="{Binding ResetDnsToDhcpCommand}" />
                             </StackPanel>
                         </Grid>
@@ -306,6 +306,7 @@
                                 <TextBlock Text="{Binding NetworkStatusText}" FontWeight="Medium" Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}" FontSize="12" />
                             </StackPanel>
                             <ui:ToggleSwitch Grid.Column="1" VerticalAlignment="Center"
+                                             AutomationProperties.Name="Disable Nagle's Algorithm Toggle"
                                              IsChecked="{Binding IsNagleDisabled, Mode=OneWay}"
                                              Command="{Binding ToggleNagleCommand}"
                                              CommandParameter="{Binding IsChecked, RelativeSource={RelativeSource Self}}" />
@@ -338,10 +339,10 @@
                                                 <TextBlock Text="{Binding PingMs, StringFormat='Latency: {0} ms'}" FontSize="12" Foreground="#0078D4" FontWeight="Medium" />
                                             </StackPanel>
                                         </StackPanel>
-                                        <ui:Button Grid.Column="1" Content="Ping Test" Icon="{ui:SymbolIcon Timer24}" VerticalAlignment="Center"
+                                        <ui:Button Grid.Column="1" Content="Ping Test" AutomationProperties.Name="{Binding Name, StringFormat='Ping test {0}'}" Icon="{ui:SymbolIcon Timer24}" VerticalAlignment="Center"
                                                    Command="{Binding DataContext.TestDnsLatencyCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                    CommandParameter="{Binding}" />
-                                        <ui:Button Grid.Column="3" Content="Apply DNS" Icon="{ui:SymbolIcon Checkmark24}" Appearance="Primary" VerticalAlignment="Center"
+                                        <ui:Button Grid.Column="3" Content="Apply DNS" AutomationProperties.Name="{Binding Name, StringFormat='Apply DNS {0}'}" Icon="{ui:SymbolIcon Checkmark24}" Appearance="Primary" VerticalAlignment="Center"
                                                    Command="{Binding DataContext.ApplyDnsCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                    CommandParameter="{Binding}" />
                                     </Grid>

@@ -39,15 +39,20 @@
                         <!-- Right Badges -->
                         <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center">
                             <!-- Admin Badge -->
-                            <Border Background="{Binding AdminBadgeBg}" CornerRadius="12" Padding="10,4" Margin="0,0,8,0" VerticalAlignment="Center">
+                            <Border AutomationProperties.AutomationId="AdminStatusBadge"
+                                    AutomationProperties.Name="Administrator Status"
+                                    Background="{Binding AdminBadgeBg}" CornerRadius="12" Padding="10,4" Margin="0,0,8,0" VerticalAlignment="Center">
                                 <StackPanel Orientation="Horizontal">
                                     <ui:SymbolIcon Symbol="Shield20" Foreground="{Binding AdminBadgeFg}" FontSize="14" Margin="0,0,6,0" VerticalAlignment="Center" />
-                                    <TextBlock Text="{Binding AdminStatusText}" FontWeight="Bold" FontSize="11" Foreground="{Binding AdminBadgeFg}" VerticalAlignment="Center" />
+                                    <TextBlock AutomationProperties.AutomationId="AdminStatusBadge"
+                                               AutomationProperties.Name="Administrator Status"
+                                               Text="{Binding AdminStatusText}" FontWeight="Bold" FontSize="11" Foreground="{Binding AdminBadgeFg}" VerticalAlignment="Center" />
                                 </StackPanel>
                             </Border>
 
                             <!-- Create Restore Point Button -->
                             <ui:Button AutomationProperties.AutomationId="CreateRestorePointButton"
+                                       AutomationProperties.Name="Create Restore Point"
                                        Appearance="Secondary"
                                        Icon="{ui:SymbolIcon History24}"
                                        Content="Create Restore Point"
@@ -78,6 +83,7 @@
                                     <TextBlock Text="{Binding ExplorerRestartPendingMessage}" FontWeight="SemiBold" FontSize="12" Foreground="#DBEAFE" VerticalAlignment="Center" />
                                 </StackPanel>
                                 <ui:Button DockPanel.Dock="Right" Appearance="Primary" Content="Restart Explorer"
+                                           AutomationProperties.Name="Restart Windows Explorer"
                                            Command="{Binding RestartExplorerCommand}" Padding="10,4" FontSize="11" />
                             </DockPanel>
                         </Border>
@@ -107,13 +113,17 @@
                         </Border>
 
                         <!-- Card 2: System Restore -->
-                        <Border Grid.Column="1" Background="{DynamicResource ControlFillColorDefaultBrush}"
+                        <Border Grid.Column="1" AutomationProperties.AutomationId="SystemRestoreCard"
+                                AutomationProperties.Name="System Restore Status"
+                                Background="{DynamicResource ControlFillColorDefaultBrush}"
                                 BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
                                 BorderThickness="1" CornerRadius="8" Padding="14,12" Margin="3,0,3,0">
                             <StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
                                     <ui:SymbolIcon Symbol="History24" Foreground="{Binding SystemRestoreBadgeFg}" FontSize="16" Margin="0,0,8,0" VerticalAlignment="Center" />
-                                    <TextBlock Text="SYSTEM RESTORE" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" />
+                                    <TextBlock AutomationProperties.AutomationId="SystemRestoreHeader"
+                                               AutomationProperties.Name="System Restore"
+                                               Text="SYSTEM RESTORE" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" />
                                 </StackPanel>
                                 <TextBlock Text="{Binding SystemRestoreStatusText}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis" />
                                 <TextBlock Text="{Binding RestorePointStatus}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0" TextTrimming="CharacterEllipsis" />
@@ -158,6 +168,7 @@
                         <ui:SymbolIcon Symbol="Info24" Foreground="{DynamicResource AccentPrimaryBrush}" FontSize="16" Margin="0,0,8,0" VerticalAlignment="Center" />
                         <TextBlock Text="{Binding GlobalStatusMessage}" FontSize="12" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" />
                         <Button Style="{DynamicResource ModernGhostBtn}"
+                                AutomationProperties.Name="Show Global Error Details"
                                 Padding="4,1" Margin="6,0,0,0"
                                 Visibility="{Binding HasFailedDetails, Converter={StaticResource BoolToVisConverter}}"
                                 Command="{Binding ShowDetailsDialogCommand}">
@@ -166,6 +177,7 @@
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center">
                         <ui:Button AutomationProperties.AutomationId="SmartAnalyzeOptimizeButton"
+                                   AutomationProperties.Name="Run Smart Advisor"
                                    Appearance="Secondary"
                                    Command="{Binding SmartAnalyzeAndOptimizeCommand}"
                                    IsEnabled="{Binding IsNotSmartOptimizing}"
@@ -191,7 +203,9 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Border Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                        <Border AutomationProperties.AutomationId="{Binding Id, StringFormat='PresetCard_{0}'}"
+                                AutomationProperties.Name="{Binding Title}"
+                                Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
                                 BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
                                 BorderThickness="1" CornerRadius="10" Padding="18,16" Margin="6">
                             <Grid>
@@ -209,7 +223,9 @@
                                             <ui:SymbolIcon Symbol="{Binding IconSymbol}" Foreground="{DynamicResource AccentPrimaryBrush}" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                         </Border>
                                         <StackPanel VerticalAlignment="Center">
-                                            <TextBlock Text="{Binding Title}" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" />
+                                            <TextBlock AutomationProperties.AutomationId="{Binding Id, StringFormat='PresetCard_{0}'}"
+                                                       AutomationProperties.Name="{Binding Title}"
+                                                       Text="{Binding Title}" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" />
                                             <TextBlock Text="{Binding TweakCountText}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" />
                                         </StackPanel>
                                     </StackPanel>
@@ -236,6 +252,7 @@
                                     <ui:Button DockPanel.Dock="Left"
                                                Appearance="Primary"
                                                AutomationProperties.AutomationId="{Binding Id, StringFormat='ProfileBtn_{0}'}"
+                                               AutomationProperties.Name="{Binding Title, StringFormat='Apply {0} Profile'}"
                                                Content="{Binding ButtonText}"
                                                Command="{Binding ApplyCommand}"
                                                Padding="16,7" FontWeight="SemiBold" />
@@ -244,6 +261,7 @@
                                         <TextBlock Text="{Binding StatusMessage}" FontSize="11"
                                                    Foreground="{Binding StatusColor}" FontWeight="SemiBold" VerticalAlignment="Center" />
                                         <Button Style="{DynamicResource ModernGhostBtn}"
+                                                AutomationProperties.Name="{Binding Title, StringFormat='Show details for {0} profile'}"
                                                 Padding="4,1" Margin="4,0,0,0"
                                                 Visibility="{Binding HasFailures, Converter={StaticResource BoolToVisConverter}}"
                                                 Command="{Binding ShowDetailsCommand}">
@@ -295,6 +313,7 @@
                                                          Foreground="#3B82F6"
                                                          Visibility="{Binding IsApplying, Converter={StaticResource BoolToVisConverter}}" />
                                         <ui:ToggleSwitch AutomationProperties.AutomationId="{Binding Id, StringFormat='Toggle_{0}'}"
+                                                         AutomationProperties.Name="{Binding Title, StringFormat='Toggle {0}'}"
                                                          IsChecked="{Binding IsActive, Mode=OneWay}"
                                                          IsEnabled="{Binding IsNotApplying}"
                                                          Command="{Binding ToggleCommand}"
@@ -344,6 +363,7 @@
                 <DockPanel Grid.Row="0" Margin="0,0,0,12">
                     <TextBlock Text="{Binding DetailsDialogTitle}" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" />
                     <Button DockPanel.Dock="Right" Content="✕" Style="{DynamicResource ModernGhostBtn}"
+                            AutomationProperties.Name="Close Execution Details"
                             Command="{Binding CloseDetailsDialogCommand}" />
                 </DockPanel>
 
@@ -378,6 +398,7 @@
 
                 <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,14,0,0">
                     <ui:Button Content="Close" Appearance="Secondary"
+                               AutomationProperties.Name="Close Details Dialog"
                                Command="{Binding CloseDetailsDialogCommand}" />
                 </StackPanel>
             </Grid>
@@ -406,6 +427,7 @@
                         <TextBlock Text="{Binding IrreversibleDialogTitle}" FontSize="16" FontWeight="Bold" Foreground="#EF4444" VerticalAlignment="Center" />
                     </StackPanel>
                     <Button DockPanel.Dock="Right" Content="✕" Style="{DynamicResource ModernGhostBtn}"
+                            AutomationProperties.Name="Close Warning Dialog"
                             Command="{Binding CancelIrreversibleCommand}" />
                 </DockPanel>
 
@@ -431,8 +453,10 @@
 
                 <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
                     <ui:Button Content="Cancel" Appearance="Secondary" Margin="0,0,10,0"
+                               AutomationProperties.Name="Cancel Permanent Changes"
                                Command="{Binding CancelIrreversibleCommand}" />
                     <ui:Button Content="I Understand, Apply Changes" Appearance="Danger"
+                               AutomationProperties.Name="Confirm Apply Permanent Changes"
                                Command="{Binding ConfirmIrreversibleCommand}" />
                 </StackPanel>
             </Grid>
@@ -464,6 +488,7 @@
                         <TextBlock Text="{Binding ProfilePreviewTitle}" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" />
                     </StackPanel>
                     <Button DockPanel.Dock="Right" Content="✕" Style="{DynamicResource ModernGhostBtn}"
+                            AutomationProperties.Name="Close Profile Preview"
                             Command="{Binding CancelProfilePreviewCommand}" />
                 </DockPanel>
 
@@ -503,6 +528,7 @@
 
                                             <!-- Checkbox (disabled if already applied) -->
                                             <CheckBox Grid.Column="0" IsChecked="{Binding IsSelected}"
+                                                      AutomationProperties.Name="{Binding Name, StringFormat='Select {0}'}"
                                                       IsEnabled="{Binding IsSelectable}"
                                                       VerticalAlignment="Center" Margin="0,0,12,0" />
 
@@ -542,8 +568,10 @@
                 <!-- Actions -->
                 <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
                     <ui:Button Content="Cancel" Appearance="Secondary" Margin="0,0,10,0"
+                               AutomationProperties.Name="Cancel Profile Preview"
                                Command="{Binding CancelProfilePreviewCommand}" />
                     <ui:Button Content="{Binding ProfilePreviewConfirmText}" Appearance="Primary"
+                               AutomationProperties.Name="{Binding ProfilePreviewConfirmText}"
                                Command="{Binding ConfirmProfilePreviewCommand}" />
                 </StackPanel>
             </Grid>
