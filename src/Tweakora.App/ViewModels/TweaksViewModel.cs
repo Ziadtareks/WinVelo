@@ -544,6 +544,15 @@ public sealed partial class TweaksViewModel : ObservableObject
         }
     }
 
+    private static int GetRiskRank(string? risk) => (risk?.Trim().ToLowerInvariant()) switch
+    {
+        "safe" => 0,
+        "low" => 1,
+        "medium" or "moderate" => 2,
+        "high" or "caution" => 3,
+        _ => 4
+    };
+
     private void LoadCatalogTweaksFast()
     {
         _allTweaks.Clear();
@@ -561,6 +570,16 @@ public sealed partial class TweaksViewModel : ObservableObject
             };
             _allTweaks.Add(card);
         }
+
+        // Sort by risk ascending (Safe -> Low -> Medium -> High), then alphabetically by name
+        _allTweaks.Sort((a, b) =>
+        {
+            int riskA = GetRiskRank(a.Risk);
+            int riskB = GetRiskRank(b.Risk);
+            int cmp = riskA.CompareTo(riskB);
+            if (cmp != 0) return cmp;
+            return string.Compare(a.Title, b.Title, StringComparison.OrdinalIgnoreCase);
+        });
 
         TotalCount = _allTweaks.Count;
         AllCount = TotalCount;
@@ -637,7 +656,7 @@ public sealed partial class TweaksViewModel : ObservableObject
     private bool _showExperimentalTweaks = false;
 
     [ObservableProperty]
-    private bool _isRecommendedOnly = false;
+    private bool _isRecommendedOnly = true;
 
     [ObservableProperty]
     private string _selectedRisk = "All";

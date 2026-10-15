@@ -184,11 +184,9 @@ public sealed class TweakExplanationTests
         var tweakService = new TweakService(fakeReg, fakeServices, fakeTasks, fakeRestore, fakeShell, journal);
         var vm = new TweaksViewModel(tweakService, runner);
 
-        Assert.False(vm.IsRecommendedOnly);
-        int totalBefore = vm.FilteredTweaks.Count;
-        Assert.True(totalBefore > 0);
-
-        vm.IsRecommendedOnly = true;
+        Assert.True(vm.IsRecommendedOnly);
+        int recBefore = vm.FilteredTweaks.Count;
+        Assert.True(recBefore > 0);
 
         foreach (var card in vm.FilteredTweaks)
         {
@@ -204,10 +202,39 @@ public sealed class TweakExplanationTests
             Assert.NotEqual("Experimental", card.Category, StringComparer.OrdinalIgnoreCase);
         }
 
-        // Toggle back off
+        // Toggle to "All" (Recommended only OFF)
         vm.ToggleRecommendedOnlyCommand.Execute(null);
         Assert.False(vm.IsRecommendedOnly);
-        Assert.Equal(totalBefore, vm.FilteredTweaks.Count);
+        int totalBefore = vm.FilteredTweaks.Count;
+        Assert.True(totalBefore > recBefore);
+
+        // Verify sorting in "All": risk ascending (Safe -> Low -> Medium -> High), then by name
+        int prevRisk = -1;
+        string prevTitle = string.Empty;
+        foreach (var card in vm.FilteredTweaks)
+        {
+            int r = card.Risk.ToLowerInvariant() switch
+            {
+                "safe" => 0,
+                "low" => 1,
+                "medium" or "moderate" => 2,
+                "high" or "caution" => 3,
+                _ => 4
+            };
+            Assert.True(r >= prevRisk, $"Card {card.Title} risk {card.Risk} appeared after risk rank {prevRisk}");
+            if (r == prevRisk)
+            {
+                Assert.True(string.Compare(card.Title, prevTitle, StringComparison.OrdinalIgnoreCase) >= 0,
+                    $"Card {card.Title} appeared out of alphabetical order after {prevTitle}");
+            }
+            prevRisk = r;
+            prevTitle = card.Title;
+        }
+
+        // Toggle back to Recommended only
+        vm.ToggleRecommendedOnlyCommand.Execute(null);
+        Assert.True(vm.IsRecommendedOnly);
+        Assert.Equal(recBefore, vm.FilteredTweaks.Count);
     }
 
     [Fact]

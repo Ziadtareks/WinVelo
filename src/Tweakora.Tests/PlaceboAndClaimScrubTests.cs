@@ -178,7 +178,8 @@ public sealed class PlaceboAndClaimScrubTests
         Assert.DoesNotContain(vm.FilteredTweaks, t => t.Category.Equals("Experimental", StringComparison.OrdinalIgnoreCase));
         Assert.DoesNotContain(vm.FilteredTweaks, t => t.Evidence.Equals("anecdotal", StringComparison.OrdinalIgnoreCase));
 
-        // When toggled on, Experimental tweaks appear
+        // When in All mode and toggled on, Experimental tweaks appear
+        vm.IsRecommendedOnly = false;
         vm.ShowExperimentalTweaks = true;
         Assert.Contains(vm.FilteredTweaks, t => t.Category.Equals("Experimental", StringComparison.OrdinalIgnoreCase));
         Assert.Contains(vm.FilteredTweaks, t => t.Evidence.Equals("anecdotal", StringComparison.OrdinalIgnoreCase));
