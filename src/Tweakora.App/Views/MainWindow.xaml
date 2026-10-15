@@ -160,7 +160,7 @@
                                        Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" />
                         </StackPanel>
                         <Border DockPanel.Dock="Right" Background="{DynamicResource StatusDefaultBgBrush}" CornerRadius="4" Padding="6,2" VerticalAlignment="Center">
-                            <TextBlock Text="v1.0.0" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextSecondaryBrush}" />
+                            <TextBlock Text="v0.9.0-beta" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextSecondaryBrush}" />
                         </Border>
                     </DockPanel>
 

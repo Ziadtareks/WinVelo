@@ -380,7 +380,7 @@ public sealed partial class MainViewModel : ObservableObject
     {
         ConfigDialogText = System.Text.Json.JsonSerializer.Serialize(new
         {
-            Version = "1.0.0",
+            Version = "0.9.0-beta",
             ExportedAtUtc = DateTime.UtcNow,
             SelectedTweaks = TweaksVM.GetSelectedTweakIds()
         }, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });

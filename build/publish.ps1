@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Reproducible release packaging script for WinVelo.
 .DESCRIPTION
@@ -8,7 +8,9 @@
 #>
 
 [CmdletBinding()]
-param()
+param(
+    [string]$Version = "0.9.0-beta"
+)
 
 $ErrorActionPreference = "Stop"
 
@@ -60,10 +62,10 @@ if ($runningProcesses) {
 }
 
 $distDir = Join-Path $repoRoot "dist"
-$portableDir = Join-Path $distDir "WinVelo-v1.0.0-win-x64-portable"
-$smallDir = Join-Path $distDir "WinVelo-v1.0.0-win-x64-small"
-$portableZip = Join-Path $distDir "WinVelo-v1.0.0-win-x64-portable.zip"
-$smallZip = Join-Path $distDir "WinVelo-v1.0.0-win-x64-small.zip"
+$portableDir = Join-Path $distDir "WinVelo-v$Version-win-x64-portable"
+$smallDir = Join-Path $distDir "WinVelo-v$Version-win-x64-small"
+$portableZip = Join-Path $distDir "WinVelo-v$Version-win-x64-portable.zip"
+$smallZip = Join-Path $distDir "WinVelo-v$Version-win-x64-small.zip"
 $shaSumsFile = Join-Path $distDir "SHA256SUMS.txt"
 
 Write-Host "=== WinVelo Reproducible Release Publisher ===" -ForegroundColor Cyan
@@ -149,8 +151,8 @@ if (Test-Path $shaSumsFile) {
 
 $shaContent = @(
     "# WinVelo Production Releases",
-    "$portableHash  WinVelo-v1.0.0-win-x64-portable.zip",
-    "$smallHash  WinVelo-v1.0.0-win-x64-small.zip",
+    "$portableHash  WinVelo-v$Version-win-x64-portable.zip",
+    "$smallHash  WinVelo-v$Version-win-x64-small.zip",
     "",
     $legacySection
 ) -join [Environment]::NewLine
@@ -161,7 +163,7 @@ $portableSizeMb = [Math]::Round((Get-Item $portableZip).Length / 1MB, 2)
 $smallSizeMb = [Math]::Round((Get-Item $smallZip).Length / 1MB, 2)
 
 Write-Host "`n========================================================" -ForegroundColor Green
-Write-Host " WinVelo Release v1.0.0 Successfully Built & Packaged!" -ForegroundColor Green
+Write-Host " WinVelo Release v$Version Successfully Built & Packaged!" -ForegroundColor Green
 Write-Host "========================================================" -ForegroundColor Green
 Write-Host "Portable Package: $portableZip"
 Write-Host "  Size:   $portableSizeMb MB"

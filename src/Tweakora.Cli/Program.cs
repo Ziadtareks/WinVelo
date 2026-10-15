@@ -39,7 +39,7 @@ public static class Program
     public static async Task<int> Main(string[] args)
     {
         Console.WriteLine("========================================");
-        Console.WriteLine("         WinVelo CLI v1.0.0             ");
+        Console.WriteLine("         WinVelo CLI v0.9.0-beta        ");
         Console.WriteLine("========================================");
 
         if (args.Length == 0 || args.Contains("--help") || args.Contains("-h"))
