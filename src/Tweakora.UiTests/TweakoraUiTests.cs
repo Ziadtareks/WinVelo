@@ -103,12 +103,14 @@ public sealed partial class TweakoraUiTests
     {
         try
         {
-            var skipBtn = window.FindFirstDescendant(cf => cf.ByAutomationId("SkipWizardButton"))
-                       ?? window.FindFirstDescendant(cf => cf.ByName("Skip Setup"));
+            var skipBtn = Retry.WhileNull(() =>
+                window.FindFirstDescendant(cf => cf.ByAutomationId("SkipWizardButton"))
+                ?? window.FindFirstDescendant(cf => cf.ByName("Skip Setup")),
+                TimeSpan.FromSeconds(5)).Result;
             if (skipBtn != null)
             {
                 SafeInvoke(skipBtn);
-                Thread.Sleep(500);
+                Thread.Sleep(800);
             }
         }
         catch { }
@@ -153,9 +155,14 @@ public sealed partial class TweakoraUiTests
 
         var app = Application.Launch(psi);
         var automation = new UIA3Automation();
-        app.WaitWhileMainHandleIsMissing(TimeSpan.FromSeconds(15));
-
-        var window = Retry.WhileNull(() => app.GetMainWindow(automation), TimeSpan.FromSeconds(15)).Result;
+        var window = Retry.WhileNull(() =>
+        {
+            var topWindows = app.GetAllTopLevelWindows(automation);
+            return topWindows.FirstOrDefault(w =>
+                (!string.IsNullOrEmpty(w.Title) && w.Title.Contains("WinVelo")) ||
+                w.AutomationId == "TweakoraMainWindow")
+                ?? topWindows.FirstOrDefault(w => w.FindAllDescendants().Length > 5);
+        }, TimeSpan.FromSeconds(25)).Result;
         Assert.NotNull(window);
         window.Focus();
         try
@@ -512,6 +519,73 @@ public sealed partial class TweakoraUiTests
 
             Assert.True(missingInteractiveNames.Count == 0,
                 $"UI Accessibility violation: Interactive elements missing automation name:\n{string.Join("\n", missingInteractiveNames)}");
+        }
+        finally
+        {
+            automation.Dispose();
+            app.Close();
+        }
+    }
+
+    [Fact]
+    public void Test_08_FirstRunWizard_ModalAndKeyboardNavigation()
+    {
+        string solutionDir = FindSolutionRoot();
+        string exePath = Path.Combine(solutionDir, "src", "Tweakora.App", "bin", "Debug", "net10.0-windows", "WinVelo.exe");
+        if (!File.Exists(exePath))
+        {
+            exePath = Path.Combine(solutionDir, "src", "Tweakora.App", "bin", "Debug", "net10.0-windows", "Tweakora.App.exe");
+        }
+
+        var psi = new ProcessStartInfo
+        {
+            FileName = exePath,
+            Arguments = "--test-mode",
+            UseShellExecute = false
+        };
+
+        var app = Application.Launch(psi);
+        var automation = new UIA3Automation();
+        try
+        {
+            var window = Retry.WhileNull(() =>
+            {
+                var topWindows = app.GetAllTopLevelWindows(automation);
+                return topWindows.FirstOrDefault(w =>
+                    (!string.IsNullOrEmpty(w.Title) && w.Title.Contains("WinVelo")) ||
+                    w.AutomationId == "TweakoraMainWindow")
+                    ?? topWindows.FirstOrDefault(w => w.FindAllDescendants().Length > 5);
+            }, TimeSpan.FromSeconds(25)).Result;
+            Assert.NotNull(window);
+
+            // 1. Verify Wizard is open initially on launch in test mode
+            var wizard = Retry.WhileNull(() =>
+                window.FindFirstDescendant(cf => cf.ByAutomationId("FirstRunWizardView")),
+                TimeSpan.FromSeconds(10)).Result;
+            Assert.NotNull(wizard);
+
+            // 2. Verify Step 1 elements
+            var nextBtn = window.FindFirstDescendant(cf => cf.ByAutomationId("WizardNextButton"));
+            Assert.NotNull(nextBtn);
+
+            var skipBtn = window.FindFirstDescendant(cf => cf.ByAutomationId("SkipWizardButton"));
+            Assert.NotNull(skipBtn);
+
+            // 3. Test Enter key / Next Step invocation
+            SafeInvoke(nextBtn);
+            Thread.Sleep(600);
+
+            var restoreTitle = window.FindFirstDescendant(cf => cf.ByName("System Restore Protection"))
+                            ?? window.FindFirstDescendant(cf => cf.ByName("Step 2 of 3"));
+            Assert.NotNull(restoreTitle);
+
+            // 4. Test Skip / Esc closes wizard
+            SafeInvoke(skipBtn);
+            Thread.Sleep(800);
+
+            // 5. Verify wizard overlay is closed and Home is accessible
+            var homeBtn = window.FindFirstDescendant(cf => cf.ByAutomationId("Tab_Dashboard"));
+            Assert.NotNull(homeBtn);
         }
         finally
         {

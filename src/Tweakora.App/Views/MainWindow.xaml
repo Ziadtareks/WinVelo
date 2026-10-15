@@ -440,7 +440,7 @@
 
         <!-- FIRST-RUN WIZARD MODAL OVERLAY -->
         <Grid Grid.Row="0" Grid.RowSpan="4"
-              Background="#B0000000"
+              Background="#99000000"
               Panel.ZIndex="2000"
               Visibility="{Binding IsWizardOpen, Converter={StaticResource BoolToVisConverter}}">
             <views:FirstRunWizardView DataContext="{Binding WizardVM}" />
