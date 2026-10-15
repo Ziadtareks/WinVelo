@@ -47,9 +47,11 @@
 
 ## 📸 Screenshots
 
+![WinVelo Visual Overview](docs/screenshots/overview.png)
+
 ### Home (Calm System Status)
 Honest status overview showing administrator privilege, System Restore state with latest restore point date, exact count of tweaks applied by WinVelo, servicing health, and preset cards.
-![WinVelo Home](docs/screenshots/dashboard.png)
+![WinVelo Home](docs/screenshots/home.png)
 
 ### Tweaks (Catalog & Exact Changes)
 149 verified tweaks categorized by risk (Safe, Low, Medium, High) with honest state badges (Applied, Partial, Not applied, Can't verify), auto-generated exact changes, and cited source documentation.
@@ -57,7 +59,7 @@ Honest status overview showing administrator privilege, System Restore state wit
 
 ### Apps (Curated Package Manager)
 Curated package installer across Browsers, Social, Media, Utilities, Gaming, and Development with live installation progress.
-![WinVelo Apps](docs/screenshots/install.png)
+![WinVelo Apps](docs/screenshots/apps.png)
 
 ### Tools (Consolidated System Hub)
 Consolidated toolkit housing Startup Apps, Windows Services, System Cleaner, DNS switcher, Windows Fixes, Windows Updates mode, Optional Features, and Restore Points.

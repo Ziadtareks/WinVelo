@@ -7,7 +7,7 @@
                    xmlns:loc="clr-namespace:Tweakora.App.Localization"
                    Title="WinVelo — Windows Velocity &amp; Performance Utility"
                    Height="860" Width="1360"
-                   MinHeight="700" MinWidth="1080"
+                   MinHeight="640" MinWidth="960"
                    WindowStartupLocation="CenterScreen"
                    ExtendsContentIntoTitleBar="True"
                    AutomationProperties.AutomationId="TweakoraMainWindow">

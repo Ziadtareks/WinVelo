@@ -20,16 +20,16 @@
         </Grid.RowDefinitions>
 
         <!-- HEADER -->
-        <DockPanel Grid.Row="0" Margin="0,0,0,18" LastChildFill="False">
-            <StackPanel DockPanel.Dock="Left">
+        <WrapPanel Grid.Row="0" Margin="0,0,0,18" Orientation="Horizontal">
+            <StackPanel Margin="0,0,24,10">
                 <TextBlock Text="History &amp; Rollback Journal" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" />
                 <TextBlock Text="Track every modification made by WinVelo with baseline snapshots and non-destructive rollbacks."
                            FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,4,0,0" />
             </StackPanel>
 
-            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+            <WrapPanel Orientation="Horizontal" VerticalAlignment="Center">
                 <!-- View Switcher -->
-                <Border Background="{DynamicResource BgDeepBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="1" CornerRadius="6" Padding="2" Margin="0,0,12,0">
+                <Border Background="{DynamicResource BgDeepBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="1" CornerRadius="6" Padding="2" Margin="0,0,12,6">
                     <StackPanel Orientation="Horizontal">
                         <Button AutomationProperties.Name="View session timeline" Content="Session Timeline"
                                 Command="{Binding SetHistoryViewCommand}" CommandParameter="Sessions"
@@ -44,29 +44,29 @@
                 <Button AutomationProperties.AutomationId="UndoAllWinVeloButton"
                         AutomationProperties.Name="Undo all WinVelo changes"
                         Content="Undo All WinVelo Changes" Style="{DynamicResource ModernSecondaryBtn}"
-                        Command="{Binding UndoAllChangesCommand}" Margin="0,0,8,0" Padding="12,7" FontSize="12" />
+                        Command="{Binding UndoAllChangesCommand}" Margin="0,0,8,6" Padding="12,7" FontSize="12" />
 
                 <!-- Create Restore Point -->
                 <Button AutomationProperties.AutomationId="CreateRestorePointButton"
                         AutomationProperties.Name="Create restore point"
                         Content="Create Restore Point" Style="{DynamicResource ModernGhostBtn}"
-                        Command="{Binding CreateRestorePointCommand}" Margin="0,0,8,0" Padding="10,7" FontSize="12" />
+                        Command="{Binding CreateRestorePointCommand}" Margin="0,0,8,6" Padding="10,7" FontSize="12" />
 
                 <!-- Refresh -->
                 <Button AutomationProperties.AutomationId="RefreshHistoryButton"
                         AutomationProperties.Name="Refresh history"
                         Content="Refresh" Style="{DynamicResource ModernGhostBtn}"
-                        Command="{Binding RefreshHistoryCommand}" Padding="10,7" FontSize="12" />
-            </StackPanel>
-        </DockPanel>
+                        Command="{Binding RefreshHistoryCommand}" Margin="0,0,0,6" Padding="10,7" FontSize="12" />
+            </WrapPanel>
+        </WrapPanel>
 
         <!-- MAIN WORKSPACE -->
         <Grid Grid.Row="1">
             <!-- 1. SESSIONS TIMELINE (2-COLUMN) -->
             <Grid Visibility="{Binding IsTimelineView, Converter={StaticResource BoolToVisConverter}}">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="380" /> <!-- Left: Sessions & Restore Points -->
-                    <ColumnDefinition Width="*" />   <!-- Right: Selected Session Details & Tweaks -->
+                    <ColumnDefinition Width="330" MinWidth="260" /> <!-- Left: Sessions & Restore Points -->
+                    <ColumnDefinition Width="*" />                  <!-- Right: Selected Session Details & Tweaks -->
                 </Grid.ColumnDefinitions>
 
             <!-- LEFT: SESSIONS LIST & RESTORE POINTS -->

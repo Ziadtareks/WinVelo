@@ -20,7 +20,7 @@
         </StackPanel>
 
         <!-- Content -->
-        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
             <StackPanel MaxWidth="800" HorizontalAlignment="Left">
 
                 <!-- 1. Experience Level -->

@@ -1,9 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using FlaUI.Core;
 using FlaUI.Core.AutomationElements;
 using FlaUI.Core.Capturing;
@@ -593,4 +596,157 @@ public sealed partial class TweakoraUiTests
             app.Close();
         }
     }
+
+    [Fact]
+    public void Test_09_UiReviewVerification_Screenshots_Responsiveness_Contrast()
+    {
+        string solutionDir = FindSolutionRoot();
+        string screenshotsDir = Path.Combine(solutionDir, "docs", "screenshots");
+
+        // ==================== 1. SCREENSHOT INTEGRITY (>= 20KB & NOT PURE BLACK) ====================
+        string[] requiredScreenshots =
+        {
+            "home.png", "tweaks.png", "apps.png", "tools.png", "history.png", "settings.png", "wizard.png", "preview.png", "overview.png",
+            Path.Combine("light", "home.png"),
+            Path.Combine("light", "tweaks.png"),
+            Path.Combine("light", "apps.png"),
+            Path.Combine("light", "tools.png"),
+            Path.Combine("light", "history.png"),
+            Path.Combine("light", "settings.png"),
+            Path.Combine("light", "wizard.png"),
+            Path.Combine("light", "preview.png")
+        };
+
+        foreach (var file in requiredScreenshots)
+        {
+            string path = Path.Combine(screenshotsDir, file);
+            Assert.True(File.Exists(path), $"Mandatory screenshot missing: {file}");
+            var fi = new FileInfo(path);
+            Assert.True(fi.Length >= 20480, $"Screenshot {file} is suspiciously small ({fi.Length} bytes < 20KB limit)");
+
+            // Check not pure black
+            var decoder = BitmapDecoder.Create(new Uri(path, UriKind.Absolute), BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
+            var frame = decoder.Frames[0];
+            var converted = new FormatConvertedBitmap(frame, PixelFormats.Bgra32, null, 0);
+            int stride = converted.PixelWidth * 4;
+            byte[] pixels = new byte[converted.PixelHeight * stride];
+            converted.CopyPixels(pixels, stride, 0);
+
+            int maxBrightness = 0;
+            // Sample every 16th pixel for speed
+            for (int i = 0; i < pixels.Length; i += 64)
+            {
+                int b = pixels[i];
+                int g = pixels[i + 1];
+                int r = pixels[i + 2];
+                int brightness = Math.Max(r, Math.Max(g, b));
+                if (brightness > maxBrightness) maxBrightness = brightness;
+                if (maxBrightness > 80) break;
+            }
+            Assert.True(maxBrightness > 80, $"Screenshot {file} appears completely black (max brightness {maxBrightness} <= 80)");
+        }
+
+        // ==================== 2. TEXT CONTRAST (WCAG AA >= 4.5:1 ON BODY TEXT) ====================
+        // Dark theme tokens
+        var darkBgColors = new[]
+        {
+            Color.FromRgb(0x0F, 0x11, 0x17), // BgDeep
+            Color.FromRgb(0x1E, 0x22, 0x2D), // BgCard
+            Color.FromRgb(0x16, 0x19, 0x22)  // BgSidebar
+        };
+        var darkTextColors = new[]
+        {
+            Color.FromRgb(0xF9, 0xFA, 0xFB), // TextPrimary
+            Color.FromRgb(0xD1, 0xD5, 0xDB), // TextSecondary
+            Color.FromRgb(0x9C, 0xA3, 0xAF)  // TextMuted
+        };
+
+        foreach (var bg in darkBgColors)
+        {
+            foreach (var fg in darkTextColors)
+            {
+                double ratio = ComputeContrastRatio(fg, bg);
+                Assert.True(ratio >= 4.5, $"Dark theme text contrast ratio {ratio:F2}:1 is below WCAG AA 4.5:1 requirement");
+            }
+        }
+
+        // Light theme tokens
+        var lightBgColors = new[]
+        {
+            Color.FromRgb(0xF3, 0xF4, 0xF6), // BgDeep
+            Color.FromRgb(0xFF, 0xFF, 0xFF), // BgCard
+            Color.FromRgb(0xE5, 0xE7, 0xEB)  // BgSidebar
+        };
+        var lightTextColors = new[]
+        {
+            Color.FromRgb(0x11, 0x18, 0x27), // TextPrimary
+            Color.FromRgb(0x37, 0x41, 0x51), // TextSecondary
+            Color.FromRgb(0x4B, 0x55, 0x63)  // TextMuted
+        };
+
+        foreach (var bg in lightBgColors)
+        {
+            foreach (var fg in lightTextColors)
+            {
+                double ratio = ComputeContrastRatio(fg, bg);
+                Assert.True(ratio >= 4.5, $"Light theme text contrast ratio {ratio:F2}:1 is below WCAG AA 4.5:1 requirement");
+            }
+        }
+
+        // ==================== 3. RESPONSIVENESS (NO HORIZONTAL SCROLL AT 960x640) ====================
+        var (app, automation, window) = LaunchAppInTestMode();
+        try
+        {
+            DismissWizardIfOpen(window);
+
+            // Resize window to minimum allowed dimensions: 960x640
+            SetWindowPos(window.Properties.NativeWindowHandle, IntPtr.Zero, 40, 40, 960, 640, 0x0040);
+            Thread.Sleep(600);
+
+            string[] tabs = { "Home", "Tweaks", "Apps", "Tools", "History", "Settings" };
+            foreach (var tab in tabs)
+            {
+                NavigateTab(window, tab);
+                Thread.Sleep(400);
+
+                // Verify no active horizontal scrollbars
+                var horizontalScrollbars = window.FindAllDescendants(cf => cf.ByControlType(ControlType.ScrollBar))
+                    .Where(sb => sb.BoundingRectangle.Width > sb.BoundingRectangle.Height
+                              && sb.IsAvailable
+                              && !sb.IsOffscreen
+                              && sb.BoundingRectangle.Width > 30)
+                    .ToList();
+
+                Assert.True(horizontalScrollbars.Count == 0,
+                    $"Page '{tab}' exhibits active horizontal scrollbar at minimum window size (960x640)");
+            }
+
+            AssertNoErrorDialogs(app, automation);
+        }
+        finally
+        {
+            automation.Dispose();
+            app.Close();
+        }
+    }
+
+    private static double ComputeContrastRatio(Color fg, Color bg)
+    {
+        double l1 = ComputeLuminance(fg);
+        double l2 = ComputeLuminance(bg);
+        double lighter = Math.Max(l1, l2);
+        double darker = Math.Min(l1, l2);
+        return (lighter + 0.05) / (darker + 0.05);
+    }
+
+    private static double ComputeLuminance(Color c)
+    {
+        double r = SrgbToLinear(c.R / 255.0);
+        double g = SrgbToLinear(c.G / 255.0);
+        double b = SrgbToLinear(c.B / 255.0);
+        return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    }
+
+    private static double SrgbToLinear(double c) =>
+        c <= 0.03928 ? c / 12.92 : Math.Pow((c + 0.055) / 1.055, 2.4);
 }

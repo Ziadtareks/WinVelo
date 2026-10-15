@@ -10,7 +10,7 @@
         <BooleanToVisibilityConverter x:Key="BoolToVisConverter" />
     </UserControl.Resources>
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
         <StackPanel Margin="24" MaxWidth="1180" HorizontalAlignment="Stretch">
             <!-- OVERVIEW: Grid of Tool Tiles (Visible when no subtool is active) -->
             <Border Visibility="{Binding IsOverview, Converter={StaticResource BoolToVisConverter}}">
