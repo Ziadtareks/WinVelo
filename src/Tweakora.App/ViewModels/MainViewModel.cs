@@ -101,6 +101,9 @@ public sealed partial class MainViewModel : ObservableObject
     public HistoryViewModel HistoryVM { get; }
     public FirstRunWizardViewModel WizardVM { get; }
     public UnifiedExecutionDialogViewModel ExecutionDialogVM { get; }
+    public SettingsViewModel SettingsVM { get; }
+
+    public string AppVersion => $"v{typeof(MainViewModel).Assembly.GetName().Version?.ToString(3) ?? "0.9.0"}-beta";
 
     [ObservableProperty]
     private bool _isWizardOpen;
@@ -129,7 +132,8 @@ public sealed partial class MainViewModel : ObservableObject
         IAppSettingsService? appSettings = null,
         ISystemRestoreService? restoreService = null,
         FirstRunWizardViewModel? wizardVM = null,
-        UnifiedExecutionDialogViewModel? executionDialogVM = null)
+        UnifiedExecutionDialogViewModel? executionDialogVM = null,
+        SettingsViewModel? settingsVM = null)
     {
         DashboardVM = dashboardVM;
         InstallVM = installVM;
@@ -148,6 +152,9 @@ public sealed partial class MainViewModel : ObservableObject
         HistoryVM = historyVM ?? new HistoryViewModel(tweakService, resSvc, null, ExecutionDialogVM);
         WizardVM = wizardVM ?? new FirstRunWizardViewModel(resSvc, _appSettings);
         WizardVM.WizardCompleted += OnWizardCompleted;
+
+        SettingsVM = settingsVM ?? new SettingsViewModel(_appSettings, tweaksVM);
+        SettingsVM.RequestOpenWizard = OpenFirstRunWizard;
 
         var userSettings = _appSettings.GetSettings();
         if (!userSettings.HasCompletedFirstRunWizard)
@@ -258,6 +265,10 @@ public sealed partial class MainViewModel : ObservableObject
                 ActiveTab = "History";
                 CurrentPage = HistoryVM;
                 HistoryVM.RefreshHistory();
+                break;
+            case "Settings":
+                ActiveTab = "Settings";
+                CurrentPage = SettingsVM;
                 break;
 
             // Direct routes to sub-tools inside Tools:

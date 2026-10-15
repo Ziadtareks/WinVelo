@@ -43,6 +43,9 @@
         <DataTemplate DataType="{x:Type vm:StartupViewModel}">
             <views:StartupTabView />
         </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
+            <views:SettingsTabView />
+        </DataTemplate>
     </Window.Resources>
 
     <Grid Background="{DynamicResource BgDeepBrush}">
@@ -160,7 +163,7 @@
                                        Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" />
                         </StackPanel>
                         <Border DockPanel.Dock="Right" Background="{DynamicResource StatusDefaultBgBrush}" CornerRadius="4" Padding="6,2" VerticalAlignment="Center">
-                            <TextBlock Text="v0.9.0-beta" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextSecondaryBrush}" />
+                            <TextBlock Text="{Binding AppVersion}" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextSecondaryBrush}" />
                         </Border>
                     </DockPanel>
 
@@ -241,263 +244,29 @@
                                     </Border>
                                 </DockPanel>
                             </Button>
-
-                            <!-- Setup Wizard (Reopenable from Settings) -->
-                            <Button AutomationProperties.AutomationId="Btn_OpenWizard"
-                                    AutomationProperties.Name="Setup Wizard"
-                                    Style="{DynamicResource SidebarNavBtn}"
-                                    Command="{Binding OpenFirstRunWizardCommand}" Margin="0,0,0,6">
-                                <DockPanel LastChildFill="False">
-                                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
-                                        <ui:SymbolIcon Symbol="Settings24" FontSize="16" Margin="0,0,10,0" Foreground="{DynamicResource AccentPrimaryBrush}" />
-                                        <TextBlock Text="Setup Wizard" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" />
-                                    </StackPanel>
-                                </DockPanel>
-                            </Button>
                         </StackPanel>
                     </ScrollViewer>
 
-                    <!-- Sidebar Footer: Mode Switch & System Info -->
-                    <StackPanel Grid.Row="2" Margin="0,10,0,0">
-
-                        <!-- Dry-Run / Live Mode Switch -->
-                        <Border Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
-                                BorderThickness="1" CornerRadius="6" Padding="10,8" Margin="0,0,0,8">
+                    <!-- Sidebar Footer: Pinned Settings -->
+                    <Border Grid.Row="2" BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="0,1,0,0" Padding="0,10,0,0">
+                        <Button AutomationProperties.AutomationId="Tab_Settings"
+                                AutomationProperties.Name="Settings"
+                                Style="{DynamicResource SidebarNavBtn}"
+                                Command="{Binding SwitchTabCommand}" CommandParameter="Settings">
                             <DockPanel LastChildFill="False">
-                                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" VerticalAlignment="Center">
-                                    <ui:SymbolIcon Symbol="Play24" FontSize="14" Margin="0,0,6,0" Foreground="{DynamicResource AccentPrimaryBrush}" VerticalAlignment="Center" />
-                                    <TextBlock Text="Dry-Run Mode" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" />
+                                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                                    <ui:SymbolIcon Symbol="Settings24" FontSize="16" Margin="0,0,10,0" Foreground="{DynamicResource AccentPrimaryBrush}" VerticalAlignment="Center" />
+                                    <TextBlock Text="Settings" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" />
                                 </StackPanel>
-                                <CheckBox DockPanel.Dock="Right" IsChecked="{Binding TweaksVM.IsDryRun, Mode=TwoWay}"
-                                          AutomationProperties.Name="Dry run mode toggle"
-                                          Style="{DynamicResource ModernCheckBox}" ToolTip="When ON, actions are simulated without touching system" />
                             </DockPanel>
-                        </Border>
-
-                        <!-- System Info Summary Card -->
-                        <Border Background="{DynamicResource BgDeepBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
-                                BorderThickness="1" CornerRadius="6" Padding="10,8">
-                            <StackPanel>
-                                <DockPanel LastChildFill="False">
-                                    <TextBlock Text="{Binding SystemInfo.OsName}" FontSize="12" FontWeight="Bold"
-                                               Foreground="{DynamicResource TextPrimaryBrush}" DockPanel.Dock="Left"
-                                               MaxWidth="160" TextTrimming="CharacterEllipsis" ToolTip="{Binding SystemInfo.OsName}" />
-                                    <Border DockPanel.Dock="Right" Background="{DynamicResource StatusAppliedBgBrush}" CornerRadius="4" Padding="4,1"
-                                            Visibility="{Binding IsAdministrator, Converter={StaticResource BoolToVisConverter}}">
-                                        <TextBlock Text="ADMIN" FontSize="9" FontWeight="ExtraBold" Foreground="{DynamicResource StatusAppliedFgBrush}" />
-                                    </Border>
-                                </DockPanel>
-                                <TextBlock Text="{Binding SystemInfo.BuildNumber}" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" Margin="0,2,0,0" />
-                                <DockPanel LastChildFill="False" Margin="0,4,0,0">
-                                    <TextBlock Text="{Binding SystemInfo.Architecture}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" DockPanel.Dock="Left" />
-                                    <TextBlock Text="{Binding SystemInfo.MemoryDisplay}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" DockPanel.Dock="Right" />
-                                </DockPanel>
-                            </StackPanel>
-                        </Border>
-                    </StackPanel>
+                        </Button>
+                    </Border>
                 </Grid>
             </Border>
 
-            <!-- ==================== CENTER & BOTTOM WORKSPACE ==================== -->
+            <!-- ==================== CENTER WORKSPACE ==================== -->
             <Grid Grid.Column="1">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" /> <!-- Top Action Header: Live Search, Presets, Status Counter -->
-                    <RowDefinition Height="*" />    <!-- Active View Content -->
-                    <RowDefinition Height="Auto" /> <!-- Sticky Bottom Action Bar -->
-                    <RowDefinition Height="Auto" /> <!-- Collapsible Live Log Drawer -->
-                </Grid.RowDefinitions>
-
-                <!-- TOP ACTION HEADER -->
-                <Border Grid.Row="0" Background="{DynamicResource BgCardBrush}"
-                        BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="0,0,0,1"
-                        Padding="16,10">
-                    <DockPanel LastChildFill="False">
-                        <!-- Left: Live Search Box -->
-                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" VerticalAlignment="Center">
-                            <ui:TextBox AutomationProperties.AutomationId="TopSearchBox"
-                                        AutomationProperties.Name="Search Tweaks"
-                                        PlaceholderText="Search tweaks by title, ID, or description..."
-                                        Text="{Binding TopSearchText, UpdateSourceTrigger=PropertyChanged}"
-                                        Icon="{ui:SymbolIcon Search24}"
-                                        Width="320" Margin="0,0,14,0" VerticalAlignment="Center" />
-
-                            <!-- Presets Toolbar -->
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBlock Text="Presets:" FontSize="12" FontWeight="SemiBold"
-                                           Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" Margin="0,0,8,0" />
-
-                                <Button AutomationProperties.AutomationId="Preset_Standard"
-                                        AutomationProperties.Name="Standard Recommended Preset"
-                                        Content="Standard (Recommended)" Style="{DynamicResource ModernSecondaryBtn}"
-                                        Command="{Binding TweaksVM.ApplyPresetCommand}" CommandParameter="Standard"
-                                        Margin="0,0,6,0" Padding="10,6" FontSize="12" />
-
-                                <Button AutomationProperties.AutomationId="Preset_Minimal"
-                                        AutomationProperties.Name="Minimal Safe Preset"
-                                        Content="Minimal (Safe)" Style="{DynamicResource ModernSecondaryBtn}"
-                                        Command="{Binding TweaksVM.ApplyPresetCommand}" CommandParameter="Minimal"
-                                        Margin="0,0,6,0" Padding="10,6" FontSize="12" />
-
-                                <Button Content="Select Applied"
-                                        AutomationProperties.Name="Select Applied Preset"
-                                        Style="{DynamicResource ModernSecondaryBtn}"
-                                        Command="{Binding TweaksVM.ApplyPresetCommand}" CommandParameter="SelectApplied"
-                                        Margin="0,0,6,0" Padding="10,6" FontSize="12" />
-
-                                <Button AutomationProperties.AutomationId="Preset_Clear"
-                                        AutomationProperties.Name="Clear Preset Selection"
-                                        Content="Clear" Style="{DynamicResource ModernGhostBtn}"
-                                        Command="{Binding TweaksVM.ClearSelectionCommand}"
-                                        Padding="8,6" FontSize="12" />
-                            </StackPanel>
-                        </StackPanel>
-
-                        <!-- Right: Status Counters & Diff Preview -->
-                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center">
-                            <!-- Selected Counter Badge -->
-                            <Border Background="{DynamicResource StatusDefaultBgBrush}" CornerRadius="12" Padding="10,4" Margin="0,0,8,0">
-                                <TextBlock Text="{Binding TweaksVM.SelectedCount, StringFormat='Selected: {0}'}"
-                                           Foreground="{DynamicResource AccentPrimaryBrush}" FontWeight="Bold" FontSize="12" />
-                            </Border>
-
-                            <!-- Currently Applied Counter Badge -->
-                            <Border Background="{DynamicResource StatusAppliedBgBrush}" BorderBrush="{DynamicResource StatusAppliedBorderBrush}"
-                                    BorderThickness="1" CornerRadius="12" Padding="10,4" Margin="0,0,8,0">
-                                <TextBlock Text="{Binding TweaksVM.AppliedCount, StringFormat='Applied on PC: {0}'}"
-                                           Foreground="{DynamicResource StatusAppliedFgBrush}" FontWeight="Bold" FontSize="12" />
-                            </Border>
-
-                            <!-- Diff Preview Dialog Button -->
-                            <Button AutomationProperties.AutomationId="PreviewTweaksButton"
-                                    AutomationProperties.Name="Diff Preview"
-                                    Content="Diff Preview" Style="{DynamicResource ModernGhostBtn}"
-                                    Command="{Binding TweaksVM.OpenDiffPreviewCommand}"
-                                    Padding="8,6" FontSize="12" ToolTip="Preview dry-run differences" />
-                        </StackPanel>
-                    </DockPanel>
-                </Border>
-
-                <!-- CENTER VIEW CONTENT HOST -->
-                <ContentControl Grid.Row="1" Content="{Binding CurrentPage}" />
-
-                <!-- BOTTOM STICKY ACTION BAR -->
-                <Border Grid.Row="2" Background="{DynamicResource BgCardBrush}"
-                        BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="0,1,0,0"
-                        Padding="16,10">
-                    <DockPanel LastChildFill="False">
-                        <!-- Primary Operation Action Buttons -->
-                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" VerticalAlignment="Center">
-                            <!-- Apply Selected Tweaks -->
-                            <Button AutomationProperties.AutomationId="RunTweaksButton"
-                                    AutomationProperties.Name="Apply Selected Tweaks"
-                                    Content="Apply Selected Tweaks" Style="{DynamicResource ModernPrimaryBtn}"
-                                    Command="{Binding TweaksVM.ApplySelectedTweaksCommand}"
-                                    Padding="18,9" FontSize="13" FontWeight="Bold" Margin="0,0,10,0" />
-
-                            <!-- Undo Selected Tweaks -->
-                            <Button AutomationProperties.AutomationId="UndoTweaksButton"
-                                    AutomationProperties.Name="Undo Selected Tweaks"
-                                    Content="Undo Selected Tweaks" Style="{DynamicResource ModernSecondaryBtn}"
-                                    Command="{Binding TweaksVM.UndoSelectedTweaksCommand}"
-                                    Padding="14,9" FontSize="13" Margin="0,0,10,0" />
-
-                            <!-- Re-Scan System -->
-                            <Button Content="Re-Scan System"
-                                    AutomationProperties.Name="Re-Scan System"
-                                    Style="{DynamicResource ModernGhostBtn}"
-                                    Command="{Binding TweaksVM.RescanSystemCommand}"
-                                    Padding="10,8" FontSize="12" Margin="0,0,6,0" ToolTip="Check active tweaks against real Windows state" />
-
-                            <!-- Create Restore Point -->
-                            <Button Content="Create Restore Point"
-                                    AutomationProperties.Name="Create Restore Point"
-                                    Style="{DynamicResource ModernGhostBtn}"
-                                    Command="{Binding TweaksVM.CreateRestorePointCommand}"
-                                    Padding="10,8" FontSize="12" ToolTip="Create a Windows System Protection Restore point" />
-                        </StackPanel>
-
-                        <!-- Right: Execution Progress & Live Log Console Toggle -->
-                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center">
-                            <!-- Active Operation Indicator -->
-                            <StackPanel Orientation="Horizontal" Visibility="{Binding TweaksVM.IsBusy, Converter={StaticResource BoolToVisConverter}}" Margin="0,0,16,0">
-                                <ProgressBar Value="{Binding TweaksVM.ExecutionProgress}" Width="100" Height="6" Margin="0,0,8,0" VerticalAlignment="Center" />
-                                <TextBlock Text="Working..." FontSize="12" Foreground="{DynamicResource AccentPrimaryBrush}" VerticalAlignment="Center" />
-                            </StackPanel>
-
-                            <!-- Log Console Toggle Button -->
-                            <Button AutomationProperties.AutomationId="ToggleLogButton"
-                                    AutomationProperties.Name="Toggle Log Console"
-                                    Style="{DynamicResource ModernSecondaryBtn}"
-                                    Command="{Binding TweaksVM.ToggleLogDrawerCommand}"
-                                    Padding="12,7" FontSize="12">
-                                <StackPanel Orientation="Horizontal">
-                                    <ui:SymbolIcon Symbol="DocumentBulletList24" FontSize="14" Margin="0,0,6,0" VerticalAlignment="Center" />
-                                    <TextBlock Text="{Binding TweaksVM.LogEntries.Count, StringFormat='Log Console ({0})'}"
-                                               FontWeight="SemiBold" VerticalAlignment="Center" />
-                                </StackPanel>
-                            </Button>
-                        </StackPanel>
-                    </DockPanel>
-                </Border>
-
-                <!-- COLLAPSIBLE LIVE EXECUTION LOG DRAWER -->
-                <Border Grid.Row="3" Height="170"
-                        Background="#0B0D13" BorderBrush="{DynamicResource BorderSubtleBrush}"
-                        BorderThickness="0,1,0,0"
-                        Visibility="{Binding TweaksVM.IsLogDrawerOpen, Converter={StaticResource BoolToVisConverter}}">
-                    <Grid Margin="16,10">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
-
-                        <!-- Log Header -->
-                        <DockPanel Grid.Row="0" Margin="0,0,0,6">
-                            <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" VerticalAlignment="Center">
-                                <TextBlock Text="Live Execution &amp; Detection Log" FontWeight="Bold" FontSize="13"
-                                           Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,10,0" />
-                                <TextBlock Text="{Binding TweaksVM.StatusMessage}" FontSize="12"
-                                           Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" />
-                            </StackPanel>
-
-                            <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center">
-                                <Button Content="Clear Log"
-                                        AutomationProperties.Name="Clear Log"
-                                        Style="{DynamicResource ModernGhostBtn}"
-                                        Command="{Binding TweaksVM.ClearLogsCommand}" Padding="6,3" FontSize="11" Margin="0,0,8,0" />
-                                <Button Content="Close"
-                                        AutomationProperties.Name="Close Log Drawer"
-                                        Style="{DynamicResource ModernGhostBtn}"
-                                        Command="{Binding TweaksVM.ToggleLogDrawerCommand}" Padding="6,3" FontSize="11" />
-                            </StackPanel>
-                        </DockPanel>
-
-                        <!-- Live Color-Coded Log List -->
-                        <ListBox Grid.Row="1" ItemsSource="{Binding TweaksVM.LogEntries}"
-                                 Background="Transparent" BorderThickness="0"
-                                 ScrollViewer.VerticalScrollBarVisibility="Auto">
-                            <ListBox.ItemTemplate>
-                                <DataTemplate DataType="{x:Type vm:LogEntryItem}">
-                                    <DockPanel Margin="0,2">
-                                        <TextBlock Text="{Binding Timestamp}" Foreground="{DynamicResource TextMutedBrush}"
-                                                   FontFamily="Consolas, Cascadia Code, Courier New" FontSize="11"
-                                                   DockPanel.Dock="Left" Margin="0,0,8,0" VerticalAlignment="Center" />
-
-                                        <Border Background="{Binding BadgeBg}" CornerRadius="3" Padding="5,1"
-                                                DockPanel.Dock="Left" Margin="0,0,8,0" VerticalAlignment="Center">
-                                            <TextBlock Text="{Binding Level}" Foreground="{Binding BadgeFg}"
-                                                       FontFamily="Consolas, Cascadia Code, Courier New" FontWeight="Bold" FontSize="10" />
-                                        </Border>
-
-                                        <TextBlock Text="{Binding Message}" Foreground="{DynamicResource TextPrimaryBrush}"
-                                                   FontFamily="Consolas, Cascadia Code, Courier New" FontSize="12"
-                                                   VerticalAlignment="Center" TextWrapping="Wrap" />
-                                    </DockPanel>
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
-                        </ListBox>
-                    </Grid>
-                </Border>
+                <ContentControl Content="{Binding CurrentPage}" />
             </Grid>
         </Grid>
 
