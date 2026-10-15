@@ -47,15 +47,7 @@ public partial class App : Application
 
     public App()
     {
-        // 1. Initialize logging first so all crashes are recorded
-        LoggingConfiguration.InitializeLogging();
-
-        // 2. Global Crash Handlers with re-entrancy and storm guards
-        AppDomain.CurrentDomain.UnhandledException += OnAppDomainUnhandledException;
-        DispatcherUnhandledException += OnDispatcherUnhandledException;
-        TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
-
-        // 3. Detect Test Mode from command line arguments or environment variable
+        // 1. Detect Test Mode from command line arguments or environment variable
         string[] args = Environment.GetCommandLineArgs();
         bool isTestMode = args.Any(a => string.Equals(a, "--test-mode", StringComparison.OrdinalIgnoreCase)) ||
                           string.Equals(Environment.GetEnvironmentVariable("WINVELO_TEST_MODE"), "1", StringComparison.OrdinalIgnoreCase) ||
@@ -64,7 +56,25 @@ public partial class App : Application
         if (isTestMode)
         {
             TestModeManager.EnableTestMode();
-            Log.Warning("⚠️ WinVelo launched in TEST MODE. All system operations are simulated with in-memory fakes.");
+            WinVeloStoragePaths.InitializeStorage(true);
+        }
+        else
+        {
+            TestModeManager.DisableTestMode();
+            WinVeloStoragePaths.InitializeStorage(false);
+        }
+
+        // 2. Initialize logging so all crashes are recorded in the isolated log directory
+        LoggingConfiguration.InitializeLogging(WinVeloStoragePaths.GetLogsDirectory(isTestMode));
+
+        // 3. Global Crash Handlers with re-entrancy and storm guards
+        AppDomain.CurrentDomain.UnhandledException += OnAppDomainUnhandledException;
+        DispatcherUnhandledException += OnDispatcherUnhandledException;
+        TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
+
+        if (isTestMode)
+        {
+            Log.Warning("⚠️ WinVelo launched in TEST MODE. All system operations are simulated with in-memory fakes. Storage isolated at {StorageRoot}", WinVeloStoragePaths.GetStorageRoot(true));
         }
         else
         {
@@ -83,7 +93,7 @@ public partial class App : Application
                     services.AddSingleton<ITaskSchedulerService, FakeTaskSchedulerService>();
                     services.AddSingleton<ISystemRestoreService, FakeRestoreService>();
                     services.AddSingleton<IShellService, FakeShellService>();
-                    services.AddSingleton<IAppSettingsService, FakeAppSettingsService>();
+                    services.AddSingleton<IAppSettingsService>(new AppSettingsService(WinVeloStoragePaths.GetSettingsPath(true)));
                 }
                 else
                 {
@@ -92,18 +102,20 @@ public partial class App : Application
                     services.AddSingleton<ITaskSchedulerService, WindowsTaskSchedulerService>();
                     services.AddSingleton<ISystemRestoreService, WindowsRestoreService>();
                     services.AddSingleton<IShellService, WindowsShellService>();
-                    services.AddSingleton<IAppSettingsService, AppSettingsService>();
+                    services.AddSingleton<IAppSettingsService>(new AppSettingsService(WinVeloStoragePaths.GetSettingsPath(false)));
                 }
 
                 // Core Engine and Operation Infrastructure
-                AppDataMigrator.Migrate(logCallback: (msg, ex) =>
+                if (!isTestMode)
                 {
-                    if (ex != null) Log.Warning(ex, "{Message}", msg);
-                    else Log.Information("{Message}", msg);
-                });
-                string journalDir = Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                    "WinVelo", "Journal");
+                    AppDataMigrator.Migrate(logCallback: (msg, ex) =>
+                    {
+                        if (ex != null) Log.Warning(ex, "{Message}", msg);
+                        else Log.Information("{Message}", msg);
+                    });
+                }
+
+                string journalDir = WinVeloStoragePaths.GetJournalDirectory(isTestMode);
                 services.AddSingleton(new RollbackJournalManager(journalDir));
                 services.AddSingleton<IActivityTracker, ActivityTracker>();
                 services.AddSingleton<IOperationRunner, OperationRunner>();

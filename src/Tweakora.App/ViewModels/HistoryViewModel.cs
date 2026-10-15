@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Tweakora.App.Services;
@@ -12,6 +13,7 @@ using Tweakora.Core.Engine.Runners;
 using Tweakora.Core.Interfaces;
 using Tweakora.Core.Models;
 using Tweakora.Core.Operations;
+using Tweakora.Core.Safety;
 using Tweakora.Modules.Tweaks;
 
 namespace Tweakora.App.ViewModels;
@@ -35,15 +37,21 @@ public sealed class HistorySessionCardModel
     public string StartedAtDisplay => StartedAtUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss");
     public required bool IsCompleted { get; init; }
     public string TriggerSource { get; init; } = "Manual";
+    public string? Mode { get; init; }
+    public string? AppVersion { get; init; }
+    public bool IsLegacy { get; init; }
     public required IReadOnlyList<JournalActionRecord> Records { get; init; }
     public required IReadOnlyList<HistoryTweakItemModel> Tweaks { get; init; }
     public int TotalActions => Records.Count;
     public int ActiveActions => Records.Count(r => !r.IsReverted);
     public int RevertedActions => Records.Count(r => r.IsReverted);
-    public string StatusText => ActiveActions == 0 ? "Reverted" : (RevertedActions > 0 ? "Partially Reverted" : (IsCompleted ? "Active" : "Unfinished"));
-    public string StatusBg => ActiveActions == 0 ? "#374151" : (RevertedActions > 0 ? "#451A03" : "#064E3B");
-    public string StatusFg => ActiveActions == 0 ? "#9CA3AF" : (RevertedActions > 0 ? "#FBBF24" : "#10B981");
+    public string StatusText => IsLegacy ? "Legacy (Read Only)" : (ActiveActions == 0 ? "Reverted" : (RevertedActions > 0 ? "Partially Reverted" : (IsCompleted ? "Active" : "Unfinished")));
+    public string StatusBg => IsLegacy ? "#1F2937" : (ActiveActions == 0 ? "#374151" : (RevertedActions > 0 ? "#451A03" : "#064E3B"));
+    public string StatusFg => IsLegacy ? "#9CA3AF" : (ActiveActions == 0 ? "#9CA3AF" : (RevertedActions > 0 ? "#FBBF24" : "#10B981"));
     public string DistinctTweaksSummary => string.Join(", ", Tweaks.Select(t => t.TweakName));
+    public bool CanUndo => !IsLegacy;
+    public Visibility UndoVisibility => IsLegacy ? Visibility.Collapsed : Visibility.Visible;
+    public Visibility LegacyBannerVisibility => IsLegacy ? Visibility.Visible : Visibility.Collapsed;
 }
 
 public sealed partial class HistoryViewModel : ObservableObject
@@ -54,6 +62,13 @@ public sealed partial class HistoryViewModel : ObservableObject
     private readonly UnifiedExecutionDialogViewModel? _executionDialog;
 
     public ObservableCollection<HistorySessionCardModel> Sessions { get; } = new();
+    public ObservableCollection<HistorySessionCardModel> LegacySessions { get; } = new();
+
+    [ObservableProperty]
+    private bool _isLegacySectionExpanded;
+
+    public bool HasLegacySessions => LegacySessions.Count > 0;
+
     public ObservableCollection<RestorePointItem> RestorePoints { get; } = new();
     public ObservableCollection<BackupSnapshotInfo> Snapshots { get; } = new();
 
@@ -99,6 +114,7 @@ public sealed partial class HistoryViewModel : ObservableObject
     public void RefreshHistory()
     {
         Sessions.Clear();
+        LegacySessions.Clear();
         RestorePoints.Clear();
         Snapshots.Clear();
 
@@ -150,21 +166,41 @@ public sealed partial class HistoryViewModel : ObservableObject
                     })
                     .ToList();
 
-                Sessions.Add(new HistorySessionCardModel
+                bool isLegacy = !TestModeManager.IsTestMode && s.IsLegacy;
+
+                var card = new HistorySessionCardModel
                 {
                     SessionId = s.SessionId,
                     StartedAtUtc = s.StartedAtUtc,
                     IsCompleted = s.IsCompleted,
                     TriggerSource = trigger,
+                    Mode = s.Mode ?? (isLegacy ? "legacy" : (TestModeManager.IsTestMode ? "test" : "real")),
+                    AppVersion = s.AppVersion,
+                    IsLegacy = isLegacy,
                     Records = s.Records.ToList(),
                     Tweaks = tweakGroups
-                });
+                };
+
+                if (isLegacy)
+                {
+                    LegacySessions.Add(card);
+                }
+                else
+                {
+                    Sessions.Add(card);
+                }
             }
 
             if (Sessions.Count > 0)
             {
                 SelectedSession = Sessions[0];
             }
+            else if (LegacySessions.Count > 0)
+            {
+                SelectedSession = LegacySessions[0];
+            }
+
+            OnPropertyChanged(nameof(HasLegacySessions));
 
             if (_restoreService != null)
             {
@@ -188,7 +224,9 @@ public sealed partial class HistoryViewModel : ObservableObject
                 SelectedSnapshot = Snapshots[0];
             }
 
-            StatusMessage = $"Loaded {Sessions.Count} journal session(s) and {RestorePoints.Count} restore point(s).";
+            StatusMessage = $"Loaded {Sessions.Count} active journal session(s)" +
+                            (LegacySessions.Count > 0 ? $" and {LegacySessions.Count} legacy session(s)" : "") +
+                            $" ({RestorePoints.Count} restore point(s)).";
         }
         catch (Exception ex)
         {
@@ -203,6 +241,12 @@ public sealed partial class HistoryViewModel : ObservableObject
         if (session == null)
         {
             StatusMessage = "Please select a session to undo.";
+            return;
+        }
+
+        if (session.IsLegacy)
+        {
+            StatusMessage = "Legacy sessions are read-only and cannot be reverted automatically.";
             return;
         }
 

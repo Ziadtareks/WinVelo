@@ -81,41 +81,98 @@
                             </Border>
                         </DockPanel>
 
-                        <ListBox Grid.Row="1" ItemsSource="{Binding Sessions}"
-                                 SelectedItem="{Binding SelectedSession, Mode=TwoWay}"
-                                 Background="Transparent" BorderThickness="0"
-                                 AutomationProperties.Name="Recorded sessions list"
-                                 ScrollViewer.VerticalScrollBarVisibility="Auto">
-                            <ListBox.ItemTemplate>
-                                <DataTemplate DataType="{x:Type vm:HistorySessionCardModel}">
-                                    <Border Background="{DynamicResource BgDeepBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
-                                            BorderThickness="1" CornerRadius="6" Padding="12,10" Margin="0,0,0,8">
-                                        <StackPanel>
-                                            <DockPanel Margin="0,0,0,4">
-                                                <TextBlock Text="{Binding StartedAtDisplay}" FontWeight="Bold" FontSize="13"
-                                                           Foreground="{DynamicResource TextPrimaryBrush}" DockPanel.Dock="Left" />
-                                                <Border DockPanel.Dock="Right" CornerRadius="4" Padding="6,1"
-                                                        Background="{Binding StatusBg}">
-                                                    <TextBlock Text="{Binding StatusText}" FontSize="10" FontWeight="Bold"
-                                                               Foreground="{Binding StatusFg}" />
-                                                </Border>
-                                            </DockPanel>
+                        <Grid Grid.Row="1">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
 
-                                            <DockPanel Margin="0,0,0,4">
-                                                <Border Background="{DynamicResource StatusDefaultBgBrush}" CornerRadius="4" Padding="6,1" DockPanel.Dock="Left">
-                                                    <TextBlock Text="{Binding TriggerSource}" FontSize="10" Foreground="{DynamicResource AccentPrimaryBrush}" FontWeight="SemiBold" />
-                                                </Border>
-                                                <TextBlock Text="{Binding TotalActions, StringFormat='{}Actions: {0}'}"
-                                                           FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" DockPanel.Dock="Right" VerticalAlignment="Center" />
-                                            </DockPanel>
+                            <ListBox Grid.Row="0" ItemsSource="{Binding Sessions}"
+                                     SelectedItem="{Binding SelectedSession, Mode=TwoWay}"
+                                     Background="Transparent" BorderThickness="0"
+                                     AutomationProperties.Name="Recorded sessions list"
+                                     ScrollViewer.VerticalScrollBarVisibility="Auto">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type vm:HistorySessionCardModel}">
+                                        <Border Background="{DynamicResource BgDeepBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
+                                                BorderThickness="1" CornerRadius="6" Padding="12,10" Margin="0,0,0,8">
+                                            <StackPanel>
+                                                <DockPanel Margin="0,0,0,4">
+                                                    <TextBlock Text="{Binding StartedAtDisplay}" FontWeight="Bold" FontSize="13"
+                                                               Foreground="{DynamicResource TextPrimaryBrush}" DockPanel.Dock="Left" />
+                                                    <Border DockPanel.Dock="Right" CornerRadius="4" Padding="6,1"
+                                                            Background="{Binding StatusBg}">
+                                                        <TextBlock Text="{Binding StatusText}" FontSize="10" FontWeight="Bold"
+                                                                   Foreground="{Binding StatusFg}" />
+                                                    </Border>
+                                                </DockPanel>
 
-                                            <TextBlock Text="{Binding DistinctTweaksSummary}" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"
-                                                       TextTrimming="CharacterEllipsis" MaxWidth="330" Margin="0,2,0,0" />
-                                        </StackPanel>
+                                                <DockPanel Margin="0,0,0,4">
+                                                    <Border Background="{DynamicResource StatusDefaultBgBrush}" CornerRadius="4" Padding="6,1" DockPanel.Dock="Left">
+                                                        <TextBlock Text="{Binding TriggerSource}" FontSize="10" Foreground="{DynamicResource AccentPrimaryBrush}" FontWeight="SemiBold" />
+                                                    </Border>
+                                                    <TextBlock Text="{Binding TotalActions, StringFormat='{}Actions: {0}'}"
+                                                               FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" DockPanel.Dock="Right" VerticalAlignment="Center" />
+                                                </DockPanel>
+
+                                                <TextBlock Text="{Binding DistinctTweaksSummary}" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"
+                                                           TextTrimming="CharacterEllipsis" MaxWidth="330" Margin="0,2,0,0" />
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+
+                            <!-- Legacy Sessions Section (Collapsed by Default) -->
+                            <Expander Grid.Row="1"
+                                      IsExpanded="{Binding IsLegacySectionExpanded, Mode=TwoWay}"
+                                      Visibility="{Binding HasLegacySessions, Converter={StaticResource BoolToVisConverter}}"
+                                      Margin="0,8,0,0"
+                                      Background="{DynamicResource BgDeepBrush}"
+                                      BorderBrush="{DynamicResource BorderSubtleBrush}"
+                                      BorderThickness="1">
+                                <Expander.Header>
+                                    <DockPanel LastChildFill="False">
+                                        <TextBlock Text="Legacy sessions" FontWeight="SemiBold" FontSize="12"
+                                                   Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" />
+                                        <Border Background="{DynamicResource StatusDefaultBgBrush}" CornerRadius="8" Padding="6,1" Margin="8,0,0,0" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding LegacySessions.Count, StringFormat='{}{0} archived'}" FontSize="10" Foreground="{DynamicResource TextMutedBrush}" />
+                                        </Border>
+                                    </DockPanel>
+                                </Expander.Header>
+                                <StackPanel Margin="6">
+                                    <Border Background="#2B1A00" BorderBrush="#B45309" BorderThickness="1" CornerRadius="4" Padding="8,6" Margin="0,0,0,8">
+                                        <TextBlock Text="These sessions were created by an earlier version of WinVelo or during test runs. To prevent unintended system changes, they are displayed as read-only and cannot be undone automatically."
+                                                   FontSize="11" Foreground="#FBBF24" TextWrapping="Wrap" />
                                     </Border>
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
-                        </ListBox>
+                                    <ListBox ItemsSource="{Binding LegacySessions}"
+                                             SelectedItem="{Binding SelectedSession, Mode=TwoWay}"
+                                             Background="Transparent" BorderThickness="0"
+                                             MaxHeight="160"
+                                             AutomationProperties.Name="Legacy sessions list"
+                                             ScrollViewer.VerticalScrollBarVisibility="Auto">
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate DataType="{x:Type vm:HistorySessionCardModel}">
+                                                <Border Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
+                                                        BorderThickness="1" CornerRadius="6" Padding="10,8" Margin="0,0,0,6">
+                                                    <StackPanel>
+                                                        <DockPanel Margin="0,0,0,2">
+                                                            <TextBlock Text="{Binding StartedAtDisplay}" FontWeight="Bold" FontSize="12"
+                                                                       Foreground="{DynamicResource TextPrimaryBrush}" DockPanel.Dock="Left" />
+                                                            <Border DockPanel.Dock="Right" CornerRadius="4" Padding="4,1" Background="{Binding StatusBg}">
+                                                                <TextBlock Text="{Binding StatusText}" FontSize="9" FontWeight="Bold" Foreground="{Binding StatusFg}" />
+                                                            </Border>
+                                                        </DockPanel>
+                                                        <TextBlock Text="{Binding DistinctTweaksSummary}" FontSize="10" Foreground="{DynamicResource TextMutedBrush}"
+                                                                   TextTrimming="CharacterEllipsis" MaxWidth="300" />
+                                                    </StackPanel>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
+                                </StackPanel>
+                            </Expander>
+                        </Grid>
                     </Grid>
                 </Border>
 
@@ -184,35 +241,45 @@
                     <!-- Session Actions Bar -->
                     <Border Grid.Row="0" Background="{DynamicResource BgDeepBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
                             BorderThickness="1" CornerRadius="6" Padding="14,10" Margin="0,0,0,12">
-                        <DockPanel LastChildFill="False">
-                            <StackPanel DockPanel.Dock="Left" VerticalAlignment="Center">
-                                <DockPanel Margin="0,0,0,2">
-                                    <TextBlock Text="{Binding SelectedSession.SessionId, StringFormat='Session ID: {0}'}"
-                                               FontWeight="Bold" FontSize="14" Foreground="{DynamicResource TextPrimaryBrush}" DockPanel.Dock="Left" />
-                                    <Border Margin="8,0,0,0" Background="{Binding SelectedSession.StatusBg}" CornerRadius="4" Padding="6,1" VerticalAlignment="Center">
-                                        <TextBlock Text="{Binding SelectedSession.StatusText}" FontSize="10" FontWeight="Bold" Foreground="{Binding SelectedSession.StatusFg}" />
-                                    </Border>
-                                </DockPanel>
-                                <TextBlock Text="{Binding SelectedSession.DistinctTweaksSummary, StringFormat='Target Tweaks: {0}'}"
-                                           FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" MaxWidth="450" TextTrimming="CharacterEllipsis" Margin="0,2,0,0" />
-                            </StackPanel>
+                        <StackPanel>
+                            <!-- Legacy Warning Banner -->
+                            <Border Visibility="{Binding SelectedSession.LegacyBannerVisibility}"
+                                    Background="#2B1A00" BorderBrush="#B45309" BorderThickness="1" CornerRadius="4" Padding="10,6" Margin="0,0,0,10">
+                                <TextBlock Text="⚠️ Legacy session: Recorded by an earlier version of WinVelo or during test runs. This session is read-only and cannot be undone."
+                                           FontSize="11" Foreground="#FBBF24" TextWrapping="Wrap" />
+                            </Border>
 
-                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
-                                <!-- Undo Session Button -->
-                                <Button AutomationProperties.Name="Undo this session"
-                                        AutomationProperties.AutomationId="UndoSessionButton"
-                                        Content="Undo This Session" Style="{DynamicResource ModernSecondaryBtn}"
-                                        Command="{Binding UndoSessionCommand}" CommandParameter="{Binding SelectedSession}"
-                                        Margin="0,0,8,0" Padding="12,6" FontSize="12" />
+                            <DockPanel LastChildFill="False">
+                                <StackPanel DockPanel.Dock="Left" VerticalAlignment="Center">
+                                    <DockPanel Margin="0,0,0,2">
+                                        <TextBlock Text="{Binding SelectedSession.SessionId, StringFormat='Session ID: {0}'}"
+                                                   FontWeight="Bold" FontSize="14" Foreground="{DynamicResource TextPrimaryBrush}" DockPanel.Dock="Left" />
+                                        <Border Margin="8,0,0,0" Background="{Binding SelectedSession.StatusBg}" CornerRadius="4" Padding="6,1" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding SelectedSession.StatusText}" FontSize="10" FontWeight="Bold" Foreground="{Binding SelectedSession.StatusFg}" />
+                                        </Border>
+                                    </DockPanel>
+                                    <TextBlock Text="{Binding SelectedSession.DistinctTweaksSummary, StringFormat='Target Tweaks: {0}'}"
+                                               FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" MaxWidth="450" TextTrimming="CharacterEllipsis" Margin="0,2,0,0" />
+                                </StackPanel>
 
-                                <!-- Export Log Button -->
-                                <Button AutomationProperties.Name="Export session log"
-                                        AutomationProperties.AutomationId="ExportSessionLogButton"
-                                        Content="Export Session Log (.txt)" Style="{DynamicResource ModernGhostBtn}"
-                                        Command="{Binding ExportSessionLogCommand}" CommandParameter="{Binding SelectedSession}"
-                                        Padding="10,6" FontSize="12" />
-                            </StackPanel>
-                        </DockPanel>
+                                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <!-- Undo Session Button -->
+                                    <Button AutomationProperties.Name="Undo this session"
+                                            AutomationProperties.AutomationId="UndoSessionButton"
+                                            Content="Undo This Session" Style="{DynamicResource ModernSecondaryBtn}"
+                                            Command="{Binding UndoSessionCommand}" CommandParameter="{Binding SelectedSession}"
+                                            Visibility="{Binding SelectedSession.UndoVisibility}"
+                                            Margin="0,0,8,0" Padding="12,6" FontSize="12" />
+
+                                    <!-- Export Log Button -->
+                                    <Button AutomationProperties.Name="Export session log"
+                                            AutomationProperties.AutomationId="ExportSessionLogButton"
+                                            Content="Export Session Log (.txt)" Style="{DynamicResource ModernGhostBtn}"
+                                            Command="{Binding ExportSessionLogCommand}" CommandParameter="{Binding SelectedSession}"
+                                            Padding="10,6" FontSize="12" />
+                                </StackPanel>
+                            </DockPanel>
+                        </StackPanel>
                     </Border>
 
                     <!-- Tweaks in Session List -->
@@ -249,6 +316,7 @@
                                                     AutomationProperties.Name="{Binding TweakName, StringFormat='Undo tweak {0}'}"
                                                     Command="{Binding DataContext.UndoTweakCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                     CommandParameter="{Binding TweakId}"
+                                                    Visibility="{Binding DataContext.SelectedSession.UndoVisibility, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                     Padding="10,4" FontSize="11" VerticalAlignment="Center" />
                                         </Grid>
 

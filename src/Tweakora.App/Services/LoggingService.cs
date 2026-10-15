@@ -4,6 +4,7 @@ using System.Windows;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
+using Tweakora.Core.Safety;
 
 namespace Tweakora.App.Services;
 
@@ -56,13 +57,9 @@ public sealed class UiLogSink : ILogEventSink
 
 public static class LoggingConfiguration
 {
-    public static void InitializeLogging()
+    public static void InitializeLogging(string? logDir = null)
     {
-        string logDir = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "WinVelo",
-            "Logs"
-        );
+        logDir ??= WinVeloStoragePaths.GetLogsDirectory(TestModeManager.IsTestMode);
         Directory.CreateDirectory(logDir);
 
         Log.Logger = new LoggerConfiguration()

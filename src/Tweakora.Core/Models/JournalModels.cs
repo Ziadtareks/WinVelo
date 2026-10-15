@@ -52,6 +52,15 @@ public sealed class RollbackJournalSession
     [JsonPropertyName("isCompleted")]
     public bool IsCompleted { get; set; }
 
+    [JsonPropertyName("mode")]
+    public string? Mode { get; set; }
+
+    [JsonPropertyName("appVersion")]
+    public string? AppVersion { get; set; }
+
+    [JsonIgnore]
+    public bool IsLegacy => string.IsNullOrWhiteSpace(Mode);
+
     [JsonPropertyName("records")]
     public List<JournalActionRecord> Records { get; set; } = new();
 }

@@ -19,6 +19,7 @@ using Tweakora.Modules.Services;
 using Tweakora.Modules.Startup;
 using Tweakora.Modules.Tweaks;
 using Tweakora.Modules.Updates;
+using Tweakora.Core.Safety;
 using Tweakora.Simulation;
 using Xunit;
 
@@ -328,5 +329,47 @@ public sealed class ArchitectureIntegrityTests
             current = Directory.GetParent(current)?.FullName;
         }
         return null;
+    }
+
+    [Fact]
+    public void Architecture_TestModeJournalPath_IsNeverAppDataPath()
+    {
+        string realAppData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        string realLocalAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        string realWinVeloAppData = Path.Combine(realAppData, "WinVelo");
+        string realWinVeloLocalAppData = Path.Combine(realLocalAppData, "WinVelo");
+
+        // 1. Verify test mode paths are completely isolated from real WinVelo AppData and LocalAppData
+        string testJournalDir = WinVeloStoragePaths.GetJournalDirectory(isTestMode: true);
+        string testSettingsPath = WinVeloStoragePaths.GetSettingsPath(isTestMode: true);
+        string testLogsDir = WinVeloStoragePaths.GetLogsDirectory(isTestMode: true);
+        string testRoot = WinVeloStoragePaths.GetStorageRoot(isTestMode: true);
+
+        Assert.DoesNotContain(realWinVeloAppData, testJournalDir, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain(realWinVeloAppData, testSettingsPath, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain(realWinVeloLocalAppData, testLogsDir, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain(realAppData, testJournalDir, StringComparison.OrdinalIgnoreCase);
+
+        Assert.StartsWith(Path.GetTempPath(), testJournalDir, StringComparison.OrdinalIgnoreCase);
+        Assert.StartsWith(Path.GetTempPath(), testSettingsPath, StringComparison.OrdinalIgnoreCase);
+        Assert.StartsWith(Path.GetTempPath(), testLogsDir, StringComparison.OrdinalIgnoreCase);
+        Assert.StartsWith(Path.GetTempPath(), testRoot, StringComparison.OrdinalIgnoreCase);
+
+        Assert.Contains(WinVeloStoragePaths.TestModeFolderName, testJournalDir, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains(WinVeloStoragePaths.TestModeFolderName, testSettingsPath, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains(WinVeloStoragePaths.TestModeFolderName, testLogsDir, StringComparison.OrdinalIgnoreCase);
+
+        // 2. Verify real mode paths correctly target real WinVelo AppData
+        string realJournalDir = WinVeloStoragePaths.GetJournalDirectory(isTestMode: false);
+        string realSettingsPath = WinVeloStoragePaths.GetSettingsPath(isTestMode: false);
+        string realLogsDir = WinVeloStoragePaths.GetLogsDirectory(isTestMode: false);
+
+        Assert.NotEqual(realJournalDir, testJournalDir, StringComparer.OrdinalIgnoreCase);
+        Assert.NotEqual(realSettingsPath, testSettingsPath, StringComparer.OrdinalIgnoreCase);
+        Assert.NotEqual(realLogsDir, testLogsDir, StringComparer.OrdinalIgnoreCase);
+
+        Assert.StartsWith(realWinVeloAppData, realJournalDir, StringComparison.OrdinalIgnoreCase);
+        Assert.StartsWith(realWinVeloAppData, realSettingsPath, StringComparison.OrdinalIgnoreCase);
+        Assert.StartsWith(realWinVeloLocalAppData, realLogsDir, StringComparison.OrdinalIgnoreCase);
     }
 }

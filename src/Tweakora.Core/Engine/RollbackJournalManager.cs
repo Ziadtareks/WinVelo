@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Tweakora.Core.Models;
+using Tweakora.Core.Safety;
 
 namespace Tweakora.Core.Engine;
 
@@ -15,15 +16,20 @@ public sealed class RollbackJournalManager
         Directory.CreateDirectory(_journalDirectory);
     }
 
-    public RollbackJournalSession StartSession()
+    public RollbackJournalSession StartSession(string? mode = null, string? appVersion = null)
     {
         lock (_lock)
         {
+            mode ??= TestModeManager.IsTestMode ? "test" : "real";
+            appVersion ??= "0.9.0-beta";
+
             _currentSession = new RollbackJournalSession
             {
                 SessionId = DateTime.UtcNow.ToString("yyyyMMdd_HHmmss_") + Guid.NewGuid().ToString("N")[..8],
                 StartedAtUtc = DateTime.UtcNow,
-                IsCompleted = false
+                IsCompleted = false,
+                Mode = mode,
+                AppVersion = appVersion
             };
 
             FlushSessionUnsafe(_currentSession);
@@ -130,6 +136,12 @@ public sealed class RollbackJournalManager
                     RollbackJournalSession? session = JsonSerializer.Deserialize<RollbackJournalSession>(json);
                     if (session != null && !session.IsCompleted && session.Records.Count > 0)
                     {
+                        // In real mode, exclude sessions without a marker (legacy sessions)
+                        if (!TestModeManager.IsTestMode && session.IsLegacy)
+                        {
+                            continue;
+                        }
+
                         unfinished.Add(session);
                     }
                 }

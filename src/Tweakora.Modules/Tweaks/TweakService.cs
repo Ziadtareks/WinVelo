@@ -210,6 +210,12 @@ public sealed class TweakService : ITweakService
 
         foreach (var session in sessions)
         {
+            // In real mode, exclude sessions without a marker (legacy sessions) from active changes / Undo-all
+            if (!TestModeManager.IsTestMode && session.IsLegacy)
+            {
+                continue;
+            }
+
             for (int i = session.Records.Count - 1; i >= 0; i--)
             {
                 var r = session.Records[i];

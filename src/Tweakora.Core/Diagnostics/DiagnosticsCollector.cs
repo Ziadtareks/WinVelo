@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Tweakora.Core.Engine;
 using Tweakora.Core.Interfaces;
 using Tweakora.Core.Models;
+using Tweakora.Core.Safety;
 
 namespace Tweakora.Core.Diagnostics;
 
@@ -70,13 +71,8 @@ public sealed class DiagnosticsCollector
         string? journalDir = null,
         string? logsDir = null)
     {
-        journalDir ??= Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "WinVelo", "Journal");
-
-        logsDir ??= Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "WinVelo", "Logs");
+        journalDir ??= WinVeloStoragePaths.GetJournalDirectory(TestModeManager.IsTestMode);
+        logsDir ??= WinVeloStoragePaths.GetLogsDirectory(TestModeManager.IsTestMode);
 
         string? outDir = Path.GetDirectoryName(outputPath);
         if (!string.IsNullOrEmpty(outDir) && !Directory.Exists(outDir))

@@ -14,19 +14,7 @@ public sealed class AppSettingsService : IAppSettingsService
 
     public AppSettingsService(string? customPath = null)
     {
-        if (customPath != null)
-        {
-            _settingsFilePath = customPath;
-        }
-        else if (TestModeManager.IsTestMode)
-        {
-            _settingsFilePath = Path.Combine(Path.GetTempPath(), "WinVelo-Test", "settings.json");
-        }
-        else
-        {
-            string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            _settingsFilePath = Path.Combine(appData, "WinVelo", "settings.json");
-        }
+        _settingsFilePath = customPath ?? WinVeloStoragePaths.GetSettingsPath(TestModeManager.IsTestMode);
 
         _cachedSettings = LoadSettings();
     }

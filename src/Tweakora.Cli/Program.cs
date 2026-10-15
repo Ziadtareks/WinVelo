@@ -58,6 +58,7 @@ public static class Program
         if (isRealMode)
         {
             TestModeManager.DisableTestMode();
+            WinVeloStoragePaths.InitializeStorage(false);
             Console.WriteLine("[MODE] REAL-MODE ACTIVE — Operating directly against host OS.");
 
             // Strict Elevation Check: Only required for modifying operations
@@ -73,6 +74,7 @@ public static class Program
         else
         {
             TestModeManager.EnableTestMode();
+            WinVeloStoragePaths.InitializeStorage(true);
             Console.WriteLine("[MODE] TEST/SIMULATION ACTIVE — Using safe in-memory fakes.");
         }
 
@@ -201,9 +203,7 @@ public static class Program
             return 0;
         }
 
-        string journalDir = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "WinVelo", "Journal");
+        string journalDir = WinVeloStoragePaths.GetJournalDirectory(!isRealMode);
         RollbackJournalManager journal = new(journalDir);
 
         Core.Engine.ExecutionContext context = new()
