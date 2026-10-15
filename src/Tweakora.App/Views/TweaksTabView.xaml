@@ -423,11 +423,11 @@
         </Border>
 
         <!-- EXECUTION DETAILS DIALOG OVERLAY -->
-        <Grid Grid.Column="0" Grid.ColumnSpan="2" Background="#80000000"
+        <Grid Grid.Column="0" Grid.ColumnSpan="2" Background="#99000000"
               Visibility="{Binding IsDetailsDialogOpen, Converter={StaticResource BoolToVis}}"
               Panel.ZIndex="2000">
-            <Border Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
-                    BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+            <Border Background="{DynamicResource BgCardBrush}"
+                    BorderBrush="{DynamicResource BorderSubtleBrush}"
                     BorderThickness="1" CornerRadius="10"
                     Width="700" MaxHeight="520" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <Grid Margin="20">
@@ -447,7 +447,7 @@
                         <ItemsControl ItemsSource="{Binding ExecutionDetailsItems}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Border Background="{DynamicResource BgDeepBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="1"
+                                    <Border Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="1"
                                             CornerRadius="6" Padding="12,10" Margin="0,0,0,8">
                                         <Grid>
                                             <Grid.RowDefinitions>
@@ -482,10 +482,10 @@
         </Grid>
 
         <!-- IRREVERSIBLE TWEAK WARNING MODAL -->
-        <Grid Grid.Column="0" Grid.ColumnSpan="2" Background="#80000000"
+        <Grid Grid.Column="0" Grid.ColumnSpan="2" Background="#99000000"
               Visibility="{Binding IsIrreversibleDialogOpen, Converter={StaticResource BoolToVis}}"
               Panel.ZIndex="2100">
-            <Border Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+            <Border Background="{DynamicResource BgCardBrush}"
                     BorderBrush="{DynamicResource RiskHighFgBrush}"
                     BorderThickness="1" CornerRadius="10"
                     Width="650" MaxHeight="520" HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -514,7 +514,7 @@
                         <ItemsControl ItemsSource="{Binding IrreversibleWarningItems}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Border Background="{DynamicResource BgDeepBrush}" BorderBrush="{DynamicResource RiskHighFgBrush}" BorderThickness="1"
+                                    <Border Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource RiskHighFgBrush}" BorderThickness="1"
                                             CornerRadius="6" Padding="12,10" Margin="0,0,0,8">
                                         <StackPanel>
                                             <TextBlock Text="{Binding Name}" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource RiskHighFgBrush}" />

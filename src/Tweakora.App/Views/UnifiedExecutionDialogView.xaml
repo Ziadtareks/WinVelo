@@ -14,8 +14,8 @@
         <Grid Background="#99000000"
               Visibility="{Binding IsPreviewOpen, Converter={StaticResource BoolToVisConverter}}"
               Panel.ZIndex="3100">
-            <Border Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
-                    BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+            <Border Background="{DynamicResource BgCardBrush}"
+                    BorderBrush="{DynamicResource BorderSubtleBrush}"
                     BorderThickness="1" CornerRadius="10"
                     Width="780" MaxHeight="620" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <Border.Effect>
@@ -45,10 +45,10 @@
                     <!-- Description & Notice -->
                     <StackPanel Grid.Row="1" Margin="0,0,0,14">
                         <TextBlock Text="{Binding PreviewDescription}" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,0,0,8" />
-                        <Border Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="6" Padding="10,8">
+                        <Border Background="{DynamicResource BgDeepBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="1" CornerRadius="6" Padding="10,8">
                             <StackPanel Orientation="Horizontal">
                                 <ui:SymbolIcon Symbol="Info16" Foreground="#60A5FA" FontSize="14" Margin="0,0,8,0" VerticalAlignment="Center" />
-                                <TextBlock Text="{Binding PreviewNotice}" FontSize="11" Foreground="#94A3B8" TextWrapping="Wrap" VerticalAlignment="Center" />
+                                <TextBlock Text="{Binding PreviewNotice}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" VerticalAlignment="Center" />
                             </StackPanel>
                         </Border>
                     </StackPanel>
@@ -67,7 +67,7 @@
                             <ItemsControl ItemsSource="{Binding PreviewItems}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Border Background="#1E2433" BorderBrush="#334155" BorderThickness="1"
+                                        <Border Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="1"
                                                 CornerRadius="6" Padding="12,10" Margin="0,0,0,8">
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
@@ -134,8 +134,8 @@
         <Grid Background="#99000000"
               Visibility="{Binding IsResultOpen, Converter={StaticResource BoolToVisConverter}}"
               Panel.ZIndex="3200">
-            <Border Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
-                    BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+            <Border Background="{DynamicResource BgCardBrush}"
+                    BorderBrush="{DynamicResource BorderSubtleBrush}"
                     BorderThickness="1" CornerRadius="10"
                     Width="740" MaxHeight="600" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <Border.Effect>
@@ -171,7 +171,7 @@
                         <ItemsControl ItemsSource="{Binding ResultItems}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Border Background="#1E2433" BorderBrush="#334155" BorderThickness="1"
+                                    <Border Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="1"
                                             CornerRadius="6" Padding="12,10" Margin="0,0,0,8">
                                         <Grid>
                                             <Grid.ColumnDefinitions>

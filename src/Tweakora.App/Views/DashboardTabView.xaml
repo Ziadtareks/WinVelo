@@ -345,11 +345,11 @@
     </ScrollViewer>
 
     <!-- EXECUTION DETAILS DIALOG OVERLAY -->
-    <Grid Background="#80000000"
+    <Grid Background="#99000000"
           Visibility="{Binding IsDetailsDialogOpen, Converter={StaticResource BoolToVisConverter}}"
           Panel.ZIndex="2000">
-        <Border Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
-                BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+        <Border Background="{DynamicResource BgCardBrush}"
+                BorderBrush="{DynamicResource BorderSubtleBrush}"
                 BorderThickness="1" CornerRadius="10"
                 Width="700" MaxHeight="520" HorizontalAlignment="Center" VerticalAlignment="Center">
             <Grid Margin="20">
@@ -369,7 +369,7 @@
                     <ItemsControl ItemsSource="{Binding ExecutionDetailsItems}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border Background="#1E2433" BorderBrush="#334155" BorderThickness="1"
+                                <Border Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="1"
                                         CornerRadius="6" Padding="12,10" Margin="0,0,0,8">
                                     <Grid>
                                         <Grid.RowDefinitions>
@@ -404,10 +404,10 @@
     </Grid>
 
     <!-- IRREVERSIBLE TWEAK WARNING MODAL -->
-    <Grid Background="#80000000"
+    <Grid Background="#99000000"
           Visibility="{Binding IsIrreversibleDialogOpen, Converter={StaticResource BoolToVisConverter}}"
           Panel.ZIndex="2100">
-        <Border Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+        <Border Background="{DynamicResource BgCardBrush}"
                 BorderBrush="#EF4444"
                 BorderThickness="1" CornerRadius="10"
                 Width="650" MaxHeight="520" HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -436,7 +436,7 @@
                     <ItemsControl ItemsSource="{Binding IrreversibleWarningItems}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border Background="#1E1E24" BorderBrush="#DC2626" BorderThickness="1"
+                                <Border Background="{DynamicResource BgCardBrush}" BorderBrush="#DC2626" BorderThickness="1"
                                         CornerRadius="6" Padding="12,10" Margin="0,0,0,8">
                                     <StackPanel>
                                         <TextBlock Text="{Binding Name}" FontSize="13" FontWeight="Bold" Foreground="#FCA5A5" />
@@ -462,11 +462,11 @@
     </Grid>
 
     <!-- PROFILE PREVIEW DIALOG MODAL -->
-    <Grid Background="#80000000"
+    <Grid Background="#99000000"
           Visibility="{Binding IsProfilePreviewOpen, Converter={StaticResource BoolToVisConverter}}"
           Panel.ZIndex="2150">
-        <Border Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
-                BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+        <Border Background="{DynamicResource BgCardBrush}"
+                BorderBrush="{DynamicResource BorderSubtleBrush}"
                 BorderThickness="1" CornerRadius="10"
                 Width="780" MaxHeight="600" HorizontalAlignment="Center" VerticalAlignment="Center">
             <Grid Margin="20">
@@ -493,10 +493,10 @@
                 <!-- Description & Notice -->
                 <StackPanel Grid.Row="1" Margin="0,0,0,12">
                     <TextBlock Text="{Binding ProfilePreviewDescription}" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,0,0,6" />
-                    <Border Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="6" Padding="10,6">
+                    <Border Background="{DynamicResource BgDeepBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="1" CornerRadius="6" Padding="10,6">
                         <StackPanel Orientation="Horizontal">
                             <ui:SymbolIcon Symbol="Info16" Foreground="#60A5FA" FontSize="14" Margin="0,0,8,0" VerticalAlignment="Center" />
-                            <TextBlock Text="{Binding ProfilePreviewNotice}" FontSize="11" Foreground="#94A3B8" TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <TextBlock Text="{Binding ProfilePreviewNotice}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" VerticalAlignment="Center" />
                         </StackPanel>
                     </Border>
                 </StackPanel>
@@ -515,7 +515,7 @@
                         <ItemsControl ItemsSource="{Binding ProfilePreviewItems}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Border Background="#1E2433" BorderBrush="#334155" BorderThickness="1"
+                                    <Border Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="1"
                                             CornerRadius="6" Padding="12,10" Margin="0,0,0,8">
                                         <Grid>
                                             <Grid.ColumnDefinitions>
