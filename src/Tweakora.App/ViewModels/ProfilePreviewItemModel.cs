@@ -38,8 +38,8 @@ public sealed partial class ProfilePreviewItemModel : ObservableObject
     {
         "Safe" => "#064E3B",
         "Low" => "#1E3A8A",
-        "Medium" => "#78350F",
-        "High" => "#7F1D1D",
+        "Moderate" or "Medium" => "#451A03",
+        "Caution" or "High" => "#450A0A",
         _ => "#1E222D"
     };
 
@@ -47,8 +47,17 @@ public sealed partial class ProfilePreviewItemModel : ObservableObject
     {
         "Safe" => "#10B981",
         "Low" => "#60A5FA",
-        "Medium" => "#FBBF24",
-        "High" => "#F87171",
+        "Moderate" or "Medium" => "#F59E0B",
+        "Caution" or "High" => "#EF4444",
         _ => "#94A3B8"
+    };
+
+    public string RiskBadgeBorder => Risk switch
+    {
+        "Safe" => "#059669",
+        "Low" => "#3B82F6",
+        "Moderate" or "Medium" => "#D97706",
+        "Caution" or "High" => "#DC2626",
+        _ => "#334155"
     };
 }

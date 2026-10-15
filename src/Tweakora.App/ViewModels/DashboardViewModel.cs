@@ -471,6 +471,66 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
         bool isUndo,
         ProfileCardModel? card)
     {
+        if (_executionDialog != null)
+        {
+            await _executionDialog.OpenPreviewAsync(
+                title,
+                description,
+                notice,
+                confirmText,
+                tweaks,
+                isUndo,
+                onConfirmed: async (selected) =>
+                {
+                    if (card != null)
+                    {
+                        card.IsBusy = true;
+                        card.StatusMessage = isUndo ? "Reverting selected tweaks..." : "Applying selected tweaks...";
+                    }
+                    try
+                    {
+                        OperationExecutionReport rep;
+                        if (isUndo)
+                        {
+                            rep = await Task.Run(() => _tweakService.UndoTweaksAsync(selected, _runner));
+                        }
+                        else
+                        {
+                            rep = await Task.Run(() => _tweakService.ApplyTweaksAsync(selected, _runner));
+                        }
+
+                        ServicingHealthReport? health = null;
+                        try
+                        {
+                            health = await _tweakService.CheckServicingHealthAsync();
+                            LastServicingHealthReport = health;
+                            ServicingHealthSummary = health.SummaryText;
+                        }
+                        catch { }
+
+                        if (card != null)
+                        {
+                            HandleProfileReport(card, rep, isRestore: isUndo);
+                        }
+
+                        _executionDialog.ShowResult(selected, rep, health, isUndo);
+                        await RefreshCalmStatusAsync();
+                        await RefreshAllToggleStatesAsync();
+                        _ = RecalculateOptimizationScoreAsync();
+                    }
+                    finally
+                    {
+                        if (card != null) card.IsBusy = false;
+                    }
+                },
+                onCancelled: () =>
+                {
+                    if (card != null) card.StatusMessage = "Cancelled by user.";
+                    GlobalStatusMessage = "Operation cancelled.";
+                });
+            return;
+        }
+
         _activePreviewCard = card;
         ProfilePreviewTitle = title;
         ProfilePreviewDescription = description;
@@ -578,6 +638,8 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
     public ObservableCollection<ProfileCardModel> Profiles { get; } = new();
     public ObservableCollection<QuickToggleCardModel> QuickToggles { get; } = new();
 
+    private readonly UnifiedExecutionDialogViewModel? _executionDialog;
+
     public DashboardViewModel(
         ITweakService tweakService,
         IOperationRunner runner,
@@ -585,7 +647,8 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
         IMemoryOptimizerService memoryService,
         ISmartAdvisorService advisorService,
         IActivityTracker? activityTracker = null,
-        IShellService? shellService = null)
+        IShellService? shellService = null,
+        UnifiedExecutionDialogViewModel? executionDialog = null)
     {
         _tweakService = tweakService;
         _runner = runner;
@@ -594,6 +657,7 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
         _advisorService = advisorService;
         _activityTracker = activityTracker;
         _shellService = shellService;
+        _executionDialog = executionDialog;
 
         try
         {

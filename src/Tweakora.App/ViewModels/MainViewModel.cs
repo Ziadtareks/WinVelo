@@ -101,6 +101,7 @@ public sealed partial class MainViewModel : ObservableObject
     public ToolsViewModel ToolsVM { get; }
     public HistoryViewModel HistoryVM { get; }
     public FirstRunWizardViewModel WizardVM { get; }
+    public UnifiedExecutionDialogViewModel ExecutionDialogVM { get; }
 
     [ObservableProperty]
     private bool _isWizardOpen;
@@ -129,7 +130,8 @@ public sealed partial class MainViewModel : ObservableObject
         ITweakService? tweakService = null,
         IAppSettingsService? appSettings = null,
         ISystemRestoreService? restoreService = null,
-        FirstRunWizardViewModel? wizardVM = null)
+        FirstRunWizardViewModel? wizardVM = null,
+        UnifiedExecutionDialogViewModel? executionDialogVM = null)
     {
         DashboardVM = dashboardVM;
         InstallVM = installVM;
@@ -144,6 +146,7 @@ public sealed partial class MainViewModel : ObservableObject
 
         ToolsVM = toolsVM ?? new ToolsViewModel(startupVM, updatesVM, configVM, toolboxVM, null);
         HistoryVM = historyVM ?? new HistoryViewModel(tweakService, null);
+        ExecutionDialogVM = executionDialogVM ?? new UnifiedExecutionDialogViewModel(tweakService, null, activityTracker);
 
         _appSettings = appSettings ?? new AppSettingsService();
         var resSvc = restoreService ?? new NullRestoreService();
@@ -569,3 +572,4 @@ file sealed class NullRestoreService : ISystemRestoreService
     public DateTime? GetLatestRestorePointDate() => null;
     public RestorePointResult CreateRestorePoint(string description) => new() { Success = true };
 }
+

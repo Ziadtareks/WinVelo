@@ -152,25 +152,25 @@ public sealed class CompositeStateDetectionTests
         card.State = TweakState.NotApplied;
         Assert.False(card.IsActive);
         Assert.False(card.ToggleCheckedState);
-        Assert.Equal("DEFAULT", card.StatusBadgeText);
+        Assert.Equal("Not applied", card.StatusBadgeText);
 
         // Partial
         card.State = TweakState.Partial;
         Assert.False(card.IsActive);
         Assert.Null(card.ToggleCheckedState); // Indeterminate null
-        Assert.Equal("PARTIAL ⚠", card.StatusBadgeText);
+        Assert.Equal("Partial", card.StatusBadgeText);
 
         // Applied
         card.State = TweakState.Applied;
         Assert.True(card.IsActive);
         Assert.True(card.ToggleCheckedState);
-        Assert.Equal("APPLIED ✓", card.StatusBadgeText);
+        Assert.Equal("Applied", card.StatusBadgeText);
 
         // Unknown
         card.State = TweakState.Unknown;
         Assert.False(card.IsActive);
         Assert.False(card.ToggleCheckedState);
-        Assert.Equal("CAN'T VERIFY", card.StatusBadgeText);
+        Assert.Equal("Can't verify", card.StatusBadgeText);
     }
 
     [Fact]

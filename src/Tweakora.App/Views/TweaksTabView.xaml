@@ -15,65 +15,66 @@
             <RowDefinition Height="*" />    <!-- Scrollable Cards List -->
         </Grid.RowDefinitions>
 
-        <!-- Category & Results Status Bar -->
+        <!-- Filters & Results Status Bar -->
         <Border Grid.Row="0" Background="{DynamicResource BgCardBrush}"
                 BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="0,0,0,1"
                 Padding="16,10" Margin="0,0,0,8">
             <DockPanel LastChildFill="False">
-                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" VerticalAlignment="Center">
-                    <TextBlock Text="{Binding SelectedCategory, StringFormat='Category: {0}'}"
-                               FontWeight="Bold" FontSize="14" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,12,0" />
-                    <Border Background="{DynamicResource StatusDefaultBgBrush}" CornerRadius="10" Padding="8,2" VerticalAlignment="Center">
+                <!-- Left: Full Filter Controls Suite -->
+                <WrapPanel Orientation="Horizontal" DockPanel.Dock="Left" VerticalAlignment="Center">
+                    <!-- Search Input -->
+                    <ui:TextBox AutomationProperties.AutomationId="TweaksSearchBox"
+                                AutomationProperties.Name="Search tweaks"
+                                PlaceholderText="Search tweaks..."
+                                Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                Width="180" Margin="0,0,8,0" VerticalAlignment="Center" />
+
+                    <!-- Category Dropdown -->
+                    <ComboBox AutomationProperties.Name="Filter by category"
+                              ItemsSource="{Binding CategoryOptions}"
+                              SelectedItem="{Binding SelectedCategory, Mode=TwoWay}"
+                              Width="120" Margin="0,0,8,0" VerticalAlignment="Center" />
+
+                    <!-- Risk Dropdown -->
+                    <ComboBox AutomationProperties.Name="Filter by risk"
+                              ItemsSource="{Binding RiskOptions}"
+                              SelectedItem="{Binding SelectedRisk, Mode=TwoWay}"
+                              Width="95" Margin="0,0,8,0" VerticalAlignment="Center" />
+
+                    <!-- State Dropdown -->
+                    <ComboBox AutomationProperties.Name="Filter by state"
+                              ItemsSource="{Binding StateOptions}"
+                              SelectedItem="{Binding SelectedState, Mode=TwoWay}"
+                              Width="110" Margin="0,0,12,0" VerticalAlignment="Center" />
+
+                    <!-- Recommended Only Toggle -->
+                    <CheckBox AutomationProperties.AutomationId="RecommendedOnlyCheckBox"
+                              Content="Recommended only"
+                              IsChecked="{Binding IsRecommendedOnly, Mode=TwoWay}"
+                              Margin="0,0,12,0" VerticalAlignment="Center"
+                              FontSize="11" Foreground="#34D399" FontWeight="SemiBold"
+                              ToolTip="Filter to conservative, well-documented, reversible settings (Safe and Low risk only)" />
+
+                    <!-- Show Experimental Tweaks Toggle -->
+                    <CheckBox AutomationProperties.AutomationId="ShowExperimentalTweaksCheckBox"
+                              Content="Show experimental"
+                              IsChecked="{Binding ShowExperimentalTweaks, Mode=TwoWay}"
+                              Margin="0,0,8,0" VerticalAlignment="Center"
+                              FontSize="11" Foreground="#94A3B8"
+                              ToolTip="Display unproven community-lore tweaks (quarantined from presets)" />
+                </WrapPanel>
+
+                <!-- Right: Scan Status and Available Count -->
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center">
+                    <Border Background="{DynamicResource StatusDefaultBgBrush}" CornerRadius="10" Padding="8,3" Margin="0,0,12,0" VerticalAlignment="Center">
                         <TextBlock Text="{Binding FilteredTweaks.Count, StringFormat='{}{0} available'}"
                                    FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" FontWeight="SemiBold" />
                     </Border>
 
-                    <!-- Beginner vs Pro Mode Switch -->
-                    <Border Background="#1E293B" CornerRadius="6" Padding="2" Margin="14,0,0,0" VerticalAlignment="Center">
-                        <StackPanel Orientation="Horizontal">
-                            <ui:Button AutomationProperties.AutomationId="ModeBeginnerButton"
-                                       Content="Beginner Mode"
-                                       Command="{Binding SetModeCommand}" CommandParameter="Beginner"
-                                       Padding="10,3" FontSize="11" Margin="0,0,2,0" />
-                            <ui:Button AutomationProperties.AutomationId="ModeProButton"
-                                       Content="Pro Mode (All)"
-                                       Command="{Binding SetModeCommand}" CommandParameter="Pro"
-                                       Padding="10,3" FontSize="11" />
-                        </StackPanel>
-                    </Border>
-
-                    <!-- Show Experimental Tweaks Toggle -->
-                    <CheckBox AutomationProperties.AutomationId="ShowExperimentalTweaksCheckBox"
-                              Content="Show experimental tweaks"
-                              IsChecked="{Binding ShowExperimentalTweaks, Mode=TwoWay}"
-                              Margin="16,0,0,0" VerticalAlignment="Center"
-                              FontSize="11" Foreground="#94A3B8"
-                              ToolTip="Display unproven community-lore tweaks (quarantined from presets)" />
-
-                    <!-- Recommended Only Filter Toggle -->
-                    <CheckBox AutomationProperties.AutomationId="RecommendedOnlyCheckBox"
-                              Content="Recommended only"
-                              IsChecked="{Binding IsRecommendedOnly, Mode=TwoWay}"
-                              Margin="16,0,0,0" VerticalAlignment="Center"
-                              FontSize="11" Foreground="#34D399" FontWeight="SemiBold"
-                              ToolTip="Filter to conservative, well-documented, reversible settings (Safe and Low risk only)" />
-                </StackPanel>
-
-                <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center">
                     <!-- Progress scanning indicator -->
-                    <StackPanel Orientation="Horizontal" Visibility="{Binding IsScanning, Converter={StaticResource BoolToVis}}" Margin="0,0,16,0">
-                        <ProgressBar IsIndeterminate="True" Width="80" Height="4" Margin="0,0,8,0" VerticalAlignment="Center" />
-                        <TextBlock Text="{Binding ScanStatusText}" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" />
-                    </StackPanel>
-
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock Text="{Binding StatusMessage}" FontSize="12" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" />
-                        <Button Style="{DynamicResource ModernGhostBtn}"
-                                Padding="4,1" Margin="6,0,0,0"
-                                Visibility="{Binding HasFailedDetails, Converter={StaticResource BoolToVis}}"
-                                Command="{Binding ShowDetailsDialogCommand}">
-                            <TextBlock Text="(details)" FontSize="11" Foreground="#60A5FA" TextDecorations="Underline" />
-                        </Button>
+                    <StackPanel Orientation="Horizontal" Visibility="{Binding IsScanning, Converter={StaticResource BoolToVis}}" Margin="0,0,12,0">
+                        <ProgressBar IsIndeterminate="True" Width="70" Height="4" Margin="0,0,6,0" VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding ScanStatusText}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" />
                     </StackPanel>
                 </StackPanel>
             </DockPanel>
@@ -110,16 +111,37 @@
                                     <RowDefinition Height="Auto" /> <!-- Expandable Info Drawer -->
                                 </Grid.RowDefinitions>
 
-                                <!-- Top Header Row -->
+                                <!-- Top Header Row (Collapsed card essentials) -->
                                 <DockPanel Grid.Row="0" LastChildFill="False">
                                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" VerticalAlignment="Center">
                                         <!-- Selection Checkbox -->
                                         <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                                  AutomationProperties.Name="{Binding Title, StringFormat='Select {0}'}"
                                                   Style="{DynamicResource ModernCheckBox}"
                                                   VerticalAlignment="Center" Margin="0,0,10,0" />
                                         <!-- Bold Title -->
                                         <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="14"
-                                                   Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" />
+                                                   Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" Margin="0,0,10,0" />
+
+                                        <!-- Reboot Requirement Icon -->
+                                        <Border Background="#450A0A" BorderBrush="#DC2626" BorderThickness="1" CornerRadius="4" Padding="5,2" Margin="0,0,6,0"
+                                                Visibility="{Binding RequiresReboot, Converter={StaticResource BoolToVis}}"
+                                                ToolTip="Requires system reboot to take effect">
+                                            <StackPanel Orientation="Horizontal">
+                                                <ui:SymbolIcon Symbol="ArrowSync24" Foreground="#F87171" FontSize="11" Margin="0,0,3,0" VerticalAlignment="Center" />
+                                                <TextBlock Text="Reboot" FontSize="10" FontWeight="Bold" Foreground="#F87171" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                        </Border>
+
+                                        <!-- Explorer Restart Icon -->
+                                        <Border Background="#1E3A8A" BorderBrush="#3B82F6" BorderThickness="1" CornerRadius="4" Padding="5,2" Margin="0,0,6,0"
+                                                Visibility="{Binding RequiresExplorerRestart, Converter={StaticResource BoolToVis}}"
+                                                ToolTip="Requires Windows Explorer restart to take effect">
+                                            <StackPanel Orientation="Horizontal">
+                                                <ui:SymbolIcon Symbol="ArrowCounterclockwise24" Foreground="#60A5FA" FontSize="11" Margin="0,0,3,0" VerticalAlignment="Center" />
+                                                <TextBlock Text="Explorer" FontSize="10" FontWeight="Bold" Foreground="#60A5FA" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                        </Border>
                                     </StackPanel>
 
                                     <!-- Right Badges & Direct 1-Click Toggle -->
@@ -131,13 +153,14 @@
 
                                         <!-- Direct 1-Click Toggle Switch -->
                                         <ui:ToggleSwitch AutomationProperties.AutomationId="{Binding Id, StringFormat='TweakToggle_{0}'}"
+                                                         AutomationProperties.Name="{Binding Title, StringFormat='Toggle {0}'}"
                                                          IsChecked="{Binding ToggleCheckedState, Mode=OneWay}"
                                                          IsEnabled="{Binding IsNotApplying}"
                                                          Command="{Binding DataContext.ToggleTweakCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                          CommandParameter="{Binding}"
                                                          Margin="0,0,10,0" VerticalAlignment="Center" />
 
-                                        <!-- Real System State Status Badge -->
+                                        <!-- Real System State Status Badge (Applied / Partial / Not applied / Can't verify) -->
                                         <Border Background="{Binding StatusBadgeBackground}"
                                                 BorderBrush="{Binding StatusBadgeBorder}"
                                                 BorderThickness="1" CornerRadius="10" Padding="8,3" Margin="0,0,6,0">
@@ -146,7 +169,7 @@
                                                        FontSize="10" FontWeight="ExtraBold" />
                                         </Border>
 
-                                        <!-- Risk Badge -->
+                                        <!-- Risk Color Chip (Safe green / Low blue / Medium amber / High red) -->
                                         <Border Background="{Binding RiskBadgeBackground}"
                                                 BorderBrush="{Binding RiskBadgeBorder}"
                                                 BorderThickness="1" CornerRadius="10" Padding="8,3">
@@ -328,6 +351,32 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </ScrollViewer>
+
+        <!-- TOAST NOTIFICATION OVERLAY (Safe / Low instant apply + Undo) -->
+        <Border Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                Margin="0,0,32,24"
+                Background="#1E293B" BorderBrush="#3B82F6" BorderThickness="1"
+                CornerRadius="8" Padding="16,12"
+                Panel.ZIndex="1500"
+                Visibility="{Binding IsToastVisible, Converter={StaticResource BoolToVis}}">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="16" ShadowDepth="4" Direction="270" Color="#000000" Opacity="0.5" />
+            </Border.Effect>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <ui:SymbolIcon Symbol="CheckmarkCircle24" Foreground="#34D399" FontSize="18" Margin="0,0,10,0" VerticalAlignment="Center" />
+                <TextBlock Text="{Binding ToastMessage}" FontSize="13" FontWeight="SemiBold"
+                           Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" Margin="0,0,16,0" />
+                <ui:Button AutomationProperties.AutomationId="ToastUndoButton"
+                           AutomationProperties.Name="Undo applied tweak"
+                           Content="{Binding ToastActionText}" Appearance="Primary"
+                           Command="{Binding UndoToastActionCommand}"
+                           Padding="14,4" Margin="0,0,10,0" />
+                <Button Style="{DynamicResource ModernGhostBtn}" Content="✕"
+                        AutomationProperties.Name="Dismiss notification"
+                        Command="{Binding DismissToastCommand}"
+                        Padding="6,2" VerticalAlignment="Center" />
+            </StackPanel>
+        </Border>
 
         <!-- EXECUTION DETAILS DIALOG OVERLAY -->
         <Grid Grid.Row="0" Grid.RowSpan="2" Background="#80000000"

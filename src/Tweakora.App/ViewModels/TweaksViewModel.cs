@@ -119,13 +119,13 @@ public sealed partial class TweakCardModel : ObservableObject
     {
         get
         {
-            if (IsApplying) return "APPLYING...";
+            if (IsApplying) return "Applying...";
             return State switch
             {
-                TweakState.Applied => "APPLIED ✓",
-                TweakState.Partial => "PARTIAL ⚠",
-                TweakState.Unknown => "CAN'T VERIFY",
-                _ => "DEFAULT"
+                TweakState.Applied => "Applied",
+                TweakState.Partial => "Partial",
+                TweakState.Unknown => "Can't verify",
+                _ => "Not applied"
             };
         }
     }
@@ -178,7 +178,8 @@ public sealed partial class TweakCardModel : ObservableObject
     public string RiskBadgeBackground => Risk switch
     {
         "Safe" => "#064E3B",
-        "Low" or "Moderate" or "Medium" => "#451A03",
+        "Low" => "#1E3A8A",
+        "Moderate" or "Medium" => "#451A03",
         "Caution" or "High" => "#450A0A",
         _ => "#1E222D"
     };
@@ -186,7 +187,8 @@ public sealed partial class TweakCardModel : ObservableObject
     public string RiskBadgeForeground => Risk switch
     {
         "Safe" => "#10B981",
-        "Low" or "Moderate" or "Medium" => "#F59E0B",
+        "Low" => "#60A5FA",
+        "Moderate" or "Medium" => "#F59E0B",
         "Caution" or "High" => "#EF4444",
         _ => "#94A3B8"
     };
@@ -194,7 +196,8 @@ public sealed partial class TweakCardModel : ObservableObject
     public string RiskBadgeBorder => Risk switch
     {
         "Safe" => "#059669",
-        "Low" or "Moderate" or "Medium" => "#D97706",
+        "Low" => "#3B82F6",
+        "Moderate" or "Medium" => "#D97706",
         "Caution" or "High" => "#DC2626",
         _ => "#334155"
     };
@@ -297,6 +300,7 @@ public sealed partial class TweaksViewModel : ObservableObject
 {
     private readonly ITweakService _tweakService;
     private readonly IOperationRunner _runner;
+    private readonly IActivityTracker? _activityTracker;
     private readonly List<TweakCardModel> _allTweaks = new();
     private readonly Dictionary<string, List<string>> _presets = new(StringComparer.OrdinalIgnoreCase);
 
@@ -453,13 +457,18 @@ public sealed partial class TweaksViewModel : ObservableObject
 
     public bool IsAdmin => AdminPrivilegeHelper.IsRunningAsAdministrator();
 
-    private readonly IActivityTracker? _activityTracker;
+    private readonly UnifiedExecutionDialogViewModel? _executionDialog;
 
-    public TweaksViewModel(ITweakService tweakService, IOperationRunner runner, IActivityTracker? activityTracker = null)
+    public TweaksViewModel(
+        ITweakService tweakService,
+        IOperationRunner runner,
+        IActivityTracker? activityTracker = null,
+        UnifiedExecutionDialogViewModel? executionDialog = null)
     {
         _tweakService = tweakService;
         _runner = runner;
         _activityTracker = activityTracker;
+        _executionDialog = executionDialog;
 
         LoadPresets();
         LoadCatalogTweaksFast();
@@ -610,6 +619,29 @@ public sealed partial class TweaksViewModel : ObservableObject
     [ObservableProperty]
     private bool _isRecommendedOnly = false;
 
+    [ObservableProperty]
+    private string _selectedRisk = "All";
+
+    [ObservableProperty]
+    private string _selectedState = "All";
+
+    public IReadOnlyList<string> RiskOptions { get; } = new[] { "All", "Safe", "Low", "Medium", "High" };
+    public IReadOnlyList<string> StateOptions { get; } = new[] { "All", "Applied", "Partial", "Not applied", "Can't verify" };
+    public IReadOnlyList<string> CategoryOptions { get; } = new[] { "All", "Essential", "Privacy", "Performance", "Customize UI", "Advanced" };
+
+    // Toast notification properties
+    [ObservableProperty]
+    private bool _isToastVisible;
+
+    [ObservableProperty]
+    private string _toastMessage = string.Empty;
+
+    [ObservableProperty]
+    private string _toastActionText = "Undo";
+
+    private TweakCardModel? _lastAppliedToastCard;
+    private System.Windows.Threading.DispatcherTimer? _toastDismissTimer;
+
     public void SetSearchQuery(string query)
     {
         SearchQuery = query;
@@ -617,6 +649,8 @@ public sealed partial class TweaksViewModel : ObservableObject
 
     partial void OnSearchQueryChanged(string value) => ApplyFilter();
     partial void OnSelectedCategoryChanged(string value) => ApplyFilter();
+    partial void OnSelectedRiskChanged(string value) => ApplyFilter();
+    partial void OnSelectedStateChanged(string value) => ApplyFilter();
     partial void OnIsBeginnerModeChanged(bool value) => ApplyFilter();
     partial void OnShowExperimentalTweaksChanged(bool value) => ApplyFilter();
     partial void OnIsRecommendedOnlyChanged(bool value) => ApplyFilter();
@@ -694,6 +728,29 @@ public sealed partial class TweaksViewModel : ObservableObject
                 }
             }
 
+            // Risk filter
+            if (!string.Equals(SelectedRisk, "All", StringComparison.OrdinalIgnoreCase))
+            {
+                if (!string.Equals(card.Risk, SelectedRisk, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+            }
+
+            // State filter
+            if (!string.Equals(SelectedState, "All", StringComparison.OrdinalIgnoreCase))
+            {
+                bool stateMatches = SelectedState switch
+                {
+                    "Applied" => card.State == TweakState.Applied,
+                    "Partial" => card.State == TweakState.Partial,
+                    "Not applied" => card.State == TweakState.NotApplied,
+                    "Can't verify" => card.State == TweakState.Unknown,
+                    _ => true
+                };
+                if (!stateMatches) continue;
+            }
+
             // Search query filter
             if (!string.IsNullOrWhiteSpace(q))
             {
@@ -720,6 +777,59 @@ public sealed partial class TweaksViewModel : ObservableObject
         if (card == null || card.IsBusy || card.IsApplying || IsScanning) return;
         bool targetState = !card.IsActive;
 
+        bool isMediumOrHigh = string.Equals(card.Risk, "High", StringComparison.OrdinalIgnoreCase) ||
+                              string.Equals(card.Risk, "Caution", StringComparison.OrdinalIgnoreCase) ||
+                              string.Equals(card.Risk, "Medium", StringComparison.OrdinalIgnoreCase) ||
+                              string.Equals(card.Risk, "Moderate", StringComparison.OrdinalIgnoreCase);
+
+        // Medium and High tweaks never apply immediately; they open the shared preview dialog
+        if (isMediumOrHigh)
+        {
+            if (_executionDialog != null)
+            {
+                string verb = targetState ? "Apply" : "Revert";
+                await _executionDialog.OpenPreviewAsync(
+                    title: $"{verb} Tweak — {card.Title}",
+                    description: $"Review the system impact of {card.Title} before applying.",
+                    notice: "Medium and High risk modifications require explicit review and confirmation before execution.",
+                    confirmText: $"{verb} Tweak",
+                    tweaks: new[] { card.Tweak },
+                    isUndo: !targetState,
+                    onConfirmed: async (selected) =>
+                    {
+                        card.IsBusy = true;
+                        card.IsApplying = true;
+                        try
+                        {
+                            OperationExecutionReport rep;
+                            if (targetState)
+                            {
+                                rep = await _tweakService.ApplyTweaksAsync(selected, _runner);
+                            }
+                            else
+                            {
+                                rep = await _tweakService.UndoTweaksAsync(selected, _runner);
+                            }
+                            _ = WindowsSettingNotifier.NotifySettingsChangedAsync();
+                            var actualState = await _tweakService.DetectTweakStateAsync(card.Tweak);
+                            card.State = actualState;
+                            UpdateCounts();
+
+                            ServicingHealthReport? health = null;
+                            try { health = await _tweakService.CheckServicingHealthAsync(); } catch { }
+                            _executionDialog.ShowResult(selected, rep, health, isUndo: !targetState);
+                        }
+                        finally
+                        {
+                            card.IsApplying = false;
+                            card.IsBusy = false;
+                        }
+                    });
+                return;
+            }
+        }
+
+        // Safe and Low: apply immediately and show toast with Undo
         if (targetState && !card.Tweak.Reversible)
         {
             bool confirmed = await RequestIrreversibleConfirmationAsync(new[] { card.Tweak });
@@ -733,8 +843,8 @@ public sealed partial class TweaksViewModel : ObservableObject
         card.IsBusy = true;
         card.IsApplying = true;
 
-        string verb = targetState ? "Applying" : "Reverting";
-        using var activity = _activityTracker?.BeginActivity($"{verb} {card.Title}...");
+        string actionVerb = targetState ? "Applying" : "Reverting";
+        using var activity = _activityTracker?.BeginActivity($"{actionVerb} {card.Title}...");
         await Task.Yield();
 
         try
@@ -756,19 +866,19 @@ public sealed partial class TweaksViewModel : ObservableObject
             });
 
             card.State = actualState;
-            AppliedCount = _allTweaks.Count(t => t.IsActive);
+            UpdateCounts();
 
             var res = report.Results.FirstOrDefault();
             bool opSucceeded = res != null && (res.Status is OperationItemStatus.Succeeded or OperationItemStatus.Applied or OperationItemStatus.Restored);
             if (opSucceeded)
             {
                 AddLog("OK", $"Successfully {(actualState == TweakState.Applied ? "applied" : "reverted")}: {card.Title}");
+                ShowApplyToast(card, actualState == TweakState.Applied ? "Applied — Undo" : "Reverted — Undo");
             }
             else
             {
                 AddLog("ERR", $"Failed {card.Title}: {res?.Reason ?? "System policy updated"}");
             }
-            UpdateCounts();
         }
         catch (Exception ex)
         {
@@ -778,6 +888,80 @@ public sealed partial class TweaksViewModel : ObservableObject
         {
             card.IsApplying = false;
             card.IsBusy = false;
+        }
+    }
+
+    [RelayCommand]
+    public async Task UndoToastActionAsync()
+    {
+        IsToastVisible = false;
+        _toastDismissTimer?.Stop();
+
+        if (_lastAppliedToastCard == null) return;
+        var card = _lastAppliedToastCard;
+        _lastAppliedToastCard = null;
+
+        card.IsBusy = true;
+        card.IsApplying = true;
+        using var activity = _activityTracker?.BeginActivity($"Undoing {card.Title}...");
+        await Task.Yield();
+
+        try
+        {
+            bool wasApplied = card.IsActive;
+            if (wasApplied)
+            {
+                await Task.Run(() => _tweakService.UndoTweaksAsync(new[] { card.Tweak }, _runner));
+            }
+            else
+            {
+                await Task.Run(() => _tweakService.ApplyTweaksAsync(new[] { card.Tweak }, _runner));
+            }
+            _ = WindowsSettingNotifier.NotifySettingsChangedAsync();
+            var newState = await _tweakService.DetectTweakStateAsync(card.Tweak);
+            card.State = newState;
+            UpdateCounts();
+            AddLog("OK", $"Reverted via toast undo: {card.Title}");
+        }
+        catch (Exception ex)
+        {
+            AddLog("ERR", $"Toast undo failed for {card.Title}: {ex.Message}");
+        }
+        finally
+        {
+            card.IsApplying = false;
+            card.IsBusy = false;
+        }
+    }
+
+    [RelayCommand]
+    public void DismissToast()
+    {
+        IsToastVisible = false;
+        _toastDismissTimer?.Stop();
+        _lastAppliedToastCard = null;
+    }
+
+    private void ShowApplyToast(TweakCardModel card, string message = "Applied — Undo")
+    {
+        _lastAppliedToastCard = card;
+        ToastMessage = message;
+        IsToastVisible = true;
+
+        if (System.Windows.Application.Current?.Dispatcher != null)
+        {
+            _toastDismissTimer?.Stop();
+            _toastDismissTimer = new System.Windows.Threading.DispatcherTimer
+            {
+                Interval = TimeSpan.FromSeconds(8)
+            };
+            _toastDismissTimer.Tick += (s, e) =>
+            {
+                _toastDismissTimer.Stop();
+                IsToastVisible = false;
+                _lastAppliedToastCard = null;
+            };
+            _toastDismissTimer.Start();
         }
     }
 

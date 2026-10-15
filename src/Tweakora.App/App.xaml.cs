@@ -128,6 +128,7 @@ public partial class App : Application
                 services.AddSingleton<ToolsViewModel>();
                 services.AddSingleton<HistoryViewModel>();
                 services.AddSingleton<FirstRunWizardViewModel>();
+                services.AddSingleton<UnifiedExecutionDialogViewModel>();
                 services.AddSingleton<MainViewModel>();
 
                 // Views

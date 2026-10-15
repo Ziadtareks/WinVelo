@@ -650,5 +650,10 @@
               Visibility="{Binding IsWizardOpen, Converter={StaticResource BoolToVisConverter}}">
             <views:FirstRunWizardView DataContext="{Binding WizardVM}" />
         </Grid>
+
+        <!-- UNIFIED EXECUTION DIALOG OVERLAY (SHARED PREVIEW & RESULT) -->
+        <views:UnifiedExecutionDialogView Grid.Row="0" Grid.RowSpan="4"
+                                          DataContext="{Binding ExecutionDialogVM}"
+                                          Panel.ZIndex="3000" />
     </Grid>
 </ui:FluentWindow>

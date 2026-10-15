@@ -471,5 +471,25 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
   3. Integrated wizard modal overlay in `MainWindow.xaml` and `MainViewModel.cs`, auto-displaying on first run and accessible on demand via a "Setup Wizard" button in the navigation sidebar.
   4. Added `EnableSystemRestore(string driveLetter)` to `ISystemRestoreService`, `WindowsRestoreService` (via PowerShell `Enable-ComputerRestore`), and `FakeRestoreService`.
   5. Added comprehensive test coverage in `FirstRunWizardTests.cs` covering all wizard steps, restoration validation, mode selection, and reopenability.
+---
 
-
+## BUG-031: Tweaks Page Usability Gaps: Divergent Execution Dialogs, Missing Risk/State Filter Suite, and Lack of Instant Apply Undo Toasts
+- **Component**: `src/Tweakora.App/ViewModels/UnifiedExecutionDialogViewModel.cs`, `src/Tweakora.App/Views/UnifiedExecutionDialogView.xaml`, `src/Tweakora.App/ViewModels/TweaksViewModel.cs`, `src/Tweakora.App/Views/TweaksTabView.xaml`, `src/Tweakora.App/ViewModels/DashboardViewModel.cs`, `src/Tweakora.App/ViewModels/MainViewModel.cs`, `src/Tweakora.App/Views/MainWindow.xaml`, `src/Tweakora.Tests/EngineTests/CompositeStateDetectionTests.cs`
+- **Finding**:
+  1. The UI maintained fragmented, disparate dialog implementations for preset previews, multi-select apply, single tweak execution, and rollback reporting.
+  2. Safe and Low risk tweaks required redundant confirmation steps or failed to provide immediate undo capability via non-intrusive toast notifications.
+  3. Medium and High risk tweaks risked accidental single-click execution rather than mandating an explicit preview/confirm modal with safety notices and servicing warnings.
+  4. The tweaks catalog lacked dedicated filter dropdowns for Risk (Safe, Low, Medium, High) and Detection State (Applied, Partial, Not applied, Can't verify).
+  5. State badges used inconsistent naming instead of clean, human-readable labels (`Applied`, `Partial`, `Not applied`, `Can't verify`), and risk color chips lacked high-contrast WCAG-compliant styling.
+- **Root Cause**: Ad-hoc UI dialogs developed independently across tabs without a single unified preview/execution modal component and missing toast notification workflow.
+- **Fix**:
+  1. Implemented `UnifiedExecutionDialogViewModel` and `UnifiedExecutionDialogView.xaml`:
+     - Serves as the single shared modal preview dialog (supporting batch selection, item toggling, reversible status, reboot indicators, current state, and risk color chips).
+     - Serves as the single shared execution result dialog (displaying itemized outcomes, failure reasons, and Windows servicing health check warnings).
+  2. Refactored `TweaksViewModel`:
+     - Safe and Low risk tweaks apply immediately and trigger a calm, non-blocking toast banner with a direct "Undo" action.
+     - Medium and High risk tweaks never apply on a single click; they open the unified preview dialog requiring explicit confirmation.
+     - Added comprehensive filter controls: Risk filter, State filter, Search box, Category selector, "Recommended only", and "Show experimental".
+     - Standardized state badge labels and risk color chips across collapsed and expanded cards.
+  3. Integrated `UnifiedExecutionDialogView` into `MainWindow.xaml` and wired it into `DashboardViewModel`, `TweaksViewModel`, and `MainViewModel`.
+  4. Updated unit and engine tests to validate new status badge strings and execution flows.
