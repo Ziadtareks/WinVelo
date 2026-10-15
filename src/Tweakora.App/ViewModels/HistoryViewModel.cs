@@ -449,7 +449,14 @@ public sealed partial class HistoryViewModel : ObservableObject
             (t.Aliases != null && t.Aliases.Any(a => string.Equals(a, tweakId, StringComparison.OrdinalIgnoreCase))));
         if (tweak == null)
         {
-            StatusMessage = $"Tweak '{tweakId}' not found in catalog.";
+            if (DeprecatedTweaks.TryGetRemovalMessage(tweakId, out var removalMsg))
+            {
+                StatusMessage = removalMsg;
+            }
+            else
+            {
+                StatusMessage = $"Tweak '{tweakId}' not found in catalog.";
+            }
             return;
         }
 

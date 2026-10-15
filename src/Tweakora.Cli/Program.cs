@@ -136,7 +136,14 @@ public static class Program
             if (tweak == null)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"[ERROR] Tweak '{targetId}' not found in catalog.");
+                if (DeprecatedTweaks.TryGetRemovalMessage(targetId, out var removalMsg))
+                {
+                    Console.WriteLine($"[ERROR] {removalMsg}");
+                }
+                else
+                {
+                    Console.WriteLine($"[ERROR] Tweak '{targetId}' not found in catalog.");
+                }
                 Console.ResetColor();
                 return 1;
             }
@@ -388,7 +395,14 @@ public static class Program
                 else
                 {
                     missingCount++;
-                    Console.WriteLine($"[Failed] {id}: Tweak not found in catalog");
+                    if (DeprecatedTweaks.TryGetRemovalMessage(id, out var removalMsg))
+                    {
+                        Console.WriteLine($"[Failed] {id}: {removalMsg}");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"[Failed] {id}: Tweak not found in catalog");
+                    }
                 }
             }
 

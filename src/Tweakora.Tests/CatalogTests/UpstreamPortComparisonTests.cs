@@ -53,7 +53,7 @@ public sealed class UpstreamPortComparisonTests
         foreach (var prop in upstreamDocJson.RootElement.EnumerateObject())
         {
             string key = prop.Name;
-            bool isPorted = ourOrigins.Contains(key) || ourIds.Contains(key) || ourAliases.Contains(key);
+            bool isPorted = ourOrigins.Contains(key) || ourIds.Contains(key) || ourAliases.Contains(key) || DeprecatedTweaks.IsDeprecated(key);
             bool isDocumented = upstreamDoc.Contains(key, StringComparison.OrdinalIgnoreCase);
 
             if (!isPorted && !isDocumented)
