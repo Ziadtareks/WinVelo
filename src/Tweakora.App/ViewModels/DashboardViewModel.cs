@@ -345,6 +345,12 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
     private string? _servicingHealthSummary;
 
     [ObservableProperty]
+    private string _servicingHealthShortStatus = "All OK";
+
+    [ObservableProperty]
+    private string _servicingHealthDetails = "Windows Update, BITS, Microsoft Store, and Defender are operational.";
+
+    [ObservableProperty]
     private ServicingHealthReport? _lastServicingHealthReport;
 
     public ObservableCollection<ProfilePreviewItemModel> ProfilePreviewItems { get; } = new();
@@ -734,9 +740,20 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
 
                 LastServicingHealthReport = health;
                 IsServicingHealthy = health.IsHealthy;
-                ServicingHealthSummary = health.IsHealthy
-                    ? "Normal — Windows Update, BITS, Store, and Defender are operational."
-                    : string.Join("; ", health.Warnings);
+                if (health.IsHealthy)
+                {
+                    ServicingHealthShortStatus = "All OK";
+                    ServicingHealthDetails = "Windows Update, BITS, Microsoft Store, and Defender are operational.";
+                }
+                else
+                {
+                    int issueCount = health.Warnings?.Count ?? 1;
+                    ServicingHealthShortStatus = issueCount == 1 ? "1 issue" : $"{issueCount} issues";
+                    ServicingHealthDetails = health.Warnings != null && health.Warnings.Count > 0
+                        ? string.Join("\n", health.Warnings)
+                        : health.SummaryText;
+                }
+                ServicingHealthSummary = ServicingHealthShortStatus;
                 ServicingHealthBadgeBg = health.IsHealthy ? "#064E3B" : "#78350F";
                 ServicingHealthBadgeFg = health.IsHealthy ? "#10B981" : "#FBBF24";
 

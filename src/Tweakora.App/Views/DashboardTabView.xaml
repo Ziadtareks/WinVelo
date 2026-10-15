@@ -132,14 +132,15 @@
                         <!-- Card 3: Servicing Health -->
                         <Border Grid.Column="2" Background="{DynamicResource ControlFillColorDefaultBrush}"
                                 BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
-                                BorderThickness="1" CornerRadius="8" Padding="14,12" Margin="6,0,0,0">
+                                BorderThickness="1" CornerRadius="8" Padding="14,12" Margin="6,0,0,0"
+                                ToolTip="{Binding ServicingHealthDetails}">
                             <StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
                                     <ui:SymbolIcon Symbol="HeartPulse24" Foreground="{Binding ServicingHealthBadgeFg}" FontSize="16" Margin="0,0,8,0" VerticalAlignment="Center" />
                                     <TextBlock Text="SERVICING HEALTH" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" />
                                 </StackPanel>
-                                <TextBlock Text="{Binding ServicingHealthSummary}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis" />
-                                <TextBlock Text="Windows Update, BITS, Store, Defender" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0" TextTrimming="CharacterEllipsis" />
+                                <TextBlock Text="{Binding ServicingHealthShortStatus}" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" />
+                                <TextBlock Text="Hover for component details" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0" />
                             </StackPanel>
                         </Border>
                     </Grid>
