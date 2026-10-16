@@ -335,6 +335,7 @@ public sealed class TweakService : ITweakService
             cancellationToken);
 
         _ = WindowsSettingNotifier.NotifySettingsChangedAsync();
+        RestartExplorerIfNeeded(tweaks, report);
         return report;
     }
 
@@ -360,7 +361,42 @@ public sealed class TweakService : ITweakService
             cancellationToken);
 
         _ = WindowsSettingNotifier.NotifySettingsChangedAsync();
+        RestartExplorerIfNeeded(tweaks, report);
         return report;
+    }
+
+    /// <summary>
+    /// Taskbar, Start and File Explorer settings only show up after Explorer reloads them.
+    /// Restart Explorer once when a changed tweak is flagged requiresExplorerRestart and does
+    /// not already restart Explorer in its own script.
+    /// </summary>
+    private void RestartExplorerIfNeeded(IReadOnlyList<TweakDefinition> tweaks, OperationExecutionReport report)
+    {
+        var changed = new HashSet<string>(
+            report.Results
+                .Where(r => r.Status is OperationItemStatus.Applied or OperationItemStatus.Restored or OperationItemStatus.Succeeded)
+                .Select(r => r.Id),
+            StringComparer.OrdinalIgnoreCase);
+
+        bool needed = tweaks.Any(t =>
+            t.RequiresExplorerRestart &&
+            changed.Contains(t.Id) &&
+            !t.Apply.Concat(t.Undo).Any(a => (a.Script ?? string.Empty).Contains("Stop-Process -Name explorer", StringComparison.OrdinalIgnoreCase)));
+
+        if (!needed) return;
+
+        // Run in the background: the restart waits for the shell to come back and must not freeze the UI.
+        _ = Task.Run(() =>
+        {
+            try
+            {
+                _shell.RestartExplorer();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[WARN] Explorer restart after tweak failed: {ex.Message}");
+            }
+        });
     }
 
     public async Task<bool> SetPerformancePlanAsync(string planName)

@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using Tweakora.Core.Interfaces;
 using Tweakora.Core.Models;
 using Tweakora.Core.Safety;
@@ -41,8 +42,17 @@ public sealed class WindowsShellService : IShellService
         EnsureNotTestMode();
         foreach (var p in Process.GetProcessesByName("explorer"))
         {
-            try { p.Kill(); } catch { }
+            try { p.Kill(); p.WaitForExit(3000); } catch { }
         }
+
+        // Windows normally relaunches the shell by itself. Only start it when it did not come back,
+        // otherwise a second explorer.exe would just open an extra File Explorer window.
+        for (int i = 0; i < 10; i++)
+        {
+            Thread.Sleep(500);
+            if (Process.GetProcessesByName("explorer").Length > 0) return;
+        }
+
         Process.Start(new ProcessStartInfo
         {
             FileName = "explorer.exe",

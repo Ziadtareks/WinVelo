@@ -1256,8 +1256,8 @@
     "schemaVersion": "1.0.0",
     "id": "pref.taskbarsearch",
     "origin": "WPFToggleTaskbarSearch",
-    "name": "Taskbar Search Icon",
-    "description": "Toggles the Search Button on the Taskbar.",
+    "name": "Taskbar Search - Hide",
+    "description": "Hides the search box or search icon from the taskbar.",
     "category": "ui",
     "subcategory": "Customize Preferences",
     "risk": "Safe",
@@ -1275,20 +1275,9 @@
       "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Search",
       "valueName": "SearchboxTaskbarMode",
       "matchType": "Equals",
-      "expectedValue": 1
+      "expectedValue": 0
     },
     "apply": [
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Search",
-        "operation": "Set",
-        "valueName": "SearchboxTaskbarMode",
-        "valueKind": "DWord",
-        "data": 1
-      }
-    ],
-    "undo": [
       {
         "type": "Registry",
         "hive": "HKCU",
@@ -1299,20 +1288,33 @@
         "data": 0
       }
     ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Search",
+        "operation": "Set",
+        "valueName": "SearchboxTaskbarMode",
+        "valueKind": "DWord",
+        "data": 2
+      }
+    ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/taskbarsearch",
     "verifiedOnBuild": "26100",
     "evidence": "ui-equivalent",
-    "whatItDoes": "Configures Windows taskbar search box display mode.",
-    "sideEffects": "None known.",
+    "whatItDoes": "Turns the taskbar search mode (SearchboxTaskbarMode) off. Explorer restarts so the taskbar updates right away.",
+    "sideEffects": "Search still works: press the Windows key and start typing.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/win32/shell/taskbar-extensions"
     ],
     "needsReview": false,
-    "uiEquivalentLocation": "Settings › Personalization › Taskbar › Taskbar items › Search",
-    "oppositeOf": "advanced.display",
+    "uiEquivalentLocation": "Settings › Personalization › Taskbar › Taskbar items › Search › Hide",
     "tags": [
       "ui"
     ],
-    "presetRole": "preference"
+    "presetRole": "preference",
+    "relatedTweaks": [
+      "advanced.display"
+    ]
   }
 ]

@@ -1270,10 +1270,11 @@
     "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/display",
     "verifiedOnBuild": "26100",
     "evidence": "ui-equivalent",
-    "whatItDoes": "Adjusts graphics driver timeout detection recovery (TdrLevel, TdrDelay) in system graphics drivers.",
-    "sideEffects": "Modifies display driver recovery timeouts; display driver crashes may freeze the entire operating system instead of recovering dynamically.",
+    "whatItDoes": "Applies the 'Adjust for best performance' visual effects: turns off window animations, showing window contents while dragging, list shadows, Aero Peek and taskbar animations, and hides the Chat, Task View and Search buttons on the taskbar.",
+    "sideEffects": "Windows looks plainer: no animations, fades or shadows. The taskbar loses its Search, Task View and Chat buttons until you undo the tweak.",
     "sources": [
-      "https://learn.microsoft.com/en-us/windows-hardware/drivers/display/timeout-detection-and-recovery"
+      "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/display",
+      "https://learn.microsoft.com/en-us/troubleshoot/windows-client/performance/performance-options"
     ],
     "needsReview": false,
     "uiEquivalentLocation": "SystemPropertiesPerformance.exe › Visual Effects › Adjust for best performance",
