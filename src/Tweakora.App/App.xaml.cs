@@ -302,14 +302,17 @@ public partial class App : Application
             SaveVisualToPng(window, 1440, 900, Path.Combine(darkDir, "settings.png"));
             SaveVisualToPng(window, 1440, 900, Path.Combine(targetDir, "settings.png"));
 
-            // Unified Execution Preview Dialog (Home -> Review on a Preset)
+            // Unified Execution Preview Dialog (Home -> Review on a Preset: clean-ui Full)
             vm.SwitchTabCommand.Execute("Home");
             FlushUi(window);
-            if (vm.DashboardVM.Profiles.Count > 0)
+            var bigPreset = vm.DashboardVM.Profiles.FirstOrDefault(p => p.Id == "preset.clean-ui") ?? vm.DashboardVM.Profiles.FirstOrDefault();
+            if (bigPreset != null)
             {
-                vm.DashboardVM.Profiles[0].ApplyCommand.Execute(null);
+                bigPreset.IsFullTier = true;
                 FlushUi(window);
-                System.Threading.Thread.Sleep(300);
+                bigPreset.ApplyCommand.Execute(null);
+                FlushUi(window);
+                System.Threading.Thread.Sleep(500);
                 FlushUi(window);
                 SaveVisualToPng(window, 1440, 900, Path.Combine(darkDir, "preview.png"));
                 SaveVisualToPng(window, 1440, 900, Path.Combine(targetDir, "preview.png"));
@@ -370,14 +373,17 @@ public partial class App : Application
             FlushUi(window);
             SaveVisualToPng(window, 1440, 900, Path.Combine(lightDir, "settings.png"));
 
-            // Preview (Light - Home -> Review on a Preset)
+            // Preview (Light - Home -> Review on a Preset: clean-ui Full)
             vm.SwitchTabCommand.Execute("Home");
             FlushUi(window);
-            if (vm.DashboardVM.Profiles.Count > 0)
+            var lightBigPreset = vm.DashboardVM.Profiles.FirstOrDefault(p => p.Id == "preset.clean-ui") ?? vm.DashboardVM.Profiles.FirstOrDefault();
+            if (lightBigPreset != null)
             {
-                vm.DashboardVM.Profiles[0].ApplyCommand.Execute(null);
+                lightBigPreset.IsFullTier = true;
                 FlushUi(window);
-                System.Threading.Thread.Sleep(300);
+                lightBigPreset.ApplyCommand.Execute(null);
+                FlushUi(window);
+                System.Threading.Thread.Sleep(500);
                 FlushUi(window);
                 SaveVisualToPng(window, 1440, 900, Path.Combine(lightDir, "preview.png"));
                 vm.ExecutionDialogVM.CancelPreview();
