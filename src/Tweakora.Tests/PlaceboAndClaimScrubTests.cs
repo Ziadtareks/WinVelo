@@ -82,8 +82,15 @@ public sealed class PlaceboAndClaimScrubTests
         foreach (var pFile in presetFiles)
         {
             using var doc = JsonDocument.Parse(File.ReadAllText(pFile));
-            var root = doc.RootElement;
-            var tweakIds = root.GetProperty("tweakIds").EnumerateArray().Select(x => x.GetString()!).ToList();
+            var tweakIds = new List<string>();
+            if (doc.RootElement.TryGetProperty("full", out var fullProp))
+            {
+                tweakIds.AddRange(fullProp.EnumerateArray().Select(x => x.GetString()!));
+            }
+            else if (doc.RootElement.TryGetProperty("tweakIds", out var tProp))
+            {
+                tweakIds.AddRange(tProp.EnumerateArray().Select(x => x.GetString()!));
+            }
 
             foreach (var id in tweakIds)
             {

@@ -1,4 +1,4 @@
-
+﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
@@ -28,6 +28,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UpstreamImporter", "tools\UpstreamImporter\UpstreamImporter.csproj", "{986424D0-BBCE-4831-A10C-07327EC0E61E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tweakora.Simulation", "src\Tweakora.Simulation\Tweakora.Simulation.csproj", "{A077F6B5-6798-4EDD-A333-0046199C65C1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PresetGenerator", "tools\PresetGenerator\PresetGenerator.csproj", "{57422A81-DF56-42A8-ADF2-473F7BB8D7AB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TagApplier", "tools\TagApplier\TagApplier.csproj", "{26E41D44-DDEF-4129-AC3D-1BCAD7BBCE64}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -171,6 +175,30 @@ Global
 		{A077F6B5-6798-4EDD-A333-0046199C65C1}.Release|x64.Build.0 = Release|Any CPU
 		{A077F6B5-6798-4EDD-A333-0046199C65C1}.Release|x86.ActiveCfg = Release|Any CPU
 		{A077F6B5-6798-4EDD-A333-0046199C65C1}.Release|x86.Build.0 = Release|Any CPU
+		{57422A81-DF56-42A8-ADF2-473F7BB8D7AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57422A81-DF56-42A8-ADF2-473F7BB8D7AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57422A81-DF56-42A8-ADF2-473F7BB8D7AB}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{57422A81-DF56-42A8-ADF2-473F7BB8D7AB}.Debug|x64.Build.0 = Debug|Any CPU
+		{57422A81-DF56-42A8-ADF2-473F7BB8D7AB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{57422A81-DF56-42A8-ADF2-473F7BB8D7AB}.Debug|x86.Build.0 = Debug|Any CPU
+		{57422A81-DF56-42A8-ADF2-473F7BB8D7AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57422A81-DF56-42A8-ADF2-473F7BB8D7AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57422A81-DF56-42A8-ADF2-473F7BB8D7AB}.Release|x64.ActiveCfg = Release|Any CPU
+		{57422A81-DF56-42A8-ADF2-473F7BB8D7AB}.Release|x64.Build.0 = Release|Any CPU
+		{57422A81-DF56-42A8-ADF2-473F7BB8D7AB}.Release|x86.ActiveCfg = Release|Any CPU
+		{57422A81-DF56-42A8-ADF2-473F7BB8D7AB}.Release|x86.Build.0 = Release|Any CPU
+		{26E41D44-DDEF-4129-AC3D-1BCAD7BBCE64}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{26E41D44-DDEF-4129-AC3D-1BCAD7BBCE64}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{26E41D44-DDEF-4129-AC3D-1BCAD7BBCE64}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{26E41D44-DDEF-4129-AC3D-1BCAD7BBCE64}.Debug|x64.Build.0 = Debug|Any CPU
+		{26E41D44-DDEF-4129-AC3D-1BCAD7BBCE64}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{26E41D44-DDEF-4129-AC3D-1BCAD7BBCE64}.Debug|x86.Build.0 = Debug|Any CPU
+		{26E41D44-DDEF-4129-AC3D-1BCAD7BBCE64}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{26E41D44-DDEF-4129-AC3D-1BCAD7BBCE64}.Release|Any CPU.Build.0 = Release|Any CPU
+		{26E41D44-DDEF-4129-AC3D-1BCAD7BBCE64}.Release|x64.ActiveCfg = Release|Any CPU
+		{26E41D44-DDEF-4129-AC3D-1BCAD7BBCE64}.Release|x64.Build.0 = Release|Any CPU
+		{26E41D44-DDEF-4129-AC3D-1BCAD7BBCE64}.Release|x86.ActiveCfg = Release|Any CPU
+		{26E41D44-DDEF-4129-AC3D-1BCAD7BBCE64}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -187,5 +215,7 @@ Global
 		{8769D403-1E36-44AC-A189-CE50B87CC22C} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{986424D0-BBCE-4831-A10C-07327EC0E61E} = {07C2787E-EAC7-C090-1BA3-A61EC2A24D84}
 		{A077F6B5-6798-4EDD-A333-0046199C65C1} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{57422A81-DF56-42A8-ADF2-473F7BB8D7AB} = {07C2787E-EAC7-C090-1BA3-A61EC2A24D84}
+		{26E41D44-DDEF-4129-AC3D-1BCAD7BBCE64} = {07C2787E-EAC7-C090-1BA3-A61EC2A24D84}
 	EndGlobalSection
 EndGlobal

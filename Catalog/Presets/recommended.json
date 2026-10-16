@@ -2,10 +2,484 @@
   "id": "preset.recommended",
   "name": "Recommended Baseline",
   "description": "Safe, reversible baseline settings that balance privacy, system responsiveness, and clean UI without breaking any features.",
-  "tweakIds": [
-    "privacy.telemetry.diagnostic-data",
+  "standard": [
+    "advanced.display",
+    "advanced.removehomeandgallery",
+    "essential.disableexplorerautodiscovery",
+    "gaming.input.disable-mouse-acceleration",
+    "gaming.mode.enable",
+    "performance.visual.disable-animations",
+    "performance.visual.disable-transparency",
+    "pref.batterypercentage",
+    "pref.darkmode",
+    "pref.hidesettingshome",
+    "pref.newoutlook",
+    "pref.numlock",
+    "pref.scrollbars",
+    "pref.stickykeys",
+    "pref.taskbarsearch",
+    "pref.windowsnapping",
     "privacy.advertising.advertising-id",
+    "privacy.experiences.tailored-experiences",
+    "privacy.feedback.feedback-prompts",
+    "privacy.search.device-search-history",
+    "privacy.speech.online-speech-recognition",
+    "privacy.tracking.app-launch-tracking",
+    "privacy.typing.inking-typing-personalization",
     "ui.explorer.classic-context-menu",
-    "ui.explorer.show-file-extensions"
+    "ui.explorer.hide-frequent-folders",
+    "ui.explorer.hide-gallery",
+    "ui.explorer.hide-recent-files",
+    "ui.explorer.open-to-this-pc",
+    "ui.explorer.show-file-extensions",
+    "ui.explorer.show-full-path-title",
+    "ui.explorer.show-hidden-files",
+    "ui.search.disable-search-highlights",
+    "ui.system.disable-tips-suggestions",
+    "ui.system.disable-welcome-experience",
+    "ui.taskbar.alignment-left",
+    "ui.taskbar.end-task-right-click",
+    "ui.taskbar.show-seconds-clock"
+  ],
+  "full": [
+    "advanced.display",
+    "advanced.removehomeandgallery",
+    "essential.disableexplorerautodiscovery",
+    "gaming.input.disable-mouse-acceleration",
+    "gaming.mode.enable",
+    "performance.visual.disable-animations",
+    "performance.visual.disable-transparency",
+    "pref.batterypercentage",
+    "pref.darkmode",
+    "pref.hidesettingshome",
+    "pref.newoutlook",
+    "pref.numlock",
+    "pref.scrollbars",
+    "pref.stickykeys",
+    "pref.taskbarsearch",
+    "pref.windowsnapping",
+    "privacy.advertising.advertising-id",
+    "privacy.experiences.tailored-experiences",
+    "privacy.feedback.feedback-prompts",
+    "privacy.search.device-search-history",
+    "privacy.speech.online-speech-recognition",
+    "privacy.tracking.app-launch-tracking",
+    "privacy.typing.inking-typing-personalization",
+    "ui.explorer.classic-context-menu",
+    "ui.explorer.hide-frequent-folders",
+    "ui.explorer.hide-gallery",
+    "ui.explorer.hide-recent-files",
+    "ui.explorer.open-to-this-pc",
+    "ui.explorer.show-file-extensions",
+    "ui.explorer.show-full-path-title",
+    "ui.explorer.show-hidden-files",
+    "ui.search.disable-search-highlights",
+    "ui.system.disable-tips-suggestions",
+    "ui.system.disable-welcome-experience",
+    "ui.taskbar.alignment-left",
+    "ui.taskbar.end-task-right-click",
+    "ui.taskbar.show-seconds-clock"
+  ],
+  "excluded": [
+    {
+      "id": "advanced.bravedebloat",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "advanced.disablebgapps",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "advanced.disablebitlocker",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "advanced.disableipv6",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "advanced.disablenotifications",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "advanced.disablewarningforunsignedrdp",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "advanced.edgedebloat",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "advanced.ipv46",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "advanced.logiblock",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "advanced.razerblock",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "advanced.removeedge",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "advanced.removeonedrive",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "advanced.reservedstorage",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "advanced.teredo",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "advanced.utc",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "advanced.windowsai",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "ai.copilot.disable-policy",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "ai.copilot.disable-taskbar-button",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "ai.recall.disable-snapshots",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "ai.search.disable-bing-web-search",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "essential.activity",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "essential.consumerfeatures",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "essential.deletetempfiles",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "essential.disablestoresearch",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "essential.diskcleanup",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "essential.hiber",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "essential.location",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "essential.preventdevicemetadatafromnetwork",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "essential.restorepoint",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "essential.revertstartmenu",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "essential.services",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "essential.telemetry",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "essential.widget",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "essential.wpbt",
+      "reason": "Needs manual review before applying"
+    },
+    {
+      "id": "gaming.dvr.disable-background-recording",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "gaming.xbox.disable-game-bar",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "network.dns.enable-doh",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "network.optimization.limit-peering-lan",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "network.probing.disable-active-probing",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "network.teredo.disable-tunneling",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "network.wifi.disable-autoconnect-sense",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "network.wifi.disable-hotspot-reporting",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "performance.cpu.priority-separation",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "performance.cpu.unpark-cores",
+      "reason": "Experimental tweak — requires manual testing"
+    },
+    {
+      "id": "performance.gaming.mmcss-responsiveness",
+      "reason": "Experimental tweak — requires manual testing"
+    },
+    {
+      "id": "performance.gpu.disable-mpo",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "performance.gpu.hags",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "performance.input.buffer-queue",
+      "reason": "Experimental tweak — requires manual testing"
+    },
+    {
+      "id": "performance.memory.svchost-split-threshold",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "performance.network.delivery-optimization-simple",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "performance.network.disable-remote-differential-compression",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "performance.ntfs.disable-8dot3-names",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "performance.ntfs.disable-last-access",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "performance.power.disable-throttling",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "performance.search.prevent-indexing-on-battery",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "performance.system.disable-maintenance-wake",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "performance.system.storage-sense",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "pref.bingsearch",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "pref.detailedbsod",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "pref.disablelockscreen",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "pref.loginblur",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "pref.multiplaneoverlay",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "pref.s3sleep",
+      "reason": "Needs manual review before applying"
+    },
+    {
+      "id": "pref.standbyfix",
+      "reason": "Needs manual review before applying"
+    },
+    {
+      "id": "pref.startmenurecommendations",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "pref.verboselogon",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "privacy.activity.activity-history",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "privacy.ceip.customer-experience-improvement",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "privacy.clipboard.cloud-clipboard-sync",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "privacy.consent.deny-account-info",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "privacy.consent.deny-calendar",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "privacy.consent.deny-contacts",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "privacy.consent.deny-diagnostics",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "privacy.consent.deny-location",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "privacy.consent.deny-microphone",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "privacy.consent.deny-notifications",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "privacy.consent.deny-webcam",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "privacy.location.disable-sensor",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "privacy.reporting.windows-error-reporting",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "privacy.spotlight.lockscreen-ads",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "privacy.suggestions.start-menu-promotions",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "privacy.telemetry.diagnostic-data",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "system.security.disable-autorun",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "system.security.disable-llmnr",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "system.security.disable-lockscreen-camera",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "system.security.disable-rdp-auto-enable",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "system.security.disable-remote-assistance",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "system.security.disable-wsh",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "system.security.enforce-smartscreen",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "ui.logon.hide-fast-user-switching",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "ui.system.enable-long-paths",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "ui.taskbar.disable-chat-button",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "ui.taskbar.disable-task-view-button",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "ui.taskbar.disable-widgets-button",
+      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+    },
+    {
+      "id": "updates.activehours.enable-policy",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "updates.au.notify-download",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "updates.drivers.exclude-from-updates",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "updates.peering.metered-connections",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "updates.preview.disable-optional-content",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "updates.reboot.disable-auto-reboot-logged-on",
+      "reason": "High risk — enable individually from Tweaks"
+    }
   ]
 }

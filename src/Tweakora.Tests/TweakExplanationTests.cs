@@ -122,11 +122,23 @@ public sealed class TweakExplanationTests
         foreach (var pFile in presetFiles)
         {
             using var doc = JsonDocument.Parse(File.ReadAllText(pFile));
-            var tweakIds = doc.RootElement.GetProperty("tweakIds")
-                .EnumerateArray()
-                .Select(x => x.GetString())
-                .Where(x => !string.IsNullOrEmpty(x))
-                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+            var tweakIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            if (doc.RootElement.TryGetProperty("full", out var fullProp))
+            {
+                foreach (var x in fullProp.EnumerateArray())
+                {
+                    string? s = x.GetString();
+                    if (!string.IsNullOrEmpty(s)) tweakIds.Add(s);
+                }
+            }
+            if (doc.RootElement.TryGetProperty("tweakIds", out var tProp))
+            {
+                foreach (var x in tProp.EnumerateArray())
+                {
+                    string? s = x.GetString();
+                    if (!string.IsNullOrEmpty(s)) tweakIds.Add(s);
+                }
+            }
 
             foreach (var nr in needsReview)
             {

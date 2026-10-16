@@ -7,6 +7,7 @@ using Tweakora.Core.Engine;
 using Tweakora.Core.Engine.Runners;
 using Tweakora.Core.Models;
 using Tweakora.Core.Operations;
+using Tweakora.Core.Safety;
 using Tweakora.Modules.Tweaks;
 using Tweakora.Simulation;
 using Xunit;
@@ -47,6 +48,7 @@ public sealed class HistoryPageTests : IDisposable
         var tweakService = new TweakService(fakeReg, fakeServices, fakeTasks, fakeRestore, fakeShell, journal);
         var dialog = new UnifiedExecutionDialogViewModel(tweakService, new OperationRunner());
 
+        TestModeManager.EnableTestMode();
         var vm = new HistoryViewModel(tweakService, fakeRestore, new OperationRunner(), dialog);
         return (vm, tweakService, fakeRestore, dialog);
     }
@@ -62,6 +64,7 @@ public sealed class HistoryPageTests : IDisposable
             SessionId = "session_old_20261010",
             StartedAtUtc = DateTime.UtcNow.AddDays(-2),
             IsCompleted = true,
+            Mode = "test",
             Records = new()
             {
                 new JournalActionRecord { TweakId = "pref.darkmode", ActionType = "Registry", TargetIdentifier = "HKCU\\Test", IsBaseline = true }
@@ -73,6 +76,7 @@ public sealed class HistoryPageTests : IDisposable
             SessionId = "session_new_20261012",
             StartedAtUtc = DateTime.UtcNow.AddMinutes(-10),
             IsCompleted = true,
+            Mode = "test",
             Records = new()
             {
                 new JournalActionRecord { TweakId = "gaming.mode.enable", ActionType = "Registry", TargetIdentifier = "HKCU\\Gaming", IsBaseline = true }
@@ -99,6 +103,7 @@ public sealed class HistoryPageTests : IDisposable
             SessionId = "cli_session_12345",
             StartedAtUtc = DateTime.UtcNow,
             IsCompleted = true,
+            Mode = "test",
             Records = new()
             {
                 new JournalActionRecord { TweakId = "pref.darkmode", ActionType = "Registry", TargetIdentifier = "HKCU\\Test1", IsBaseline = true },

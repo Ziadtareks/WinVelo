@@ -57,7 +57,7 @@ public sealed class PresetValidationTests
         Assert.True(Directory.Exists(presetsDir), $"Presets dir not found: {presetsDir}");
 
         var presetFiles = Directory.GetFiles(presetsDir, "*.json");
-        Assert.True(presetFiles.Length >= 3, $"Expected at least 3 presets, found {presetFiles.Length}");
+        Assert.True(presetFiles.Length >= 6, $"Expected at least 6 presets, found {presetFiles.Length}");
 
         foreach (var file in presetFiles)
         {
@@ -71,18 +71,72 @@ public sealed class PresetValidationTests
             Assert.False(string.IsNullOrWhiteSpace(preset.Id), $"Preset in {Path.GetFileName(file)} has empty id");
             Assert.False(string.IsNullOrWhiteSpace(preset.Name), $"Preset in {Path.GetFileName(file)} has empty name");
             Assert.False(string.IsNullOrWhiteSpace(preset.Description), $"Preset in {Path.GetFileName(file)} has empty description");
-            Assert.NotEmpty(preset.TweakIds);
+            Assert.NotEmpty(preset.Full);
 
-            foreach (var tweakId in preset.TweakIds)
+            foreach (var tweakId in preset.Standard)
             {
                 Assert.True(catalogMap.TryGetValue(tweakId, out var tweak),
-                    $"Preset '{preset.Id}' references unknown tweak '{tweakId}'");
+                    $"Preset '{preset.Id}' standard references unknown tweak '{tweakId}'");
+
+                Assert.True(string.Equals(tweak!.Risk, "Safe", StringComparison.OrdinalIgnoreCase) ||
+                            string.Equals(tweak.Risk, "Low", StringComparison.OrdinalIgnoreCase),
+                    $"Preset '{preset.Id}' standard contains tweak '{tweakId}' with risk '{tweak.Risk}'");
+                Assert.True(tweak.Reversible, $"Preset '{preset.Id}' contains irreversible tweak '{tweakId}'");
+                Assert.False(tweak.NeedsReview, $"Preset '{preset.Id}' contains needsReview tweak '{tweakId}'");
+                Assert.NotEqual("anecdotal", tweak.Evidence, StringComparer.OrdinalIgnoreCase);
+            }
+
+            foreach (var tweakId in preset.Full)
+            {
+                Assert.True(catalogMap.TryGetValue(tweakId, out var tweak),
+                    $"Preset '{preset.Id}' full references unknown tweak '{tweakId}'");
 
                 Assert.NotEqual("High", tweak!.Risk);
                 Assert.True(tweak.Reversible, $"Preset '{preset.Id}' contains irreversible tweak '{tweakId}'");
                 Assert.False(tweak.NeedsReview, $"Preset '{preset.Id}' contains needsReview tweak '{tweakId}'");
                 Assert.NotEqual("anecdotal", tweak.Evidence, StringComparer.OrdinalIgnoreCase);
             }
+
+            foreach (var excluded in preset.Excluded)
+            {
+                Assert.True(catalogMap.TryGetValue(excluded.Id, out _),
+                    $"Preset '{preset.Id}' excluded references unknown tweak '{excluded.Id}'");
+                Assert.False(string.IsNullOrWhiteSpace(excluded.Reason),
+                    $"Preset '{preset.Id}' excluded tweak '{excluded.Id}' has empty reason");
+            }
+        }
+    }
+
+    [Fact]
+    public void Presets_CommittedFilesMatchGeneratorOutput_NoDrift()
+    {
+        var fakeReg = new FakeRegistryService();
+        var fakeSvc = new FakeServicesService();
+        var fakeSched = new FakeTaskSchedulerService();
+        var fakeRestore = new FakeRestoreService();
+        var fakeShell = new FakeShellService();
+        var journal = new RollbackJournalManager(Path.Combine(AppContext.BaseDirectory, "test-journal-presets-drift"));
+        var tweakService = new TweakService(fakeReg, fakeSvc, fakeSched, fakeRestore, fakeShell, journal);
+
+        var catalog = tweakService.LoadCatalog().ToList();
+        var generated = PresetGenerator.Program.GeneratePresets(catalog);
+
+        string presetsDir = Path.Combine(_catalogDir, "Presets");
+        var options = new JsonSerializerOptions
+        {
+            WriteIndented = true,
+            Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+        };
+
+        foreach (var (spec, expectedPreset) in generated)
+        {
+            string filePath = Path.Combine(presetsDir, spec.FileName);
+            Assert.True(File.Exists(filePath), $"Preset file missing: {filePath}");
+
+            string committedJson = File.ReadAllText(filePath).TrimEnd();
+            string expectedJson = (JsonSerializer.Serialize(expectedPreset, options) + "\n").TrimEnd();
+
+            Assert.Equal(expectedJson, committedJson);
         }
     }
 
@@ -102,8 +156,8 @@ public sealed class PresetValidationTests
         var advisor = new SmartAdvisorService(fakeReg, fakeShell);
         var dvm = new DashboardViewModel(tweakService, runner, fakeRestore, memOpt, advisor);
 
-        // 3 catalog presets (Undo All is a secondary action, not a card)
-        Assert.Equal(3, dvm.Profiles.Count);
+        // 6 catalog presets (recommended, gaming, privacy, ai, clean-ui, performance)
+        Assert.Equal(6, dvm.Profiles.Count);
         Assert.NotNull(dvm.UndoAllChangesCommand);
 
         // Verify presets have honest titles

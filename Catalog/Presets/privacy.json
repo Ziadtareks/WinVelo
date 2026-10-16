@@ -2,10 +2,123 @@
   "id": "preset.privacy",
   "name": "Privacy: Telemetry & Activity Shield",
   "description": "Minimizes diagnostic collection, tailored experiences, advertising identifiers, and activity history tracking.",
-  "tweakIds": [
-    "privacy.telemetry.diagnostic-data",
+  "standard": [
+    "essential.activity",
+    "essential.consumerfeatures",
+    "essential.preventdevicemetadatafromnetwork",
+    "essential.telemetry",
+    "pref.hidesettingshome",
+    "privacy.activity.activity-history",
     "privacy.advertising.advertising-id",
+    "privacy.ceip.customer-experience-improvement",
+    "privacy.clipboard.cloud-clipboard-sync",
     "privacy.experiences.tailored-experiences",
-    "privacy.activity.activity-history"
+    "privacy.feedback.feedback-prompts",
+    "privacy.reporting.windows-error-reporting",
+    "privacy.search.device-search-history",
+    "privacy.speech.online-speech-recognition",
+    "privacy.telemetry.diagnostic-data",
+    "privacy.tracking.app-launch-tracking",
+    "privacy.typing.inking-typing-personalization",
+    "ui.explorer.hide-frequent-folders",
+    "ui.explorer.hide-recent-files",
+    "ui.search.disable-search-highlights"
+  ],
+  "full": [
+    "advanced.disablebgapps",
+    "ai.copilot.disable-policy",
+    "ai.recall.disable-snapshots",
+    "ai.search.disable-bing-web-search",
+    "essential.activity",
+    "essential.consumerfeatures",
+    "essential.preventdevicemetadatafromnetwork",
+    "essential.telemetry",
+    "pref.bingsearch",
+    "pref.hidesettingshome",
+    "pref.startmenurecommendations",
+    "privacy.activity.activity-history",
+    "privacy.advertising.advertising-id",
+    "privacy.ceip.customer-experience-improvement",
+    "privacy.clipboard.cloud-clipboard-sync",
+    "privacy.consent.deny-account-info",
+    "privacy.consent.deny-calendar",
+    "privacy.consent.deny-contacts",
+    "privacy.consent.deny-diagnostics",
+    "privacy.consent.deny-location",
+    "privacy.consent.deny-microphone",
+    "privacy.consent.deny-notifications",
+    "privacy.consent.deny-webcam",
+    "privacy.experiences.tailored-experiences",
+    "privacy.feedback.feedback-prompts",
+    "privacy.location.disable-sensor",
+    "privacy.reporting.windows-error-reporting",
+    "privacy.search.device-search-history",
+    "privacy.speech.online-speech-recognition",
+    "privacy.spotlight.lockscreen-ads",
+    "privacy.suggestions.start-menu-promotions",
+    "privacy.telemetry.diagnostic-data",
+    "privacy.tracking.app-launch-tracking",
+    "privacy.typing.inking-typing-personalization",
+    "ui.explorer.hide-frequent-folders",
+    "ui.explorer.hide-recent-files",
+    "ui.search.disable-search-highlights"
+  ],
+  "excluded": [
+    {
+      "id": "advanced.bravedebloat",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "advanced.edgedebloat",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "advanced.removeonedrive",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "advanced.windowsai",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "essential.disablestoresearch",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "essential.location",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "essential.services",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "essential.wpbt",
+      "reason": "Needs manual review before applying"
+    },
+    {
+      "id": "network.dns.enable-doh",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "network.probing.disable-active-probing",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "network.wifi.disable-autoconnect-sense",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "network.wifi.disable-hotspot-reporting",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "system.security.disable-lockscreen-camera",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "system.security.disable-remote-assistance",
+      "reason": "High risk — enable individually from Tweaks"
+    }
   ]
 }

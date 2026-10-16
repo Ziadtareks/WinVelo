@@ -1,0 +1,100 @@
+{
+  "id": "preset.performance",
+  "name": "Performance: System Responsiveness",
+  "description": "Optimizes background services, power management, storage cleanup, and system responsiveness.",
+  "standard": [
+    "advanced.display",
+    "essential.disableexplorerautodiscovery",
+    "essential.restorepoint",
+    "essential.telemetry",
+    "gaming.mode.enable",
+    "performance.network.delivery-optimization-simple",
+    "performance.visual.disable-animations",
+    "performance.visual.disable-transparency",
+    "pref.multiplaneoverlay",
+    "ui.taskbar.end-task-right-click"
+  ],
+  "full": [
+    "advanced.disablebgapps",
+    "advanced.display",
+    "advanced.reservedstorage",
+    "essential.disableexplorerautodiscovery",
+    "essential.hiber",
+    "essential.restorepoint",
+    "essential.telemetry",
+    "gaming.dvr.disable-background-recording",
+    "gaming.mode.enable",
+    "gaming.xbox.disable-game-bar",
+    "performance.cpu.priority-separation",
+    "performance.gpu.disable-mpo",
+    "performance.gpu.hags",
+    "performance.memory.svchost-split-threshold",
+    "performance.network.delivery-optimization-simple",
+    "performance.ntfs.disable-8dot3-names",
+    "performance.ntfs.disable-last-access",
+    "performance.power.disable-throttling",
+    "performance.search.prevent-indexing-on-battery",
+    "performance.system.disable-maintenance-wake",
+    "performance.system.storage-sense",
+    "performance.visual.disable-animations",
+    "performance.visual.disable-transparency",
+    "pref.loginblur",
+    "pref.multiplaneoverlay",
+    "ui.taskbar.disable-widgets-button",
+    "ui.taskbar.end-task-right-click"
+  ],
+  "excluded": [
+    {
+      "id": "advanced.disablebitlocker",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "advanced.removeonedrive",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "essential.deletetempfiles",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "essential.diskcleanup",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "essential.services",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "essential.widget",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "essential.wpbt",
+      "reason": "Needs manual review before applying"
+    },
+    {
+      "id": "performance.cpu.unpark-cores",
+      "reason": "Experimental tweak — requires manual testing"
+    },
+    {
+      "id": "performance.gaming.mmcss-responsiveness",
+      "reason": "Experimental tweak — requires manual testing"
+    },
+    {
+      "id": "performance.input.buffer-queue",
+      "reason": "Experimental tweak — requires manual testing"
+    },
+    {
+      "id": "performance.network.disable-remote-differential-compression",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "pref.s3sleep",
+      "reason": "Needs manual review before applying"
+    },
+    {
+      "id": "pref.standbyfix",
+      "reason": "Needs manual review before applying"
+    }
+  ]
+}

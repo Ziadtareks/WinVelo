@@ -27,6 +27,7 @@
     <ProjectReference Include="..\Tweakora.App\Tweakora.App.csproj" />
     <ProjectReference Include="..\Tweakora.Cli\Tweakora.Cli.csproj" />
     <ProjectReference Include="..\Tweakora.Simulation\Tweakora.Simulation.csproj" />
+    <ProjectReference Include="..\..\tools\PresetGenerator\PresetGenerator.csproj" />
   </ItemGroup>
 
 </Project>

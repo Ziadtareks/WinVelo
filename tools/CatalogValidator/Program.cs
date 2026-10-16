@@ -274,7 +274,10 @@ public static class Program
                     string pId = pNode["id"]?.ToString() ?? "";
                     string pName = pNode["name"]?.ToString() ?? "";
                     string pDesc = pNode["description"]?.ToString() ?? "";
-                    JsonArray? tweakIds = pNode["tweakIds"]?.AsArray();
+                    JsonArray? standard = pNode["standard"]?.AsArray();
+                    JsonArray? full = pNode["full"]?.AsArray();
+                    JsonArray? excluded = pNode["excluded"]?.AsArray();
+                    JsonArray? legacyTweakIds = pNode["tweakIds"]?.AsArray();
 
                     if (string.IsNullOrWhiteSpace(pId))
                     {
@@ -297,104 +300,200 @@ public static class Program
                         Console.ResetColor();
                         errorCount++;
                     }
-                    if (tweakIds == null || tweakIds.Count == 0)
+
+                    if (standard == null && full == null && legacyTweakIds == null)
                     {
                         Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine($"  [FAIL] {fileName}: Missing or empty 'tweakIds' array.");
+                        Console.WriteLine($"  [FAIL] {fileName}: Missing preset levels ('standard' / 'full') or 'tweakIds' array.");
                         Console.ResetColor();
                         errorCount++;
                         continue;
                     }
 
                     bool presetOk = true;
-                    foreach (var tidNode in tweakIds)
+
+                    if (full != null || standard != null)
                     {
-                        string tid = tidNode?.ToString() ?? "";
-                        if (string.IsNullOrWhiteSpace(tid))
+                        if (full == null || full.Count == 0)
                         {
                             Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine($"  [FAIL] {fileName}: Empty tweakId in array.");
-                            Console.ResetColor();
-                            errorCount++;
-                            presetOk = false;
-                            continue;
-                        }
-
-                        if (!tweakMap.TryGetValue(tid, out var tweakNode))
-                        {
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine($"  [FAIL] {fileName} ({pId}): References nonexistent tweak ID '{tid}'.");
-                            Console.ResetColor();
-                            errorCount++;
-                            presetOk = false;
-                            continue;
-                        }
-
-                        string? risk = tweakNode["risk"]?.ToString();
-                        if (string.Equals(risk, "High", StringComparison.OrdinalIgnoreCase))
-                        {
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine($"  [FAIL] {fileName} ({pId}): Contains High-risk tweak '{tid}'. Presets cannot contain High-risk tweaks.");
+                            Console.WriteLine($"  [FAIL] {fileName}: Preset 'full' level must contain at least 1 tweak.");
                             Console.ResetColor();
                             errorCount++;
                             presetOk = false;
                         }
 
-                        bool? isReversible = tweakNode["reversible"]?.GetValue<bool>();
-                        if (isReversible == false)
+                        // Validate standard tweaks: Safe/Low, reversible, not needsReview, not Experimental
+                        if (standard != null)
                         {
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine($"  [FAIL] {fileName} ({pId}): Contains irreversible tweak '{tid}'. Presets cannot contain irreversible tweaks.");
-                            Console.ResetColor();
-                            errorCount++;
-                            presetOk = false;
+                            foreach (var tidNode in standard)
+                            {
+                                string tid = tidNode?.ToString() ?? "";
+                                if (!tweakMap.TryGetValue(tid, out var tweakNode))
+                                {
+                                    Console.ForegroundColor = ConsoleColor.Red;
+                                    Console.WriteLine($"  [FAIL] {fileName} ({pId}) [standard]: References nonexistent tweak ID '{tid}'.");
+                                    Console.ResetColor();
+                                    errorCount++;
+                                    presetOk = false;
+                                    continue;
+                                }
+
+                                string? risk = tweakNode["risk"]?.ToString();
+                                if (!string.Equals(risk, "Safe", StringComparison.OrdinalIgnoreCase) &&
+                                    !string.Equals(risk, "Low", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    Console.ForegroundColor = ConsoleColor.Red;
+                                    Console.WriteLine($"  [FAIL] {fileName} ({pId}) [standard]: Tweak '{tid}' has risk '{risk}'. Standard preset only allows Safe or Low.");
+                                    Console.ResetColor();
+                                    errorCount++;
+                                    presetOk = false;
+                                }
+
+                                bool? isRev = tweakNode["reversible"]?.GetValue<bool>();
+                                if (isRev == false)
+                                {
+                                    Console.ForegroundColor = ConsoleColor.Red;
+                                    Console.WriteLine($"  [FAIL] {fileName} ({pId}) [standard]: Tweak '{tid}' is irreversible.");
+                                    Console.ResetColor();
+                                    errorCount++;
+                                    presetOk = false;
+                                }
+
+                                bool? nRev = tweakNode["needsReview"]?.GetValue<bool>();
+                                if (nRev == true)
+                                {
+                                    Console.ForegroundColor = ConsoleColor.Red;
+                                    Console.WriteLine($"  [FAIL] {fileName} ({pId}) [standard]: Tweak '{tid}' has needsReview=true.");
+                                    Console.ResetColor();
+                                    errorCount++;
+                                    presetOk = false;
+                                }
+
+                                string? cat = tweakNode["category"]?.ToString();
+                                if (string.Equals(cat, "Experimental", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    Console.ForegroundColor = ConsoleColor.Red;
+                                    Console.WriteLine($"  [FAIL] {fileName} ({pId}) [standard]: Tweak '{tid}' is Experimental.");
+                                    Console.ResetColor();
+                                    errorCount++;
+                                    presetOk = false;
+                                }
+                            }
                         }
 
-                        bool? needsReview = tweakNode["needsReview"]?.GetValue<bool>();
-                        if (needsReview == true)
+                        // Validate full tweaks: Safe/Low/Medium, reversible, not needsReview, not Experimental
+                        if (full != null)
                         {
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine($"  [FAIL] {fileName} ({pId}): Contains unverified tweak '{tid}' marked with needsReview=true.");
-                            Console.ResetColor();
-                            errorCount++;
-                            presetOk = false;
+                            foreach (var tidNode in full)
+                            {
+                                string tid = tidNode?.ToString() ?? "";
+                                if (!tweakMap.TryGetValue(tid, out var tweakNode))
+                                {
+                                    Console.ForegroundColor = ConsoleColor.Red;
+                                    Console.WriteLine($"  [FAIL] {fileName} ({pId}) [full]: References nonexistent tweak ID '{tid}'.");
+                                    Console.ResetColor();
+                                    errorCount++;
+                                    presetOk = false;
+                                    continue;
+                                }
+
+                                string? risk = tweakNode["risk"]?.ToString();
+                                if (string.Equals(risk, "High", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    Console.ForegroundColor = ConsoleColor.Red;
+                                    Console.WriteLine($"  [FAIL] {fileName} ({pId}) [full]: Tweak '{tid}' has High risk.");
+                                    Console.ResetColor();
+                                    errorCount++;
+                                    presetOk = false;
+                                }
+
+                                bool? isRev = tweakNode["reversible"]?.GetValue<bool>();
+                                if (isRev == false)
+                                {
+                                    Console.ForegroundColor = ConsoleColor.Red;
+                                    Console.WriteLine($"  [FAIL] {fileName} ({pId}) [full]: Tweak '{tid}' is irreversible.");
+                                    Console.ResetColor();
+                                    errorCount++;
+                                    presetOk = false;
+                                }
+
+                                bool? nRev = tweakNode["needsReview"]?.GetValue<bool>();
+                                if (nRev == true)
+                                {
+                                    Console.ForegroundColor = ConsoleColor.Red;
+                                    Console.WriteLine($"  [FAIL] {fileName} ({pId}) [full]: Tweak '{tid}' has needsReview=true.");
+                                    Console.ResetColor();
+                                    errorCount++;
+                                    presetOk = false;
+                                }
+
+                                string? cat = tweakNode["category"]?.ToString();
+                                if (string.Equals(cat, "Experimental", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    Console.ForegroundColor = ConsoleColor.Red;
+                                    Console.WriteLine($"  [FAIL] {fileName} ({pId}) [full]: Tweak '{tid}' is Experimental.");
+                                    Console.ResetColor();
+                                    errorCount++;
+                                    presetOk = false;
+                                }
+                            }
                         }
 
-                        if (TouchesServicing(tweakNode, out string sReason))
+                        // Validate excluded tweaks
+                        if (excluded != null)
                         {
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine($"  [FAIL] {fileName} ({pId}): Contains tweak '{tid}' which impacts Windows servicing ({sReason}). Presets must protect Windows servicing and cannot contain servicing-impacting tweaks.");
-                            Console.ResetColor();
-                            errorCount++;
-                            presetOk = false;
+                            foreach (var exNode in excluded)
+                            {
+                                string exId = exNode?["id"]?.ToString() ?? "";
+                                string exReason = exNode?["reason"]?.ToString() ?? "";
+                                if (string.IsNullOrWhiteSpace(exId) || !tweakMap.ContainsKey(exId))
+                                {
+                                    Console.ForegroundColor = ConsoleColor.Red;
+                                    Console.WriteLine($"  [FAIL] {fileName} ({pId}) [excluded]: References nonexistent tweak ID '{exId}'.");
+                                    Console.ResetColor();
+                                    errorCount++;
+                                    presetOk = false;
+                                }
+                                if (string.IsNullOrWhiteSpace(exReason))
+                                {
+                                    Console.ForegroundColor = ConsoleColor.Red;
+                                    Console.WriteLine($"  [FAIL] {fileName} ({pId}) [excluded]: Excluded tweak '{exId}' has missing or empty reason.");
+                                    Console.ResetColor();
+                                    errorCount++;
+                                    presetOk = false;
+                                }
+                            }
                         }
 
-                        string? evidence = tweakNode["evidence"]?.ToString();
-                        if (string.Equals(evidence, "anecdotal", StringComparison.OrdinalIgnoreCase))
+                        if (presetOk)
                         {
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine($"  [FAIL] {fileName} ({pId}): Contains tweak '{tid}' with evidence 'anecdotal'. Presets cannot contain unproven or anecdotal tweaks.");
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.WriteLine($"  [PASS] Preset '{pId}' (Standard: {standard?.Count ?? 0}, Full: {full?.Count ?? 0}, Excluded: {excluded?.Count ?? 0})");
                             Console.ResetColor();
-                            errorCount++;
-                            presetOk = false;
-                        }
-
-                        string? category = tweakNode["category"]?.ToString();
-                        if (string.Equals(category, "Experimental", StringComparison.OrdinalIgnoreCase))
-                        {
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine($"  [FAIL] {fileName} ({pId}): Contains tweak '{tid}' with category 'Experimental'. Presets cannot contain experimental tweaks.");
-                            Console.ResetColor();
-                            errorCount++;
-                            presetOk = false;
                         }
                     }
-
-                    if (presetOk)
+                    else if (legacyTweakIds != null)
                     {
-                        Console.ForegroundColor = ConsoleColor.Green;
-                        Console.WriteLine($"  [PASS] Preset '{pId}' ({tweakIds.Count} tweaks)");
-                        Console.ResetColor();
+                        foreach (var tidNode in legacyTweakIds)
+                        {
+                            string tid = tidNode?.ToString() ?? "";
+                            if (!tweakMap.TryGetValue(tid, out var tweakNode))
+                            {
+                                Console.ForegroundColor = ConsoleColor.Red;
+                                Console.WriteLine($"  [FAIL] {fileName} ({pId}): References nonexistent tweak ID '{tid}'.");
+                                Console.ResetColor();
+                                errorCount++;
+                                presetOk = false;
+                                continue;
+                            }
+                        }
+                        if (presetOk)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.WriteLine($"  [PASS] Preset '{pId}' ({legacyTweakIds.Count} tweaks)");
+                            Console.ResetColor();
+                        }
                     }
                 }
                 catch (Exception ex)

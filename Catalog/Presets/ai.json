@@ -1,0 +1,22 @@
+{
+  "id": "preset.ai",
+  "name": "AI & Copilot Management",
+  "description": "Disables Windows Copilot, Recall automated snapshots, and Bing web suggestions in shell search.",
+  "standard": [],
+  "full": [
+    "ai.copilot.disable-policy",
+    "ai.copilot.disable-taskbar-button",
+    "ai.recall.disable-snapshots",
+    "ai.search.disable-bing-web-search"
+  ],
+  "excluded": [
+    {
+      "id": "advanced.bravedebloat",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "advanced.windowsai",
+      "reason": "High risk — enable individually from Tweaks"
+    }
+  ]
+}
