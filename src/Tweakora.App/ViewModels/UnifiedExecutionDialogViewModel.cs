@@ -24,6 +24,49 @@ public sealed partial class ExecutionResultItemModel : ObservableObject
     public bool HasReason => !string.IsNullOrWhiteSpace(Reason);
 }
 
+public sealed partial class PreviewSubcategoryGroup : ObservableObject
+{
+    public required string Subcategory { get; init; }
+    public ObservableCollection<ProfilePreviewItemModel> Items { get; } = new();
+
+    public string TotalCountText => $"{Items.Count} tweak{(Items.Count == 1 ? "" : "s")}";
+
+    public Action? OnSelectionChanged { get; set; }
+
+    [RelayCommand]
+    public void SelectAll()
+    {
+        foreach (var item in Items)
+        {
+            if (item.IsSelectable)
+            {
+                item.IsSelected = true;
+            }
+        }
+        OnSelectionChanged?.Invoke();
+    }
+
+    [RelayCommand]
+    public void SelectNone()
+    {
+        foreach (var item in Items)
+        {
+            if (item.IsSelectable)
+            {
+                item.IsSelected = false;
+            }
+        }
+        OnSelectionChanged?.Invoke();
+    }
+}
+
+public sealed class ExcludedPreviewItemModel
+{
+    public required string Id { get; init; }
+    public required string Name { get; init; }
+    public required string Reason { get; init; }
+}
+
 public sealed partial class UnifiedExecutionDialogViewModel : ObservableObject
 {
     // PREVIEW DIALOG PROPERTIES
@@ -48,7 +91,34 @@ public sealed partial class UnifiedExecutionDialogViewModel : ObservableObject
     [ObservableProperty]
     private bool _isUndo;
 
+    [ObservableProperty]
+    private string _previewSummaryText = string.Empty;
+
+    [ObservableProperty]
+    private bool _hasExcludedItems;
+
+    [ObservableProperty]
+    private bool _isExcludedSectionOpen;
+
+    [ObservableProperty]
+    private string _excludedSectionHeader = "Not included";
+
+    public string ExcludedChevronText => IsExcludedSectionOpen ? "▲ Hide" : "▼ Show";
+
+    partial void OnIsExcludedSectionOpenChanged(bool value)
+    {
+        OnPropertyChanged(nameof(ExcludedChevronText));
+    }
+
+    [RelayCommand]
+    public void ToggleExcludedSection()
+    {
+        IsExcludedSectionOpen = !IsExcludedSectionOpen;
+    }
+
     public ObservableCollection<ProfilePreviewItemModel> PreviewItems { get; } = new();
+    public ObservableCollection<PreviewSubcategoryGroup> ItemGroups { get; } = new();
+    public ObservableCollection<ExcludedPreviewItemModel> ExcludedItems { get; } = new();
 
     private Func<List<TweakDefinition>, Task>? _onConfirmedCallback;
     private Action? _onCancelledCallback;
@@ -86,6 +156,22 @@ public sealed partial class UnifiedExecutionDialogViewModel : ObservableObject
         _activityTracker = activityTracker;
     }
 
+    public void UpdateSummary()
+    {
+        int toApply = PreviewItems.Count(i => i.IsSelected && (!i.IsAlreadyApplied || IsUndo));
+        int alreadyApplied = PreviewItems.Count(i => i.IsAlreadyApplied && !IsUndo);
+        int needRestart = PreviewItems.Count(i => i.IsSelected && (!i.IsAlreadyApplied || IsUndo) && (i.RequiresReboot || i.RequiresExplorerRestart));
+
+        if (IsUndo)
+        {
+            PreviewSummaryText = $"{toApply} to revert · {needRestart} need a restart";
+        }
+        else
+        {
+            PreviewSummaryText = $"{toApply} to apply · {alreadyApplied} already applied (skipped) · {needRestart} need a restart";
+        }
+    }
+
     public async Task OpenPreviewAsync(
         string title,
         string description,
@@ -94,7 +180,8 @@ public sealed partial class UnifiedExecutionDialogViewModel : ObservableObject
         IEnumerable<TweakDefinition> tweaks,
         bool isUndo,
         Func<List<TweakDefinition>, Task>? onConfirmed = null,
-        Action? onCancelled = null)
+        Action? onCancelled = null,
+        IReadOnlyList<ExcludedPresetTweak>? excludedTweaks = null)
     {
         PreviewTitle = title;
         PreviewDescription = description;
@@ -105,6 +192,8 @@ public sealed partial class UnifiedExecutionDialogViewModel : ObservableObject
         _onCancelledCallback = onCancelled;
 
         PreviewItems.Clear();
+        ItemGroups.Clear();
+        ExcludedItems.Clear();
         IsPreviewLoading = true;
         IsPreviewOpen = true;
 
@@ -113,7 +202,7 @@ public sealed partial class UnifiedExecutionDialogViewModel : ObservableObject
 
         foreach (var t in tweakList)
         {
-            previewList.Add(new ProfilePreviewItemModel
+            var item = new ProfilePreviewItemModel
             {
                 Tweak = t,
                 Id = t.Id,
@@ -123,13 +212,64 @@ public sealed partial class UnifiedExecutionDialogViewModel : ObservableObject
                 RequiresReboot = t.RequiresReboot,
                 RequiresExplorerRestart = t.RequiresExplorerRestart,
                 IsSelected = true
-            });
+            };
+            item.OnSelectionChanged = UpdateSummary;
+            previewList.Add(item);
         }
 
         foreach (var item in previewList)
         {
             PreviewItems.Add(item);
         }
+
+        // Group by Subcategory
+        var subcatGroups = previewList
+            .GroupBy(i => i.Subcategory)
+            .OrderBy(g => g.Key);
+
+        foreach (var group in subcatGroups)
+        {
+            var grp = new PreviewSubcategoryGroup
+            {
+                Subcategory = group.Key,
+                OnSelectionChanged = UpdateSummary
+            };
+            foreach (var item in group)
+            {
+                grp.Items.Add(item);
+            }
+            ItemGroups.Add(grp);
+        }
+
+        // Populate Excluded Items
+        if (excludedTweaks != null && excludedTweaks.Count > 0)
+        {
+            HasExcludedItems = true;
+            ExcludedSectionHeader = $"Not included ({excludedTweaks.Count})";
+            IsExcludedSectionOpen = false;
+
+            var catalog = _tweakService?.LoadCatalog() ?? Array.Empty<TweakDefinition>();
+            var catDict = catalog.ToDictionary(t => t.Id, StringComparer.OrdinalIgnoreCase);
+
+            foreach (var exc in excludedTweaks)
+            {
+                catDict.TryGetValue(exc.Id, out var tweakDef);
+                ExcludedItems.Add(new ExcludedPreviewItemModel
+                {
+                    Id = exc.Id,
+                    Name = tweakDef?.Name ?? exc.Id,
+                    Reason = exc.Reason
+                });
+            }
+        }
+        else
+        {
+            HasExcludedItems = false;
+            ExcludedSectionHeader = "Not included";
+            IsExcludedSectionOpen = false;
+        }
+
+        UpdateSummary();
 
         _ = Task.Run(async () =>
         {
@@ -189,6 +329,7 @@ public sealed partial class UnifiedExecutionDialogViewModel : ObservableObject
                                     break;
                             }
                         }
+                        UpdateSummary();
                     });
                 }
                 catch { }
@@ -197,6 +338,7 @@ public sealed partial class UnifiedExecutionDialogViewModel : ObservableObject
             System.Windows.Application.Current?.Dispatcher?.Invoke(() =>
             {
                 IsPreviewLoading = false;
+                UpdateSummary();
             });
         });
     }

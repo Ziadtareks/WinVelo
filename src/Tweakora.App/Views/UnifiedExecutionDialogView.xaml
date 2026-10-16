@@ -17,7 +17,7 @@
             <Border Background="{DynamicResource BgCardBrush}"
                     BorderBrush="{DynamicResource BorderSubtleBrush}"
                     BorderThickness="1" CornerRadius="10"
-                    Width="780" MaxHeight="620" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    Width="820" Height="640" MaxHeight="640" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <Border.Effect>
                     <DropShadowEffect BlurRadius="32" ShadowDepth="8" Direction="270" Color="#000000" Opacity="0.75" />
                 </Border.Effect>
@@ -42,10 +42,21 @@
                                 Command="{Binding CancelPreviewCommand}" />
                     </DockPanel>
 
-                    <!-- Description & Notice -->
-                    <StackPanel Grid.Row="1" Margin="0,0,0,14">
+                    <!-- Description, Dynamic Summary & Notice -->
+                    <StackPanel Grid.Row="1" Margin="0,0,0,12">
                         <TextBlock Text="{Binding PreviewDescription}" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,0,0,8" />
-                        <Border Background="{DynamicResource BgDeepBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="1" CornerRadius="6" Padding="10,8">
+
+                        <!-- Dynamic Summary Banner -->
+                        <Border Background="{DynamicResource BgDeepBrush}" BorderBrush="{DynamicResource AccentPrimaryBrush}"
+                                BorderThickness="1" CornerRadius="6" Padding="12,8" Margin="0,0,0,8">
+                            <StackPanel Orientation="Horizontal">
+                                <ui:SymbolIcon Symbol="CheckmarkCircle24" Foreground="{DynamicResource AccentPrimaryBrush}" FontSize="15" Margin="0,0,8,0" VerticalAlignment="Center" />
+                                <TextBlock Text="{Binding PreviewSummaryText}" FontSize="12" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Background="{DynamicResource BgDeepBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="1" CornerRadius="6" Padding="10,6">
                             <StackPanel Orientation="Horizontal">
                                 <ui:SymbolIcon Symbol="Info16" Foreground="#60A5FA" FontSize="14" Margin="0,0,8,0" VerticalAlignment="Center" />
                                 <TextBlock Text="{Binding PreviewNotice}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" VerticalAlignment="Center" />
@@ -63,60 +74,135 @@
                         </StackPanel>
 
                         <!-- Items ScrollViewer -->
-                        <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="340">
-                            <ItemsControl ItemsSource="{Binding PreviewItems}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Border Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="1"
-                                                CornerRadius="6" Padding="12,10" Margin="0,0,0,8">
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="Auto" />
-                                                    <ColumnDefinition Width="*" />
-                                                    <ColumnDefinition Width="Auto" />
-                                                </Grid.ColumnDefinitions>
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <StackPanel>
+                                <!-- Groups by Subcategory -->
+                                <ItemsControl ItemsSource="{Binding ItemGroups}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Background="{DynamicResource BgDeepBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
+                                                    BorderThickness="1" CornerRadius="8" Padding="12,10" Margin="0,0,0,12">
+                                                <StackPanel>
+                                                    <!-- Section Header -->
+                                                    <DockPanel LastChildFill="True" Margin="0,0,0,8">
+                                                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                                                            <Button Content="Select all" Style="{DynamicResource ModernGhostBtn}"
+                                                                    AutomationProperties.Name="{Binding Subcategory, StringFormat='Select all in {0}'}"
+                                                                    Command="{Binding SelectAllCommand}" Padding="6,2" FontSize="11" Margin="0,0,6,0" />
+                                                            <Button Content="Select none" Style="{DynamicResource ModernGhostBtn}"
+                                                                    AutomationProperties.Name="{Binding Subcategory, StringFormat='Select none in {0}'}"
+                                                                    Command="{Binding SelectNoneCommand}" Padding="6,2" FontSize="11" />
+                                                        </StackPanel>
+                                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                            <TextBlock Text="{Binding Subcategory}" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" />
+                                                            <Border Background="{DynamicResource ControlFillColorSecondaryBrush}" CornerRadius="10" Padding="6,2" Margin="8,0,0,0" VerticalAlignment="Center">
+                                                                <TextBlock Text="{Binding TotalCountText}" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}" />
+                                                            </Border>
+                                                        </StackPanel>
+                                                    </DockPanel>
 
-                                                <!-- Checkbox (disabled if already applied in apply mode) -->
-                                                <CheckBox Grid.Column="0" IsChecked="{Binding IsSelected}"
-                                                          AutomationProperties.Name="{Binding Name, StringFormat='Select {0}'}"
-                                                          IsEnabled="{Binding IsSelectable}"
-                                                          VerticalAlignment="Center" Margin="0,0,12,0" />
+                                                    <!-- Items in this Subcategory -->
+                                                    <ItemsControl ItemsSource="{Binding Items}">
+                                                        <ItemsControl.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <Border Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="1"
+                                                                        CornerRadius="6" Padding="12,10" Margin="0,0,0,6">
+                                                                    <Grid>
+                                                                        <Grid.ColumnDefinitions>
+                                                                            <ColumnDefinition Width="Auto" />
+                                                                            <ColumnDefinition Width="*" />
+                                                                            <ColumnDefinition Width="Auto" />
+                                                                        </Grid.ColumnDefinitions>
 
-                                                <!-- Tweak Info -->
-                                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                                    <TextBlock Text="{Binding Name}" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" />
-                                                    <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
-                                                        <TextBlock Text="{Binding Id}" FontSize="11" Foreground="#94A3B8" Margin="0,0,10,0" FontFamily="Consolas, Cascadia Code, Courier New" />
-                                                        <TextBlock Text="{Binding ReversibleText, StringFormat='Reversible: {0}'}" FontSize="11" Foreground="#94A3B8" Margin="0,0,10,0" />
-                                                        <TextBlock Text="Reboot Required" FontSize="11" Foreground="#F87171" FontWeight="SemiBold" Margin="0,0,10,0"
-                                                                   Visibility="{Binding RequiresReboot, Converter={StaticResource BoolToVisConverter}}" />
-                                                        <TextBlock Text="Restarts Explorer" FontSize="11" Foreground="#60A5FA" FontWeight="SemiBold"
-                                                                   ToolTip="Windows Explorer will be restarted automatically when this tweak is applied or undone"
-                                                                   Visibility="{Binding RequiresExplorerRestart, Converter={StaticResource BoolToVisConverter}}" />
-                                                    </StackPanel>
+                                                                        <!-- Checkbox (disabled if already applied in apply mode) -->
+                                                                        <CheckBox Grid.Column="0" IsChecked="{Binding IsSelected}"
+                                                                                  AutomationProperties.Name="{Binding Name, StringFormat='Select {0}'}"
+                                                                                  IsEnabled="{Binding IsSelectable}"
+                                                                                  VerticalAlignment="Center" Margin="0,0,12,0" />
+
+                                                                        <!-- Tweak Info -->
+                                                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                                            <TextBlock Text="{Binding Name}" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" />
+                                                                            <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                                                                                <TextBlock Text="{Binding Id}" FontSize="11" Foreground="#94A3B8" Margin="0,0,10,0" FontFamily="Consolas, Cascadia Code, Courier New" />
+                                                                                <TextBlock Text="{Binding ReversibleText, StringFormat='Reversible: {0}'}" FontSize="11" Foreground="#94A3B8" Margin="0,0,10,0" />
+                                                                                <TextBlock Text="Reboot Required" FontSize="11" Foreground="#F87171" FontWeight="SemiBold" Margin="0,0,10,0"
+                                                                                           Visibility="{Binding RequiresReboot, Converter={StaticResource BoolToVisConverter}}" />
+                                                                                <TextBlock Text="Restarts Explorer" FontSize="11" Foreground="#60A5FA" FontWeight="SemiBold"
+                                                                                           ToolTip="Windows Explorer will be restarted automatically when this tweak is applied or undone"
+                                                                                           Visibility="{Binding RequiresExplorerRestart, Converter={StaticResource BoolToVisConverter}}" />
+                                                                            </StackPanel>
+                                                                        </StackPanel>
+
+                                                                        <!-- Status & Risk Badges -->
+                                                                        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                                                            <!-- State Badge -->
+                                                                            <Border Background="{Binding StateBg}" CornerRadius="4" Padding="8,3" Margin="0,0,8,0">
+                                                                                <TextBlock Text="{Binding StateText}" FontSize="10" FontWeight="Bold" Foreground="{Binding StateFg}" />
+                                                                            </Border>
+
+                                                                            <!-- Risk Badge (Safe green / Low blue / Medium amber / High red) -->
+                                                                            <Border Background="{Binding RiskBadgeBg}" BorderBrush="{Binding RiskBadgeBorder}" BorderThickness="1" CornerRadius="4" Padding="8,3">
+                                                                                <TextBlock Text="{Binding Risk}" FontSize="10" FontWeight="Bold" Foreground="{Binding RiskBadgeFg}" />
+                                                                            </Border>
+                                                                        </StackPanel>
+                                                                    </Grid>
+                                                                </Border>
+                                                            </DataTemplate>
+                                                        </ItemsControl.ItemTemplate>
+                                                    </ItemsControl>
                                                 </StackPanel>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
 
-                                                <!-- Status & Risk Badges -->
-                                                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-                                                    <!-- State Badge -->
-                                                    <Border Background="{Binding StateBg}" CornerRadius="4" Padding="8,3" Margin="0,0,8,0">
-                                                        <TextBlock Text="{Binding StateText}" FontSize="10" FontWeight="Bold" Foreground="{Binding StateFg}" />
-                                                    </Border>
-
-                                                    <!-- Risk Badge (Safe green / Low blue / Medium amber / High red) -->
-                                                    <Border Background="{Binding RiskBadgeBg}" BorderBrush="{Binding RiskBadgeBorder}" BorderThickness="1" CornerRadius="4" Padding="8,3">
-                                                        <TextBlock Text="{Binding Risk}" FontSize="10" FontWeight="Bold" Foreground="{Binding RiskBadgeFg}" />
-                                                    </Border>
+                                <!-- Collapsible 'Not included' Section -->
+                                <Border Visibility="{Binding HasExcludedItems, Converter={StaticResource BoolToVisConverter}}"
+                                        Background="{DynamicResource BgDeepBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
+                                        BorderThickness="1" CornerRadius="8" Margin="0,4,0,12">
+                                    <StackPanel>
+                                        <Button Style="{DynamicResource ModernGhostBtn}"
+                                                HorizontalContentAlignment="Stretch"
+                                                Padding="12,10"
+                                                AutomationProperties.Name="Toggle Not Included Tweaks Section"
+                                                Command="{Binding ToggleExcludedSectionCommand}">
+                                            <DockPanel LastChildFill="True">
+                                                <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" VerticalAlignment="Center">
+                                                    <ui:SymbolIcon Symbol="DismissCircle24" Foreground="#EF4444" FontSize="16" Margin="0,0,8,0" VerticalAlignment="Center" />
+                                                    <TextBlock Text="{Binding ExcludedSectionHeader}" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" />
+                                                    <TextBlock Text="— Excluded for system stability and safety" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" Margin="8,0,0,0" VerticalAlignment="Center" />
                                                 </StackPanel>
-                                            </Grid>
-                                        </Border>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
+                                                <TextBlock DockPanel.Dock="Right" Text="{Binding ExcludedChevronText}" FontSize="12" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" />
+                                            </DockPanel>
+                                        </Button>
+
+                                        <ItemsControl ItemsSource="{Binding ExcludedItems}" Margin="12,0,12,12"
+                                                      Visibility="{Binding IsExcludedSectionOpen, Converter={StaticResource BoolToVisConverter}}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Border Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="1"
+                                                            CornerRadius="6" Padding="12,8" Margin="0,4,0,0">
+                                                        <DockPanel LastChildFill="True">
+                                                            <Border DockPanel.Dock="Right" Background="#450A0A" BorderBrush="#DC2626" BorderThickness="1" CornerRadius="4" Padding="8,3" VerticalAlignment="Center">
+                                                                <TextBlock Text="{Binding Reason}" FontSize="10" FontWeight="Bold" Foreground="#FCA5A5" />
+                                                            </Border>
+                                                            <StackPanel VerticalAlignment="Center">
+                                                                <TextBlock Text="{Binding Name}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" />
+                                                                <TextBlock Text="{Binding Id}" FontSize="10" Foreground="#94A3B8" FontFamily="Consolas, Cascadia Code, Courier New" />
+                                                            </StackPanel>
+                                                        </DockPanel>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
                         </ScrollViewer>
                     </Grid>
 
-                    <!-- Actions -->
+                    <!-- Pinned Actions Footer -->
                     <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,18,0,0">
                         <ui:Button Content="Cancel" Appearance="Secondary" Margin="0,0,10,0"
                                    AutomationProperties.AutomationId="PreviewCancelButton"

@@ -23,10 +23,24 @@ public sealed partial class ProfilePreviewItemModel : ObservableObject
     private string _stateFg = "#94A3B8";
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsSelectable))]
     private bool _isAlreadyApplied;
 
     [ObservableProperty]
     private bool _isSelected = true;
+
+    partial void OnIsSelectedChanged(bool value)
+    {
+        OnSelectionChanged?.Invoke();
+    }
+
+    public Action? OnSelectionChanged { get; set; }
+
+    public string Subcategory => !string.IsNullOrWhiteSpace(Tweak.Subcategory)
+        ? Tweak.Subcategory
+        : (!string.IsNullOrWhiteSpace(Tweak.Category)
+            ? System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(Tweak.Category)
+            : "General");
 
     public bool IsSelectable => !IsAlreadyApplied;
 

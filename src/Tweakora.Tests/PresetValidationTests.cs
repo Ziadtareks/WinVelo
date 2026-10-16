@@ -298,4 +298,72 @@ public sealed class PresetValidationTests
         dvm.ClearProfileStatusMessages();
         Assert.Empty(gamingCard.StatusMessage);
     }
+
+    [Fact]
+    public async Task UnifiedExecutionDialogViewModel_OpenPreview_GroupsBySubcategoryAndProvidesSelectAllNone()
+    {
+        var fakeReg = new FakeRegistryService();
+        var fakeSvc = new FakeServicesService();
+        var fakeSched = new FakeTaskSchedulerService();
+        var fakeRestore = new FakeRestoreService();
+        var fakeShell = new FakeShellService();
+        var journal = new RollbackJournalManager(Path.Combine(AppContext.BaseDirectory, "test-journal-uedvm-grouping"));
+        var tweakService = new TweakService(fakeReg, fakeSvc, fakeSched, fakeRestore, fakeShell, journal);
+        var uedvm = new UnifiedExecutionDialogViewModel(tweakService);
+
+        var tweaks = new List<TweakDefinition>
+        {
+            new() { Id = "test.sub1.a", Name = "Sub1 Item A", Risk = "Safe", Subcategory = "Networking", Category = "network", Reversible = true },
+            new() { Id = "test.sub1.b", Name = "Sub1 Item B", Risk = "Low", Subcategory = "Networking", Category = "network", Reversible = true },
+            new() { Id = "test.sub2.a", Name = "Sub2 Item A", Risk = "Safe", Subcategory = "Visuals", Category = "ui", Reversible = true, RequiresExplorerRestart = true }
+        };
+
+        var excluded = new List<ExcludedPresetTweak>
+        {
+            new() { Id = "test.excluded.1", Reason = "High risk" }
+        };
+
+        await uedvm.OpenPreviewAsync("Test Dialog", "Description", "Notice", "Apply", tweaks, isUndo: false, excludedTweaks: excluded);
+
+        Assert.True(uedvm.IsPreviewOpen);
+        Assert.Equal(3, uedvm.PreviewItems.Count);
+        Assert.Equal(2, uedvm.ItemGroups.Count);
+
+        var netGroup = uedvm.ItemGroups.FirstOrDefault(g => g.Subcategory == "Networking");
+        Assert.NotNull(netGroup);
+        Assert.Equal(2, netGroup.Items.Count);
+        Assert.Equal("2 tweaks", netGroup.TotalCountText);
+
+        var uiGroup = uedvm.ItemGroups.FirstOrDefault(g => g.Subcategory == "Visuals");
+        Assert.NotNull(uiGroup);
+        Assert.Single(uiGroup.Items);
+
+        // Verify summary initially
+        Assert.Contains("3 to apply", uedvm.PreviewSummaryText);
+        Assert.Contains("1 need a restart", uedvm.PreviewSummaryText);
+
+        // Deselect all in netGroup
+        netGroup.SelectNone();
+        Assert.All(netGroup.Items, item => Assert.False(item.IsSelected));
+        Assert.Contains("1 to apply", uedvm.PreviewSummaryText);
+
+        // Re-select all in netGroup
+        netGroup.SelectAll();
+        Assert.All(netGroup.Items, item => Assert.True(item.IsSelected));
+        Assert.Contains("3 to apply", uedvm.PreviewSummaryText);
+
+        // Verify excluded section
+        Assert.True(uedvm.HasExcludedItems);
+        Assert.Equal("Not included (1)", uedvm.ExcludedSectionHeader);
+        Assert.False(uedvm.IsExcludedSectionOpen);
+        Assert.Equal("▼ Show", uedvm.ExcludedChevronText);
+
+        uedvm.ToggleExcludedSection();
+        Assert.True(uedvm.IsExcludedSectionOpen);
+        Assert.Equal("▲ Hide", uedvm.ExcludedChevronText);
+        Assert.Single(uedvm.ExcludedItems);
+        Assert.Equal("test.excluded.1", uedvm.ExcludedItems[0].Id);
+        Assert.Equal("High risk", uedvm.ExcludedItems[0].Reason);
+    }
 }
+
