@@ -1,6 +1,7 @@
 <UserControl x:Class="Tweakora.App.Views.FirstRunWizardView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="clr-namespace:Tweakora.App.Localization"
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              xmlns:vm="clr-namespace:Tweakora.App.ViewModels"
              Focusable="True"
@@ -46,7 +47,7 @@
                 <!-- Step Counter / Visual Indicator -->
                 <StackPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="12,0,0,0">
                     <Border Background="{DynamicResource AccentPrimaryBrush}" CornerRadius="12" Padding="10,4" HorizontalAlignment="Right">
-                        <TextBlock Text="{Binding CurrentStep, StringFormat='Step {0} of 3'}" FontSize="12" FontWeight="SemiBold" Foreground="White" />
+                        <TextBlock Text="{Binding CurrentStep, StringFormat={loc:Tr Wizard_Step0Of3}}" FontSize="12" FontWeight="SemiBold" Foreground="White" />
                     </Border>
                     <!-- Visual 3-segment progress indicator -->
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,0,0">
@@ -101,7 +102,7 @@
                     </Style>
                 </StackPanel.Style>
 
-                <TextBlock Text="WinVelo is built on transparency, safety, and strict verification."
+                <TextBlock Text="{loc:Tr Wizard_WinveloIsBuiltOnTransparency}"
                            FontSize="14" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,12" />
 
                 <!-- Bullet 1: Transparent Tuning -->
@@ -116,8 +117,8 @@
                             <ui:SymbolIcon Symbol="CheckmarkStarburst24" Foreground="#10B981" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Border>
                         <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                            <TextBlock Text="Transparent, Evidence-Based Settings" FontWeight="SemiBold" FontSize="13" Foreground="{DynamicResource TextPrimaryBrush}" />
-                            <TextBlock Text="Every tweak shows its source, risk level and the exact changes it makes before you apply it. No placebo RAM cleaners; unproven tweaks stay hidden under Experimental."
+                            <TextBlock Text="{loc:Tr Wizard_TransparentEvidenceBasedSettings}" FontWeight="SemiBold" FontSize="13" Foreground="{DynamicResource TextPrimaryBrush}" />
+                            <TextBlock Text="{loc:Tr Wizard_EveryTweakShowsItsSource}"
                                        FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,2,0,0" LineHeight="16" />
                         </StackPanel>
                     </Grid>
@@ -135,8 +136,8 @@
                             <ui:SymbolIcon Symbol="History24" Foreground="#60A5FA" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Border>
                         <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                            <TextBlock Text="Safety &amp; Full Rollbacks" FontWeight="SemiBold" FontSize="13" Foreground="{DynamicResource TextPrimaryBrush}" />
-                            <TextBlock Text="Every change records baseline values in a rollback journal before making changes. You can undo individual tweaks or roll back all changes at any time."
+                            <TextBlock Text="{loc:Tr Wizard_SafetyFullRollbacks}" FontWeight="SemiBold" FontSize="13" Foreground="{DynamicResource TextPrimaryBrush}" />
+                            <TextBlock Text="{loc:Tr Wizard_EveryChangeRecordsBaselineValues}"
                                        FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,2,0,0" LineHeight="16" />
                         </StackPanel>
                     </Grid>
@@ -154,8 +155,8 @@
                             <ui:SymbolIcon Symbol="ShieldCheckmark24" Foreground="#FBBF24" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Border>
                         <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                            <TextBlock Text="Protects Windows Updates &amp; Integrity" FontWeight="SemiBold" FontSize="13" Foreground="{DynamicResource TextPrimaryBrush}" />
-                            <TextBlock Text="Core system components (Windows Update, BITS, Microsoft Store, and Windows Security) are protected and never disabled."
+                            <TextBlock Text="{loc:Tr Wizard_ProtectsWindowsUpdatesIntegrity}" FontWeight="SemiBold" FontSize="13" Foreground="{DynamicResource TextPrimaryBrush}" />
+                            <TextBlock Text="{loc:Tr Wizard_CoreSystemComponentsWindowsUpdate}"
                                        FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,2,0,0" LineHeight="16" />
                         </StackPanel>
                     </Grid>
@@ -179,11 +180,11 @@
                 <Border Background="{DynamicResource BgDeepBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
                         BorderThickness="1" CornerRadius="8" Padding="14,12" Margin="0,0,0,12">
                     <StackPanel>
-                        <TextBlock Text="CURRENT STATUS" FontWeight="Bold" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,4" />
+                        <TextBlock Text="{loc:Tr Wizard_CurrentStatus}" FontWeight="Bold" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,4" />
                         <TextBlock Text="{Binding RestoreStatusMessage}" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" TextWrapping="Wrap" LineHeight="18" />
 
                         <!-- Enable Button (if disabled) -->
-                        <Button Content="Turn On System Restore (Drive C:\)"
+                        <Button Content="{loc:Tr Wizard_TurnOnSystemRestoreDrive}"
                                 AutomationProperties.Name="Turn On System Restore"
                                 Command="{Binding EnableSystemRestoreCommand}"
                                 IsEnabled="{Binding IsSystemRestoreEnabled, Converter={StaticResource BoolToVisConverter}}"
@@ -206,8 +207,8 @@
                 <Border Background="{DynamicResource BgDeepBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
                         BorderThickness="1" CornerRadius="8" Padding="14,12">
                     <StackPanel>
-                        <TextBlock Text="SYSTEM RESTORE POINT VERIFICATION" FontWeight="Bold" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,4" />
-                        <TextBlock Text="Create a fresh restore point before configuring tweaks. WinVelo verifies its existence directly against Windows."
+                        <TextBlock Text="{loc:Tr Wizard_SystemRestorePointVerification}" FontWeight="Bold" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,4" />
+                        <TextBlock Text="{loc:Tr Wizard_CreateAFreshRestorePoint}"
                                    FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,0,0,12" LineHeight="16" />
 
                         <DockPanel LastChildFill="False">
@@ -219,7 +220,7 @@
                                        Padding="14,7">
                                 <StackPanel Orientation="Horizontal">
                                     <ui:SymbolIcon Symbol="AddCircle24" Margin="0,0,6,0" FontSize="16" />
-                                    <TextBlock Text="Create &amp; Verify Restore Point" FontWeight="SemiBold" />
+                                    <TextBlock Text="{loc:Tr Wizard_CreateVerifyRestorePoint}" FontWeight="SemiBold" />
                                 </StackPanel>
                             </ui:Button>
                         </DockPanel>
@@ -247,7 +248,7 @@
                     </Style>
                 </StackPanel.Style>
 
-                <TextBlock Text="Select how much of the tweak catalog you wish to see. You can change this at any time in Tweaks or Settings."
+                <TextBlock Text="{loc:Tr Wizard_SelectHowMuchOfThe}"
                            FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,14" TextWrapping="Wrap" />
 
                 <!-- Simple Mode Card -->
@@ -301,12 +302,12 @@
                         </Grid>
                         <StackPanel Grid.Column="1" VerticalAlignment="Center">
                             <DockPanel LastChildFill="False">
-                                <TextBlock Text="Simple Mode (Recommended)" FontWeight="Bold" FontSize="13" Foreground="{DynamicResource TextPrimaryBrush}" DockPanel.Dock="Left" />
+                                <TextBlock Text="{loc:Tr Wizard_SimpleModeRecommended}" FontWeight="Bold" FontSize="13" Foreground="{DynamicResource TextPrimaryBrush}" DockPanel.Dock="Left" />
                                 <Border Background="#064E3B" CornerRadius="4" Padding="6,1" Margin="8,0,0,0" DockPanel.Dock="Left" VerticalAlignment="Center">
-                                    <TextBlock Text="RECOMMENDED" FontSize="9" FontWeight="Bold" Foreground="#10B981" />
+                                    <TextBlock Text="{loc:Tr Wizard_Recommended}" FontSize="9" FontWeight="Bold" Foreground="#10B981" />
                                 </Border>
                             </DockPanel>
-                            <TextBlock Text="Only Recommended tweaks are visible (Safe and Low risk, verified sources). Recommended for standard users who want a clean, stable system."
+                            <TextBlock Text="{loc:Tr Wizard_OnlyRecommendedTweaksAreVisible}"
                                        FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,3,0,0" LineHeight="16" />
                         </StackPanel>
                     </Grid>
@@ -363,12 +364,12 @@
                         </Grid>
                         <StackPanel Grid.Column="1" VerticalAlignment="Center">
                             <DockPanel LastChildFill="False">
-                                <TextBlock Text="Advanced Mode" FontWeight="Bold" FontSize="13" Foreground="{DynamicResource TextPrimaryBrush}" DockPanel.Dock="Left" />
+                                <TextBlock Text="{loc:Tr Wizard_AdvancedMode}" FontWeight="Bold" FontSize="13" Foreground="{DynamicResource TextPrimaryBrush}" DockPanel.Dock="Left" />
                                 <Border Background="#1E293B" CornerRadius="4" Padding="6,1" Margin="8,0,0,0" DockPanel.Dock="Left" VerticalAlignment="Center">
-                                    <TextBlock Text="ALL TWEAKS" FontSize="9" FontWeight="Bold" Foreground="#94A3B8" />
+                                    <TextBlock Text="{loc:Tr Wizard_AllTweaks}" FontSize="9" FontWeight="Bold" Foreground="#94A3B8" />
                                 </Border>
                             </DockPanel>
-                            <TextBlock Text="Full catalog across all risk tiers. Experimental tweaks remain protected behind their own toggle. For power users and system administrators."
+                            <TextBlock Text="{loc:Tr Wizard_FullCatalogAcrossAllRisk}"
                                        FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,3,0,0" LineHeight="16" />
                         </StackPanel>
                     </Grid>
@@ -378,7 +379,7 @@
             <!-- ==================== NAVIGATION BUTTONS ==================== -->
             <DockPanel Grid.Row="2" LastChildFill="False" Margin="0,8,0,0">
                 <!-- Back Button -->
-                <Button DockPanel.Dock="Left" Content="Back"
+                <Button DockPanel.Dock="Left" Content="{loc:Tr Wizard_Back}"
                         AutomationProperties.Name="Previous Wizard Step"
                         Command="{Binding PreviousStepCommand}" Padding="16,8">
                     <Button.Style>
@@ -397,14 +398,14 @@
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
                     <Button AutomationProperties.AutomationId="SkipWizardButton"
                             AutomationProperties.Name="Skip Setup"
-                            Content="Skip Setup" Style="{DynamicResource ModernGhostBtn}"
+                            Content="{loc:Tr Wizard_SkipSetup}" Style="{DynamicResource ModernGhostBtn}"
                             IsCancel="True"
                             Command="{Binding FinishCommand}" Margin="0,0,10,0" Padding="14,8" />
 
                     <!-- Next Step Button (Steps 1 & 2) -->
                     <ui:Button AutomationProperties.AutomationId="WizardNextButton"
                                AutomationProperties.Name="Next Step"
-                               Appearance="Primary" Content="Next Step"
+                               Appearance="Primary" Content="{loc:Tr Wizard_NextStep}"
                                IsDefault="True"
                                Command="{Binding NextStepCommand}" Padding="18,8" FontWeight="SemiBold">
                         <ui:Button.Style>
@@ -422,7 +423,7 @@
                     <!-- Finish Button (Step 3) -->
                     <ui:Button AutomationProperties.AutomationId="WizardFinishButton"
                                AutomationProperties.Name="Get Started"
-                               Appearance="Primary" Content="Get Started"
+                               Appearance="Primary" Content="{loc:Tr Wizard_GetStarted}"
                                IsDefault="True"
                                Command="{Binding FinishCommand}" Padding="18,8" FontWeight="SemiBold">
                         <ui:Button.Style>

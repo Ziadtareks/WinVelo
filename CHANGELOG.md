@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 First stable release.
 
 ### Added
+- Arabic interface with a full right-to-left layout, including Arabic names and descriptions for all 152 tweaks and the presets. Switch it in Settings › Language (applied after a restart) or start with `--lang ar`.
 - 15 commonly requested tweaks: Microsoft Edge sidebar, startup boost and background mode policies; Click to Do; Recall availability; Paint and Notepad AI features; Widgets policy; File Explorer sync-provider ads; OneDrive entry in the File Explorer navigation pane; last-active-window taskbar click; Find My Device; Fast Startup; close apps automatically at shutdown; startup-app delay (Experimental). The catalog now has 152 tweaks.
 - `presetRole` for every tweak. Presets only contain optimizations; personal preferences, problem-specific fixes, one-time actions and advanced tuning are listed under "Not included" with a reason.
 - New app icon (exe, window, taskbar and sidebar).

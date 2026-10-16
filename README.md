@@ -59,6 +59,7 @@ There is nothing to install and you don't need to download .NET, because the run
 | **Apps** | Install 36 popular apps in one go with `winget` (or Chocolatey). |
 | **Tools** | Startup apps, Windows services, cleaner, DNS benchmark and switcher, common fixes, Windows Update settings, optional features and restore points. |
 | **History** | Every session WinVelo ran, with one-click undo. |
+| **Languages** | English and Arabic, with a full right-to-left layout. You can switch in **Settings › Language**. |
 
 <details>
 <summary><b>More screenshots</b></summary>
@@ -81,7 +82,22 @@ There is nothing to install and you don't need to download .NET, because the run
 **Settings**
 ![Settings](docs/screenshots/settings.png)
 
+**Arabic interface**
+![Arabic interface](docs/screenshots/ar/home.png)
+
 </details>
+
+---
+
+## بالعربية
+
+WinVelo أداة مفتوحة المصدر لضبط Windows 10 و 11. تعرض لك كل تعديل بالتفصيل قبل تطبيقه، وتتيح لك التراجع عنه في أي وقت.
+
+1. نزّل **`WinVelo-v1.0.0-portable.zip`** من [صفحة الإصدارات](https://github.com/Ziadtareks/WinVelo/releases/latest).
+2. فك الضغط في أي مكان، وشغّل **`WinVelo.exe`**. لا يحتاج إلى تثبيت ولا إلى تنزيل .NET.
+3. لتحويل الواجهة إلى العربية: **Settings › Language › العربية**، ثم أعد تشغيل البرنامج.
+
+إذا ظهر تحذير SmartScreen، اضغط **More info** ثم **Run anyway**، لأن البرنامج غير موقّع رقميًا بعد. ننصح بإنشاء نقطة استعادة قبل أول تعديل، والبدء بالوضع البسيط.
 
 ---
 

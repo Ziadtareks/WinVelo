@@ -1,6 +1,7 @@
 <UserControl x:Class="Tweakora.App.Views.SettingsTabView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="clr-namespace:Tweakora.App.Localization"
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              xmlns:vm="clr-namespace:Tweakora.App.ViewModels"
              AutomationProperties.AutomationId="SettingsTabView"
@@ -14,8 +15,8 @@
 
         <!-- Header -->
         <StackPanel Grid.Row="0" Margin="0,0,0,20">
-            <TextBlock Text="Settings" FontSize="{StaticResource FontSizeHeader}" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" />
-            <TextBlock Text="Preferences, execution safety, and application configuration."
+            <TextBlock Text="{loc:Tr Main_Settings}" FontSize="{StaticResource FontSizeHeader}" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" />
+            <TextBlock Text="{loc:Tr Settings_PreferencesExecutionSafetyAndApplication}"
                        FontSize="{StaticResource FontSizeBody}" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,4,0,0" />
         </StackPanel>
 
@@ -27,8 +28,8 @@
                 <Border Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
                         BorderThickness="1" CornerRadius="8" Padding="16" Margin="0,0,0,16">
                     <StackPanel>
-                        <TextBlock Text="Experience Level" FontSize="{StaticResource FontSizeSubtitle}" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,4" />
-                        <TextBlock Text="Choose how much technical detail and tweak control is exposed."
+                        <TextBlock Text="{loc:Tr Settings_ExperienceLevel}" FontSize="{StaticResource FontSizeSubtitle}" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,4" />
+                        <TextBlock Text="{loc:Tr Settings_ChooseHowMuchTechnicalDetail}"
                                    FontSize="{StaticResource FontSizeCaption}" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,12" />
 
                         <Grid Margin="0,0,0,8">
@@ -40,11 +41,11 @@
                             <Border Grid.Column="0" Background="{DynamicResource BgDeepBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
                                     BorderThickness="1" CornerRadius="6" Padding="12" Margin="0,0,8,0">
                                 <StackPanel>
-                                    <RadioButton GroupName="ModeGroup" IsChecked="{Binding AppMode, Converter={x:Null}, ConverterParameter=Simple}"
+                                    <RadioButton GroupName="ModeGroup" IsChecked="{Binding IsSimpleMode, Mode=OneWay}"
                                                  Command="{Binding SetSimpleModeCommand}"
                                                  AutomationProperties.Name="Simple mode selection"
-                                                 Content="Simple Mode" FontWeight="Bold" FontSize="{StaticResource FontSizeBody}" />
-                                    <TextBlock Text="Curated presets and safe, reversible tweaks. Technical details hidden by default."
+                                                 Content="{loc:Tr Settings_SimpleMode}" FontWeight="Bold" FontSize="{StaticResource FontSizeBody}" />
+                                    <TextBlock Text="{loc:Tr Settings_CuratedPresetsAndSafeReversible}"
                                                FontSize="{StaticResource FontSizeCaption}" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="22,4,0,0" />
                                 </StackPanel>
                             </Border>
@@ -52,11 +53,11 @@
                             <Border Grid.Column="1" Background="{DynamicResource BgDeepBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
                                     BorderThickness="1" CornerRadius="6" Padding="12" Margin="8,0,0,0">
                                 <StackPanel>
-                                    <RadioButton GroupName="ModeGroup"
+                                    <RadioButton GroupName="ModeGroup" IsChecked="{Binding IsAdvancedMode, Mode=OneWay}"
                                                  Command="{Binding SetAdvancedModeCommand}"
                                                  AutomationProperties.Name="Advanced mode selection"
-                                                 Content="Advanced Mode" FontWeight="Bold" FontSize="{StaticResource FontSizeBody}" />
-                                    <TextBlock Text="Full catalog access with registry paths, service states, and manual filter controls."
+                                                 Content="{loc:Tr Wizard_AdvancedMode}" FontWeight="Bold" FontSize="{StaticResource FontSizeBody}" />
+                                    <TextBlock Text="{loc:Tr Settings_FullCatalogAccessWithRegistry}"
                                                FontSize="{StaticResource FontSizeCaption}" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="22,4,0,0" />
                                 </StackPanel>
                             </Border>
@@ -68,15 +69,15 @@
                 <Border Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
                         BorderThickness="1" CornerRadius="8" Padding="16" Margin="0,0,0,16">
                     <StackPanel>
-                        <TextBlock Text="Safety &amp; Execution" FontSize="{StaticResource FontSizeSubtitle}" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,4" />
-                        <TextBlock Text="Configure execution guards and catalog filtering."
+                        <TextBlock Text="{loc:Tr Settings_SafetyExecution}" FontSize="{StaticResource FontSizeSubtitle}" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,4" />
+                        <TextBlock Text="{loc:Tr Settings_ConfigureExecutionGuardsAndCatalog}"
                                    FontSize="{StaticResource FontSizeCaption}" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,12" />
 
                         <!-- Dry-Run Mode Toggle -->
                         <DockPanel Margin="0,0,0,12" LastChildFill="False">
                             <StackPanel DockPanel.Dock="Left">
-                                <TextBlock Text="Dry-Run Mode" FontWeight="SemiBold" FontSize="{StaticResource FontSizeBody}" Foreground="{DynamicResource TextPrimaryBrush}" />
-                                <TextBlock Text="Simulate operations without making any changes to Windows or registry."
+                                <TextBlock Text="{loc:Tr Settings_DryRunMode}" FontWeight="SemiBold" FontSize="{StaticResource FontSizeBody}" Foreground="{DynamicResource TextPrimaryBrush}" />
+                                <TextBlock Text="{loc:Tr Settings_SimulateOperationsWithoutMakingAny}"
                                            FontSize="{StaticResource FontSizeCaption}" Foreground="{DynamicResource TextMutedBrush}" />
                             </StackPanel>
                             <CheckBox DockPanel.Dock="Right" IsChecked="{Binding IsDryRun, Mode=TwoWay}"
@@ -87,8 +88,8 @@
                         <!-- Recommended Only Filter -->
                         <DockPanel Margin="0,0,0,12" LastChildFill="False">
                             <StackPanel DockPanel.Dock="Left">
-                                <TextBlock Text="Show Recommended Only by Default" FontWeight="SemiBold" FontSize="{StaticResource FontSizeBody}" Foreground="{DynamicResource TextPrimaryBrush}" />
-                                <TextBlock Text="Filter the tweaks catalog to display only safe, high-confidence recommendations."
+                                <TextBlock Text="{loc:Tr Settings_ShowRecommendedOnlyByDefault}" FontWeight="SemiBold" FontSize="{StaticResource FontSizeBody}" Foreground="{DynamicResource TextPrimaryBrush}" />
+                                <TextBlock Text="{loc:Tr Settings_FilterTheTweaksCatalogTo}"
                                            FontSize="{StaticResource FontSizeCaption}" Foreground="{DynamicResource TextMutedBrush}" />
                             </StackPanel>
                             <CheckBox DockPanel.Dock="Right" IsChecked="{Binding RecommendedOnly, Mode=TwoWay}"
@@ -99,8 +100,8 @@
                         <!-- Show Experimental Tweaks -->
                         <DockPanel LastChildFill="False">
                             <StackPanel DockPanel.Dock="Left">
-                                <TextBlock Text="Show Experimental Tweaks" FontWeight="SemiBold" FontSize="{StaticResource FontSizeBody}" Foreground="{DynamicResource TextPrimaryBrush}" />
-                                <TextBlock Text="Unlock experimental tweaks under development. Use with caution."
+                                <TextBlock Text="{loc:Tr Settings_ShowExperimentalTweaks}" FontWeight="SemiBold" FontSize="{StaticResource FontSizeBody}" Foreground="{DynamicResource TextPrimaryBrush}" />
+                                <TextBlock Text="{loc:Tr Settings_UnlockExperimentalTweaksUnderDevelopment}"
                                            FontSize="{StaticResource FontSizeCaption}" Foreground="{DynamicResource TextMutedBrush}" />
                             </StackPanel>
                             <CheckBox DockPanel.Dock="Right" IsChecked="{Binding ShowExperimental, Mode=TwoWay}"
@@ -114,17 +115,46 @@
                 <Border Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
                         BorderThickness="1" CornerRadius="8" Padding="16" Margin="0,0,0,16">
                     <StackPanel>
-                        <TextBlock Text="Interface &amp; Setup" FontSize="{StaticResource FontSizeSubtitle}" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,4" />
-                        <TextBlock Text="Appearance and first-run configuration."
+                        <TextBlock Text="{loc:Tr Settings_InterfaceSetup}" FontSize="{StaticResource FontSizeSubtitle}" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,4" />
+                        <TextBlock Text="{loc:Tr Settings_AppearanceAndFirstRunConfiguration}"
                                    FontSize="{StaticResource FontSizeCaption}" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,12" />
+
+                        <!-- Language -->
+                        <DockPanel Margin="0,0,0,12" LastChildFill="False">
+                            <StackPanel DockPanel.Dock="Left">
+                                <TextBlock Text="{loc:Tr Settings_Language}" FontWeight="SemiBold" FontSize="{StaticResource FontSizeBody}" Foreground="{DynamicResource TextPrimaryBrush}" />
+                                <TextBlock Text="{loc:Tr Settings_LanguageHint}"
+                                           FontSize="{StaticResource FontSizeCaption}" Foreground="{DynamicResource TextMutedBrush}" />
+                            </StackPanel>
+                            <ComboBox DockPanel.Dock="Right" MinWidth="160"
+                                      ItemsSource="{Binding Languages}"
+                                      SelectedItem="{Binding SelectedLanguage, Mode=TwoWay}"
+                                      DisplayMemberPath="DisplayName"
+                                      AutomationProperties.AutomationId="LanguageComboBox"
+                                      AutomationProperties.Name="Language selection" />
+                        </DockPanel>
+                        <Border Margin="0,0,0,12" Padding="12,8" CornerRadius="6"
+                                Background="{DynamicResource AccentSubtleBrush}"
+                                Visibility="{Binding IsLanguageRestartNeeded, Converter={StaticResource BoolToVisConverter}}">
+                            <DockPanel LastChildFill="True">
+                                <Button DockPanel.Dock="Right" Content="{loc:Tr Settings_RestartNow}"
+                                        Style="{DynamicResource ModernSecondaryBtn}"
+                                        Command="{Binding RestartToApplyLanguageCommand}"
+                                        AutomationProperties.AutomationId="RestartForLanguageButton"
+                                        AutomationProperties.Name="Restart to apply language"
+                                        Padding="12,6" Margin="12,0,0,0" FontSize="{StaticResource FontSizeCaption}" />
+                                <TextBlock Text="{loc:Tr Settings_LanguageRestartNotice}" TextWrapping="Wrap" VerticalAlignment="Center"
+                                           FontSize="{StaticResource FontSizeCaption}" Foreground="{DynamicResource TextPrimaryBrush}" />
+                            </DockPanel>
+                        </Border>
 
                         <DockPanel Margin="0,0,0,12" LastChildFill="False">
                             <StackPanel DockPanel.Dock="Left">
-                                <TextBlock Text="Theme" FontWeight="SemiBold" FontSize="{StaticResource FontSizeBody}" Foreground="{DynamicResource TextPrimaryBrush}" />
-                                <TextBlock Text="Toggle between dark and light themes."
+                                <TextBlock Text="{loc:Tr Settings_Theme}" FontWeight="SemiBold" FontSize="{StaticResource FontSizeBody}" Foreground="{DynamicResource TextPrimaryBrush}" />
+                                <TextBlock Text="{loc:Tr Settings_ToggleBetweenDarkAndLight}"
                                            FontSize="{StaticResource FontSizeCaption}" Foreground="{DynamicResource TextMutedBrush}" />
                             </StackPanel>
-                            <Button DockPanel.Dock="Right" Content="Toggle Dark / Light"
+                            <Button DockPanel.Dock="Right" Content="{loc:Tr Settings_ToggleDarkLight}"
                                     Style="{DynamicResource ModernSecondaryBtn}"
                                     Command="{Binding ToggleThemeCommand}"
                                     AutomationProperties.Name="Toggle theme button"
@@ -133,11 +163,11 @@
 
                         <DockPanel LastChildFill="False">
                             <StackPanel DockPanel.Dock="Left">
-                                <TextBlock Text="First-Run Setup Wizard" FontWeight="SemiBold" FontSize="{StaticResource FontSizeBody}" Foreground="{DynamicResource TextPrimaryBrush}" />
-                                <TextBlock Text="Re-launch the initial setup wizard to reconfigure restore points and mode."
+                                <TextBlock Text="{loc:Tr Settings_FirstRunSetupWizard}" FontWeight="SemiBold" FontSize="{StaticResource FontSizeBody}" Foreground="{DynamicResource TextPrimaryBrush}" />
+                                <TextBlock Text="{loc:Tr Settings_ReLaunchTheInitialSetup}"
                                            FontSize="{StaticResource FontSizeCaption}" Foreground="{DynamicResource TextMutedBrush}" />
                             </StackPanel>
-                            <Button DockPanel.Dock="Right" Content="Run Setup Wizard"
+                            <Button DockPanel.Dock="Right" Content="{loc:Tr Settings_RunSetupWizard}"
                                     Style="{DynamicResource ModernSecondaryBtn}"
                                     Command="{Binding OpenWizardCommand}"
                                     AutomationProperties.Name="Reopen setup wizard button"
@@ -150,14 +180,14 @@
                 <Border Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
                         BorderThickness="1" CornerRadius="8" Padding="16" Margin="0,0,0,16">
                     <StackPanel>
-                        <TextBlock Text="About WinVelo" FontSize="{StaticResource FontSizeSubtitle}" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,4" />
-                        <TextBlock Text="{Binding VersionDisplay, StringFormat='WinVelo {0} — An honest Windows utility'}"
+                        <TextBlock Text="{loc:Tr Main_AboutWinvelo}" FontSize="{StaticResource FontSizeSubtitle}" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,4" />
+                        <TextBlock Text="{Binding VersionDisplay, StringFormat={loc:Tr Settings_Winvelo0AnHonestWindows}}"
                                    FontWeight="SemiBold" FontSize="{StaticResource FontSizeBody}" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,4" />
-                        <TextBlock Text="{Binding OsDescription, StringFormat='Operating System: {0}'}"
+                        <TextBlock Text="{Binding OsDescription, StringFormat={loc:Tr Settings_OperatingSystem0}}"
                                    FontSize="{StaticResource FontSizeCaption}" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,8" />
-                        <TextBlock Text="WinVelo does not promise unverified performance gains or make hidden modifications. It transparently applies cataloged Windows settings with change previews, rollback journal tracking, and non-destructive reversal."
+                        <TextBlock Text="{loc:Tr Settings_WinveloDoesNotPromiseUnverified}"
                                    FontSize="{StaticResource FontSizeCaption}" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,0,0,8" />
-                        <TextBlock Text="Catalog derived from Chris Titus Tech WinUtil (MIT License)."
+                        <TextBlock Text="{loc:Tr Settings_CatalogDerivedFromChrisTitus}"
                                    FontSize="{StaticResource FontSizeCaption}" Foreground="{DynamicResource TextMutedBrush}" />
                     </StackPanel>
                 </Border>

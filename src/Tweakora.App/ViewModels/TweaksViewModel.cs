@@ -17,6 +17,7 @@ using Tweakora.Core.Safety;
 using Tweakora.Core.Utilities;
 using Tweakora.Modules.Tweaks;
 using Tweakora.Platform;
+using Tweakora.App.Localization;
 
 namespace Tweakora.App.ViewModels;
 
@@ -119,13 +120,13 @@ public sealed partial class TweakCardModel : ObservableObject
     {
         get
         {
-            if (IsApplying) return "Applying...";
+            if (IsApplying) return LocalizationManager.T("Applying...");
             return State switch
             {
-                TweakState.Applied => "Applied",
-                TweakState.Partial => "Partial",
-                TweakState.Unknown => "Can't verify",
-                _ => "Not applied"
+                TweakState.Applied => LocalizationManager.T("Applied"),
+                TweakState.Partial => LocalizationManager.T("Partial"),
+                TweakState.Unknown => LocalizationManager.T("Can't verify"),
+                _ => LocalizationManager.T("Not applied")
             };
         }
     }
@@ -336,8 +337,8 @@ public sealed partial class TweaksViewModel : ObservableObject
     private bool _isMultiSelectMode;
 
     public bool HasSelection => IsMultiSelectMode && SelectedCount > 0;
-    public string SelectionStatusText => $"{SelectedCount} selected — Review & apply";
-    public string MultiSelectButtonText => IsMultiSelectMode ? "Done Selecting" : "Select multiple";
+    public string SelectionStatusText => LocalizationManager.T("{0} selected — Review & apply", SelectedCount);
+    public string MultiSelectButtonText => IsMultiSelectMode ? LocalizationManager.T("Done Selecting") : LocalizationManager.T("Select multiple");
     public bool IsMultiSelectActive => IsMultiSelectMode;
 
     [RelayCommand]
@@ -381,7 +382,7 @@ public sealed partial class TweaksViewModel : ObservableObject
     private int _scanProgress;
 
     [ObservableProperty]
-    private string _scanStatusText = "Ready";
+    private string _scanStatusText = LocalizationManager.T("Ready");
 
     [ObservableProperty]
     private bool _isBusy;
@@ -396,7 +397,7 @@ public sealed partial class TweaksViewModel : ObservableObject
     private double _executionProgress;
 
     [ObservableProperty]
-    private string _statusMessage = "Select tweaks or choose a preset to begin.";
+    private string _statusMessage = LocalizationManager.T("Select tweaks or choose a preset to begin.");
 
     [ObservableProperty]
     private bool _hasFailedDetails;
@@ -405,7 +406,7 @@ public sealed partial class TweaksViewModel : ObservableObject
     private bool _isDetailsDialogOpen;
 
     [ObservableProperty]
-    private string _detailsDialogTitle = "Execution Details";
+    private string _detailsDialogTitle = LocalizationManager.T("Execution Details");
 
     public ObservableCollection<OperationItemResult> ExecutionDetailsItems { get; } = new();
 
@@ -428,7 +429,7 @@ public sealed partial class TweaksViewModel : ObservableObject
     private bool _isIrreversibleDialogOpen;
 
     [ObservableProperty]
-    private string _irreversibleDialogTitle = "Irreversible Action Warning";
+    private string _irreversibleDialogTitle = LocalizationManager.T("Irreversible Action Warning");
 
     public ObservableCollection<IrreversibleItemModel> IrreversibleWarningItems { get; } = new();
 
@@ -460,13 +461,13 @@ public sealed partial class TweaksViewModel : ObservableObject
             {
                 Id = t.Id,
                 Name = t.Name,
-                Reason = t.IrreversibleReason ?? "Permanent system modification."
+                Reason = t.IrreversibleReason ?? LocalizationManager.T("Permanent system modification.")
             });
         }
 
         IrreversibleDialogTitle = irreversible.Count == 1
-            ? $"Irreversible Action — {irreversible[0].Name}"
-            : $"Irreversible Actions Warning ({irreversible.Count} tweaks)";
+            ? LocalizationManager.T("Irreversible Action — {0}", irreversible[0].Name)
+            : LocalizationManager.T("Irreversible Actions Warning ({0} tweaks)", irreversible.Count);
 
         _irreversibleConfirmTcs = new TaskCompletionSource<bool>();
         IsIrreversibleDialogOpen = true;
@@ -604,7 +605,7 @@ public sealed partial class TweaksViewModel : ObservableObject
     {
         IsScanning = true;
         ScanProgress = 0;
-        ScanStatusText = "Scanning system tweaks...";
+        ScanStatusText = LocalizationManager.T("Scanning system tweaks...");
 
         await Task.Yield();
         int count = _allTweaks.Count;
@@ -637,7 +638,7 @@ public sealed partial class TweaksViewModel : ObservableObject
                     Application.Current?.Dispatcher?.InvokeAsync(() =>
                     {
                         ScanProgress = pct;
-                        ScanStatusText = $"Scanning ({currentIdx}/{count}): {card.Title}";
+                        ScanStatusText = LocalizationManager.T("Scanning ({0}/{1}): {2}", currentIdx, count, card.Title);
                         AppliedCount = _allTweaks.Count(t => t.IsActive);
                     });
                 }
@@ -649,7 +650,7 @@ public sealed partial class TweaksViewModel : ObservableObject
             IsScanning = false;
             ScanProgress = 100;
             AppliedCount = _allTweaks.Count(t => t.IsActive);
-            ScanStatusText = $"Scan complete. {AppliedCount} applied on system.";
+            ScanStatusText = LocalizationManager.T("Scan complete. {0} applied on system.", AppliedCount);
             AddLog("OK", $"System state detection finished. Currently applied: {AppliedCount}/{count} tweaks.");
         });
     }
@@ -678,7 +679,7 @@ public sealed partial class TweaksViewModel : ObservableObject
     private string _toastMessage = string.Empty;
 
     [ObservableProperty]
-    private string _toastActionText = "Undo";
+    private string _toastActionText = LocalizationManager.T("Undo");
 
     private TweakCardModel? _lastAppliedToastCard;
     private System.Windows.Threading.DispatcherTimer? _toastDismissTimer;
@@ -820,12 +821,12 @@ public sealed partial class TweaksViewModel : ObservableObject
         {
             if (_executionDialog != null)
             {
-                string verb = targetState ? "Apply" : "Revert";
+                string verb = targetState ? LocalizationManager.T("Apply") : LocalizationManager.T("Revert");
                 await _executionDialog.OpenPreviewAsync(
-                    title: $"{verb} Tweak — {card.Title}",
-                    description: $"Review the system impact of {card.Title} before applying.",
-                    notice: "Medium and High risk modifications require explicit review and confirmation before execution.",
-                    confirmText: $"{verb} Tweak",
+                    title: LocalizationManager.T("{0} Tweak — {1}", verb, card.Title),
+                    description: LocalizationManager.T("Review the system impact of {0} before applying.", card.Title),
+                    notice: LocalizationManager.T("Medium and High risk modifications require explicit review and confirmation before execution."),
+                    confirmText: LocalizationManager.T("{0} Tweak", verb),
                     tweaks: new[] { card.Tweak },
                     isUndo: !targetState,
                     onConfirmed: async (selected) =>
@@ -906,7 +907,7 @@ public sealed partial class TweaksViewModel : ObservableObject
             if (opSucceeded)
             {
                 AddLog("OK", $"Successfully {(actualState == TweakState.Applied ? "applied" : "reverted")}: {card.Title}");
-                ShowApplyToast(card, actualState == TweakState.Applied ? "Applied — Undo" : "Reverted — Undo");
+                ShowApplyToast(card, actualState == TweakState.Applied ? LocalizationManager.T("Applied — Undo") : LocalizationManager.T("Reverted — Undo"));
             }
             else
             {
@@ -1020,7 +1021,7 @@ public sealed partial class TweaksViewModel : ObservableObject
                 card.IsSelected = card.IsActive;
             }
             UpdateCounts();
-            StatusMessage = $"Selected {SelectedCount} currently applied tweaks.";
+            StatusMessage = LocalizationManager.T("Selected {0} currently applied tweaks.", SelectedCount);
             AddLog("INFO", $"Selected all currently applied tweaks ({SelectedCount} total).");
             return;
         }
@@ -1037,7 +1038,7 @@ public sealed partial class TweaksViewModel : ObservableObject
         if (!_presets.TryGetValue(mappedKey, out var presetKeys) &&
             !_presets.TryGetValue(presetName, out presetKeys))
         {
-            StatusMessage = $"Preset '{presetName}' not found.";
+            StatusMessage = LocalizationManager.T("Preset '{0}' not found.", presetName);
             return;
         }
 
@@ -1060,7 +1061,7 @@ public sealed partial class TweaksViewModel : ObservableObject
         }
 
         UpdateCounts();
-        StatusMessage = $"Preset '{presetName}' loaded ({matched} tweaks selected).";
+        StatusMessage = LocalizationManager.T("Preset '{0}' loaded ({1} tweaks selected).", presetName, matched);
         AddLog("INFO", $"Applied preset '{presetName}' ({matched} tweaks selected).");
     }
 
@@ -1072,7 +1073,7 @@ public sealed partial class TweaksViewModel : ObservableObject
             card.IsSelected = false;
         }
         UpdateCounts();
-        StatusMessage = "Selection cleared.";
+        StatusMessage = LocalizationManager.T("Selection cleared.");
         AddLog("INFO", "Cleared all selected tweaks.");
     }
 
@@ -1082,13 +1083,13 @@ public sealed partial class TweaksViewModel : ObservableObject
         var selected = _allTweaks.Where(t => t.IsSelected).ToList();
         if (selected.Count == 0)
         {
-            StatusMessage = "No tweaks selected to apply.";
+            StatusMessage = LocalizationManager.T("No tweaks selected to apply.");
             return;
         }
 
         if (!IsDryRun && !AppAdminGuard.EnsureAdmin("apply system tweaks"))
         {
-            StatusMessage = "Administrator privileges required to apply tweaks.";
+            StatusMessage = LocalizationManager.T("Administrator privileges required to apply tweaks.");
             AddLog("ERR", "Cannot apply tweaks: Administrator privileges are required.");
             return;
         }
@@ -1097,10 +1098,10 @@ public sealed partial class TweaksViewModel : ObservableObject
         {
             var tweakDefs = selected.Select(c => c.Tweak).ToList();
             await _executionDialog.OpenPreviewAsync(
-                title: "Review & Apply Selected Tweaks",
-                description: $"Review {selected.Count} tweak(s) before applying changes to the system.",
-                notice: "Review the planned modifications below. You can uncheck individual items before confirming.",
-                confirmText: "Apply Selected",
+                title: LocalizationManager.T("Review & Apply Selected Tweaks"),
+                description: LocalizationManager.T("Review {0} tweak(s) before applying changes to the system.", selected.Count),
+                notice: LocalizationManager.T("Review the planned modifications below. You can uncheck individual items before confirming."),
+                confirmText: LocalizationManager.T("Apply Selected"),
                 tweaks: tweakDefs,
                 isUndo: false,
                 onConfirmed: async (confirmedTweaks) =>
@@ -1147,14 +1148,14 @@ public sealed partial class TweaksViewModel : ObservableObject
         var selected = _allTweaks.Where(t => t.IsSelected).ToList();
         if (selected.Count == 0)
         {
-            StatusMessage = "No tweaks selected. Select tweaks or choose a preset first.";
+            StatusMessage = LocalizationManager.T("No tweaks selected. Select tweaks or choose a preset first.");
             AddLog("WARN", "Apply requested but no tweaks were selected.");
             return;
         }
 
         if (!IsDryRun && !AppAdminGuard.EnsureAdmin("apply system tweaks"))
         {
-            StatusMessage = "Administrator privileges required to apply tweaks.";
+            StatusMessage = LocalizationManager.T("Administrator privileges required to apply tweaks.");
             AddLog("ERR", "Cannot apply tweaks: Administrator privileges are required.");
             return;
         }
@@ -1166,7 +1167,7 @@ public sealed partial class TweaksViewModel : ObservableObject
             bool confirmed = await RequestIrreversibleConfirmationAsync(irreversible);
             if (!confirmed)
             {
-                StatusMessage = "Cancelled application of irreversible tweaks.";
+                StatusMessage = LocalizationManager.T("Cancelled application of irreversible tweaks.");
                 AddLog("INFO", "Cancelled application of irreversible tweaks.");
                 return;
             }
@@ -1194,7 +1195,7 @@ public sealed partial class TweaksViewModel : ObservableObject
                     AddLog("SKIP", $"[DRY-RUN] Would apply: {tweak.Title} ({tweak.Id})");
                     ExecutionProgress = ((i + 1) / (double)selected.Count) * 100;
                 }
-                StatusMessage = $"Dry-run completed for {selected.Count} tweak(s). No changes made.";
+                StatusMessage = LocalizationManager.T("Dry-run completed for {0} tweak(s). No changes made.", selected.Count);
                 AddLog("OK", "Dry-run simulation completed successfully.");
                 return;
             }
@@ -1237,22 +1238,22 @@ public sealed partial class TweaksViewModel : ObservableObject
 
             if (report.FailedCount > 0)
             {
-                StatusMessage = $"Applied {report.SucceededCount} of {report.TotalRequested} — {report.FailedCount} failed (details)";
+                StatusMessage = LocalizationManager.T("Applied {0} of {1} — {2} failed (details)", report.SucceededCount, report.TotalRequested, report.FailedCount);
                 HasFailedDetails = true;
-                DetailsDialogTitle = "Execution Details — Apply Tweaks";
+                DetailsDialogTitle = LocalizationManager.T("Execution Details — Apply Tweaks");
                 ExecutionDetailsItems.Clear();
                 foreach (var f in report.Results.Where(r => r.IsFailure)) ExecutionDetailsItems.Add(f);
                 IsLogDrawerOpen = true;
             }
             else if (report.SkippedCount > 0)
             {
-                StatusMessage = $"Applied {report.SucceededCount} of {report.TotalRequested} ({report.SkippedCount} skipped).";
+                StatusMessage = LocalizationManager.T("Applied {0} of {1} ({2} skipped).", report.SucceededCount, report.TotalRequested, report.SkippedCount);
                 HasFailedDetails = false;
                 ExecutionDetailsItems.Clear();
             }
             else
             {
-                StatusMessage = $"Applied all {report.SucceededCount} tweak(s) successfully.";
+                StatusMessage = LocalizationManager.T("Applied all {0} tweak(s) successfully.", report.SucceededCount);
                 HasFailedDetails = false;
                 ExecutionDetailsItems.Clear();
             }
@@ -1260,7 +1261,7 @@ public sealed partial class TweaksViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Error during execution: {ex.Message}";
+            StatusMessage = LocalizationManager.T("Error during execution: {0}", ex.Message);
             AddLog("ERR", $"Unhandled execution failure: {ex.Message}");
         }
         finally
@@ -1280,14 +1281,14 @@ public sealed partial class TweaksViewModel : ObservableObject
         var selected = _allTweaks.Where(t => t.IsSelected).ToList();
         if (selected.Count == 0)
         {
-            StatusMessage = "No tweaks selected to undo.";
+            StatusMessage = LocalizationManager.T("No tweaks selected to undo.");
             AddLog("WARN", "Undo requested but no tweaks were selected.");
             return;
         }
 
         if (!IsDryRun && !AppAdminGuard.EnsureAdmin("undo system tweaks"))
         {
-            StatusMessage = "Administrator privileges required to undo tweaks.";
+            StatusMessage = LocalizationManager.T("Administrator privileges required to undo tweaks.");
             AddLog("ERR", "Cannot undo tweaks: Administrator privileges are required.");
             return;
         }
@@ -1314,7 +1315,7 @@ public sealed partial class TweaksViewModel : ObservableObject
                     AddLog("SKIP", $"[DRY-RUN] Would revert: {tweak.Title} ({tweak.Id})");
                     ExecutionProgress = ((i + 1) / (double)selected.Count) * 100;
                 }
-                StatusMessage = $"Dry-run undo completed for {selected.Count} tweak(s).";
+                StatusMessage = LocalizationManager.T("Dry-run undo completed for {0} tweak(s).", selected.Count);
                 AddLog("OK", "Dry-run undo simulation completed successfully.");
                 return;
             }
@@ -1347,16 +1348,16 @@ public sealed partial class TweaksViewModel : ObservableObject
 
             if (report.FailedCount > 0)
             {
-                StatusMessage = $"Restored {report.SucceededCount} of {report.TotalRequested} — {report.FailedCount} failed (details)";
+                StatusMessage = LocalizationManager.T("Restored {0} of {1} — {2} failed (details)", report.SucceededCount, report.TotalRequested, report.FailedCount);
                 HasFailedDetails = true;
-                DetailsDialogTitle = "Execution Details — Revert Tweaks";
+                DetailsDialogTitle = LocalizationManager.T("Execution Details — Revert Tweaks");
                 ExecutionDetailsItems.Clear();
                 foreach (var f in report.Results.Where(r => r.IsFailure)) ExecutionDetailsItems.Add(f);
                 IsLogDrawerOpen = true;
             }
             else
             {
-                StatusMessage = $"Restored all {report.SucceededCount} tweak(s) successfully.";
+                StatusMessage = LocalizationManager.T("Restored all {0} tweak(s) successfully.", report.SucceededCount);
                 HasFailedDetails = false;
                 ExecutionDetailsItems.Clear();
             }
@@ -1364,7 +1365,7 @@ public sealed partial class TweaksViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Error during revert: {ex.Message}";
+            StatusMessage = LocalizationManager.T("Error during revert: {0}", ex.Message);
             AddLog("ERR", $"Unhandled undo failure: {ex.Message}");
         }
         finally
@@ -1390,7 +1391,7 @@ public sealed partial class TweaksViewModel : ObservableObject
     {
         if (!AppAdminGuard.EnsureAdmin("create a system restore point"))
         {
-            StatusMessage = "Administrator privileges required to create a System Restore point.";
+            StatusMessage = LocalizationManager.T("Administrator privileges required to create a System Restore point.");
             AddLog("ERR", "Cannot create restore point: Administrator privileges required.");
             return;
         }
@@ -1406,13 +1407,13 @@ public sealed partial class TweaksViewModel : ObservableObject
             if (res.Success)
             {
                 AddLog("OK", "System Restore Point created successfully.");
-                StatusMessage = "System Restore Point created successfully.";
+                StatusMessage = LocalizationManager.T("System Restore Point created successfully.");
             }
             else
             {
                 string msg = res.WasThrottledOrSkipped
-                    ? "Windows restricted creation (24-hour rate limit). Registry backup snapshot was preserved."
-                    : (res.ErrorMessage ?? "Could not create restore point (check if System Protection is enabled).");
+                    ? LocalizationManager.T("Windows restricted creation (24-hour rate limit). Registry backup snapshot was preserved.")
+                    : (res.ErrorMessage ?? LocalizationManager.T("Could not create restore point (check if System Protection is enabled)."));
                 AddLog("WARN", msg);
                 StatusMessage = msg;
             }
@@ -1441,7 +1442,7 @@ public sealed partial class TweaksViewModel : ObservableObject
         var selected = _allTweaks.Where(t => t.IsSelected).ToList();
         if (selected.Count == 0)
         {
-            StatusMessage = "No tweaks currently selected to preview.";
+            StatusMessage = LocalizationManager.T("No tweaks currently selected to preview.");
             return;
         }
 

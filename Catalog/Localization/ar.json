@@ -1,0 +1,985 @@
+{
+  "_comment": "Arabic display text for the catalog. Only names and descriptions are translated; ids, risks and actions come from Catalog/Tweaks. Missing entries fall back to English.",
+  "tweaks": {
+    "advanced.bravedebloat": {
+      "name": "متصفح Brave - إزالة الإضافات غير الضرورية",
+      "description": "يعطّل عدة مزايا مزعجة مثل Brave Rewards وLeo AI وCrypto Wallet وVPN.",
+      "whatItDoes": "يوقف ويزيل خدمات القياس عن بُعد والتحديث والمهام المجدولة التي يشغّلها متصفح Brave في الخلفية.",
+      "sideEffects": "ستتوقف التحديثات التلقائية لمتصفح Brave في الخلفية وإشعاراته الترويجية."
+    },
+    "advanced.disablebgapps": {
+      "name": "تطبيقات الخلفية - تعطيل",
+      "description": "يمنع جميع تطبيقات Microsoft Store من العمل في الخلفية، وهو أمر يجب فعله لكل تطبيق على حدة منذ Windows 11.",
+      "whatItDoes": "يضبط GlobalUserDisabled على 1 ضمن BackgroundAccessApplications، فيمنع تشغيل تطبيقات Store وUWP في الخلفية.",
+      "sideEffects": "يمنع تطبيقات Windows Store وUWP من العمل أو التحديث في الخلفية عند تصغيرها."
+    },
+    "advanced.disablebitlocker": {
+      "name": "BitLocker - تعطيل",
+      "description": "يعطّل BitLocker.",
+      "whatItDoes": "يفك تشفير BitLocker ويعطّله على جميع وحدات تخزين النظام المكتشفة.",
+      "sideEffects": "يفك تشفير وحدات التخزين بالكامل، فتزول حماية البيانات من الوصول المادي غير المتصل أو السرقة.",
+      "warnings": "تعطيل BitLocker يزيل تشفير القرص ويترك بيانات المحرك دون أي حماية من الوصول المادي غير المصرّح به."
+    },
+    "advanced.disableipv6": {
+      "name": "IPv6 - تعطيل",
+      "description": "يعطّل IPv6.",
+      "whatItDoes": "يعطّل حزمة بروتوكول IPv6 على جميع واجهات الشبكة النشطة.",
+      "sideEffects": "يمنع الاتصال عبر IPv6 تمامًا؛ وقد يقطع الاتصال بخدمات IPv6 الحديثة وشبكات VPN الخاصة بالشركات والشبكات المنزلية.",
+      "warnings": "يعطّل IPv6 على جميع محوّلات الشبكة. قد تفقد بعض الشبكات والخدمات الحديثة التي تتطلب IPv6 الاتصال."
+    },
+    "advanced.disablenotifications": {
+      "name": "إشعارات علبة النظام والتقويم - تعطيل",
+      "description": "يعطّل جميع الإشعارات بما فيها التقويم.",
+      "whatItDoes": "يعطّل منصة إشعارات Windows وتنبيهات Action Center بالكامل عبر سياسات النظام.",
+      "sideEffects": "ستُحجب جميع إشعارات التطبيقات وتنبيهات أمان النظام ولافتات Action Center."
+    },
+    "advanced.disablewarningforunsignedrdp": {
+      "name": "تحذيرات ملفات RDP غير الموقّعة - تعطيل",
+      "description": "يعطّل التحذيرات التي تظهر عند تشغيل ملفات RDP غير موقّعة، والتي أُضيفت في أحدث تحديثات Windows 10 و11.",
+      "whatItDoes": "يضبط RedirectionWarningDialogVersion على 1 في سياسات عميل Terminal Services ضمن HKLM، وRdpLaunchConsentAccepted على 1 في إعدادات Terminal Server Client ضمن HKCU.",
+      "sideEffects": "يخفي نوافذ التحذير الأمني عند الاتصال بأجهزة سطح المكتب البعيد غير الموثوقة أو ذات الشهادات الموقّعة ذاتيًا."
+    },
+    "advanced.display": {
+      "name": "المؤثرات المرئية - ضبط لأفضل أداء",
+      "description": "يضبط تفضيلات النظام على الأداء. يمكنك فعل ذلك يدويًا أيضًا عبر sysdm.cpl.",
+      "whatItDoes": "يعدّل آلية اكتشاف انتهاء مهلة برنامج تشغيل الرسوميات واسترداده (TdrLevel وTdrDelay) في برامج تشغيل رسوميات النظام.",
+      "sideEffects": "يغيّر مهلات استرداد برنامج تشغيل الشاشة؛ وقد يؤدي تعطّل برنامج التشغيل إلى تجميد النظام بالكامل بدلًا من استرداده تلقائيًا."
+    },
+    "advanced.edgedebloat": {
+      "name": "Microsoft Edge - إزالة الإضافات غير الضرورية",
+      "description": "يعطّل عدة خيارات للقياس عن بُعد والنوافذ المنبثقة وغيرها من المزعجات في Edge.",
+      "whatItDoes": "يعطّل خدمات الخلفية ومهام بدء التشغيل والقياس عن بُعد الترويجي المرتبطة بـ Microsoft Edge.",
+      "sideEffects": "يعطّل التحديثات التلقائية لـ Edge في الخلفية، وقد يؤثر على أدوات النظام المصغّرة التي تعتمد على WebView2."
+    },
+    "advanced.ipv46": {
+      "name": "IPv6 - تفضيل IPv4",
+      "description": "قد يحقق تفضيل IPv4 فوائد في زمن الاستجابة والأمان على الشبكات الخاصة التي لم يُضبط فيها IPv6.",
+      "whatItDoes": "يضبط IPv4 كبروتوكول مفضّل على IPv6 في جدول سياسات البادئات لـ TCP/IP في Windows.",
+      "sideEffects": "يغيّر تفضيل توجيه الشبكة؛ وقد يقطع الاتصال على الشبكات الحديثة التي تعمل بـ IPv6 فقط أو نقاط الاتصال الخلوية."
+    },
+    "advanced.logiblock": {
+      "name": "التثبيت التلقائي لـ Logitech Download Assistant - تعطيل",
+      "description": "يمنع Logi Download Assistant الذي يعيد Windows Update تثبيته باستمرار مع برامج تشغيل أجهزة Logitech. تبقى أجهزة Logitech تعمل بدونه.",
+      "whatItDoes": "يمنع مطالبات التثبيت التلقائي لـ Logitech G-Hub وOptions عند توصيل الملحقات.",
+      "sideEffects": "لن تُثبَّت برامج إدارة الماوس ولوحة المفاتيح من Logitech تلقائيًا عند توصيل الجهاز."
+    },
+    "advanced.razerblock": {
+      "name": "التثبيت التلقائي لبرامج Razer - تعطيل",
+      "description": "يمنع جميع عمليات تثبيت برامج Razer. يعمل العتاد بشكل طبيعي دون أي برامج.",
+      "whatItDoes": "يمنع مطالبات التثبيت التلقائي لـ Razer Synapse عند توصيل العتاد، عبر سياسات برامج النظام.",
+      "sideEffects": "يجب تنزيل برامج إعداد ملحقات Razer وضبط إضاءة RGB وتثبيتها يدويًا من موقع الشركة المصنّعة."
+    },
+    "advanced.removeedge": {
+      "name": "Microsoft Edge - إزالة",
+      "description": "يزيل Microsoft Edge بإنشاء ملف MicrosoftEdge.exe وهمي في مجلد Edge القديم. هذا يدفع Windows إلى إتاحة أداة إلغاء التثبيت الرسمية لـ Edge، مما يسمح بإزالته على مستوى النظام.",
+      "whatItDoes": "يزيل Microsoft Edge باستخدام winget وسكربتات إزالة الحزم.",
+      "sideEffects": "يُزال متصفح Microsoft Edge نهائيًا؛ وقد تفشل ميزات النظام التي تعتمد على Edge أو على WebView المضمّنة في فتح الروابط الخارجية. لا يمكن التراجع عنه.",
+      "warnings": "يزيل Microsoft Edge من النظام. قد تتأثر بعض مكونات Windows أو الأدوات المصغّرة أو نوافذ المصادقة عبر الويب. التراجع يعيد تثبيت Edge عبر WinGet، لكنه لا يستعيد بيانات ملفات تعريف المستخدم المحذوفة أو سجل التصفح.",
+      "irreversibleReason": "يزيل ملفات نظام Microsoft Edge ويحذف ملفات تعريف المستخدم؛ التراجع يعيد تثبيت Edge فارغًا عبر winget، لكنه لا يستعيد السجل أو ملفات تعريف الارتباط أو بيانات ملفات التعريف المحذوفة."
+    },
+    "advanced.removehomeandgallery": {
+      "name": "الصفحة الرئيسية والمعرض في مستكشف الملفات - تعطيل",
+      "description": "يزيل Home وGallery من المستكشف ويعيّن This PC كصفحة افتراضية.",
+      "whatItDoes": "يخفي عقدتي Home وGallery من جزء التنقل في مستكشف الملفات.",
+      "sideEffects": "لا توجد آثار معروفة."
+    },
+    "advanced.removeonedrive": {
+      "name": "Microsoft OneDrive - إزالة",
+      "description": "يمنع إذن حذف ملفات OneDrive الخاصة بالمستخدم، ثم يستخدم أداة إلغاء التثبيت الخاصة به لإزالته، ويعيد الإذن الأصلي بعد ذلك.",
+      "whatItDoes": "ينهي عمليات OneDrive ويزيل عميل Microsoft OneDrive من النظام.",
+      "sideEffects": "يزيل مزامنة الملفات عبر OneDrive وتكامله مع مستكشف الملفات؛ ولن يمكن الوصول إلى الملفات المخزّنة في السحابة فقط.",
+      "warnings": "يزيل OneDrive بالكامل ويوقف مزامنة الملفات. تأكد من نسخ جميع مستنداتك السحابية احتياطيًا على الجهاز. التراجع يعيد تثبيت OneDrive عبر WinGet، لكنه لا يستعيد الملفات غير المتزامنة أو حالة المزامنة المخزّنة مؤقتًا.",
+      "irreversibleReason": "يزيل عميل Microsoft OneDrive ويوقف المزامنة؛ التراجع يعيد تثبيت OneDrive عبر winget ويستعيد سياسات المزامنة، لكنه لا يستعيد التغييرات المحلية غير المتزامنة أو ذاكرة الملفات دون اتصال."
+    },
+    "advanced.reservedstorage": {
+      "name": "تعطيل التخزين المحجوز",
+      "description": "يعطّل التخزين المحجوز في Windows (7-10 GB مخصّصة للتحديثات والملفات المؤقتة). يُنصح به فقط على الأقراص الصغيرة. أعد تفعيله قبل تحديثات ميزات Windows الكبرى لتجنّب فشل التثبيت.",
+      "whatItDoes": "يعطّل التخزين المحجوز في Windows (7GB محجوزة لتجهيز Windows Update) باستخدام fsutil.",
+      "sideEffects": "قد يفشل Windows Update أثناء تحديثات الميزات الكبرى إذا انخفضت المساحة الحرة على قرص التخزين الرئيسي."
+    },
+    "advanced.teredo": {
+      "name": "Teredo - تعطيل",
+      "description": "نفق Teredo ميزة في IPv6 قد تسبب زيادة في زمن الاستجابة، لكن تعطيلها قد يسبب مشاكل مع بعض الألعاب.",
+      "whatItDoes": "يعطّل بروتوكول النفق الانتقالي Teredo في حزمة الشبكة.",
+      "sideEffects": "يعطّل نفق IPv6 عبر IPv4؛ وقد تفشل الألعاب الجماعية القديمة أو خدمات Xbox Live التي تتطلب اجتياز NAT عبر Teredo في الاتصال."
+    },
+    "advanced.utc": {
+      "name": "التاريخ والوقت - ضبط الوقت على UTC",
+      "description": "ضروري للأجهزة التي تعمل بنظامي تشغيل مزدوجين. يصلح مزامنة الوقت مع أنظمة Linux.",
+      "whatItDoes": "يضبط RealTimeIsUniversal على 1 في معلمات النظام ضمن HKLM، فتُضبط ساعة RTC الخاصة بالعتاد على UTC.",
+      "sideEffects": "يضبط ساعة العتاد في Windows على UTC (مثالي للإقلاع المزدوج مع Linux)؛ وقد يظهر الوقت المحلي بشكل خاطئ إذا كانت المنطقة الزمنية مضبوطة بشكل خاطئ في البرنامج الثابت."
+    },
+    "advanced.windowsai": {
+      "name": "Windows AI - تعطيل وإزالة",
+      "description": "يزيل جميع ميزات وحزم الذكاء الاصطناعي ويعطّلها",
+      "whatItDoes": "يعطّل ميزتي Windows Copilot وRecall على مستوى الجهاز عبر مفاتيح الريجستري الخاصة بـ Group Policy.",
+      "sideEffects": "لن يتوفر زر Copilot في شريط المهام ولا الشريط الجانبي لـ Copilot ولا ميزات Windows المدعومة بالذكاء الاصطناعي.",
+      "warnings": "يزيل حزم Windows AI وRecall وCopilot ويعطّلها على مستوى النظام. التراجع يستعيد سياسات الريجستري فقط؛ ولا يعيد تثبيت حزم AppX وميزات Windows المحذوفة.",
+      "irreversibleReason": "يزيل نهائيًا حزم Windows Copilot وRecall وحزم Appx الخاصة بالذكاء الاصطناعي؛ التراجع يعيد مفاتيح السياسات في الريجستري فقط ولا يعيد تثبيت حزم Appx أو ميزات النظام المحذوفة."
+    },
+    "ai.clicktodo.disable": {
+      "name": "Click to Do - تعطيل",
+      "description": "يوقف Click to Do، وهي طبقة الذكاء الاصطناعي التي تقترح إجراءات للنصوص والصور على الشاشة.",
+      "whatItDoes": "يضبط سياسة Windows AI ‏DisableClickToDo لجعل مكوّن Click to Do ونقاط الوصول إليه غير متاحة.",
+      "sideEffects": "لم يعد Click to Do يفتح من اختصاره أو من Snipping Tool. يؤثر فقط على أجهزة Copilot+ التي تتضمن الميزة.",
+      "warnings": "ستعرض إعدادات Windows الرسالة 'Some settings are managed by your organization'. هذا طبيعي عند ضبط مفاتيح الريجستري الخاصة بـ Group Policy."
+    },
+    "ai.copilot.disable-policy": {
+      "name": "تعطيل Windows Copilot بالكامل",
+      "description": "يوقف مساعد Windows Copilot على مستوى النظام عبر سياسة.",
+      "whatItDoes": "يعطّل Windows Copilot بالكامل عبر مفاتيح الريجستري الخاصة بـ Group Policy.",
+      "sideEffects": "يُعطَّل الشريط الجانبي لـ Copilot واختصار لوحة المفاتيح (Win+C) تمامًا."
+    },
+    "ai.copilot.disable-taskbar-button": {
+      "name": "إخفاء زر Copilot في شريط المهام",
+      "description": "يخفي زر Copilot من شريط مهام Windows 11.",
+      "whatItDoes": "يخفي زر Copilot من شريط مهام Windows.",
+      "sideEffects": "يزيل أيقونة الوصول السريع إلى Copilot من شريط المهام."
+    },
+    "ai.notepad.disable-ai-features": {
+      "name": "ميزات الذكاء الاصطناعي في Notepad - تعطيل",
+      "description": "يوقف ميزات Copilot وإعادة الصياغة والتلخيص في Notepad.",
+      "whatItDoes": "يضبط سياسة Notepad ‏DisableAIFeatures لإزالة أدوات الكتابة بالذكاء الاصطناعي من Notepad.",
+      "sideEffects": "يستمر Notepad في العمل كمحرر نصوص عادي بدون قائمة الذكاء الاصطناعي. أعد فتح Notepad لرؤية التغيير."
+    },
+    "ai.paint.disable-ai-features": {
+      "name": "ميزات الذكاء الاصطناعي في Paint - تعطيل",
+      "description": "يوقف Cocreator وGenerative Fill وImage Creator في تطبيق Paint.",
+      "whatItDoes": "يضبط سياسات Paint ‏DisableCocreator وDisableGenerativeFill وDisableImageCreator لإزالة أدوات الذكاء الاصطناعي هذه من Paint.",
+      "sideEffects": "تختفي أزرار الذكاء الاصطناعي من Paint بعد إعادة فتحه. يبقى الرسم والتحرير العاديان كما هما."
+    },
+    "ai.recall.disable-availability": {
+      "name": "ميزة Recall - جعلها غير متاحة",
+      "description": "يمنع تشغيل Recall، فلا يحفظ Windows لقطات من شاشتك.",
+      "whatItDoes": "يضبط سياسة Windows AI ‏AllowRecallEnablement حتى لا يتمكن المستخدمون من تمكين مكوّن Recall الاختياري على هذا الجهاز.",
+      "sideEffects": "يصبح Recall ولقطاته المحفوظة غير متاحة بعد إعادة التشغيل. لاستخدام Recall مجدداً، تراجع عن التعديل وأعد التشغيل.",
+      "warnings": "ستعرض إعدادات Windows الرسالة 'Some settings are managed by your organization'. هذا طبيعي عند ضبط مفاتيح الريجستري الخاصة بـ Group Policy."
+    },
+    "ai.recall.disable-snapshots": {
+      "name": "تعطيل لقطات Windows Recall",
+      "description": "يمنع Windows من حفظ لقطات لنشاط الشاشة لصالح Recall.",
+      "whatItDoes": "يعطّل الالتقاط التلقائي للقطات الشاشة وفهرستها في Windows Recall.",
+      "sideEffects": "لن يلتقط Windows لقطات لنشاط سطح المكتب أو يفهرسها."
+    },
+    "ai.search.disable-bing-web-search": {
+      "name": "تعطيل بحث Bing على الويب في قائمة ابدأ",
+      "description": "يقصر البحث في قائمة ابدأ على الملفات والإعدادات والتطبيقات المحلية دون الاستعلام من Bing.",
+      "whatItDoes": "يعطّل اقتراحات بحث Bing على الويب في عمليات البحث من قائمة ابدأ.",
+      "sideEffects": "سيعرض مربع البحث البرامج والملفات المحلية فقط."
+    },
+    "apps.edge.disable-background-mode": {
+      "name": "تطبيقات الخلفية في Microsoft Edge - تعطيل",
+      "description": "يمنع Edge من الاستمرار في العمل بعد إغلاق جميع نوافذه.",
+      "whatItDoes": "يضبط سياسة Edge ‏BackgroundModeEnabled حتى يُغلق Edge بالكامل عند إغلاق آخر نافذة له.",
+      "sideEffects": "تتوقف إضافات Edge وتطبيقات الويب عن العمل أثناء إغلاق Edge، فتتوقف إشعاراتها مؤقتاً. يُظهر Edge أنه مُدار من قِبل مؤسستك.",
+      "warnings": "سيعرض Edge الرسالة 'Your browser is managed by your organization' في قائمته وإعداداته. هذا طبيعي عند ضبط سياسات Edge."
+    },
+    "apps.edge.disable-sidebar": {
+      "name": "الشريط الجانبي في Microsoft Edge - تعطيل",
+      "description": "يزيل الشريط الجانبي في Edge، بما في ذلك زر Copilot ولوحة التطبيقات.",
+      "whatItDoes": "يضبط سياسة Edge ‏HubsSidebarEnabled حتى لا يظهر الشريط الجانبي أبداً في Microsoft Edge.",
+      "sideEffects": "يختفي الشريط الجانبي وإدخال Copilot منه في Edge. يُظهر Edge أنه مُدار من قِبل مؤسستك.",
+      "warnings": "سيعرض Edge الرسالة 'Your browser is managed by your organization' في قائمته وإعداداته. هذا طبيعي عند ضبط سياسات Edge."
+    },
+    "apps.edge.disable-startup-boost": {
+      "name": "تعزيز بدء التشغيل في Microsoft Edge - تعطيل",
+      "description": "يمنع Edge من التحميل المسبق في الخلفية عند تسجيل الدخول إلى Windows.",
+      "whatItDoes": "يضبط سياسة Edge ‏StartupBoostEnabled حتى لا يبدأ Edge عملياته مبكراً عند تسجيل الدخول.",
+      "sideEffects": "قد تفتح أول نافذة Edge أبطأ قليلاً. يُظهر Edge أنه مُدار من قِبل مؤسستك.",
+      "warnings": "سيعرض Edge الرسالة 'Your browser is managed by your organization' في قائمته وإعداداته. هذا طبيعي عند ضبط سياسات Edge."
+    },
+    "essential.activity": {
+      "name": "سجل النشاط - تعطيل",
+      "description": "يمنع Windows من نشر أنشطة المستخدم أو رفعها مع الإبقاء على سجل الحافظة.",
+      "whatItDoes": "يعطّل تتبّع سجل النشاط في Windows ومزامنته السحابية.",
+      "sideEffects": "لن يتذكر المخطط الزمني في Task View وميزات استئناف المهام بين الأجهزة سجل التطبيقات الأخيرة."
+    },
+    "essential.consumerfeatures": {
+      "name": "ConsumerFeatures - تعطيل",
+      "description": "يوقف تثبيت التطبيقات الترويجية ويقلّل اقتراحات التطبيقات من محتوى Microsoft Store.",
+      "whatItDoes": "يعطّل التثبيت التلقائي لتطبيقات الجهات الخارجية الترويجية وتطبيقات المتجر المقترحة عبر سياسة CloudContent.",
+      "sideEffects": "يمنع Windows من تنزيل الألعاب المقترحة والتطبيقات الترويجية تلقائيًا عند الإعداد."
+    },
+    "essential.deletetempfiles": {
+      "name": "الملفات المؤقتة - إزالة",
+      "description": "يمسح مجلدات TEMP.",
+      "whatItDoes": "يمسح الملفات المؤقتة من %TEMP% و%WINDIR%\\Temp.",
+      "sideEffects": "يمسح ذاكرة التطبيقات المؤقتة؛ وتُتخطّى بأمان الملفات المؤقتة التي تستخدمها برامج قيد التشغيل.",
+      "warnings": "يفرّغ نهائيًا جميع مجلدات الملفات المؤقتة للمستخدم والنظام. لا يمكن استرداد الملفات المحذوفة منها. التراجع يعيد فقط ضبط علامة StorageSense في الريجستري.",
+      "irreversibleReason": "يحذف نهائيًا جميع الملفات في مجلدات TEMP للمستخدم والنظام؛ ولا يمكن استعادة الملفات المؤقتة المحذوفة."
+    },
+    "essential.disableexplorerautodiscovery": {
+      "name": "الاكتشاف التلقائي للمجلدات في مستكشف الملفات - تعطيل",
+      "description": "يحاول مستكشف Windows تلقائيًا تخمين نوع المجلد بناءً على محتوياته، مما يبطئ التصفح. تحذير! سيعطّل التجميع في مستكشف الملفات.",
+      "whatItDoes": "يعطّل الاكتشاف التلقائي لأجهزة الشبكة عبر SSDP وUPnP في مستكشف الملفات.",
+      "sideEffects": "لن تظهر خوادم الوسائط المتصلة بالشبكة وأجهزة التلفاز الذكية تلقائيًا في مستكشف الملفات إلا عند الوصول إليها يدويًا."
+    },
+    "essential.disablestoresearch": {
+      "name": "نتائج البحث المقترحة من Microsoft Store - تعطيل",
+      "description": "لن تظهر تطبيقات Microsoft Store المقترحة عند البحث عن التطبيقات في قائمة ابدأ.",
+      "whatItDoes": "يقيّد أذونات نظام الملفات على قاعدة البيانات المحلية لـ Microsoft Store (store.db).",
+      "sideEffects": "يمنع الوصول إلى store.db، مما قد يسبب أخطاء أو تجمّدًا في البحث وتنزيل الحزم داخل Microsoft Store."
+    },
+    "essential.diskcleanup": {
+      "name": "تنظيف القرص - تشغيل",
+      "description": "يشغّل تنظيف القرص على المحرك C: ويزيل تحديثات Windows القديمة.",
+      "whatItDoes": "يشغّل التنظيف التلقائي عبر Cleanmgr في Windows لاستهداف الملفات المؤقتة وذاكرة التحديثات المؤقتة.",
+      "sideEffects": "يفرّغ سلة المحذوفات ويحذف ملفات إعداد Windows Update التي تم تنزيلها.",
+      "warnings": "يحذف مكونات تحديثات Windows المستبدلة عبر DISM /ResetBase. بعد التنفيذ، لا يمكن التراجع عن التحديثات المستبدلة. التراجع يعيد فقط ضبط علامات CleanMgr في الريجستري.",
+      "irreversibleReason": "ينفّذ DISM ResetBase وCleanMgr اللذين يحذفان نهائيًا مكونات تحديثات Windows المستبدلة؛ ولا يمكن استعادة أسس التحديثات المحذوفة."
+    },
+    "essential.hiber": {
+      "name": "السبات - تعطيل",
+      "description": "السبات مخصّص فعليًا للأجهزة المحمولة، إذ يحفظ محتوى الذاكرة قبل إيقاف تشغيل الجهاز. لا ينبغي استخدامه عمليًا.",
+      "whatItDoes": "يعطّل السبات وبدء التشغيل السريع في Windows باستخدام powercfg.exe.",
+      "sideEffects": "يُزال السبات من النظام، فيزداد وقت الإقلاع قليلًا عند التشغيل من حالة إيقاف كامل؛ ويُحرّر عدة غيغابايت من hiberfil.sys."
+    },
+    "essential.location": {
+      "name": "تتبّع الموقع - تعطيل",
+      "description": "يعطّل تتبّع الموقع.",
+      "whatItDoes": "يعطّل منصة الموقع وخدمات المستشعرات في Windows على مستوى الجهاز.",
+      "sideEffects": "لن يتمكن الاكتشاف التلقائي للمنطقة الزمنية وتطبيق الطقس والخرائط المعتمدة على الموقع من تحديد موقعك الفعلي."
+    },
+    "essential.preventdevicemetadatafromnetwork": {
+      "name": "منع التطبيقات المصاحبة للأجهزة",
+      "description": "يمنع تثبيت برامج إضافية عند توصيل الأجهزة (مثل الإعلانات عند توصيل شاشة). يشكّل خطرًا أمنيًا محتملًا.",
+      "whatItDoes": "يمنع Windows من تنزيل أيقونات الأجهزة وبياناتها الوصفية من الإنترنت.",
+      "sideEffects": "ستظهر الطابعات والشاشات والملحقات المتصلة في Device Manager بأيقونات عامة بدلًا من صور الأجهزة الخاصة بعلاماتها التجارية."
+    },
+    "essential.restorepoint": {
+      "name": "نقطة استعادة - إنشاء",
+      "description": "ينشئ نقطة استعادة أثناء التشغيل تحسّبًا للحاجة إلى التراجع عن تعديلات WinUtil.",
+      "whatItDoes": "يفعّل حماية System Restore على قرص النظام وينشئ نقطة استعادة فورًا.",
+      "sideEffects": "يحجز مساحة تخزين من النظام (عادةً عدة غيغابايت) لنقاط الاستعادة الخاصة بـ Volume Shadow Copy."
+    },
+    "essential.revertstartmenu": {
+      "name": "التخطيط السابق لقائمة ابدأ - تفعيل",
+      "description": "يعيد تخطيط قائمة ابدأ القديم الذي سبق الطرح التدريجي للتخطيط الجديد في 25H2. على الإصدارات الأحدث من Windows !!لن يعمل هذا التعديل!!",
+      "whatItDoes": "يعيد قائمة ابدأ إلى التخطيط السابق على إصدارات Windows المتوافقة.",
+      "sideEffects": "يتجاوز التصميمات الأحدث لقائمة ابدأ؛ ولن يسري على الإصدارات الأحدث غير المتوافقة."
+    },
+    "essential.services": {
+      "name": "الخدمات - ضبط على يدوي",
+      "description": "يضبط بعض الخدمات على بدء التشغيل اليدوي ويعدّل قيمة SvcHostSplitThresholdInKB في الريجستري لتتناسب مع ذاكرة النظام، مما قد يقلّل عدد عمليات svchost.exe بشكل كبير.",
+      "whatItDoes": "يضبط خدمات الخلفية (CscService على Disabled، وDiagTrack على Disabled، وMapsBroker على Manual، وStorSvc على Manual، وSharedAccess على Disabled) ويضبط SvcHostSplitThresholdInKB ليطابق الذاكرة الفعلية.",
+      "sideEffects": "يعطّل نقطة الاتصال المحمولة ومشاركة اتصال الإنترنت (SharedAccess)، ويعطّل مزامنة الملفات دون اتصال (CscService)، وقد يؤخّر تحديثات الخرائط دون اتصال (MapsBroker)."
+    },
+    "essential.telemetry": {
+      "name": "القياس عن بُعد - تعطيل",
+      "description": "يعطّل القياس عن بُعد من Microsoft.",
+      "whatItDoes": "يضبط جمع بيانات التشخيص على مستوى الأمان/الحد الأدنى ويعطّل المهام المجدولة الخاصة بـ CEIP.",
+      "sideEffects": "يقلّل بيانات القياس عن بُعد المُرسلة إلى Microsoft؛ وقد تعرض إصدارات Windows Insider التجريبية وFeedback Hub تحذيرات تتعلق بالتشخيص."
+    },
+    "essential.widget": {
+      "name": "الأدوات المصغّرة - إزالة",
+      "description": "يزيل الأدوات المصغّرة المزعجة في أسفل يسار شريط المهام.",
+      "whatItDoes": "يزيل حزم Windows Widgets Platform وWebExperience AppX لجميع المستخدمين.",
+      "sideEffects": "يزيل زر الأدوات المصغّرة في شريط المهام ولوحة الأخبار نهائيًا. لا يمكن التراجع عنه.",
+      "warnings": "يزيل حزم Windows Widgets Platform وWebExperience AppX لجميع المستخدمين. التراجع يستعيد إعدادات شريط المهام في الريجستري، لكنه لا يعيد تثبيت حزم AppX المحذوفة.",
+      "irreversibleReason": "يزيل حزم Microsoft Widgets وWebExperience AppX لجميع المستخدمين؛ التراجع يستعيد فقط مفاتيح الريجستري الخاصة بظهورها في شريط المهام ولا يعيد تثبيت الحزم."
+    },
+    "essential.wpbt": {
+      "name": "Windows Platform Binary Table (WPBT) - تعطيل",
+      "description": "عند تفعيله، يسمح WPBT للشركة المصنّعة لجهازك بتشغيل برامج عند الإقلاع، مثل برامج مكافحة السرقة وبرامج التشغيل، وكذلك فرض تثبيت برامج دون موافقة المستخدم. يشكّل خطرًا أمنيًا محتملًا.",
+      "whatItDoes": "يعطّل تنفيذ Windows Platform Binary Table (WPBT) عبر الريجستري.",
+      "sideEffects": "يمنع الملفات التنفيذية التي تحقنها البرامج الثابتة للشركة المصنّعة عند إقلاع اللوحة الأم؛ وقد يفشل تحميل بعض الأدوات الخاصة بالشركة المصنّعة."
+    },
+    "gaming.dvr.disable-background-recording": {
+      "name": "تعطيل تسجيل Game DVR في الخلفية",
+      "description": "يمنع Windows من تسجيل مقاطع الألعاب باستمرار في الخلفية للتخلص من عبء الكتابة على القرص وGPU.",
+      "whatItDoes": "يعطّل التقاط فيديو وصوت اللعب في الخلفية عبر Game DVR.",
+      "sideEffects": "يتوقف تسجيل اللعب في الخلفية، ولا يمكن حفظ مقاطع لما حدث مسبقًا أثناء اللعب."
+    },
+    "gaming.input.disable-mouse-acceleration": {
+      "name": "تعطيل تسريع الماوس (Enhance Pointer Precision)",
+      "description": "يعطّل التسريع غير الخطي للمؤشر للحصول على إدخال ماوس خام بنسبة 1:1 في الألعاب وسطح المكتب.",
+      "whatItDoes": "يعطّل منحنى تسريع دقة المؤشر في Windows ضمن HKCU، لضمان حركة مؤشر مطابقة لحركة الماوس الفعلية بنسبة 1:1.",
+      "sideEffects": "ستبدو سرعة حركة المؤشر مختلفة، ولن يتسارع عند تحريك الماوس بسرعة عبر الشاشات عالية الدقة."
+    },
+    "gaming.mode.enable": {
+      "name": "تفعيل وضع الألعاب في Windows",
+      "description": "يمنح الأولوية في موارد CPU وGPU للألعاب النشطة ويحدّ من مهام الخلفية.",
+      "whatItDoes": "يفعّل وضع الألعاب في Windows لمنح الأولوية في تخصيص CPU وGPU للألعاب النشطة.",
+      "sideEffects": "لا توجد آثار معروفة."
+    },
+    "gaming.xbox.disable-game-bar": {
+      "name": "تعطيل واجهة Xbox Game Bar",
+      "description": "يعطّل واجهة Game Bar لمنع فتحها عن طريق الخطأ وتقليل استهلاك الذاكرة في الخلفية.",
+      "whatItDoes": "يعطّل واجهة Xbox Game Bar في إعدادات الألعاب في Windows.",
+      "sideEffects": "لن يؤدي الضغط على Win+G إلى فتح Xbox Game Bar أو خالط الصوت أو أداة الأداء."
+    },
+    "network.dns.enable-doh": {
+      "name": "تفعيل DNS over HTTPS (DoH) كخيار احتياطي للنظام",
+      "description": "يضبط عميل DNS في Windows لتفضيل استعلامات DNS المشفّرة عبر HTTPS عندما يدعمها خادم التحليل.",
+      "whatItDoes": "يضبط تشفير DNS-over-HTTPS (DoH) لاستعلامات عميل DNS.",
+      "sideEffects": "تصبح استعلامات DNS مشفّرة؛ وقد تفشل تصفية DNS في الشبكة المحلية أو بوابات تسجيل الدخول إذا تعذّر على DoH الوصول إلى خادم التحليل الرئيسي."
+    },
+    "network.optimization.limit-peering-lan": {
+      "name": "قصر Delivery Optimization على الشبكة المحلية فقط",
+      "description": "يمنع Windows Update من رفع حزم التحديثات إلى أجهزة عشوائية عبر الإنترنت العام.",
+      "whatItDoes": "يقصر مشاركة Windows Update على الأجهزة الموجودة في الشبكة الفرعية المحلية فقط (DODownloadMode = 1).",
+      "sideEffects": "يمنع Windows Update من تنزيل أجزاء التحديثات من أجهزة خارج شبكتك المحلية أو رفعها إليها."
+    },
+    "network.probing.disable-active-probing": {
+      "name": "تعطيل الفحص النشط للإنترنت عبر NCSI",
+      "description": "يمنع Windows من إرسال طلبات مستمرة إلى msftconnecttest.com للتحقق من الاتصال.",
+      "whatItDoes": "يعطّل الفحص النشط للإنترنت عبر NCSI إلى خوادم Microsoft.",
+      "sideEffects": "قد تُظهر أيقونة حالة الشبكة في علبة النظام 'لا يوجد اتصال بالإنترنت' خطأً رغم أن الاتصال يعمل.",
+      "warnings": "قد يجعل Windows يبلّغ عن 'لا يوجد إنترنت' أو يعطّل اكتشاف بوابات تسجيل الدخول (captive portal) في شبكات Wi-Fi."
+    },
+    "network.teredo.disable-tunneling": {
+      "name": "تعطيل نفق Teredo لـ IPv6",
+      "description": "يعطّل بروتوكول النفق الانتقالي Teredo القديم لتقليل سطح الهجوم ومنع تسرّب عنوان IP.",
+      "whatItDoes": "يعطّل تقنية Teredo الانتقالية لنقل IPv6 عبر IPv4.",
+      "sideEffects": "يمنع نفق Teredo؛ وقد تفقد التطبيقات أو الألعاب الجماعية التي تحتاج Teredo لتجاوز NAT اتصالها."
+    },
+    "network.wifi.disable-autoconnect-sense": {
+      "name": "تعطيل الاتصال التلقائي بشبكات Wi-Fi المفتوحة المقترحة",
+      "description": "يمنع Windows من الاتصال بصمت بنقاط اتصال Wi-Fi العامة المفتوحة غير المشفّرة.",
+      "whatItDoes": "يعطّل الاتصال التلقائي عبر Wi-Fi Sense بالشبكات المشتركة المفتوحة.",
+      "sideEffects": "لن يتصل Windows تلقائيًا بشبكات Wi-Fi المفتوحة المكتشفة ضمن النطاق."
+    },
+    "network.wifi.disable-hotspot-reporting": {
+      "name": "تعطيل إبلاغ Wi-Fi Sense عن نقاط الاتصال",
+      "description": "يمنع Windows من مشاركة معلومات شبكات Wi-Fi المعروفة تلقائيًا مع خدمات Microsoft.",
+      "whatItDoes": "يعطّل الإبلاغ التلقائي عن نقاط اتصال Wi-Fi ومطالبات الاتصال بنقاط الاتصال المفتوحة.",
+      "sideEffects": "لن يتصل Windows تلقائيًا بنقاط اتصال Wi-Fi العامة المقترحة."
+    },
+    "performance.cpu.priority-separation": {
+      "name": "ضبط Win32 Priority Separation",
+      "description": "يضبط طول الحصة الزمنية لجدولة الخيوط للتطبيقات في الواجهة الأمامية (0x26 = حصة قصيرة ومتغيرة مع تعزيز عالٍ للواجهة الأمامية). حسب الحالة: قد يحسّن استجابة الواجهة الأمامية في سيناريوهات معينة، لكنه قد يحرم خيوط الخلفية من الموارد ويسبب انقطاع الصوت أو تقطعات طفيفة في الألعاب الحديثة متعددة الخيوط.",
+      "whatItDoes": "يضبط Win32PrioritySeparation على 38 (0x26)، لتحسين مدة الحصة الزمنية لخيوط المعالج للتطبيقات التفاعلية في الواجهة الأمامية.",
+      "sideEffects": "قد يقلل قليلاً من أداء المعالجة الثقيلة في الخلفية أو ترميز الفيديو أو العرض المستمر في الخلفية."
+    },
+    "performance.cpu.unpark-cores": {
+      "name": "تعطيل Core Parking في CPU (تجريبي)",
+      "description": "يُبقي جميع أنوية CPU نشطة إجبارياً. في إصدارات Windows الحديثة، يُنشّط مُجدول الخيوط الأنوية ديناميكياً خلال ميكروثوانٍ. تعطيل هذه الميزة يهدر قدراً كبيراً من البطارية والطاقة على الحواسيب المحمولة دون تحسن ملموس في أداء الألعاب.",
+      "whatItDoes": "يضبط الحد الأدنى لنسبة الأنوية النشطة في Core Parking للمعالج (ValueMax) على 0 في إعدادات طاقة النظام.",
+      "sideEffects": "يُبقي جميع الأنوية المنطقية في CPU نشطة دائماً، مما يمنع حالات C-states الأعمق ويزيد استهلاك الطاقة والحرارة، خاصة على الحواسيب المحمولة. فائدة غير مُثبتة مع المُجدولات الحديثة."
+    },
+    "performance.gaming.mmcss-responsiveness": {
+      "name": "أولوية الألعاب في Multimedia Class Scheduler Service (MMCSS)",
+      "description": "يعطّل مؤشر تقييد الشبكة ويرفع أولوية جدولة مهام الوسائط المتعددة للألعاب لمنحها وقتاً أكثر من CPU.",
+      "whatItDoes": "يضبط Multimedia Class Scheduler Service (MMCSS) بتعيين SystemResponsiveness على 10 وNetworkThrottlingIndex على -1 في SystemProfile، مع ضبط GPU Priority لمهمة Games على 8 وPriority على 6.",
+      "sideEffects": "قد تعاني مهام النظام في الخلفية من نقص في وقت CPU أثناء اللعب؛ وفي حالات نادرة لبعض الأجهزة قد يسبب ذلك تأخراً في الصوت أو فقدان إطارات أثناء البث أو التسجيل."
+    },
+    "performance.gpu.disable-mpo": {
+      "name": "تعطيل Multi-Plane Overlay (حل بديل لـ MPO)",
+      "description": "حل بديل لأخطاء محددة في وميض الشاشة والشاشة السوداء مع بعض برامج تشغيل GPU القديمة. ملاحظة: تعطيل MPO ليس تحسيناً عاماً للأداء؛ فهو يزيد استهلاك الطاقة ويعطّل تحسينات العرض على مستوى الأجهزة للنوافذ في الأنظمة الحديثة.",
+      "whatItDoes": "يضبط OverlayTestMode على 5 لتعطيل Multi-Plane Overlay (MPO) في Desktop Window Manager (DWM).",
+      "sideEffects": "حل بديل لوميض الشاشة أو الشاشة السوداء في إعدادات الشاشات المتعددة؛ يزيد استهلاك GPU للطاقة وقد يعطّل تحسينات HDR/G-Sync في وضع النافذة."
+    },
+    "performance.gpu.hags": {
+      "name": "جدولة GPU المسرّعة بالأجهزة (HAGS)",
+      "description": "خيار تفضيل للمستخدم لجدولة GPU عبر الأجهزة في Windows Display Driver Model ‏(WDDM 2.7+). ينقل الجدولة من CPU إلى معالج جدولة مخصص في GPU.",
+      "whatItDoes": "يضبط HwSchMode على 2 ضمن GraphicsDrivers لتمكين Hardware-Accelerated GPU Scheduling (HAGS) في WDDM.",
+      "sideEffects": "يتطلب إعادة تشغيل النظام؛ قد يسبب عدم استقرار أو تقطعاً أو فقدان إطارات في بعض الألعاب القديمة أو تطبيقات تسجيل/بث الفيديو مع بعض برامج تشغيل GPU."
+    },
+    "performance.input.buffer-queue": {
+      "name": "قائمة انتظار مخزن الماوس ولوحة المفاتيح (تجريبي)",
+      "description": "يقلل أحجام قوائم انتظار برامج تشغيل الإدخال من 100 إلى 20 حزمة. تعديل من المجتمع بلا دليل تجريبي على تقليل زمن الاستجابة؛ وقد يسبب فقدان مدخلات تحت حمل مقاطعات مرتفع.",
+      "whatItDoes": "يضبط MouseDataQueueSize على 20 في Mouclass وKeyboardDataQueueSize على 20 في معاملات خدمة برنامج التشغيل Kbdclass.",
+      "sideEffects": "إذا تجاوزت أحداث الماوس المخزن المؤقت المصغّر أثناء حمل النظام الثقيل، فستُفقد نقرات الماوس أو حركات المؤشر. ادعاء من المجتمع غير مُثبت."
+    },
+    "performance.memory.svchost-split-threshold": {
+      "name": "ضبط حدّ تقسيم SvcHost",
+      "description": "يجمع خدمات النظام في عدد أقل من عمليات svchost على الأجهزة ذات الذاكرة المتوسطة لتقليل استهلاك الذاكرة.",
+      "whatItDoes": "يضبط SvcHostSplitThresholdInKB ليطابق الذاكرة الفعلية للنظام، فيجمع عمليات استضافة الخدمات.",
+      "sideEffects": "يجمع خدمات الخلفية في عدد أقل من عمليات svchost.exe، مما يقلل عبء العمليات على الأجهزة ذات الذاكرة الكبيرة."
+    },
+    "performance.network.delivery-optimization-simple": {
+      "name": "تعطيل مشاركة Delivery Optimization بين الأجهزة (HTTP فقط)",
+      "description": "يعطّل توزيع تحديثات Windows بين الأجهزة، فتُنزَّل التحديثات من خوادم Microsoft مباشرة فقط.",
+      "whatItDoes": "يضبط Delivery Optimization على وضع التنزيل البسيط عبر HTTP دون مشاركة بين الأجهزة.",
+      "sideEffects": "ستُنزَّل التحديثات من خوادم Microsoft فقط، ولن تُشارَك سعة الاتصال مع أجهزة أخرى في الشبكة المحلية."
+    },
+    "performance.network.disable-remote-differential-compression": {
+      "name": "تعطيل واجهة Remote Differential Compression",
+      "description": "يعطّل عبء بروتوكول RDC القديم لتسريع نقل الملفات عبر الشبكات المحلية الحديثة بسرعة جيجابت.",
+      "whatItDoes": "يعطّل Remote Differential Compression (RDC) عبر الشبكة.",
+      "sideEffects": "قد يزيد استهلاك سعة الاتصال قليلًا عند نسخ الملفات المعدّلة عبر اتصالات شبكة بطيئة."
+    },
+    "performance.ntfs.disable-8dot3-names": {
+      "name": "تعطيل إنشاء أسماء الملفات القصيرة 8.3",
+      "description": "يعطّل إنشاء أسماء الملفات القصيرة القديمة من MS-DOS لتسريع عرض المجلدات وإنشاء الملفات.",
+      "whatItDoes": "يعطّل إنشاء أسماء الملفات القصيرة القديمة 8.3 على وحدات تخزين NTFS.",
+      "sideEffects": "قد تفشل البرامج القديمة بنظام 16-bit أو 32-bit التي تعتمد على مسارات الأسماء القصيرة 8.3 في فتح الملفات."
+    },
+    "performance.ntfs.disable-last-access": {
+      "name": "تعطيل تحديث وقت آخر وصول في NTFS",
+      "description": "يوقف تحديث الطابع الزمني للملف عند كل قراءة، مما يقلل عمليات القرص غير الضرورية.",
+      "whatItDoes": "يعطّل تحديث الطابع الزمني لآخر وصول على الملفات والمجلدات في NTFS.",
+      "sideEffects": "لن يُحدَّث وقت الوصول عند قراءة الملفات؛ وقد تحتاج أدوات النسخ الاحتياطي المعتمدة عليه إلى إعداد."
+    },
+    "performance.power.disable-throttling": {
+      "name": "تعطيل Power Throttling في Windows",
+      "description": "يعطّل Power Throttling للتطبيقات العاملة في الخلفية. مفيد لمهام العرض أو الحوسبة في الخلفية، لكنه يزيد استهلاك البطارية بشكل كبير.",
+      "whatItDoes": "يضبط PowerThrottlingOff على 1 ضمن سياسات طاقة النظام، لمنع Windows من خفض تردد التنفيذ في الخلفية للخيوط الخاملة.",
+      "sideEffects": "يقلل مدة البطارية بشكل ملحوظ ويزيد الحرارة على الأجهزة المحمولة والعاملة بالبطارية."
+    },
+    "performance.search.prevent-indexing-on-battery": {
+      "name": "منع فهرسة البحث أثناء العمل على البطارية",
+      "description": "يوقف فهرسة Windows Search في الخلفية عند العمل على بطارية الحاسوب المحمول لإطالة عمرها.",
+      "whatItDoes": "يمنع مفهرس Windows Search من فهرسة الملفات عند العمل على البطارية.",
+      "sideEffects": "لن تظهر الملفات الجديدة أو المعدّلة في نتائج البحث حتى يُوصَل الحاسوب المحمول بالشاحن."
+    },
+    "performance.startup.remove-startup-delay": {
+      "name": "تأخير تطبيقات بدء التشغيل - إزالة",
+      "description": "يشغّل تطبيقات بدء التشغيل فور تسجيل الدخول بدلاً من الانتظار بضع ثوانٍ.",
+      "whatItDoes": "يزيل التأخير القصير الذي يضيفه Windows قبل تشغيل تطبيقات بدء التشغيل (StartupDelayInMSec).",
+      "sideEffects": "تتنافس تطبيقات بدء التشغيل مع سطح المكتب على القرص وCPU فور تسجيل الدخول، لذا قد يبدو سطح المكتب أبطأ في البداية على الأقراص القديمة. تظهر الفائدة غالباً على أقراص SSD السريعة."
+    },
+    "performance.system.disable-maintenance-wake": {
+      "name": "تعطيل مؤقتات الإيقاظ للصيانة التلقائية",
+      "description": "يمنع الصيانة التلقائية في Windows من إيقاظ الكمبيوتر من وضع السكون أثناء الليل.",
+      "whatItDoes": "يمنع الصيانة التلقائية في Windows من إيقاظ الكمبيوتر من وضع السكون.",
+      "sideEffects": "لن تُنفَّذ صيانة النظام المجدولة وفحوصات القرص إلا عندما يكون الكمبيوتر مستيقظًا وخاملًا."
+    },
+    "performance.system.storage-sense": {
+      "name": "تفعيل التنظيف التلقائي عبر Storage Sense",
+      "description": "يحرّر مساحة القرص تلقائيًا بحذف الملفات المؤقتة القديمة ومحتويات سلة المحذوفات.",
+      "whatItDoes": "يفعّل Storage Sense في Windows لتنظيف الملفات المؤقتة وإفراغ سلة المحذوفات تلقائيًا.",
+      "sideEffects": "يحذف تلقائيًا الملفات الأقدم من 30 يومًا من المجلدات المؤقتة وسلة المحذوفات."
+    },
+    "performance.visual.disable-animations": {
+      "name": "تعطيل حركات تصغير النوافذ وتكبيرها",
+      "description": "يسرّع استجابة سطح المكتب بإلغاء حركات انتقال النوافذ.",
+      "whatItDoes": "يعطّل حركات تصغير النوافذ وتكبيرها وحركات عناصر التحكم.",
+      "sideEffects": "لا توجد آثار معروفة."
+    },
+    "performance.visual.disable-transparency": {
+      "name": "تعطيل تأثيرات الشفافية",
+      "description": "يوقف الشفافية في شريط المهام وقائمة ابدأ والنوافذ لتقليل العبء على GPU.",
+      "whatItDoes": "يعطّل تأثيرات الشفافية الأكريليكية في شريط مهام Windows ونوافذ التطبيقات.",
+      "sideEffects": "لا توجد آثار معروفة."
+    },
+    "pref.batterypercentage": {
+      "name": "نسبة البطارية في منطقة الإعلام",
+      "description": "يعرض نسبة البطارية رقمياً بجوار أيقونة البطارية في منطقة الإعلام.",
+      "whatItDoes": "يُمكّن مؤشر نسبة البطارية المتبقية على شريط المهام في Windows.",
+      "sideEffects": "يتطلب حاسوباً محمولاً أو جهازاً يعمل بالبطارية؛ لا ينطبق على أجهزة سطح المكتب."
+    },
+    "pref.bingsearch": {
+      "name": "بحث Bing في قائمة ابدأ",
+      "description": "يبدّل نتائج بحث الويب من Bing في Windows Search.",
+      "whatItDoes": "يعطّل اقتراحات بحث الويب من Bing في مربع البحث بقائمة ابدأ في Windows.",
+      "sideEffects": "سيبحث قائمة ابدأ في التطبيقات والإعدادات والملفات الشخصية المحلية فقط؛ ولن تظهر نتائج الويب."
+    },
+    "pref.darkmode": {
+      "name": "السمة الداكنة لـ Windows",
+      "description": "الوضع الداكن للنظام والتطبيقات.",
+      "whatItDoes": "يُمكّن السمة الداكنة على مستوى النظام لواجهة Windows وتطبيقات سطح المكتب المدعومة.",
+      "sideEffects": "لا توجد آثار معروفة."
+    },
+    "pref.detailedbsod": {
+      "name": "الوضع المفصّل لـ BSoD",
+      "description": "يعرض معلومات أكثر عند ظهور الشاشة الزرقاء.",
+      "whatItDoes": "يضبط معالج الأعطال في Windows لعرض رموز الإيقاف التقنية المفصّلة وأسماء برامج التشغيل.",
+      "sideEffects": "يعرض التفاصيل التشخيصية التقنية الكاملة بدلاً من الوجه التعبيري المبسّط في الشاشة الزرقاء."
+    },
+    "pref.disablelockscreen": {
+      "name": "شاشة القفل - تعطيل",
+      "description": "يتخطى شاشة القفل كلياً وينتقل مباشرة إلى شاشة تسجيل الدخول عند الإقلاع والاستيقاظ.",
+      "whatItDoes": "يعطّل طبقة شاشة القفل التي تتطلب السحب أو ضغط مفتاح، فيظهر طلب كلمة المرور فوراً.",
+      "sideEffects": "يتجاوز ساعة شاشة القفل وطبقة الإشعارات، وينتقل مباشرة إلى تسجيل دخول المستخدم."
+    },
+    "pref.hidesettingshome": {
+      "name": "الصفحة الرئيسية في الإعدادات - إظهار",
+      "description": "يُظهر الصفحة الرئيسية في إعدادات Windows 11 (الإعداد الافتراضي في Windows). التراجع يخفيها.",
+      "whatItDoes": "يجعل الصفحة الرئيسية ظاهرة في إعدادات Windows 11 عبر ضبط سياسة ظهور الصفحات لإظهارها. هذا هو الإعداد الافتراضي في Windows؛ استخدم التراجع لإخفاء الصفحة الرئيسية.",
+      "sideEffects": "لا توجد آثار معروفة. تفتح الإعدادات على الصفحة الرئيسية، التي تعرض اقتراحات ولافتات الحساب."
+    },
+    "pref.loginblur": {
+      "name": "تمويه Acrylic في شاشة تسجيل الدخول - تمكين",
+      "description": "يُبقي تمويه Acrylic على خلفية شاشة تسجيل الدخول (الإعداد الافتراضي في Windows). التراجع يوقف التمويه.",
+      "whatItDoes": "يسمح بتأثير تمويه Acrylic على خلفية شاشة تسجيل الدخول في Windows. هذا هو الإعداد الافتراضي في Windows؛ استخدم التراجع لعرض صورة الخلفية دون تمويه.",
+      "sideEffects": "لا توجد آثار معروفة. تبقى خلفية تسجيل الدخول مموّهة."
+    },
+    "pref.multiplaneoverlay": {
+      "name": "حل بديل لـ Multiplane Overlay",
+      "description": "حل بديل لأخطاء محددة في وميض الشاشة مع بعض برامج تشغيل GPU القديمة. ملاحظة: تعطيل MPO ليس تحسيناً عاماً للأداء؛ فهو يزيد استهلاك الطاقة ويعطّل تحسينات العرض على مستوى الأجهزة للنوافذ في الأنظمة الحديثة.",
+      "whatItDoes": "يضبط OverlayTestMode على 1 في DWM وDisableOverlays على 1 في GraphicsDrivers لتعطيل Multi-Plane Overlay (MPO).",
+      "sideEffects": "حل بديل لوميض الشاشة؛ يزيد استهلاك DWM للطاقة وقد يعطّل عرض HDR في وضع النافذة."
+    },
+    "pref.newoutlook": {
+      "name": "Microsoft Outlook - استخدام الإصدار الجديد",
+      "description": "يحوّل Outlook الكلاسيكي إلى Outlook الجديد ويُظهر مفتاح التبديل الخاص به. التراجع يعيده إلى الكلاسيكي.",
+      "whatItDoes": "يشغّل Outlook الجديد لـ Windows، ويُظهر مفتاح Outlook الجديد داخل Outlook الكلاسيكي، ويوقف مطالبات الترحيل التلقائي.",
+      "sideEffects": "يفتح Outlook الكلاسيكي بوصفه Outlook الجديد، الذي لا يدعم بعض الوظائف الإضافية الكلاسيكية وميزات العمل دون اتصال."
+    },
+    "pref.numlock": {
+      "name": "تشغيل Num Lock عند بدء التشغيل",
+      "description": "يبدّل حالة مفتاح Num Lock عند بدء تشغيل الكمبيوتر.",
+      "whatItDoes": "يُمكّن NumLock تلقائياً على شاشة تسجيل الدخول في Windows أثناء بدء التشغيل.",
+      "sideEffects": "يغيّر الحالة الافتراضية لمفتاح NumLock عند إقلاع النظام؛ وقد يؤثر على لوحات مفاتيح الحواسيب المحمولة التي لا تحتوي على لوحة أرقام مخصصة."
+    },
+    "pref.s3sleep": {
+      "name": "سكون S3",
+      "description": "يبدّل بين Modern Standby وسكون S3، الذي يقطع الطاقة عن CPU مع الاستمرار في تحديث الذاكرة.",
+      "whatItDoes": "يفرض حالة سكون S3 القديمة بدلاً من Modern Standby ‏(S0ix) في إعدادات طاقة ACPI.",
+      "sideEffects": "قد تفشل الحواسيب المحمولة التي لا يدعم برنامجها الثابت S3 في الدخول إلى السكون، أو تتجمد، أو تتعرض لأعطال (bugcheck) عند إغلاق الغطاء."
+    },
+    "pref.scrollbars": {
+      "name": "أشرطة التمرير ظاهرة دائماً",
+      "description": "عند التمكين، تظهر أشرطة التمرير دائماً. وعند التعطيل، يخفي Windows أشرطة التمرير تلقائياً عند عدم استخدامها.",
+      "whatItDoes": "يعرض أشرطة التمرير كاملة دائماً في تطبيقات Windows 11 بدلاً من إخفائها حتى يمر المؤشر فوقها.",
+      "sideEffects": "لا توجد آثار معروفة."
+    },
+    "pref.standbyfix": {
+      "name": "اتصال الشبكة أثناء سكون S0",
+      "description": "يبدّل اتصال الشبكة أثناء سكون S0، وهو وضع الخمول منخفض الطاقة في الحواسيب المحمولة الحديثة.",
+      "whatItDoes": "يطبّق معاملات إعداد الطاقة للحد من استنزاف البطارية في وضع السكون المتصل (Modern Standby).",
+      "sideEffects": "يغيّر حالة سكون الشبكة في Modern Standby؛ ويعتمد السلوك على برنامج ثابت للوحة الأم في الحاسوب المحمول."
+    },
+    "pref.startmenurecommendations": {
+      "name": "قسم الموصى به في قائمة ابدأ - إظهار",
+      "description": "يُظهر قسم الموصى به في قائمة ابدأ في Windows 11 (الإعداد الافتراضي في Windows) ويعيد تشغيل Explorer. التراجع يخفيه.",
+      "whatItDoes": "يزيل السياسات التي تخفي قسم الموصى به في قائمة ابدأ، فتظهر الملفات الأخيرة والتطبيقات المقترحة مجدداً، ثم يعيد تشغيل Explorer. هذا هو الإعداد الافتراضي في Windows؛ استخدم التراجع لإخفاء القسم.",
+      "sideEffects": "يُعاد تشغيل Explorer، فتُغلق نوافذ مستكشف الملفات المفتوحة. يعرض قسم الموصى به الملفات الأخيرة واقتراحات التطبيقات."
+    },
+    "pref.stickykeys": {
+      "name": "اختصار المفاتيح الثابتة - تعطيل",
+      "description": "يمنع تشغيل المفاتيح الثابتة عند الضغط على Shift خمس مرات، وهو ما يقاطع الألعاب غالباً.",
+      "whatItDoes": "يعطّل اختصار إمكانية الوصول الذي يشغّل المفاتيح الثابتة عند الضغط على Shift خمس مرات.",
+      "sideEffects": "لا توجد آثار معروفة."
+    },
+    "pref.taskbarsearch": {
+      "name": "أيقونة البحث في شريط المهام",
+      "description": "يبدّل زر البحث في شريط المهام.",
+      "whatItDoes": "يضبط وضع عرض مربع البحث في شريط مهام Windows.",
+      "sideEffects": "لا توجد آثار معروفة."
+    },
+    "pref.verboselogon": {
+      "name": "الوضع المفصّل لتسجيل الدخول",
+      "description": "عرض رسائل مفصّلة أثناء بدء التشغيل وإيقافه.",
+      "whatItDoes": "يُمكّن رسائل الحالة المفصّلة أثناء تسجيل الدخول إلى Windows وبدء التشغيل وإيقافه.",
+      "sideEffects": "يعرض خطوات تهيئة الخدمات بالتفصيل على شاشة تسجيل الدخول، مما يغيّر قليلاً المظهر المرئي لبدء التشغيل."
+    },
+    "pref.windowsnapping": {
+      "name": "محاذاة النوافذ (Snap) - تمكين",
+      "description": "يبدّل ميزة محاذاة النوافذ عند سحبها.",
+      "whatItDoes": "يشغّل محاذاة النوافذ (الإعداد الافتراضي في Windows)، فيؤدي سحب نافذة إلى حافة الشاشة إلى تغيير حجمها. استخدم التراجع لإيقاف المحاذاة.",
+      "sideEffects": "يغيّر طريقة محاذاة نوافذ التطبيقات مع حواف الشاشة ومناطقها."
+    },
+    "privacy.activity.activity-history": {
+      "name": "تعطيل نشر سجل النشاط",
+      "description": "يمنع نشر سجل نشاط المستخدم ومزامنته عبر الأجهزة.",
+      "whatItDoes": "يعطّل جمع سجل النشاط ونشره إلى حساب Microsoft.",
+      "sideEffects": "ستتوقف مزامنة الخط الزمني للنشاط الأخير وميزة المتابعة من حيث توقفت عبر الأجهزة."
+    },
+    "privacy.ads.explorer-sync-notifications": {
+      "name": "إعلانات موفّر المزامنة في مستكشف الملفات - تعطيل",
+      "description": "يمنع مستكشف الملفات من عرض عروض OneDrive وMicrosoft 365 الترويجية أعلى النافذة.",
+      "whatItDoes": "يوقف إشعارات موفّر المزامنة في مستكشف الملفات (ShowSyncProviderNotifications)، التي تستخدمها Microsoft لعرض لافتات اشتراكات OneDrive وOffice.",
+      "sideEffects": "لن تظهر نصائح وإشعارات موفّر المزامنة في مستكشف الملفات. وتستمر مزامنة الملفات نفسها في العمل."
+    },
+    "privacy.advertising.advertising-id": {
+      "name": "تعطيل معرّف الإعلانات",
+      "description": "يمنع التطبيقات من استخدام معرّف الإعلانات لعرض إعلانات مخصّصة عبر التجارب المختلفة.",
+      "whatItDoes": "يعطّل معرّف الإعلانات الفريد المستخدم لتتبّع الإعلانات عبر التطبيقات.",
+      "sideEffects": "لا توجد آثار معروفة."
+    },
+    "privacy.ceip.customer-experience-improvement": {
+      "name": "تعطيل برنامج تحسين تجربة العملاء (CEIP)",
+      "description": "يعطّل المشاركة في برنامج القياس عن بُعد لتحسين تجربة عملاء Windows.",
+      "whatItDoes": "يعطّل المهام المجدولة لجمع بيانات برنامج تحسين تجربة العملاء (CEIP).",
+      "sideEffects": "لن تُجمَع بيانات القياس عن بُعد ومقاييس جودة الاستخدام لتقارير التشخيص."
+    },
+    "privacy.clipboard.cloud-clipboard-sync": {
+      "name": "تعطيل مزامنة الحافظة السحابية",
+      "description": "يوقف مزامنة محتوى الحافظة بين أجهزة Windows المتعددة.",
+      "whatItDoes": "يعطّل مزامنة الحافظة السحابية بين أجهزة Windows المسجّل الدخول إليها.",
+      "sideEffects": "لن تتم مزامنة النصوص والصور المنسوخة مع أجهزة Windows الأخرى."
+    },
+    "privacy.consent.deny-account-info": {
+      "name": "منع التطبيقات من الوصول إلى معلومات الحساب",
+      "description": "يمنع التطبيقات المثبتة من الوصول إلى اسم المستخدم المعروض وصورته ومعرّف حسابه.",
+      "whatItDoes": "يرفض إذن التطبيقات للوصول إلى اسم حساب المستخدم وصورة الملف الشخصي.",
+      "sideEffects": "لا يمكن للتطبيقات الاستعلام عن معلومات حساب مستخدم Windows."
+    },
+    "privacy.consent.deny-calendar": {
+      "name": "منع التطبيقات من الوصول إلى التقويم والمواعيد",
+      "description": "يمنع تطبيقات الجهات الخارجية من جمع إدخالات الجدول والمواعيد من التقويم.",
+      "whatItDoes": "يرفض إذن التطبيقات للوصول إلى مواعيد تقويم Windows.",
+      "sideEffects": "لا يمكن للتطبيقات قراءة المواعيد في تقويم Windows أو إضافتها إليه."
+    },
+    "privacy.consent.deny-contacts": {
+      "name": "منع التطبيقات من الوصول إلى قائمة جهات الاتصال",
+      "description": "يمنع تطبيقات المتجر والنظام من جمع جهات الاتصال من دفتر العناوين.",
+      "whatItDoes": "يرفض إذن التطبيقات للوصول إلى جهات اتصال Windows ودفتر العناوين.",
+      "sideEffects": "لا يمكن للتطبيقات قراءة قائمة جهات الاتصال المحلية في Windows."
+    },
+    "privacy.consent.deny-diagnostics": {
+      "name": "منع التطبيقات من الوصول إلى معلومات تشخيص التطبيقات الأخرى",
+      "description": "يمنع تطبيقات الجهات الخارجية من الاستعلام عن الذاكرة وإحصاءات التشخيص للبرامج الأخرى قيد التشغيل.",
+      "whatItDoes": "يرفض إذن التطبيقات للاستعلام عن معلومات التشخيص من التطبيقات الأخرى.",
+      "sideEffects": "لا يمكن للتطبيقات فحص بيانات التشخيص الخاصة بتطبيقات الجهات الخارجية."
+    },
+    "privacy.consent.deny-location": {
+      "name": "منع وصول التطبيقات إلى الموقع افتراضيًا",
+      "description": "يضبط الإذن الافتراضي لرفض وصول التطبيقات إلى موقع المستخدم الفعلي.",
+      "whatItDoes": "يرفض الإذن الافتراضي لتطبيقات المتجر وسطح المكتب للوصول إلى الموقع.",
+      "sideEffects": "سيُمنع وصول التطبيقات إلى موقعك الجغرافي الحالي حتى تمنحها الإذن صراحةً من الإعدادات."
+    },
+    "privacy.consent.deny-microphone": {
+      "name": "منع وصول تطبيقات UWP إلى الميكروفون افتراضيًا",
+      "description": "يمنع تطبيقات UWP من المتجر من الاستماع بصمت أو الوصول إلى أجهزة تسجيل الصوت.",
+      "whatItDoes": "يرفض وصول التطبيقات الافتراضي إلى أجهزة الميكروفون في النظام.",
+      "sideEffects": "سيُمنع التطبيقات من تسجيل الصوت حتى تمنحها الإذن صراحةً من إعدادات Windows."
+    },
+    "privacy.consent.deny-notifications": {
+      "name": "منع وصول تطبيقات UWP إلى إشعارات المستخدم",
+      "description": "يمنع التطبيقات من اعتراض رسائل مستمع الإشعارات الخاصة أو قراءتها.",
+      "whatItDoes": "يرفض الإذن الافتراضي للتطبيقات بعرض إشعارات المستخدم.",
+      "sideEffects": "لن يُسمح للتطبيقات بعرض الإشعارات على سطح المكتب."
+    },
+    "privacy.consent.deny-webcam": {
+      "name": "منع وصول تطبيقات UWP إلى كاميرا الويب افتراضيًا",
+      "description": "يمنع تطبيقات UWP العاملة في الخلفية من التقاط الفيديو عبر كاميرات الويب المتصلة.",
+      "whatItDoes": "يرفض وصول التطبيقات الافتراضي إلى الكاميرا وكاميرا الويب.",
+      "sideEffects": "سيُمنع التطبيقات من الوصول إلى بث كاميرا الويب حتى تمنحها الإذن صراحةً من الإعدادات."
+    },
+    "privacy.experiences.tailored-experiences": {
+      "name": "تعطيل التجارب المخصّصة",
+      "description": "يمنع Windows من تقديم نصائح وإعلانات وتوصيات مخصّصة بناءً على بيانات التشخيص.",
+      "whatItDoes": "يعطّل التجارب المخصّصة والنصائح المبنية على التشخيص والتوصيات الشخصية.",
+      "sideEffects": "لا توجد آثار معروفة."
+    },
+    "privacy.feedback.feedback-prompts": {
+      "name": "تعطيل مطالبات طلب الملاحظات",
+      "description": "يعطّل النوافذ المنبثقة الدورية التي تطلب ملاحظاتك حول ميزات Windows.",
+      "whatItDoes": "يضبط تكرار طلب الملاحظات في Windows على 'أبدًا'.",
+      "sideEffects": "لن يعرض Windows مطالبات تطلب تقييمك أو ملاحظاتك حول الميزات."
+    },
+    "privacy.findmydevice.disable": {
+      "name": "العثور على جهازي - تعطيل",
+      "description": "يوقف ميزة Find My Device حتى لا يرسل هذا الجهاز موقعه إلى حساب Microsoft الخاص بك.",
+      "whatItDoes": "يضبط السياسة AllowFindMyDevice لإيقاف Find My Device وقفله في الإعدادات.",
+      "sideEffects": "لن تتمكن من تحديد موقع هذا الجهاز أو قفله عن بُعد من account.microsoft.com إذا فُقد أو سُرق.",
+      "warnings": "ستعرض إعدادات Windows الرسالة 'Some settings are managed by your organization'. هذا طبيعي عند ضبط مفاتيح الريجستري الخاصة بـ Group Policy."
+    },
+    "privacy.location.disable-sensor": {
+      "name": "تعطيل مستشعر الموقع في النظام",
+      "description": "يعطّل مستشعرات تحديد الموقع الجغرافي في العتاد والبرامج لمنع تتبّع موقعك الفعلي.",
+      "whatItDoes": "يعطّل منصة المستشعرات في Windows وخدمة الموقع الرئيسية.",
+      "sideEffects": "لن تتمكن تطبيقات سطح المكتب وميزات Windows من الوصول إلى مستشعرات GPS أو الموقع المحدّد عبر الشبكة.",
+      "warnings": "يعطّل مستشعر الموقع لتطبيقات مثل الخرائط والطقس ومزامنة المنطقة الزمنية."
+    },
+    "privacy.reporting.windows-error-reporting": {
+      "name": "تعطيل Windows Error Reporting",
+      "description": "يعطّل الإرسال التلقائي لملفات تفريغ الأعطال وسجلات الأخطاء إلى Microsoft.",
+      "whatItDoes": "يعطّل جمع ملفات تفريغ الأعطال ورفعها تلقائيًا عبر Windows Error Reporting (WER).",
+      "sideEffects": "لن تُرسَل تقارير أعطال التطبيقات إلى Microsoft أو مطوري البرامج للتشخيص."
+    },
+    "privacy.search.device-search-history": {
+      "name": "تعطيل سجل البحث على الجهاز",
+      "description": "يمنع Windows Search من حفظ سجل البحث المحلي على الجهاز.",
+      "whatItDoes": "يعطّل جمع سجل البحث المحلي على الجهاز.",
+      "sideEffects": "لن يتذكّر مربع البحث عمليات البحث السابقة على هذا الكمبيوتر ولن يقترحها."
+    },
+    "privacy.speech.online-speech-recognition": {
+      "name": "تعطيل التعرّف على الكلام عبر الإنترنت",
+      "description": "يعطّل خدمات الكلام السحابية، فتبقى الإملاء ومعالجة الكلام دون اتصال.",
+      "whatItDoes": "يعطّل التعرّف على الكلام السحابي وخدمات Cortana الصوتية.",
+      "sideEffects": "لن تتوفر الكتابة الصوتية السحابية والتعرّف على صوت Cortana؛ ويبقى الإملاء المحلي متاحًا."
+    },
+    "privacy.spotlight.lockscreen-ads": {
+      "name": "تعطيل نصائح شاشة القفل وإعلانات Spotlight",
+      "description": "يزيل الاقتراحات والنصائح والعناصر الترويجية من شاشة القفل في Windows.",
+      "whatItDoes": "يعطّل المحتوى المقترح والنصائح والإعلانات الترويجية على شاشة القفل في Windows.",
+      "sideEffects": "ستعرض شاشة القفل الخلفيات العادية فقط دون نصائح تفاعلية أو روابط مقترحة."
+    },
+    "privacy.suggestions.start-menu-promotions": {
+      "name": "تعطيل إعلانات التطبيقات المقترحة في قائمة ابدأ",
+      "description": "يمنع Windows من عرض اقتراحات متجر التطبيقات في قائمة ابدأ.",
+      "whatItDoes": "يعطّل التطبيقات المقترحة والتوصيات الترويجية للتطبيقات في قائمة ابدأ.",
+      "sideEffects": "لن يُوصى بتطبيقات الجهات الخارجية الترويجية في قائمة ابدأ."
+    },
+    "privacy.telemetry.diagnostic-data": {
+      "name": "مستوى بيانات التشخيص",
+      "description": "يخفّض بيانات التشخيص المرسلة إلى Microsoft إلى أدنى مستوى مسموح.",
+      "whatItDoes": "يضبط جمع بيانات التشخيص على الحد الأدنى المطلوب (AllowTelemetry = 0).",
+      "sideEffects": "يقلل القياس عن بُعد المرسل إلى Microsoft؛ وقد تصبح معلومات التشخيص في Feedback Hub وWindows Insider محدودة.",
+      "effectNote": "في إصدارات Windows Enterprise وEducation، يضبط هذا جمع البيانات على 0 (Security). وفي Windows Home وPro، يعامل Windows القيمة 0 على أنها 1 (بيانات التشخيص المطلوبة).",
+      "warnings": "ستعرض إعدادات Windows عبارة 'تدير مؤسستك بعض الإعدادات'. هذا طبيعي عند ضبط مفاتيح الريجستري الخاصة بـ Group Policy."
+    },
+    "privacy.tracking.app-launch-tracking": {
+      "name": "تعطيل تتبّع تشغيل التطبيقات",
+      "description": "يمنع Windows من تتبّع تشغيل التطبيقات لتحسين قائمة ابدأ ونتائج البحث.",
+      "whatItDoes": "يعطّل تتبّع تشغيل التطبيقات المستخدم لتخصيص قائمة ابدأ ونتائج البحث.",
+      "sideEffects": "لن تتتبّع قائمة ابدأ التطبيقات الأكثر استخدامًا لتخصيص قائمة أبرز التطبيقات."
+    },
+    "privacy.typing.inking-typing-personalization": {
+      "name": "تعطيل جمع بيانات الكتابة بالحبر والكتابة",
+      "description": "يوقف إرسال عينات الكتابة والخط اليدوي إلى Microsoft لتحسين القاموس.",
+      "whatItDoes": "يعطّل جمع قاموس تخصيص الكتابة بالحبر والكتابة.",
+      "sideEffects": "لن يتعلّم التعرّف على الخط اليدوي وتوقّع النص في لوحة المفاتيح اللمسية مفرداتك الشخصية أو الأسماء المخصّصة."
+    },
+    "system.power.disable-fast-startup": {
+      "name": "بدء التشغيل السريع - تعطيل",
+      "description": "يجعل أمر إيقاف التشغيل يُجري إيقافاً كاملاً بدلاً من سبات جزئي للنظام.",
+      "whatItDoes": "يوقف بدء التشغيل السريع (HiberbootEnabled)، فيُغلق كل إيقاف تشغيل نواة Windows وبرامج التشغيل بالكامل.",
+      "sideEffects": "قد يستغرق التشغيل من حالة الإيقاف الكامل بضع ثوانٍ إضافية. يفيد في أنظمة الإقلاع المزدوج، وتحديثات برامج التشغيل التي تتطلب بدءاً نظيفاً، والأجهزة التي تتصرف بشكل غير سليم بعد إيقاف التشغيل."
+    },
+    "system.security.disable-autorun": {
+      "name": "تعطيل AutoRun وAutoPlay على جميع محركات الأقراص",
+      "description": "يمنع الملفات التنفيذية الضارة على محركات USB والوسائط الخارجية من التشغيل تلقائيًا.",
+      "whatItDoes": "يعطّل التشغيل التلقائي AutoRun وAutoPlay على الأقراص الضوئية ووسائط USB القابلة للإزالة.",
+      "sideEffects": "لن تشغّل محركات الأقراص القابلة للإزالة والأقراص المضغوطة برامج التثبيت تلقائيًا عند إدخالها."
+    },
+    "system.security.disable-llmnr": {
+      "name": "تعطيل تحليل الأسماء بالبث المتعدد المحلي (LLMNR)",
+      "description": "يعطّل LLMNR على الشبكات المحلية للحد من هجمات سرقة التجزئات وهجمات الوسيط (man-in-the-middle).",
+      "whatItDoes": "يعطّل تحليل الأسماء بالبث المتعدد المحلي (LLMNR) على الشبكة المحلية.",
+      "sideEffects": "يمنع تحليل الأسماء ببث LLMNR؛ وقد تفشل الأنظمة القديمة على الشبكة المحلية التي لا تستخدم DNS في تحليل أسماء الأجهزة."
+    },
+    "system.security.disable-lockscreen-camera": {
+      "name": "تعطيل الكاميرا على شاشة القفل",
+      "description": "يمنع أي شخص من تشغيل كاميرا الويب أو الوصول إليها أثناء قفل الكمبيوتر.",
+      "whatItDoes": "يعطّل الوصول إلى الكاميرا من شاشة القفل في Windows دون تسجيل الدخول.",
+      "sideEffects": "لن يظهر اختصار تطبيق الكاميرا على شاشة القفل أثناء قفل الجهاز."
+    },
+    "system.security.disable-rdp-auto-enable": {
+      "name": "تعطيل اتصالات سطح المكتب البعيد الواردة",
+      "description": "يعطّل اتصالات سطح المكتب البعيد الواردة على المنفذ 3389.",
+      "whatItDoes": "يعطّل التفعيل التلقائي لخدمة سطح المكتب البعيد ويرفض اتصالات RDP الواردة.",
+      "sideEffects": "سيتم رفض اتصالات سطح المكتب البعيد الواردة إلى هذا الكمبيوتر.",
+      "warnings": "سيتوقف الاتصال بهذا الكمبيوتر عبر سطح المكتب البعيد."
+    },
+    "system.security.disable-remote-assistance": {
+      "name": "تعطيل المساعدة عن بُعد",
+      "description": "يعطّل المساعدة عن بُعد في Windows (Easy Connect وملفات الدعوة) لإغلاق باب المساعدة عن بُعد غير المطلوبة.",
+      "whatItDoes": "يعطّل المساعدة عن بُعد في Windows (fAllowToGetHelp = 0).",
+      "sideEffects": "لن يتمكن فنيو الدعم من الاتصال بهذا الكمبيوتر عبر أداة المساعدة عن بُعد المضمّنة في Windows."
+    },
+    "system.security.disable-wsh": {
+      "name": "تعطيل Windows Script Host (سكربتات VBS/JS)",
+      "description": "يمنع تشغيل سكربتات .vbs و.js المستقلة، وهي من الطرق الشائعة لنشر البرامج الضارة.",
+      "whatItDoes": "يعطّل تشغيل Windows Script Host (WSH) لسكربتات .vbs و.js.",
+      "sideEffects": "سيُمنع تشغيل السكربتات الإدارية القديمة المكتوبة بـ VBScript وJScript.",
+      "warnings": "قد يعطّل برامج التثبيت والسكربتات الإدارية التي تعتمد على VBScript أو JScript."
+    },
+    "system.security.enforce-smartscreen": {
+      "name": "فرض Windows SmartScreen عبر سياسة",
+      "description": "يفرض حماية Windows Defender SmartScreen على مستوى نظام التشغيل عبر سياسة.",
+      "whatItDoes": "يفرض حماية Windows Defender SmartScreen على Microsoft Edge والملفات التنفيذية التي يتم تنزيلها.",
+      "sideEffects": "يمنع تشغيل البرامج المنزّلة غير المعروفة أو غير الموثوقة ما لم تتجاوز ذلك صراحةً.",
+      "warnings": "هذا الإعداد مفروض عبر سياسة ويقفل مفتاح SmartScreen في إعدادات أمن Windows."
+    },
+    "system.shutdown.auto-end-tasks": {
+      "name": "إغلاق التطبيقات تلقائياً عند إيقاف التشغيل",
+      "description": "يُغلق إيقاف التشغيل وإعادة التشغيل وتسجيل الخروج التطبيقات المفتوحة بدلاً من الانتظار على شاشة 'This app is preventing shutdown'.",
+      "whatItDoes": "يوجّه Windows لإنهاء التطبيقات التي لا تُغلق من تلقاء نفسها أثناء إيقاف التشغيل أو إعادة التشغيل أو تسجيل الخروج (AutoEndTasks).",
+      "sideEffects": "يُفقد العمل غير المحفوظ في التطبيقات المفتوحة عند إيقاف التشغيل بدلاً من أن يسألك Windows أولاً."
+    },
+    "ui.explorer.classic-context-menu": {
+      "name": "استعادة قائمة النقر بزر الماوس الأيمن الكلاسيكية",
+      "description": "يستعيد قائمة السياق الكاملة من Windows 10 في مستكشف الملفات في Windows 11 دون الحاجة إلى 'Show more options'.",
+      "whatItDoes": "يستعيد قائمة السياق الكاملة الكلاسيكية من Windows 10 في مستكشف الملفات في Windows 11.",
+      "sideEffects": "لا توجد آثار معروفة."
+    },
+    "ui.explorer.hide-frequent-folders": {
+      "name": "إخفاء المجلدات المستخدمة كثيرًا في Quick Access",
+      "description": "يمنع Windows من تثبيت المجلدات التي تزورها كثيرًا تلقائيًا في مستكشف الملفات.",
+      "whatItDoes": "يخفي المجلدات المستخدمة كثيرًا من Quick Access / Home في مستكشف الملفات.",
+      "sideEffects": "لا توجد آثار معروفة."
+    },
+    "ui.explorer.hide-gallery": {
+      "name": "إخفاء Gallery من جزء التنقل في مستكشف الملفات",
+      "description": "يزيل أيقونة 'Gallery' غير الضرورية من شجرة التنقل اليسرى في مستكشف الملفات في Windows 11.",
+      "whatItDoes": "يخفي أيقونة Gallery وعنصرها من الشريط الجانبي للتنقل في مستكشف الملفات.",
+      "sideEffects": "لا توجد آثار معروفة."
+    },
+    "ui.explorer.hide-onedrive-nav": {
+      "name": "OneDrive في جزء التنقل بمستكشف الملفات - إخفاء",
+      "description": "يزيل إدخال OneDrive من الجزء الأيسر في مستكشف الملفات للمستخدم الحالي.",
+      "whatItDoes": "يخفي مجلد OneDrive من جزء التنقل في مستكشف الملفات (System.IsPinnedToNameSpaceTree). لا يتم إلغاء تثبيت OneDrive.",
+      "sideEffects": "ستصل إلى ملفات OneDrive عبر مجلد المستخدم أو أيقونة OneDrive في منطقة الإعلام بدلاً من ذلك. قد يعيد تحديث OneDrive الإدخال مجدداً."
+    },
+    "ui.explorer.hide-recent-files": {
+      "name": "إخفاء الملفات الأخيرة في صفحة Home بمستكشف الملفات",
+      "description": "يمنع الملفات المفتوحة مؤخرًا من ازدحام Quick Access وصفحة Home.",
+      "whatItDoes": "يخفي الملفات الأخيرة من Quick Access / Home في مستكشف الملفات.",
+      "sideEffects": "لا توجد آثار معروفة."
+    },
+    "ui.explorer.open-to-this-pc": {
+      "name": "فتح مستكشف الملفات على This PC",
+      "description": "يضبط مستكشف الملفات ليفتح على عرض 'This PC' بدلًا من Quick Access / Home.",
+      "whatItDoes": "يضبط مستكشف الملفات ليفتح على 'This PC' بدلًا من 'Home'.",
+      "sideEffects": "لا توجد آثار معروفة."
+    },
+    "ui.explorer.show-file-extensions": {
+      "name": "إظهار امتدادات الملفات المعروفة دائمًا",
+      "description": "يعرض امتدادات الملفات (.exe و.txt و.pdf) في مستكشف الملفات لمزيد من الوضوح والأمان.",
+      "whatItDoes": "يضبط مستكشف الملفات لإظهار امتدادات جميع أنواع الملفات.",
+      "sideEffects": "لا توجد آثار معروفة."
+    },
+    "ui.explorer.show-full-path-title": {
+      "name": "عرض المسار الكامل للمجلد في شريط عنوان مستكشف الملفات",
+      "description": "يعرض مسار المجلد الكامل في شريط عنوان المستكشف لتنقل أدق بين الملفات.",
+      "whatItDoes": "يعرض المسار الكامل للمجلد في شريط عنوان مستكشف الملفات.",
+      "sideEffects": "لا توجد آثار معروفة."
+    },
+    "ui.explorer.show-hidden-files": {
+      "name": "إظهار الملفات والمجلدات المخفية",
+      "description": "يجعل الملفات والمجلدات المخفية مرئية في مستكشف الملفات.",
+      "whatItDoes": "يضبط مستكشف الملفات لإظهار الملفات والمجلدات المخفية.",
+      "sideEffects": "لا توجد آثار معروفة."
+    },
+    "ui.logon.hide-fast-user-switching": {
+      "name": "إخفاء خيار التبديل السريع بين المستخدمين",
+      "description": "يخفي زر التبديل السريع بين المستخدمين من قائمة ابدأ وشاشة تسجيل الدخول لتجنب ترك جلسات مفتوحة في الخلفية.",
+      "whatItDoes": "يخفي زر التبديل السريع بين المستخدمين من شاشة تسجيل الدخول وقائمة ابدأ.",
+      "sideEffects": "يجب على المستخدمين تسجيل الخروج بالكامل قبل أن يتمكن مستخدم آخر من تسجيل الدخول إلى الكمبيوتر."
+    },
+    "ui.search.disable-search-highlights": {
+      "name": "تعطيل أبرز عناصر البحث والرسومات",
+      "description": "يزيل رسومات Bing اليومية والمواضيع الرائجة على الويب من مربع البحث في شريط المهام.",
+      "whatItDoes": "يعطّل أبرز عناصر البحث الملونة والرسومات اليومية في مربع بحث Windows.",
+      "sideEffects": "لا توجد آثار معروفة."
+    },
+    "ui.system.disable-tips-suggestions": {
+      "name": "تعطيل النصائح والحيل والاقتراحات حول Windows",
+      "description": "يمنع Windows من عرض نوافذ منبثقة إعلامية واقتراحات أثناء الاستخدام العادي لسطح المكتب.",
+      "whatItDoes": "يعطّل النصائح والحيل واقتراحات الميزات في إشعارات Windows.",
+      "sideEffects": "لا توجد آثار معروفة."
+    },
+    "ui.system.disable-welcome-experience": {
+      "name": "تعطيل تجربة الترحيب في Windows بعد التحديثات",
+      "description": "يمنع Windows من عرض شاشات الإعداد والترويج 'What's new' بملء الشاشة بعد تحديثات الميزات.",
+      "whatItDoes": "يعطّل شاشة الإعداد الترحيبية التي تظهر في Windows بعد التحديث.",
+      "sideEffects": "لا توجد آثار معروفة."
+    },
+    "ui.system.enable-long-paths": {
+      "name": "تفعيل المسارات الطويلة في Win32 (>260 حرفًا)",
+      "description": "يزيل القيد القديم على طول المسار البالغ 260 حرفًا في واجهات ملفات Win32.",
+      "whatItDoes": "يفعّل دعم المسارات الطويلة في Win32 (>260 حرفًا) في سياسات النظام.",
+      "sideEffects": "يسمح للتطبيقات بالوصول إلى مسارات مجلدات عميقة؛ وقد لا تتعامل البرامج القديمة بنظام 16-bit مع المسارات الطويلة."
+    },
+    "ui.taskbar.alignment-left": {
+      "name": "محاذاة أيقونات شريط المهام لليسار",
+      "description": "ينقل أيقونات شريط المهام في Windows 11 إلى الجهة اليسرى كما في Windows 10.",
+      "whatItDoes": "يحاذي أيقونات شريط المهام في Windows 11 لليسار.",
+      "sideEffects": "لا توجد آثار معروفة."
+    },
+    "ui.taskbar.disable-chat-button": {
+      "name": "إخفاء أيقونة Microsoft Teams Chat من شريط المهام",
+      "description": "يزيل أيقونة Teams Chat الشخصية المدمجة من شريط مهام Windows.",
+      "whatItDoes": "يخفي زر Microsoft Teams Chat من شريط مهام Windows 11.",
+      "sideEffects": "يزيل أيقونة Teams Chat من شريط المهام."
+    },
+    "ui.taskbar.disable-task-view-button": {
+      "name": "إخفاء زر Task View من شريط المهام",
+      "description": "يزيل زر أسطح المكتب الافتراضية / Task View من شريط مهام Windows.",
+      "whatItDoes": "يخفي زر Task View من شريط مهام Windows 11.",
+      "sideEffects": "يزيل أيقونة Task View من شريط المهام؛ ولا يزال بإمكانك التبديل بين أسطح المكتب الافتراضية باستخدام Win+Tab."
+    },
+    "ui.taskbar.disable-widgets-button": {
+      "name": "إخفاء أيقونة الطقس للأدوات المصغّرة من شريط المهام",
+      "description": "يخفي زر الأدوات المصغّرة الخاص بتوقعات الطقس وموجز MSN في شريط مهام Windows 11.",
+      "whatItDoes": "يخفي أيقونة الأدوات المصغّرة من شريط مهام Windows 11.",
+      "sideEffects": "يزيل زر الطقس للأدوات المصغّرة من شريط المهام."
+    },
+    "ui.taskbar.end-task-right-click": {
+      "name": "تفعيل 'End Task' في قائمة شريط المهام",
+      "description": "يضيف خيار 'End Task' عند النقر بزر الماوس الأيمن على التطبيقات قيد التشغيل في شريط المهام.",
+      "whatItDoes": "يضيف 'End Task' مباشرةً إلى قائمة النقر بزر الماوس الأيمن على أيقونات التطبيقات في شريط المهام.",
+      "sideEffects": "لا توجد آثار معروفة."
+    },
+    "ui.taskbar.last-active-click": {
+      "name": "النقر على شريط المهام يفتح آخر نافذة نشطة",
+      "description": "النقر على تطبيق مجمّع في شريط المهام ينتقل مباشرةً إلى آخر نافذة استخدمتها بدلًا من عرض الصور المصغرة.",
+      "whatItDoes": "عندما تكون لتطبيق عدة نوافذ مفتوحة، يعيد نقر واحد على أيقونته في شريط المهام آخر نافذة استخدمتها (LastActiveClick).",
+      "sideEffects": "لن تظهر قائمة الصور المصغرة عند النقر؛ ولا تزال المعاينات تظهر عند تمرير المؤشر. تتم إعادة تشغيل مستكشف الملفات لتطبيق التغيير."
+    },
+    "ui.taskbar.show-seconds-clock": {
+      "name": "إظهار الثواني في ساعة شريط المهام",
+      "description": "يفعّل عرض الثواني في ساعة علبة النظام في Windows.",
+      "whatItDoes": "يعرض الثواني في ساعة علبة النظام على شريط المهام.",
+      "sideEffects": "لا توجد آثار معروفة."
+    },
+    "ui.widgets.disable-policy": {
+      "name": "لوحة الأدوات المصغّرة - تعطيل عبر سياسة",
+      "description": "يوقف لوحة الأدوات المصغّرة وموجز الأخبار فيها عبر سياسة، دون إلغاء تثبيت أي شيء.",
+      "whatItDoes": "يضبط السياسة AllowNewsAndInterests لإيقاف لوحة الأدوات المصغّرة وزرها في شريط المهام وموجز الأخبار.",
+      "sideEffects": "لا يمكن فتح الأدوات المصغّرة حتى يتم التراجع عن التعديل. يسري التأثير بالكامل بعد إعادة التشغيل.",
+      "warnings": "ستعرض إعدادات Windows الرسالة 'Some settings are managed by your organization'. هذا طبيعي عند ضبط مفاتيح الريجستري الخاصة بـ Group Policy."
+    },
+    "updates.activehours.enable-policy": {
+      "name": "فرض سياسة ساعات النشاط لمنع إعادة التشغيل خلال النهار",
+      "description": "يفرض فترة ساعات نشاط (من 8 AM إلى 10 PM) حتى لا تقاطع إعادة التشغيل التلقائية أنشطتك اليومية.",
+      "whatItDoes": "يفرض نطاق ساعات النشاط المحدد الذي لن تحدث خلاله إعادة تشغيل تلقائية.",
+      "sideEffects": "سيمتنع Windows Update عن إعادة تشغيل الكمبيوتر خلال ساعات العمل المحددة."
+    },
+    "updates.au.notify-download": {
+      "name": "الإشعار قبل تنزيل تحديثات Windows",
+      "description": "يضبط التحديثات التلقائية على AUOptions 2 (الإشعار قبل التنزيل) لتجنب الاستهلاك المفاجئ للإنترنت.",
+      "whatItDoes": "يضبط التحديثات التلقائية على الإشعار قبل تنزيل التحديثات وتثبيتها (AUOptions = 2).",
+      "sideEffects": "سيُعلمك Windows بتوفر التحديثات بدلًا من تنزيلها تلقائيًا في الخلفية.",
+      "warnings": "يتطلب تأكيدًا يدويًا لتنزيل التحديثات وتثبيتها."
+    },
+    "updates.drivers.exclude-from-updates": {
+      "name": "استبعاد تعريفات الأجهزة من Windows Update",
+      "description": "يمنع Windows Update من استبدال تعريفات GPU أو الشرائح (chipset) لديك تلقائيًا.",
+      "whatItDoes": "يستبعد تحديثات تعريفات الأجهزة من عمليات فحص Windows Update العادية.",
+      "sideEffects": "لن يحدّث Windows Update تعريفات GPU أو الشرائح أو الأجهزة الطرفية؛ ويجب تحديثها يدويًا."
+    },
+    "updates.peering.metered-connections": {
+      "name": "حظر تحسين التسليم على الاتصالات المحدودة",
+      "description": "يمنع Windows Update من تنزيل ملفات التحديث أو مشاركتها عند الاتصال بشبكات محدودة أو نقاط اتصال.",
+      "whatItDoes": "يعطّل تنزيلات Windows Update عبر الاتصالات المحدودة أو الخلوية.",
+      "sideEffects": "لن يتم تنزيل التحديثات ما دام اتصال الإنترنت الحالي محددًا كاتصال محدود."
+    },
+    "updates.preview.disable-optional-content": {
+      "name": "تعطيل التحديثات التجريبية الاختيارية وإصدارات الميزات المبكرة",
+      "description": "يمنع تثبيت تحديثات الجودة التجريبية غير المختبرة (الإصدارات الاختيارية في أسبوعي C/D).",
+      "whatItDoes": "يعطّل التثبيت التلقائي للتحديثات التجريبية والمحتوى الاختياري غير الأمني.",
+      "sideEffects": "سيثبّت Windows Update التحديثات الأمنية الشهرية التراكمية فقط، متجاهلًا طرح الميزات التجريبية."
+    },
+    "updates.reboot.disable-auto-reboot-logged-on": {
+      "name": "منع إعادة التشغيل التلقائية الإجبارية أثناء تسجيل الدخول",
+      "description": "يمنع Windows Update من إعادة تشغيل الكمبيوتر قسرًا عند تثبيت التحديثات وأنت مسجّل الدخول.",
+      "whatItDoes": "يمنع Windows Update من إعادة تشغيل الكمبيوتر تلقائيًا أثناء تسجيل دخول مستخدم.",
+      "sideEffects": "ستنتظر إعادة التشغيل اللازمة للتحديثات المكتملة حتى يبدأ المستخدم إعادة التشغيل بنفسه أو يسجّل الخروج."
+    }
+  },
+  "presets": {
+    "preset.gaming": {
+      "name": "الألعاب: مقاطعات أقل في الخلفية",
+      "description": "يوقف Game Bar والتسجيل في الخلفية، ويُبقي وضع الألعاب مفعّلًا، ويمنع اختصار المفاتيح الثابتة من مقاطعة اللعب."
+    },
+    "preset.ai": {
+      "name": "الذكاء الاصطناعي و Copilot",
+      "description": "يوقف Copilot ولقطات Recall و Click to Do ونتائج Bing في البحث وميزات الذكاء الاصطناعي في Paint و Notepad."
+    },
+    "preset.privacy": {
+      "name": "الخصوصية: حماية من القياس والتتبع",
+      "description": "يقلل جمع بيانات التشخيص والتجارب المخصصة ومعرّف الإعلانات وتتبع سجل النشاط."
+    },
+    "preset.performance": {
+      "name": "الأداء: مهام أقل في الخلفية",
+      "description": "يقلل العمل في الخلفية مثل التحميل المسبق لـ Edge والاستيقاظ للصيانة والفهرسة على البطارية، ويوقف المؤثرات المرئية التي تستهلك الموارد."
+    },
+    "preset.clean-ui": {
+      "name": "واجهة نظيفة: بلا مشتتات",
+      "description": "يزيل زحمة شريط المهام والإعلانات والاقتراحات في قائمة ابدأ ومستكشف الملفات وشاشة القفل، ويعيد قائمة النقر الأيمن الكلاسيكية."
+    },
+    "preset.recommended": {
+      "name": "الأساس الموصى به",
+      "description": "تعديلات آمنة فقط: يوقف الإعلانات والنصائح والتتبع، ويُظهر امتدادات الملفات، ويعيد قائمة النقر الأيمن الكلاسيكية، ويقلل الحركات والشفافية."
+    }
+  },
+  "reasons": {
+    "Advanced tuning — apply it individually after reading the details": "ضبط متقدم — طبّقه وحده بعد قراءة التفاصيل",
+    "Conflicts with {0} (changes the same setting differently)": "يتعارض مع {0} (يغيّر الإعداد نفسه بطريقة مختلفة)",
+    "Experimental tweak — requires manual testing": "تعديل تجريبي — يحتاج إلى تجربة يدوية",
+    "Fix for a specific problem — apply it only if you have that problem": "إصلاح لمشكلة محددة — طبّقه فقط إذا كانت لديك هذه المشكلة",
+    "High risk — enable individually from Tweaks": "خطورة مرتفعة — فعّله وحده من صفحة التعديلات",
+    "Needs manual review before applying": "يحتاج إلى مراجعة يدوية قبل التطبيق",
+    "One-time action — run it from Tweaks when you need it": "إجراء لمرة واحدة — شغّله من صفحة التعديلات عند الحاجة",
+    "Personal preference — choose it yourself in Tweaks": "تفضيل شخصي — اختره بنفسك من صفحة التعديلات",
+    "Recommended Baseline only includes Safe tweaks — find it in the topic presets or Tweaks": "الأساس الموصى به يضم التعديلات الآمنة فقط — ستجده في الإعدادات الجاهزة الأخرى أو في صفحة التعديلات",
+    "Irreversible change — must be applied manually": "تغيير لا يمكن التراجع عنه — يجب تطبيقه يدويًا",
+    "Not classified for presets yet — apply it individually from Tweaks": "غير مصنّف للإعدادات الجاهزة بعد — طبّقه وحده من صفحة التعديلات"
+  }
+}

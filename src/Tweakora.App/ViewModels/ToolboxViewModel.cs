@@ -11,6 +11,7 @@ using Tweakora.Modules.Memory;
 using Tweakora.Modules.Network;
 using Tweakora.Modules.Services;
 using Tweakora.Modules.Startup;
+using Tweakora.App.Localization;
 
 namespace Tweakora.App.ViewModels;
 
@@ -26,7 +27,7 @@ public sealed partial class ToolboxViewModel : ObservableObject
     private readonly INetworkOptimizerService _networkOptimizer;
 
     [ObservableProperty]
-    private string _status = "Tools Available";
+    private string _status = LocalizationManager.T("Tools Available");
 
     [ObservableProperty]
     private string _activeTool = "Cleaner"; // "Cleaner", "Startup", "Services", "Fixes", "Network"
@@ -44,16 +45,16 @@ public sealed partial class ToolboxViewModel : ObservableObject
     private bool _isBenchmarkingDns;
 
     [ObservableProperty]
-    private string _cleanerStatusText = "Ready to scan temporary caches.";
+    private string _cleanerStatusText = LocalizationManager.T("Ready to scan temporary caches.");
 
     [ObservableProperty]
-    private string _fixStatusText = "Select a repair to diagnose and restore system components.";
+    private string _fixStatusText = LocalizationManager.T("Select a repair to diagnose and restore system components.");
 
     [ObservableProperty]
-    private string _dnsStatusText = "Select a verified DNS provider to apply.";
+    private string _dnsStatusText = LocalizationManager.T("Select a verified DNS provider to apply.");
 
     [ObservableProperty]
-    private string _networkStatusText = "Network & Gaming Latency Optimizer ready.";
+    private string _networkStatusText = LocalizationManager.T("Network & Gaming Latency Optimizer ready.");
 
     public ObservableCollection<CleanerCategoryScan> CleanerCategories { get; } = new();
     public ObservableCollection<StartupAppItem> StartupItems { get; } = new();
@@ -93,7 +94,7 @@ public sealed partial class ToolboxViewModel : ObservableObject
     private async Task ScanCleanerAsync()
     {
         IsScanningCleaner = true;
-        CleanerStatusText = "Scanning whitelisted system temporary directories...";
+        CleanerStatusText = LocalizationManager.T("Scanning whitelisted system temporary directories...");
         await Task.Yield();
 
         try
@@ -106,11 +107,11 @@ public sealed partial class ToolboxViewModel : ObservableObject
                 CleanerCategories.Add(r);
                 totalBytes += r.TotalBytes;
             }
-            CleanerStatusText = $"Scan complete. {CleanerCategories.Sum(c => c.FileCount)} junk files found ({totalBytes / (1024.0 * 1024):F1} MB).";
+            CleanerStatusText = LocalizationManager.T("Scan complete. {0} junk files found ({1:F1} MB).", CleanerCategories.Sum(c => c.FileCount), totalBytes / (1024.0 * 1024));
         }
         catch (Exception ex)
         {
-            CleanerStatusText = $"Scan error: {ex.Message}";
+            CleanerStatusText = LocalizationManager.T("Scan error: {0}", ex.Message);
         }
         finally
         {
@@ -123,30 +124,30 @@ public sealed partial class ToolboxViewModel : ObservableObject
     {
         if (!Tweakora.App.Services.AppAdminGuard.EnsureAdmin("clean system temporary files"))
         {
-            CleanerStatusText = "Administrator privileges required to clean temporary files.";
+            CleanerStatusText = LocalizationManager.T("Administrator privileges required to clean temporary files.");
             return;
         }
 
         var selected = CleanerCategories.Where(c => c.IsSelected).Select(c => c.Id).ToList();
         if (selected.Count == 0)
         {
-            CleanerStatusText = "No categories selected to clean.";
+            CleanerStatusText = LocalizationManager.T("No categories selected to clean.");
             return;
         }
 
         IsCleaning = true;
-        CleanerStatusText = "Cleaning selected safe cache locations...";
+        CleanerStatusText = LocalizationManager.T("Cleaning selected safe cache locations...");
         await Task.Yield();
 
         try
         {
             var result = await Task.Run(async () => await _cleanerService.CleanCategoriesAsync(selected));
-            CleanerStatusText = $"Cleanup completed! {result.FormattedSummary}.";
+            CleanerStatusText = LocalizationManager.T("Cleanup completed! {0}.", result.FormattedSummary);
             await ScanCleanerAsync();
         }
         catch (Exception ex)
         {
-            CleanerStatusText = $"Cleanup error: {ex.Message}";
+            CleanerStatusText = LocalizationManager.T("Cleanup error: {0}", ex.Message);
         }
         finally
         {
@@ -179,16 +180,16 @@ public sealed partial class ToolboxViewModel : ObservableObject
     {
         if (!Tweakora.App.Services.AppAdminGuard.EnsureAdmin("run system maintenance fixes"))
         {
-            FixStatusText = "Administrator privileges required to run fixes.";
+            FixStatusText = LocalizationManager.T("Administrator privileges required to run fixes.");
             return;
         }
 
-        FixStatusText = $"Running repair: {fix.Title}...";
+        FixStatusText = LocalizationManager.T("Running repair: {0}...", fix.Title);
         await Task.Yield();
         var report = await Task.Run(async () => await _fixService.RunFixAsync(fix.Id, _runner));
         FixStatusText = report.FailedCount == 0
-            ? $"Successfully completed: {fix.Title}."
-            : $"Repair finished with notes: {report.Summary}.";
+            ? LocalizationManager.T("Successfully completed: {0}.", fix.Title)
+            : LocalizationManager.T("Repair finished with notes: {0}.", report.Summary);
     }
 
     [RelayCommand]
@@ -196,11 +197,11 @@ public sealed partial class ToolboxViewModel : ObservableObject
     {
         if (!Tweakora.App.Services.AppAdminGuard.EnsureAdmin("change DNS settings"))
         {
-            DnsStatusText = "Administrator privileges required to change DNS settings.";
+            DnsStatusText = LocalizationManager.T("Administrator privileges required to change DNS settings.");
             return;
         }
 
-        DnsStatusText = $"Applying {provider.Name} ({provider.PrimaryDns})...";
+        DnsStatusText = LocalizationManager.T("Applying {0} ({1})...", provider.Name, provider.PrimaryDns);
         await Task.Yield();
         bool ok = await Task.Run(async () => await _dnsService.ApplyDnsAsync(provider));
         if (ok)
@@ -209,37 +210,37 @@ public sealed partial class ToolboxViewModel : ObservableObject
             {
                 p.IsActive = (p.Id == provider.Id);
             }
-            DnsStatusText = $"Applied {provider.Name} successfully.";
+            DnsStatusText = LocalizationManager.T("Applied {0} successfully.", provider.Name);
         }
         else
         {
-            DnsStatusText = $"Failed to apply {provider.Name}.";
+            DnsStatusText = LocalizationManager.T("Failed to apply {0}.", provider.Name);
         }
     }
 
     [RelayCommand]
     private async Task TestDnsLatencyAsync(DnsProviderDefinition provider)
     {
-        DnsStatusText = $"Pinging {provider.PrimaryDns}...";
+        DnsStatusText = LocalizationManager.T("Pinging {0}...", provider.PrimaryDns);
         await Task.Yield();
         int ping = await Task.Run(async () => await _dnsService.PingDnsAsync(provider.PrimaryDns));
         provider.PingMs = ping;
-        DnsStatusText = ping >= 0 ? $"{provider.Name} latency: {ping} ms" : $"{provider.Name} ping timed out or unavailable.";
+        DnsStatusText = ping >= 0 ? LocalizationManager.T("{0} latency: {1} ms", provider.Name, ping) : LocalizationManager.T("{0} ping timed out or unavailable.", provider.Name);
     }
 
     [RelayCommand]
     private async Task PurgeRamAsync()
     {
-        CleanerStatusText = "Purging standby memory and trimming working sets...";
+        CleanerStatusText = LocalizationManager.T("Purging standby memory and trimming working sets...");
         await Task.Yield();
         try
         {
             var result = await Task.Run(async () => await _memoryOptimizer.PurgeMemoryAndStandbyListAsync());
-            CleanerStatusText = $"Memory Purge Complete! Freed {result.FormattedFreed} of Standby & Process Cache.";
+            CleanerStatusText = LocalizationManager.T("Memory Purge Complete! Freed {0} of Standby & Process Cache.", result.FormattedFreed);
         }
         catch (Exception ex)
         {
-            CleanerStatusText = $"RAM Purge Error: {ex.Message}";
+            CleanerStatusText = LocalizationManager.T("RAM Purge Error: {0}", ex.Message);
         }
     }
 
@@ -247,7 +248,7 @@ public sealed partial class ToolboxViewModel : ObservableObject
     private async Task BenchmarkAllDnsAsync()
     {
         IsBenchmarkingDns = true;
-        DnsStatusText = "Benchmarking top 5 DNS providers (3 pings each)...";
+        DnsStatusText = LocalizationManager.T("Benchmarking top 5 DNS providers (3 pings each)...");
         await Task.Yield();
         try
         {
@@ -264,16 +265,16 @@ public sealed partial class ToolboxViewModel : ObservableObject
             var fastest = results.FirstOrDefault(r => r.IsFastest);
             if (fastest != null)
             {
-                DnsStatusText = $"Benchmark complete! Fastest DNS: {fastest.Name} ({fastest.AveragePingMs} ms).";
+                DnsStatusText = LocalizationManager.T("Benchmark complete! Fastest DNS: {0} ({1} ms).", fastest.Name, fastest.AveragePingMs);
             }
             else
             {
-                DnsStatusText = "DNS Benchmark complete.";
+                DnsStatusText = LocalizationManager.T("DNS Benchmark complete.");
             }
         }
         catch (Exception ex)
         {
-            DnsStatusText = $"Benchmark error: {ex.Message}";
+            DnsStatusText = LocalizationManager.T("Benchmark error: {0}", ex.Message);
         }
         finally
         {
@@ -286,7 +287,7 @@ public sealed partial class ToolboxViewModel : ObservableObject
     {
         if (!Tweakora.App.Services.AppAdminGuard.EnsureAdmin("apply DNS settings"))
         {
-            DnsStatusText = "Administrator privileges required to change DNS.";
+            DnsStatusText = LocalizationManager.T("Administrator privileges required to change DNS.");
             return;
         }
 
@@ -304,7 +305,7 @@ public sealed partial class ToolboxViewModel : ObservableObject
         }
         else
         {
-            DnsStatusText = "No responsive DNS providers found. Check internet connection.";
+            DnsStatusText = LocalizationManager.T("No responsive DNS providers found. Check internet connection.");
         }
     }
 
@@ -313,11 +314,11 @@ public sealed partial class ToolboxViewModel : ObservableObject
     {
         if (!Tweakora.App.Services.AppAdminGuard.EnsureAdmin("reset DNS settings"))
         {
-            DnsStatusText = "Administrator privileges required to change DNS.";
+            DnsStatusText = LocalizationManager.T("Administrator privileges required to change DNS.");
             return;
         }
 
-        DnsStatusText = "Resetting network adapters to Automatic (DHCP) DNS...";
+        DnsStatusText = LocalizationManager.T("Resetting network adapters to Automatic (DHCP) DNS...");
         await Task.Yield();
         bool ok = await Task.Run(async () => await _networkOptimizer.ResetDnsToDhcpAsync());
         if (ok)
@@ -326,11 +327,11 @@ public sealed partial class ToolboxViewModel : ObservableObject
             {
                 p.IsActive = (p.PrimaryDns == "DHCP");
             }
-            DnsStatusText = "Successfully reset network adapters to Automatic (DHCP) DNS.";
+            DnsStatusText = LocalizationManager.T("Successfully reset network adapters to Automatic (DHCP) DNS.");
         }
         else
         {
-            DnsStatusText = "Failed to reset DNS. Ensure network adapter is active.";
+            DnsStatusText = LocalizationManager.T("Failed to reset DNS. Ensure network adapter is active.");
         }
     }
 
@@ -352,12 +353,12 @@ public sealed partial class ToolboxViewModel : ObservableObject
         {
             IsNagleDisabled = await Task.Run(async () => await _networkOptimizer.DetectNagleAlgorithmDisabledAsync());
             NetworkStatusText = IsNagleDisabled
-                ? "Nagle's Algorithm Disabled: TCPNoDelay active on active network adapter(s)."
-                : "Standard TCP packet batching restored.";
+                ? LocalizationManager.T("Nagle's Algorithm Disabled: TCPNoDelay active on active network adapter(s).")
+                : LocalizationManager.T("Standard TCP packet batching restored.");
         }
         else
         {
-            NetworkStatusText = "Failed to update network adapter TCP parameters.";
+            NetworkStatusText = LocalizationManager.T("Failed to update network adapter TCP parameters.");
         }
     }
 

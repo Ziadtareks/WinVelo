@@ -1,4 +1,8 @@
 using System;
+using System.Diagnostics;
+using System.Windows;
+using Serilog;
+using Tweakora.App.Localization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Tweakora.App.Services;
@@ -28,6 +32,19 @@ public sealed partial class SettingsViewModel : ObservableObject
     private bool _showExperimental;
 
     public string VersionDisplay => Tweakora.Core.AppInfo.DisplayVersion;
+
+    public IReadOnlyList<LanguageOption> Languages => LocalizationManager.SupportedLanguages;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsLanguageRestartNeeded))]
+    private LanguageOption? _selectedLanguage;
+
+    /// <summary>True when the chosen language differs from the one the app started with.</summary>
+    public bool IsLanguageRestartNeeded =>
+        SelectedLanguage != null && SelectedLanguage.Code != LocalizationManager.Instance.CurrentLanguage;
+
+    public bool IsSimpleMode => !string.Equals(AppMode, "Advanced", StringComparison.OrdinalIgnoreCase);
+    public bool IsAdvancedMode => string.Equals(AppMode, "Advanced", StringComparison.OrdinalIgnoreCase);
     public string OsDescription => Environment.OSVersion.VersionString;
 
     public SettingsViewModel(
@@ -42,6 +59,53 @@ public sealed partial class SettingsViewModel : ObservableObject
         _recommendedOnly = s.RecommendedOnly;
         _showExperimental = s.ShowExperimental;
         _isDryRun = _tweaksVM.IsDryRun;
+
+        string savedLanguage = LocalizationManager.NormalizeCode(s.Language);
+        _selectedLanguage = Languages.FirstOrDefault(l => l.Code == savedLanguage) ?? Languages[0];
+    }
+
+    partial void OnAppModeChanged(string value)
+    {
+        OnPropertyChanged(nameof(IsSimpleMode));
+        OnPropertyChanged(nameof(IsAdvancedMode));
+    }
+
+    partial void OnSelectedLanguageChanged(LanguageOption? value)
+    {
+        if (value == null) return;
+        var s = _appSettings.GetSettings();
+        s.Language = value.Code;
+        _appSettings.SaveSettings(s);
+    }
+
+    /// <summary>Restarts WinVelo with the same arguments so the new language is applied everywhere.</summary>
+    [RelayCommand]
+    public void RestartToApplyLanguage()
+    {
+        try
+        {
+            var args = Environment.GetCommandLineArgs().Skip(1).ToList();
+            int idx = args.FindIndex(a => string.Equals(a, "--lang", StringComparison.OrdinalIgnoreCase));
+            if (idx >= 0)
+            {
+                args.RemoveAt(idx);
+                if (idx < args.Count) args.RemoveAt(idx);
+            }
+
+            var psi = new ProcessStartInfo
+            {
+                FileName = Environment.ProcessPath ?? "WinVelo.exe",
+                UseShellExecute = true
+            };
+            foreach (var a in args) psi.ArgumentList.Add(a);
+
+            Process.Start(psi);
+            Application.Current?.Shutdown();
+        }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "Failed to restart WinVelo to apply the language.");
+        }
     }
 
     [RelayCommand]

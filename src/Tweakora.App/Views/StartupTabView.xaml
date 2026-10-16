@@ -1,6 +1,7 @@
 <UserControl x:Class="Tweakora.App.Views.StartupTabView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="clr-namespace:Tweakora.App.Localization"
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              xmlns:vm="clr-namespace:Tweakora.App.ViewModels"
              xmlns:startup="clr-namespace:Tweakora.Modules.Startup;assembly=Tweakora.Modules"
@@ -34,8 +35,8 @@
                             <ui:SymbolIcon Symbol="Rocket24" Foreground="White" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Border>
                         <StackPanel VerticalAlignment="Center">
-                            <TextBlock Text="Startup Applications Manager" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" />
-                            <TextBlock Text="Task Manager bi-directional sync &amp; boot speed optimizer (StartupApproved architecture)"
+                            <TextBlock Text="{loc:Tr Startup_StartupApplicationsManager}" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" />
+                            <TextBlock Text="{loc:Tr Startup_TaskManagerBiDirectionalSync}"
                                        FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" />
                         </StackPanel>
                     </StackPanel>
@@ -46,16 +47,16 @@
                                    AutomationProperties.Name="Optimize Startup Apps"
                                    Appearance="Primary"
                                    Icon="{ui:SymbolIcon Flash24}"
-                                   Content="Optimize Startup Apps"
+                                   Content="{loc:Tr Startup_OptimizeStartupApps}"
                                    Command="{Binding OptimizeStartupCommand}"
                                    Padding="14,8" FontWeight="Bold" FontSize="12" Margin="0,0,8,0"
-                                   ToolTip="Disable non-essential apps to reduce Windows boot delay" />
+                                   ToolTip="{loc:Tr Startup_DisableNonEssentialAppsTo}" />
 
                         <ui:Button AutomationProperties.AutomationId="RefreshStartupButton"
                                    AutomationProperties.Name="Refresh Startup Apps"
                                    Appearance="Secondary"
                                    Icon="{ui:SymbolIcon ArrowSync24}"
-                                   Content="Refresh"
+                                   Content="{loc:Tr History_Refresh}"
                                    Command="{Binding RefreshCommand}"
                                    Padding="10,8" FontSize="12" />
                     </StackPanel>
@@ -74,11 +75,11 @@
                     <Border Grid.Column="0" Background="#181B22" BorderBrush="#262B36" BorderThickness="1" CornerRadius="8" Padding="14,10" Margin="0,0,8,0">
                         <StackPanel>
                             <DockPanel LastChildFill="False">
-                                <TextBlock Text="TOTAL APPS" FontSize="10" FontWeight="Bold" Foreground="#94A3B8" DockPanel.Dock="Left" />
+                                <TextBlock Text="{loc:Tr Startup_TotalApps}" FontSize="10" FontWeight="Bold" Foreground="#94A3B8" DockPanel.Dock="Left" />
                                 <ui:SymbolIcon Symbol="Apps24" Foreground="#94A3B8" FontSize="14" DockPanel.Dock="Right" />
                             </DockPanel>
                             <TextBlock Text="{Binding TotalCount}" FontSize="24" FontWeight="Bold" Foreground="#F8FAFC" Margin="0,4,0,2" />
-                            <TextBlock Text="Scanned across 5 sources" FontSize="11" Foreground="#64748B" />
+                            <TextBlock Text="{loc:Tr Startup_ScannedAcross5Sources}" FontSize="11" Foreground="#64748B" />
                         </StackPanel>
                     </Border>
 
@@ -86,11 +87,11 @@
                     <Border Grid.Column="1" Background="#181B22" BorderBrush="#262B36" BorderThickness="1" CornerRadius="8" Padding="14,10" Margin="0,0,8,0">
                         <StackPanel>
                             <DockPanel LastChildFill="False">
-                                <TextBlock Text="ENABLED APPS" FontSize="10" FontWeight="Bold" Foreground="#10B981" DockPanel.Dock="Left" />
+                                <TextBlock Text="{loc:Tr Startup_EnabledApps}" FontSize="10" FontWeight="Bold" Foreground="#10B981" DockPanel.Dock="Left" />
                                 <ui:SymbolIcon Symbol="CheckmarkCircle24" Foreground="#10B981" FontSize="14" DockPanel.Dock="Right" />
                             </DockPanel>
                             <TextBlock Text="{Binding EnabledCount}" FontSize="24" FontWeight="Bold" Foreground="#10B981" Margin="0,4,0,2" />
-                            <TextBlock Text="Active at user sign-in" FontSize="11" Foreground="#64748B" />
+                            <TextBlock Text="{loc:Tr Startup_ActiveAtUserSignIn}" FontSize="11" Foreground="#64748B" />
                         </StackPanel>
                     </Border>
 
@@ -98,11 +99,11 @@
                     <Border Grid.Column="2" Background="#181B22" BorderBrush="#262B36" BorderThickness="1" CornerRadius="8" Padding="14,10" Margin="0,0,8,0">
                         <StackPanel>
                             <DockPanel LastChildFill="False">
-                                <TextBlock Text="HIGH IMPACT" FontSize="10" FontWeight="Bold" Foreground="#F59E0B" DockPanel.Dock="Left" />
+                                <TextBlock Text="{loc:Tr Startup_HighImpact}" FontSize="10" FontWeight="Bold" Foreground="#F59E0B" DockPanel.Dock="Left" />
                                 <ui:SymbolIcon Symbol="Flash24" Foreground="#F59E0B" FontSize="14" DockPanel.Dock="Right" />
                             </DockPanel>
                             <TextBlock Text="{Binding HighImpactCount}" FontSize="24" FontWeight="Bold" Foreground="#F59E0B" Margin="0,4,0,2" />
-                            <TextBlock Text="Heavy launchers &amp; services" FontSize="11" Foreground="#64748B" />
+                            <TextBlock Text="{loc:Tr Startup_HeavyLaunchersServices}" FontSize="11" Foreground="#64748B" />
                         </StackPanel>
                     </Border>
 
@@ -110,7 +111,7 @@
                     <Border Grid.Column="3" Background="#181B22" BorderBrush="#262B36" BorderThickness="1" CornerRadius="8" Padding="14,10">
                         <StackPanel>
                             <DockPanel LastChildFill="False">
-                                <TextBlock Text="ESTIMATED IMPACT" FontSize="10" FontWeight="Bold" Foreground="#A78BFA" DockPanel.Dock="Left" />
+                                <TextBlock Text="{loc:Tr Startup_EstimatedImpact}" FontSize="10" FontWeight="Bold" Foreground="#A78BFA" DockPanel.Dock="Left" />
                                 <ui:SymbolIcon Symbol="Timer24" Foreground="#A78BFA" FontSize="14" DockPanel.Dock="Right" />
                             </DockPanel>
                             <TextBlock Text="{Binding BootDelayText}" FontSize="15" FontWeight="Bold" Foreground="#A78BFA" Margin="0,6,0,2" />
@@ -129,32 +130,32 @@
                 <!-- Search Box -->
                 <ui:TextBox AutomationProperties.AutomationId="StartupSearchBox"
                             AutomationProperties.Name="Search Startup Apps"
-                            PlaceholderText="Search startup apps by name, publisher, path, or impact..."
+                            PlaceholderText="{loc:Tr Startup_SearchStartupAppsByName}"
                             Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
                             Icon="{ui:SymbolIcon Search24}"
                             Width="360" DockPanel.Dock="Left" Margin="0,0,16,0" VerticalAlignment="Center" />
 
                 <!-- Filter Pills -->
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" VerticalAlignment="Center">
-                    <ui:Button Content="All"
+                    <ui:Button Content="{loc:Tr Startup_All}"
                                AutomationProperties.Name="Filter All"
                                Command="{Binding SetFilterCommand}" CommandParameter="All"
                                Appearance="{Binding IsFilterAll, Converter={StaticResource BoolToAppearanceConverter}}"
                                Padding="12,6" FontSize="12" Margin="0,0,6,0" />
 
-                    <ui:Button Content="Enabled"
+                    <ui:Button Content="{loc:Tr Startup_Enabled}"
                                AutomationProperties.Name="Filter Enabled"
                                Command="{Binding SetFilterCommand}" CommandParameter="Enabled"
                                Appearance="{Binding IsFilterEnabled, Converter={StaticResource BoolToAppearanceConverter}}"
                                Padding="12,6" FontSize="12" Margin="0,0,6,0" />
 
-                    <ui:Button Content="Disabled"
+                    <ui:Button Content="{loc:Tr Startup_Disabled}"
                                AutomationProperties.Name="Filter Disabled"
                                Command="{Binding SetFilterCommand}" CommandParameter="Disabled"
                                Appearance="{Binding IsFilterDisabled, Converter={StaticResource BoolToAppearanceConverter}}"
                                Padding="12,6" FontSize="12" Margin="0,0,6,0" />
 
-                    <ui:Button Content="High Impact"
+                    <ui:Button Content="{loc:Tr Startup_HighImpact2}"
                                AutomationProperties.Name="Filter High Impact"
                                Command="{Binding SetFilterCommand}" CommandParameter="HighImpact"
                                Appearance="{Binding IsFilterHighImpact, Converter={StaticResource BoolToAppearanceConverter}}"
@@ -210,12 +211,12 @@
                                     Margin="0,0,14,0" VerticalAlignment="Center" ClipToBounds="True">
                                 <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
                                     <!-- 1. Real Extracted Windows Exe Icon from Disk -->
-                                    <Image Source="{Binding IconImage}" Width="32" Height="32"
+                                    <Image FlowDirection="LeftToRight" Source="{Binding IconImage}" Width="32" Height="32"
                                            RenderOptions.BitmapScalingMode="HighQuality"
                                            Visibility="{Binding HasIconImage, Converter={StaticResource BoolToVisConverter}}" />
 
                                     <!-- 2. Authentic Branded SVG Vector Logo (when not on disk) -->
-                                    <Viewbox Width="24" Height="24"
+                                    <Viewbox FlowDirection="LeftToRight" Width="24" Height="24"
                                              Visibility="{Binding HasSvgIcon, Converter={StaticResource BoolToVisConverter}}">
                                         <Path Data="{Binding SvgIconPath}" Fill="White" Stretch="Uniform" />
                                     </Viewbox>
@@ -246,14 +247,14 @@
                                             Visibility="{Binding IsEssentialSystemItem, Converter={StaticResource BoolToVisConverter}}">
                                         <StackPanel Orientation="Horizontal">
                                             <ui:SymbolIcon Symbol="ShieldCheckmark16" Foreground="#34D399" FontSize="11" Margin="0,0,4,0" VerticalAlignment="Center" />
-                                            <TextBlock Text="SYSTEM ESSENTIAL" FontSize="9" FontWeight="Bold" Foreground="#34D399" VerticalAlignment="Center" />
+                                            <TextBlock Text="{loc:Tr Startup_SystemEssential}" FontSize="9" FontWeight="Bold" Foreground="#34D399" VerticalAlignment="Center" />
                                         </StackPanel>
                                     </Border>
                                 </StackPanel>
 
                                 <!-- Bottom Line: Clean Exe Path / Command + File Size -->
                                 <DockPanel LastChildFill="False">
-                                    <TextBlock Text="{Binding CleanExePath}" FontFamily="Consolas" FontSize="11"
+                                    <TextBlock FlowDirection="LeftToRight" Text="{Binding CleanExePath}" FontFamily="Consolas" FontSize="11"
                                                Foreground="#64748B" TextTrimming="CharacterEllipsis" MaxWidth="560" VerticalAlignment="Center" DockPanel.Dock="Left" />
 
                                     <TextBlock Text="{Binding FileSizeFormatted}" FontSize="11" Foreground="#475569"
@@ -285,19 +286,19 @@
                                         <TextBlock.Style>
                                             <Style TargetType="TextBlock">
                                                 <Setter Property="Foreground" Value="#94A3B8" />
-                                                <Setter Property="Text" Value="LOW IMPACT" />
+                                                <Setter Property="Text" Value="{loc:Tr Startup_LowImpact}" />
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding Impact}" Value="High">
                                                         <Setter Property="Foreground" Value="#F87171" />
-                                                        <Setter Property="Text" Value="HIGH IMPACT" />
+                                                        <Setter Property="Text" Value="{loc:Tr Startup_HighImpact}" />
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding Impact}" Value="Medium">
                                                         <Setter Property="Foreground" Value="#FBBF24" />
-                                                        <Setter Property="Text" Value="MEDIUM IMPACT" />
+                                                        <Setter Property="Text" Value="{loc:Tr Startup_MediumImpact}" />
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding Impact}" Value="Low">
                                                         <Setter Property="Foreground" Value="#94A3B8" />
-                                                        <Setter Property="Text" Value="LOW IMPACT" />
+                                                        <Setter Property="Text" Value="{loc:Tr Startup_LowImpact}" />
                                                     </DataTrigger>
                                                 </Style.Triggers>
                                             </Style>
@@ -321,11 +322,11 @@
                                         <TextBlock.Style>
                                             <Style TargetType="TextBlock">
                                                 <Setter Property="Foreground" Value="#64748B" />
-                                                <Setter Property="Text" Value="DISABLED" />
+                                                <Setter Property="Text" Value="{loc:Tr Startup_Disabled2}" />
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding IsEnabled}" Value="True">
                                                         <Setter Property="Foreground" Value="#34D399" />
-                                                        <Setter Property="Text" Value="ENABLED" />
+                                                        <Setter Property="Text" Value="{loc:Tr Startup_Enabled2}" />
                                                     </DataTrigger>
                                                 </Style.Triggers>
                                             </Style>
@@ -339,7 +340,7 @@
                                            Appearance="Transparent"
                                            Command="{Binding DataContext.OpenFolderCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                            CommandParameter="{Binding}"
-                                           ToolTip="Open in File Explorer"
+                                           ToolTip="{loc:Tr Startup_OpenInFileExplorer}"
                                            Padding="6" Margin="0,0,10,0" VerticalAlignment="Center" />
 
                                 <!-- Inline Progress Ring when toggling -->

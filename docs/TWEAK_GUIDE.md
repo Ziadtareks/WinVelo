@@ -31,6 +31,11 @@ Every tweak in WinVelo is data-driven, defined as a JSON document in the `Catalo
    - Presets are built by `tools/PresetGenerator` from topic tags: Safe/Low go into Standard, Medium only into Full, and High, irreversible, Experimental or needsReview tweaks are always excluded with a reason shown to the user.
    - If two tweaks change the same registry value differently, the generator keeps the first one alphabetically and lists the other as a conflict. After changing tags, risk or `presetRole`, run the generator and commit the updated `Catalog/Presets/*.json`.
 
+7. **Arabic Text**:
+   - Every tweak and preset needs an Arabic `name` (and ideally `description`, `whatItDoes`, `sideEffects`) in `Catalog/Localization/ar.json`. `LocalizationTests` fails if one is missing.
+   - Keep registry value names, product names and numbers in Latin script.
+   - New UI text: XAML uses `{loc:Tr Key}` with the English text in `src/Tweakora.App/Localization/Lang-en.json`; view models use `LocalizationManager.T("English text")`. Add the Arabic text to `Lang-ar.json`.
+
 ---
 
 ## 2. Risk Rating Rubric

@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Tweakora.Core.Interfaces;
 using Tweakora.Core.Models;
+using Tweakora.App.Localization;
 
 namespace Tweakora.App.ViewModels;
 
@@ -18,10 +19,10 @@ public sealed partial class FirstRunWizardViewModel : ObservableObject
     private int _currentStep = 1;
 
     [ObservableProperty]
-    private string _stepTitle = "Welcome to WinVelo";
+    private string _stepTitle = LocalizationManager.T("Welcome to WinVelo");
 
     [ObservableProperty]
-    private string _stepDescription = "What WinVelo does and does not do.";
+    private string _stepDescription = LocalizationManager.T("What WinVelo does and does not do.");
 
     // Step 2 properties
     [ObservableProperty]
@@ -34,7 +35,7 @@ public sealed partial class FirstRunWizardViewModel : ObservableObject
     private bool _isCreatingRestorePoint;
 
     [ObservableProperty]
-    private string _restoreStatusMessage = "Checking System Restore status...";
+    private string _restoreStatusMessage = LocalizationManager.T("Checking System Restore status...");
 
     [ObservableProperty]
     private string _restoreVerificationMessage = string.Empty;
@@ -75,24 +76,24 @@ public sealed partial class FirstRunWizardViewModel : ObservableObject
 
             if (!IsSystemRestoreEnabled)
             {
-                RestoreStatusMessage = "System Restore is currently turned OFF. We recommend enabling it to ensure full protection.";
+                RestoreStatusMessage = LocalizationManager.T("System Restore is currently turned OFF. We recommend enabling it to ensure full protection.");
                 RestoreVerificationMessage = string.Empty;
                 HasVerifiedRestorePoint = false;
             }
             else
             {
                 string dateStr = latestDate.HasValue ? latestDate.Value.ToString("g") : "None on record";
-                RestoreStatusMessage = $"System Restore is enabled. Existing restore points: {count} (Latest: {dateStr}).";
+                RestoreStatusMessage = LocalizationManager.T("System Restore is enabled. Existing restore points: {0} (Latest: {1}).", count, dateStr);
                 if (count > 0)
                 {
-                    RestoreVerificationMessage = $"✓ Verified: System restore points exist on this system ({count} point{(count == 1 ? "" : "s")}).";
+                    RestoreVerificationMessage = LocalizationManager.T("✓ Verified: System restore points exist on this system ({0} point{1}).", count, (count == 1 ? "" : "s"));
                     HasVerifiedRestorePoint = true;
                 }
             }
         }
         catch (Exception ex)
         {
-            RestoreStatusMessage = $"System Restore status notice: {ex.Message}";
+            RestoreStatusMessage = LocalizationManager.T("System Restore status notice: {0}", ex.Message);
         }
     }
 
@@ -101,7 +102,7 @@ public sealed partial class FirstRunWizardViewModel : ObservableObject
     {
         if (IsEnablingRestore) return;
         IsEnablingRestore = true;
-        RestoreStatusMessage = "Enabling System Restore for C:\\ drive...";
+        RestoreStatusMessage = LocalizationManager.T("Enabling System Restore for C:\\ drive...");
 
         try
         {
@@ -109,16 +110,16 @@ public sealed partial class FirstRunWizardViewModel : ObservableObject
             if (success)
             {
                 IsSystemRestoreEnabled = true;
-                RestoreStatusMessage = "System Restore successfully enabled for C:\\ drive.";
+                RestoreStatusMessage = LocalizationManager.T("System Restore successfully enabled for C:\\ drive.");
             }
             else
             {
-                RestoreStatusMessage = "Notice: Could not enable System Restore automatically (Administrator rights required).";
+                RestoreStatusMessage = LocalizationManager.T("Notice: Could not enable System Restore automatically (Administrator rights required).");
             }
         }
         catch (Exception ex)
         {
-            RestoreStatusMessage = $"Failed to enable System Restore: {ex.Message}";
+            RestoreStatusMessage = LocalizationManager.T("Failed to enable System Restore: {0}", ex.Message);
         }
         finally
         {
@@ -131,7 +132,7 @@ public sealed partial class FirstRunWizardViewModel : ObservableObject
     {
         if (IsCreatingRestorePoint) return;
         IsCreatingRestorePoint = true;
-        RestoreVerificationMessage = "Creating and verifying restore point...";
+        RestoreVerificationMessage = LocalizationManager.T("Creating and verifying restore point...");
 
         try
         {
@@ -144,24 +145,24 @@ public sealed partial class FirstRunWizardViewModel : ObservableObject
             {
                 HasVerifiedRestorePoint = true;
                 string dateStr = latestDate.HasValue ? latestDate.Value.ToString("g") : DateTime.Now.ToString("g");
-                RestoreVerificationMessage = $"✓ Verified: Restore point created and confirmed in system restore points list ({dateStr}).";
+                RestoreVerificationMessage = LocalizationManager.T("✓ Verified: Restore point created and confirmed in system restore points list ({0}).", dateStr);
             }
             else if (res.WasThrottledOrSkipped)
             {
                 HasVerifiedRestorePoint = true;
-                RestoreVerificationMessage = "✓ Verified: Windows has a recent restore point on record, but throttled creating a new one (standard 24h limit). You can safely proceed.";
+                RestoreVerificationMessage = LocalizationManager.T("✓ Verified: Windows has a recent restore point on record, but throttled creating a new one (standard 24h limit). You can safely proceed.");
             }
             else
             {
                 HasVerifiedRestorePoint = false;
-                RestoreVerificationMessage = $"Notice: Restore point creation could not be verified ({res.ErrorMessage ?? "Standard Windows policy"}). WinVelo's rollback journal will track all changes.";
+                RestoreVerificationMessage = LocalizationManager.T("Notice: Restore point creation could not be verified ({0}). WinVelo's rollback journal will track all changes.", res.ErrorMessage ?? LocalizationManager.T("Standard Windows policy"));
             }
 
             IsSystemRestoreEnabled = _restoreService.IsSystemRestoreEnabled();
         }
         catch (Exception ex)
         {
-            RestoreVerificationMessage = $"Notice: {ex.Message}. WinVelo's rollback journal will track all changes.";
+            RestoreVerificationMessage = LocalizationManager.T("Notice: {0}. WinVelo's rollback journal will track all changes.", ex.Message);
         }
         finally
         {
@@ -223,17 +224,17 @@ public sealed partial class FirstRunWizardViewModel : ObservableObject
         switch (CurrentStep)
         {
             case 1:
-                StepTitle = "Welcome to WinVelo";
-                StepDescription = "What WinVelo does and does not do.";
+                StepTitle = LocalizationManager.T("Welcome to WinVelo");
+                StepDescription = LocalizationManager.T("What WinVelo does and does not do.");
                 break;
             case 2:
-                StepTitle = "System Restore Protection";
-                StepDescription = "Ensure your system can be rolled back to a clean baseline.";
+                StepTitle = LocalizationManager.T("System Restore Protection");
+                StepDescription = LocalizationManager.T("Ensure your system can be rolled back to a clean baseline.");
                 RefreshRestoreState();
                 break;
             case 3:
-                StepTitle = "Choose Your Experience";
-                StepDescription = "Select between Simple and Advanced catalog modes.";
+                StepTitle = LocalizationManager.T("Choose Your Experience");
+                StepDescription = LocalizationManager.T("Select between Simple and Advanced catalog modes.");
                 break;
         }
     }

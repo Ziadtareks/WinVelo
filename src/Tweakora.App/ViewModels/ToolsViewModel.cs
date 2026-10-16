@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Tweakora.App.Services;
 using Tweakora.Core.Interfaces;
+using Tweakora.App.Localization;
 
 namespace Tweakora.App.ViewModels;
 
@@ -95,7 +96,7 @@ public sealed partial class ToolsViewModel : ObservableObject
         {
             IsRestoreEnabled = false;
             RestorePointCount = 0;
-            RestoreStatusText = "Restore service not available.";
+            RestoreStatusText = LocalizationManager.T("Restore service not available.");
             return;
         }
 
@@ -104,12 +105,12 @@ public sealed partial class ToolsViewModel : ObservableObject
             IsRestoreEnabled = _restoreService.IsSystemRestoreEnabled();
             RestorePointCount = _restoreService.GetRestorePointCount();
             RestoreStatusText = IsRestoreEnabled
-                ? $"System Restore is enabled. {RestorePointCount} restore point(s) found."
-                : "System Protection is currently turned off in Windows.";
+                ? LocalizationManager.T("System Restore is enabled. {0} restore point(s) found.", RestorePointCount)
+                : LocalizationManager.T("System Protection is currently turned off in Windows.");
         }
         catch (Exception ex)
         {
-            RestoreStatusText = $"Unable to read restore points: {ex.Message}";
+            RestoreStatusText = LocalizationManager.T("Unable to read restore points: {0}", ex.Message);
         }
     }
 
@@ -118,18 +119,18 @@ public sealed partial class ToolsViewModel : ObservableObject
     {
         if (!AppAdminGuard.EnsureAdmin("create a Windows System Restore point"))
         {
-            RestoreStatusText = "Administrator privileges required to create a restore point.";
+            RestoreStatusText = LocalizationManager.T("Administrator privileges required to create a restore point.");
             return;
         }
 
         if (_restoreService == null)
         {
-            RestoreStatusText = "Restore service not available.";
+            RestoreStatusText = LocalizationManager.T("Restore service not available.");
             return;
         }
 
         IsCreatingRestorePoint = true;
-        RestoreStatusText = "Creating Windows System Restore point...";
+        RestoreStatusText = LocalizationManager.T("Creating Windows System Restore point...");
         await Task.Yield();
 
         try
@@ -139,22 +140,22 @@ public sealed partial class ToolsViewModel : ObservableObject
 
             if (result.Success)
             {
-                RestoreStatusText = $"Restore point created successfully (Seq #{result.SequenceNumber}).";
+                RestoreStatusText = LocalizationManager.T("Restore point created successfully (Seq #{0}).", result.SequenceNumber);
             }
             else if (result.WasThrottledOrSkipped)
             {
-                RestoreStatusText = "Windows throttled restore point creation (24-hour frequency limit). Existing restore point preserved.";
+                RestoreStatusText = LocalizationManager.T("Windows throttled restore point creation (24-hour frequency limit). Existing restore point preserved.");
             }
             else
             {
-                RestoreStatusText = $"Failed to create restore point: {result.ErrorMessage ?? "Unknown error"}";
+                RestoreStatusText = LocalizationManager.T("Failed to create restore point: {0}", result.ErrorMessage ?? LocalizationManager.T("Unknown error"));
             }
 
             RefreshRestoreInfo();
         }
         catch (Exception ex)
         {
-            RestoreStatusText = $"Restore point creation failed: {ex.Message}";
+            RestoreStatusText = LocalizationManager.T("Restore point creation failed: {0}", ex.Message);
         }
         finally
         {

@@ -10,6 +10,7 @@ using Tweakora.Core.Models;
 using Tweakora.Core.Operations;
 using Tweakora.Core.Safety;
 using Tweakora.Modules.Tweaks;
+using Tweakora.App.Localization;
 
 namespace Tweakora.App.ViewModels;
 
@@ -29,7 +30,7 @@ public sealed partial class PreviewSubcategoryGroup : ObservableObject
     public required string Subcategory { get; init; }
     public ObservableCollection<ProfilePreviewItemModel> Items { get; } = new();
 
-    public string TotalCountText => $"{Items.Count} tweak{(Items.Count == 1 ? "" : "s")}";
+    public string TotalCountText => LocalizationManager.T("{0} tweak{1}", Items.Count, (Items.Count == 1 ? "" : "s"));
 
     public Action? OnSelectionChanged { get; set; }
 
@@ -74,7 +75,7 @@ public sealed partial class UnifiedExecutionDialogViewModel : ObservableObject
     private bool _isPreviewOpen;
 
     [ObservableProperty]
-    private string _previewTitle = "Preview Changes";
+    private string _previewTitle = LocalizationManager.T("Preview Changes");
 
     [ObservableProperty]
     private string _previewDescription = string.Empty;
@@ -83,7 +84,7 @@ public sealed partial class UnifiedExecutionDialogViewModel : ObservableObject
     private string _previewNotice = string.Empty;
 
     [ObservableProperty]
-    private string _previewConfirmText = "Confirm & Apply";
+    private string _previewConfirmText = LocalizationManager.T("Confirm & Apply");
 
     [ObservableProperty]
     private bool _isPreviewLoading;
@@ -101,9 +102,9 @@ public sealed partial class UnifiedExecutionDialogViewModel : ObservableObject
     private bool _isExcludedSectionOpen;
 
     [ObservableProperty]
-    private string _excludedSectionHeader = "Not included";
+    private string _excludedSectionHeader = LocalizationManager.T("Not included");
 
-    public string ExcludedChevronText => IsExcludedSectionOpen ? "▲ Hide" : "▼ Show";
+    public string ExcludedChevronText => IsExcludedSectionOpen ? LocalizationManager.T("▲ Hide") : LocalizationManager.T("▼ Show");
 
     partial void OnIsExcludedSectionOpenChanged(bool value)
     {
@@ -128,7 +129,7 @@ public sealed partial class UnifiedExecutionDialogViewModel : ObservableObject
     private bool _isResultOpen;
 
     [ObservableProperty]
-    private string _resultTitle = "Execution Summary";
+    private string _resultTitle = LocalizationManager.T("Execution Summary");
 
     [ObservableProperty]
     private string _resultSummary = string.Empty;
@@ -164,11 +165,11 @@ public sealed partial class UnifiedExecutionDialogViewModel : ObservableObject
 
         if (IsUndo)
         {
-            PreviewSummaryText = $"{toApply} to revert · {needRestart} need a restart";
+            PreviewSummaryText = LocalizationManager.T("{0} to revert · {1} need a restart", toApply, needRestart);
         }
         else
         {
-            PreviewSummaryText = $"{toApply} to apply · {alreadyApplied} already applied (skipped) · {needRestart} need a restart";
+            PreviewSummaryText = LocalizationManager.T("{0} to apply · {1} already applied (skipped) · {2} need a restart", toApply, alreadyApplied, needRestart);
         }
     }
 
@@ -245,7 +246,7 @@ public sealed partial class UnifiedExecutionDialogViewModel : ObservableObject
         if (excludedTweaks != null && excludedTweaks.Count > 0)
         {
             HasExcludedItems = true;
-            ExcludedSectionHeader = $"Not included ({excludedTweaks.Count})";
+            ExcludedSectionHeader = LocalizationManager.T("Not included ({0})", excludedTweaks.Count);
             IsExcludedSectionOpen = false;
 
             var catalog = _tweakService?.LoadCatalog() ?? Array.Empty<TweakDefinition>();
@@ -265,7 +266,7 @@ public sealed partial class UnifiedExecutionDialogViewModel : ObservableObject
         else
         {
             HasExcludedItems = false;
-            ExcludedSectionHeader = "Not included";
+            ExcludedSectionHeader = LocalizationManager.T("Not included");
             IsExcludedSectionOpen = false;
         }
 
@@ -286,9 +287,9 @@ public sealed partial class UnifiedExecutionDialogViewModel : ObservableObject
                         {
                             item.StateText = state switch
                             {
-                                TweakState.Applied => "Applied",
-                                TweakState.Partial => "Partial",
-                                _ => "Modified"
+                                TweakState.Applied => LocalizationManager.T("Applied"),
+                                TweakState.Partial => LocalizationManager.T("Partial"),
+                                _ => LocalizationManager.T("Modified")
                             };
                             item.StateBg = "#1E3A8A";
                             item.StateFg = "#60A5FA";
@@ -300,28 +301,28 @@ public sealed partial class UnifiedExecutionDialogViewModel : ObservableObject
                             switch (state)
                             {
                                 case TweakState.Applied:
-                                    item.StateText = "Applied";
+                                    item.StateText = LocalizationManager.T("Applied");
                                     item.StateBg = "#064E3B";
                                     item.StateFg = "#10B981";
                                     item.IsAlreadyApplied = true;
                                     item.IsSelected = false; // already applied tweaks are skipped and unticked
                                     break;
                                 case TweakState.Partial:
-                                    item.StateText = "Partial";
+                                    item.StateText = LocalizationManager.T("Partial");
                                     item.StateBg = "#451A03";
                                     item.StateFg = "#F59E0B";
                                     item.IsAlreadyApplied = false;
                                     item.IsSelected = true;
                                     break;
                                 case TweakState.NotApplied:
-                                    item.StateText = "Not applied";
+                                    item.StateText = LocalizationManager.T("Not applied");
                                     item.StateBg = "#1E222D";
                                     item.StateFg = "#94A3B8";
                                     item.IsAlreadyApplied = false;
                                     item.IsSelected = true;
                                     break;
                                 default:
-                                    item.StateText = "Can't verify";
+                                    item.StateText = LocalizationManager.T("Can't verify");
                                     item.StateBg = "#1E222D";
                                     item.StateFg = "#94A3B8";
                                     item.IsAlreadyApplied = false;
@@ -387,7 +388,7 @@ public sealed partial class UnifiedExecutionDialogViewModel : ObservableObject
                 ? await Task.Run(() => _tweakService.UndoTweaksAsync(tweaks, _runner))
                 : new OperationExecutionReport
                 {
-                    Title = "Undo Changes",
+                    Title = LocalizationManager.T("Undo Changes"),
                     StartTime = DateTime.UtcNow,
                     EndTime = DateTime.UtcNow,
                     Results = new List<OperationItemResult>()
@@ -399,7 +400,7 @@ public sealed partial class UnifiedExecutionDialogViewModel : ObservableObject
                 ? await Task.Run(() => _tweakService.ApplyTweaksAsync(tweaks, _runner))
                 : new OperationExecutionReport
                 {
-                    Title = "Apply Changes",
+                    Title = LocalizationManager.T("Apply Changes"),
                     StartTime = DateTime.UtcNow,
                     EndTime = DateTime.UtcNow,
                     Results = new List<OperationItemResult>()
@@ -425,10 +426,10 @@ public sealed partial class UnifiedExecutionDialogViewModel : ObservableObject
         ServicingHealthReport? healthReport,
         bool isUndo)
     {
-        ResultTitle = isUndo ? "Undo Changes Completed" : "Modifications Applied";
+        ResultTitle = isUndo ? LocalizationManager.T("Undo Changes Completed") : LocalizationManager.T("Modifications Applied");
         ResultSummary = isUndo
-            ? $"Reverted {report.SucceededCount} of {report.TotalRequested} changes."
-            : $"Applied {report.SucceededCount} of {report.TotalRequested} modifications.";
+            ? LocalizationManager.T("Reverted {0} of {1} changes.", report.SucceededCount, report.TotalRequested)
+            : LocalizationManager.T("Applied {0} of {1} modifications.", report.SucceededCount, report.TotalRequested);
 
         ResultItems.Clear();
         foreach (var tweak in tweaks)
@@ -437,7 +438,7 @@ public sealed partial class UnifiedExecutionDialogViewModel : ObservableObject
             bool succeeded = res != null && (res.Status is OperationItemStatus.Succeeded or OperationItemStatus.Applied or OperationItemStatus.Restored);
             bool skipped = res != null && res.Status == OperationItemStatus.Skipped;
 
-            string statusText = succeeded ? (isUndo ? "Reverted" : "Applied") : (skipped ? "Skipped" : "Failed");
+            string statusText = succeeded ? (isUndo ? LocalizationManager.T("Reverted") : LocalizationManager.T("Applied")) : (skipped ? LocalizationManager.T("Skipped") : LocalizationManager.T("Failed"));
             string statusBg = succeeded ? "#064E3B" : (skipped ? "#1E3A8A" : "#450A0A");
             string statusFg = succeeded ? "#10B981" : (skipped ? "#60A5FA" : "#EF4444");
 
@@ -465,7 +466,7 @@ public sealed partial class UnifiedExecutionDialogViewModel : ObservableObject
         else
         {
             IsServicingHealthy = true;
-            ServicingHealthSummary = "Servicing health check passed.";
+            ServicingHealthSummary = LocalizationManager.T("Servicing health check passed.");
         }
 
         IsResultOpen = true;

@@ -1,6 +1,7 @@
 <UserControl x:Class="Tweakora.App.Views.UpdatesTabView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="clr-namespace:Tweakora.App.Localization"
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              xmlns:vm="clr-namespace:Tweakora.App.ViewModels"
              xmlns:updates="clr-namespace:Tweakora.Modules.Updates;assembly=Tweakora.Modules"
@@ -24,7 +25,7 @@
             <DockPanel LastChildFill="False">
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
                     <ui:SymbolIcon Symbol="ArrowSync24" FontSize="20" Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}" Margin="0,0,8,0" VerticalAlignment="Center" />
-                    <TextBlock Text="Current Windows Update Profile:" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,8,0" />
+                    <TextBlock Text="{loc:Tr Updates_CurrentWindowsUpdateProfile}" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,8,0" />
                     <Border Background="{DynamicResource AccentFillColorDefaultBrush}" CornerRadius="12" Padding="10,4" VerticalAlignment="Center">
                         <TextBlock Text="{Binding ActiveModeTitle}" Foreground="White" FontWeight="Bold" FontSize="12" />
                     </Border>
@@ -52,19 +53,19 @@
                     </Grid.RowDefinitions>
 
                     <StackPanel Grid.Row="0">
-                        <TextBlock Text="Default (Out of Box)" FontSize="16" FontWeight="Bold" Margin="0,0,0,4" />
-                        <TextBlock Text="Standard Microsoft Windows Update behavior." Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12" Margin="0,0,0,12" />
+                        <TextBlock Text="{loc:Tr Tools_DefaultOutOfBox}" FontSize="16" FontWeight="Bold" Margin="0,0,0,4" />
+                        <TextBlock Text="{loc:Tr Updates_StandardMicrosoftWindowsUpdateBehavior}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12" Margin="0,0,0,12" />
                     </StackPanel>
 
                     <StackPanel Grid.Row="1">
-                        <TextBlock Text="• Windows automatically checks for and downloads all updates." TextWrapping="Wrap" Margin="0,0,0,6" FontSize="12" />
-                        <TextBlock Text="• Feature updates installed as soon as Microsoft releases them." TextWrapping="Wrap" Margin="0,0,0,6" FontSize="12" />
-                        <TextBlock Text="• Recommended for ordinary home users requiring automatic maintenance." TextWrapping="Wrap" Margin="0,0,0,6" FontSize="12" />
+                        <TextBlock Text="{loc:Tr Updates_WindowsAutomaticallyChecksForAnd}" TextWrapping="Wrap" Margin="0,0,0,6" FontSize="12" />
+                        <TextBlock Text="{loc:Tr Updates_FeatureUpdatesInstalledAsSoon}" TextWrapping="Wrap" Margin="0,0,0,6" FontSize="12" />
+                        <TextBlock Text="{loc:Tr Updates_RecommendedForOrdinaryHomeUsers}" TextWrapping="Wrap" Margin="0,0,0,6" FontSize="12" />
                     </StackPanel>
 
                     <ui:Button Grid.Row="2" AutomationProperties.AutomationId="SelectMode_Default"
                                AutomationProperties.Name="Select Default Profile"
-                               Content="Select Default Profile" HorizontalAlignment="Stretch"
+                               Content="{loc:Tr Updates_SelectDefaultProfile}" HorizontalAlignment="Stretch"
                                Command="{Binding SelectModeCommand}">
                         <ui:Button.CommandParameter>
                             <updates:UpdateProfileMode>Default</updates:UpdateProfileMode>
@@ -86,24 +87,24 @@
 
                     <StackPanel Grid.Row="0">
                         <DockPanel Margin="0,0,0,4">
-                            <TextBlock Text="Security Only" FontSize="16" FontWeight="Bold" />
+                            <TextBlock Text="{loc:Tr Updates_SecurityOnly}" FontSize="16" FontWeight="Bold" />
                             <Border DockPanel.Dock="Right" Background="#E6F4EA" CornerRadius="4" Padding="6,2" HorizontalAlignment="Right">
-                                <TextBlock Text="RECOMMENDED" FontSize="10" FontWeight="Bold" Foreground="#137333" />
+                                <TextBlock Text="{loc:Tr Wizard_Recommended}" FontSize="10" FontWeight="Bold" Foreground="#137333" />
                             </Border>
                         </DockPanel>
-                        <TextBlock Text="Maximum stability without sacrificing security patches." Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12" Margin="0,0,0,12" />
+                        <TextBlock Text="{loc:Tr Updates_MaximumStabilityWithoutSacrificingSecuri}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12" Margin="0,0,0,12" />
                     </StackPanel>
 
                     <StackPanel Grid.Row="1">
-                        <TextBlock Text="• Installs critical security updates automatically." TextWrapping="Wrap" Margin="0,0,0,6" FontSize="12" />
-                        <TextBlock Text="• Delays annual feature updates by up to 1 year to avoid OS bugs." TextWrapping="Wrap" Margin="0,0,0,6" FontSize="12" />
-                        <TextBlock Text="• Disables disruptive automatic reboots while working." TextWrapping="Wrap" Margin="0,0,0,6" FontSize="12" />
-                        <TextBlock Text="• Excludes buggy third-party hardware driver updates." TextWrapping="Wrap" Margin="0,0,0,6" FontSize="12" />
+                        <TextBlock Text="{loc:Tr Updates_InstallsCriticalSecurityUpdatesAutomatic}" TextWrapping="Wrap" Margin="0,0,0,6" FontSize="12" />
+                        <TextBlock Text="{loc:Tr Updates_DelaysAnnualFeatureUpdatesBy}" TextWrapping="Wrap" Margin="0,0,0,6" FontSize="12" />
+                        <TextBlock Text="{loc:Tr Updates_DisablesDisruptiveAutomaticRebootsWhile}" TextWrapping="Wrap" Margin="0,0,0,6" FontSize="12" />
+                        <TextBlock Text="{loc:Tr Updates_ExcludesBuggyThirdPartyHardware}" TextWrapping="Wrap" Margin="0,0,0,6" FontSize="12" />
                     </StackPanel>
 
                     <ui:Button Grid.Row="2" AutomationProperties.AutomationId="SelectMode_Security"
                                AutomationProperties.Name="Select Security Profile"
-                               Content="Select Security Profile" Appearance="Primary" HorizontalAlignment="Stretch"
+                               Content="{loc:Tr Updates_SelectSecurityProfile}" Appearance="Primary" HorizontalAlignment="Stretch"
                                Command="{Binding SelectModeCommand}">
                         <ui:Button.CommandParameter>
                             <updates:UpdateProfileMode>Security</updates:UpdateProfileMode>
@@ -124,24 +125,24 @@
 
                     <StackPanel Grid.Row="0">
                         <DockPanel Margin="0,0,0,4">
-                            <TextBlock Text="Disable All Updates" FontSize="16" FontWeight="Bold" Foreground="#C5221F" />
+                            <TextBlock Text="{loc:Tr Updates_DisableAllUpdates}" FontSize="16" FontWeight="Bold" Foreground="#C5221F" />
                             <Border DockPanel.Dock="Right" Background="#FCE8E6" CornerRadius="4" Padding="6,2" HorizontalAlignment="Right">
-                                <TextBlock Text="CAUTION" FontSize="10" FontWeight="Bold" Foreground="#C5221F" />
+                                <TextBlock Text="{loc:Tr Updates_Caution}" FontSize="10" FontWeight="Bold" Foreground="#C5221F" />
                             </Border>
                         </DockPanel>
-                        <TextBlock Text="Completely halts all Windows Update activity." Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12" Margin="0,0,0,12" />
+                        <TextBlock Text="{loc:Tr Updates_CompletelyHaltsAllWindowsUpdate}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12" Margin="0,0,0,12" />
                     </StackPanel>
 
                     <StackPanel Grid.Row="1">
                         <Border Background="#FFF0F0" BorderBrush="#FFCCCC" BorderThickness="1" CornerRadius="4" Padding="8" Margin="0,0,0,10">
-                            <TextBlock Text="WARNING: Stopping updates leaves your system vulnerable to newly discovered security exploits."
+                            <TextBlock Text="{loc:Tr Updates_WarningStoppingUpdatesLeavesYour}"
                                        Foreground="#C5221F" FontSize="11" FontWeight="SemiBold" TextWrapping="Wrap" />
                         </Border>
-                        <TextBlock Text="• Disables wuauserv, BITS, and UsoSvc services." TextWrapping="Wrap" Margin="0,0,0,6" FontSize="12" />
-                        <TextBlock Text="• Prevents Windows from checking or downloading patches." TextWrapping="Wrap" Margin="0,0,0,6" FontSize="12" />
+                        <TextBlock Text="{loc:Tr Updates_DisablesWuauservBitsAndUsosvc}" TextWrapping="Wrap" Margin="0,0,0,6" FontSize="12" />
+                        <TextBlock Text="{loc:Tr Updates_PreventsWindowsFromCheckingOr}" TextWrapping="Wrap" Margin="0,0,0,6" FontSize="12" />
 
                         <!-- Safety typed confirmation input -->
-                        <TextBlock Text="To select this mode, type 'I understand':" FontSize="11" FontWeight="SemiBold" Margin="0,10,0,4" />
+                        <TextBlock Text="{loc:Tr Updates_ToSelectThisModeType}" FontSize="11" FontWeight="SemiBold" Margin="0,10,0,4" />
                         <TextBox AutomationProperties.AutomationId="DisableUpdatesConfirmBox"
                                  AutomationProperties.Name="Disable Updates Confirmation Input"
                                  Text="{Binding TypedConfirmation, UpdateSourceTrigger=PropertyChanged}"
@@ -150,7 +151,7 @@
 
                     <ui:Button Grid.Row="2" AutomationProperties.AutomationId="SelectMode_DisableAll"
                                AutomationProperties.Name="Select Disable Profile"
-                               Content="Select Disable Profile" Appearance="Danger" HorizontalAlignment="Stretch"
+                               Content="{loc:Tr Updates_SelectDisableProfile}" Appearance="Danger" HorizontalAlignment="Stretch"
                                Command="{Binding SelectModeCommand}">
                         <ui:Button.CommandParameter>
                             <updates:UpdateProfileMode>DisableAll</updates:UpdateProfileMode>
@@ -168,7 +169,7 @@
                 <TextBlock Text="{Binding StatusMessage}" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center" DockPanel.Dock="Left" />
                 <ui:Button AutomationProperties.AutomationId="ApplyUpdatesProfileButton"
                            AutomationProperties.Name="Apply Selected Update Profile"
-                           Content="Apply Selected Profile" Appearance="Primary" Icon="{ui:SymbolIcon Checkmark24}"
+                           Content="{loc:Tr Updates_ApplySelectedProfile}" Appearance="Primary" Icon="{ui:SymbolIcon Checkmark24}"
                            Command="{Binding ApplySelectedModeCommand}" IsEnabled="{Binding IsApplyEnabled}"
                            DockPanel.Dock="Right" />
             </DockPanel>

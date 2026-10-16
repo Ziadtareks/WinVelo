@@ -8,6 +8,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Tweakora.Core.Operations;
 using Tweakora.Modules.Apps;
+using Tweakora.App.Localization;
 
 namespace Tweakora.App.ViewModels;
 
@@ -37,7 +38,7 @@ public sealed partial class InstallViewModel : ObservableObject
     private string _packageManager = "WinGet"; // "WinGet" or "Chocolatey"
 
     [ObservableProperty]
-    private string _packageManagerStatus = "WinGet (Auto-Selected)";
+    private string _packageManagerStatus = LocalizationManager.T("WinGet (Auto-Selected)");
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(InstallSelectedCommand))]
@@ -49,7 +50,7 @@ public sealed partial class InstallViewModel : ObservableObject
     private int _progressPercent;
 
     [ObservableProperty]
-    private string _statusMessage = "Select applications to install or manage.";
+    private string _statusMessage = LocalizationManager.T("Select applications to install or manage.");
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasSelection))]
@@ -57,7 +58,7 @@ public sealed partial class InstallViewModel : ObservableObject
     private int _selectedCount;
 
     public bool HasSelection => SelectedCount > 0;
-    public string SelectionStatusText => $"{SelectedCount} selected — Install";
+    public string SelectionStatusText => LocalizationManager.T("{0} selected — Install", SelectedCount);
 
     public InstallViewModel(IAppInstallService installService, IOperationRunner runner)
     {
@@ -97,7 +98,7 @@ public sealed partial class InstallViewModel : ObservableObject
         catch
         {
             PackageManager = "WinGet";
-            PackageManagerStatus = "WinGet (Default)";
+            PackageManagerStatus = LocalizationManager.T("WinGet (Default)");
         }
     }
 
@@ -403,14 +404,14 @@ public sealed partial class InstallViewModel : ObservableObject
     {
         if (!Tweakora.App.Services.AppAdminGuard.EnsureAdmin("install applications"))
         {
-            StatusMessage = "Administrator privileges required to install applications.";
+            StatusMessage = LocalizationManager.T("Administrator privileges required to install applications.");
             return;
         }
 
         var selected = _allApps.Where(a => a.IsSelected).ToList();
         if (selected.Count == 0)
         {
-            StatusMessage = "No applications selected to install.";
+            StatusMessage = LocalizationManager.T("No applications selected to install.");
             return;
         }
 
@@ -419,13 +420,13 @@ public sealed partial class InstallViewModel : ObservableObject
 
         try
         {
-            StatusMessage = $"Installing {selected.Count} application(s) via {PackageManager}...";
+            StatusMessage = LocalizationManager.T("Installing {0} application(s) via {1}...", selected.Count, PackageManager);
             var report = await Task.Run(async () => await _installService.InstallAppsAsync(selected, PackageManager, _runner));
-            StatusMessage = $"Installation completed: {report.Summary}.";
+            StatusMessage = LocalizationManager.T("Installation completed: {0}.", report.Summary);
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Installation error: {ex.Message}";
+            StatusMessage = LocalizationManager.T("Installation error: {0}", ex.Message);
         }
         finally
         {
@@ -438,14 +439,14 @@ public sealed partial class InstallViewModel : ObservableObject
     {
         if (!Tweakora.App.Services.AppAdminGuard.EnsureAdmin("uninstall applications"))
         {
-            StatusMessage = "Administrator privileges required to uninstall applications.";
+            StatusMessage = LocalizationManager.T("Administrator privileges required to uninstall applications.");
             return;
         }
 
         var selected = _allApps.Where(a => a.IsSelected).ToList();
         if (selected.Count == 0)
         {
-            StatusMessage = "No applications selected to uninstall.";
+            StatusMessage = LocalizationManager.T("No applications selected to uninstall.");
             return;
         }
 
@@ -454,13 +455,13 @@ public sealed partial class InstallViewModel : ObservableObject
 
         try
         {
-            StatusMessage = $"Uninstalling {selected.Count} application(s) via {PackageManager}...";
+            StatusMessage = LocalizationManager.T("Uninstalling {0} application(s) via {1}...", selected.Count, PackageManager);
             var report = await Task.Run(async () => await _installService.UninstallAppsAsync(selected, PackageManager, _runner));
-            StatusMessage = $"Uninstallation completed: {report.Summary}.";
+            StatusMessage = LocalizationManager.T("Uninstallation completed: {0}.", report.Summary);
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Uninstallation error: {ex.Message}";
+            StatusMessage = LocalizationManager.T("Uninstallation error: {0}", ex.Message);
         }
         finally
         {
@@ -473,7 +474,7 @@ public sealed partial class InstallViewModel : ObservableObject
     {
         if (!Tweakora.App.Services.AppAdminGuard.EnsureAdmin("upgrade applications"))
         {
-            StatusMessage = "Administrator privileges required to upgrade applications.";
+            StatusMessage = LocalizationManager.T("Administrator privileges required to upgrade applications.");
             return;
         }
 
@@ -482,14 +483,14 @@ public sealed partial class InstallViewModel : ObservableObject
 
         try
         {
-            StatusMessage = $"Checking and upgrading all applications via {PackageManager}...";
+            StatusMessage = LocalizationManager.T("Checking and upgrading all applications via {0}...", PackageManager);
             string output = await Task.Run(async () => await _installService.UpgradeAllAsync(PackageManager));
-            StatusMessage = "Upgrade check completed.";
+            StatusMessage = LocalizationManager.T("Upgrade check completed.");
             OperationLogs.Add(output);
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Upgrade error: {ex.Message}";
+            StatusMessage = LocalizationManager.T("Upgrade error: {0}", ex.Message);
         }
         finally
         {
@@ -511,7 +512,7 @@ public sealed partial class InstallViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Could not open link: {ex.Message}";
+            StatusMessage = LocalizationManager.T("Could not open link: {0}", ex.Message);
         }
     }
 

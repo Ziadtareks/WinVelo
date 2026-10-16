@@ -37,6 +37,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Localization\Lang-en.json" />
+    <EmbeddedResource Include="Localization\Lang-ar.json" />
     <Resource Include="Assets\winvelo.ico" />
     <Resource Include="Assets\winvelo-64.png" />
   </ItemGroup>

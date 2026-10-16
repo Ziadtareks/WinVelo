@@ -12,6 +12,7 @@ using Serilog;
 using Tweakora.App.Services;
 using Tweakora.Core.Operations;
 using Tweakora.Modules.Startup;
+using Tweakora.App.Localization;
 
 namespace Tweakora.App.ViewModels;
 
@@ -34,10 +35,10 @@ public sealed partial class StartupViewModel : ObservableObject
     private double _bootDelaySeconds;
 
     [ObservableProperty]
-    private string _bootDelayText = "Estimated (heuristic)";
+    private string _bootDelayText = LocalizationManager.T("Estimated (heuristic)");
 
     [ObservableProperty]
-    private string _bootTimeSavedText = "Relative weight";
+    private string _bootTimeSavedText = LocalizationManager.T("Relative weight");
 
     [ObservableProperty]
     private string _searchText = string.Empty;
@@ -65,7 +66,7 @@ public sealed partial class StartupViewModel : ObservableObject
     private bool _isOptimizing;
 
     [ObservableProperty]
-    private string _statusMessage = "Ready. Toggle apps to control Windows boot startup.";
+    private string _statusMessage = LocalizationManager.T("Ready. Toggle apps to control Windows boot startup.");
 
     public ObservableCollection<StartupAppItem> AllApps { get; } = new();
     public ObservableCollection<StartupAppItem> FilteredApps { get; } = new();
@@ -124,17 +125,17 @@ public sealed partial class StartupViewModel : ObservableObject
             success = await Task.Run(async () => await _startupService.SetEntryStateAsync(item, targetState));
             if (!success)
             {
-                StatusMessage = $"Failed to change startup state for {item.Name}.";
+                StatusMessage = LocalizationManager.T("Failed to change startup state for {0}.", item.Name);
             }
             else
             {
-                StatusMessage = $"{item.Name} is now {(targetState ? "enabled" : "disabled")} on Windows startup.";
+                StatusMessage = LocalizationManager.T("{0} is now {1} on Windows startup.", item.Name, (targetState ? "enabled" : "disabled"));
             }
         }
         catch (Exception ex)
         {
             item.IsEnabled = !targetState;
-            StatusMessage = $"Error: {ex.Message}";
+            StatusMessage = LocalizationManager.T("Error: {0}", ex.Message);
             Log.Error(ex, "Failed to toggle startup item {Name}", item.Name);
         }
         finally
@@ -143,8 +144,8 @@ public sealed partial class StartupViewModel : ObservableObject
             RecalculateMetrics();
             ApplyFilter();
             _activityTracker?.CompleteActivity(success
-                ? $"{item.Name} startup {(targetState ? "enabled" : "disabled")}"
-                : $"Failed to update {item.Name}");
+                ? LocalizationManager.T("{0} startup {1}", item.Name, (targetState ? "enabled" : "disabled"))
+                : LocalizationManager.T("Failed to update {0}", item.Name));
         }
     }
 
@@ -153,32 +154,32 @@ public sealed partial class StartupViewModel : ObservableObject
     {
         if (!AppAdminGuard.EnsureAdmin("optimize Windows startup applications"))
         {
-            StatusMessage = "Administrator privileges required to optimize startup apps.";
+            StatusMessage = LocalizationManager.T("Administrator privileges required to optimize startup apps.");
             return;
         }
 
         var heavyNonEssential = AllApps.Where(a => a.IsEnabled && a.Impact == "High" && !a.IsEssentialSystemItem).ToList();
         if (heavyNonEssential.Count == 0)
         {
-            StatusMessage = "Startup is already optimal! No heavy non-essential apps are enabled.";
+            StatusMessage = LocalizationManager.T("Startup is already optimal! No heavy non-essential apps are enabled.");
             return;
         }
 
         IsOptimizing = true;
         using var optActivity = _activityTracker?.BeginActivity($"Optimizing startup: disabling {heavyNonEssential.Count} heavy apps...");
-        StatusMessage = $"Disabling {heavyNonEssential.Count} heavy startup applications...";
+        StatusMessage = LocalizationManager.T("Disabling {0} heavy startup applications...", heavyNonEssential.Count);
         await Task.Yield();
 
         try
         {
             int disabledCount = await Task.Run(async () => await _startupService.OptimizeStartupAsync());
             await LoadStartupAppsAsync(silent: true);
-            StatusMessage = $"Disabled {disabledCount} heavy non-essential startup applications.";
-            _activityTracker?.CompleteActivity($"Startup optimized: Disabled {disabledCount} heavy non-essential apps");
+            StatusMessage = LocalizationManager.T("Disabled {0} heavy non-essential startup applications.", disabledCount);
+            _activityTracker?.CompleteActivity(LocalizationManager.T("Startup optimized: Disabled {0} heavy non-essential apps", disabledCount));
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Optimization error: {ex.Message}";
+            StatusMessage = LocalizationManager.T("Optimization error: {0}", ex.Message);
             Log.Error(ex, "Failed to optimize startup applications");
         }
         finally
@@ -198,7 +199,7 @@ public sealed partial class StartupViewModel : ObservableObject
 
         if (string.IsNullOrEmpty(target))
         {
-            StatusMessage = $"File location for {item.Name} not found on disk.";
+            StatusMessage = LocalizationManager.T("File location for {0} not found on disk.", item.Name);
             return;
         }
 
@@ -213,7 +214,7 @@ public sealed partial class StartupViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Could not open folder: {ex.Message}";
+            StatusMessage = LocalizationManager.T("Could not open folder: {0}", ex.Message);
         }
     }
 
@@ -231,7 +232,7 @@ public sealed partial class StartupViewModel : ObservableObject
             if (!silent)
             {
                 IsLoading = true;
-                StatusMessage = "Scanning startup programs across 5 Windows locations...";
+                StatusMessage = LocalizationManager.T("Scanning startup programs across 5 Windows locations...");
             }
 
             await Task.Yield();
@@ -269,7 +270,7 @@ public sealed partial class StartupViewModel : ObservableObject
 
                 if (!silent)
                 {
-                    StatusMessage = $"Found {TotalCount} startup apps ({EnabledCount} enabled, {HighImpactCount} high impact).";
+                    StatusMessage = LocalizationManager.T("Found {0} startup apps ({1} enabled, {2} high impact).", TotalCount, EnabledCount, HighImpactCount);
                 }
             };
 
@@ -284,7 +285,7 @@ public sealed partial class StartupViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Failed to scan startup apps: {ex.Message}";
+            StatusMessage = LocalizationManager.T("Failed to scan startup apps: {0}", ex.Message);
             Log.Error(ex, "Error scanning startup apps");
         }
         finally
@@ -306,8 +307,8 @@ public sealed partial class StartupViewModel : ObservableObject
 
         double totalDelay = AllApps.Where(a => a.IsEnabled).Sum(a => a.BootDelaySeconds);
         BootDelaySeconds = Math.Round(totalDelay, 1);
-        BootDelayText = "Estimated (heuristic)";
-        BootTimeSavedText = $"{HighImpactCount} high-impact active";
+        BootDelayText = LocalizationManager.T("Estimated (heuristic)");
+        BootTimeSavedText = LocalizationManager.T("{0} high-impact active", HighImpactCount);
     }
 
     private void ApplyFilter()
