@@ -4,6 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net10.0-windows</TargetFramework>
     <AssemblyName>winvelo-cli</AssemblyName>
+    <ApplicationIcon>..\Tweakora.App\Assets\winvelo.ico</ApplicationIcon>
     <RootNamespace>Tweakora.Cli</RootNamespace>
     <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
   </PropertyGroup>

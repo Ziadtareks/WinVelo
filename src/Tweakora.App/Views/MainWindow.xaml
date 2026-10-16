@@ -8,6 +8,7 @@
                    Title="WinVelo — Windows Velocity &amp; Performance Utility"
                    Height="860" Width="1360"
                    MinHeight="640" MinWidth="960"
+                   Icon="pack://application:,,,/WinVelo;component/Assets/winvelo.ico"
                    WindowStartupLocation="CenterScreen"
                    ExtendsContentIntoTitleBar="True"
                    AutomationProperties.AutomationId="TweakoraMainWindow">
@@ -64,7 +65,7 @@
                      ShowMinimize="True"
                      ShowClose="True">
             <ui:TitleBar.Icon>
-                <ui:SymbolIcon Symbol="Shield24" Foreground="{DynamicResource AccentPrimaryBrush}" />
+                <ui:ImageIcon Source="pack://application:,,,/WinVelo;component/Assets/winvelo-64.png" Width="18" Height="18" />
             </ui:TitleBar.Icon>
             <ui:TitleBar.TrailingContent>
                 <StackPanel Orientation="Horizontal" Margin="0,0,8,0">
