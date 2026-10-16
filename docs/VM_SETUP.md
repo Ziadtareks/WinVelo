@@ -42,7 +42,7 @@ Use the VirtualBox GUI or run these commands in PowerShell:
 2. Complete Windows Setup.
 3. When prompted to create a user account, create a local administrator with:
    - **Username**: `tweakora-admin`
-   - **Password**: `Password123!`
+   - **Password**: `<choose-a-local-password>`
 4. Verify that this user has Administrator rights.
 
 ---
