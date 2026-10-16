@@ -71,12 +71,17 @@ Complete rollback journal listing sessions newest first, grouped tweak statuses,
 
 ---
 
-## 💾 Downloads (Release v0.9.0-beta)
+## 💾 Download
 
-| Package | Type | Size | Verification |
-|---|---|---|---|
-| **[WinVelo-v0.9.0-beta-win-x64-portable.zip](dist/WinVelo-v0.9.0-beta-win-x64-portable.zip)** | Standalone Portable (Includes .NET Runtime) | ~95 MB | See [dist/SHA256SUMS.txt](dist/SHA256SUMS.txt) |
-| **[WinVelo-v0.9.0-beta-win-x64-small.zip](dist/WinVelo-v0.9.0-beta-win-x64-small.zip)** | Framework Dependent (Requires .NET 10) | ~3.6 MB | See [dist/SHA256SUMS.txt](dist/SHA256SUMS.txt) |
+Get **`WinVelo-v<version>-portable.zip`** from the [Releases page](../../releases/latest).
+
+1. Unzip it anywhere (Desktop, USB drive, ...).
+2. Run `WinVelo.exe`. No installation and no .NET download needed — the runtime is built into the exe.
+3. Keep the `Catalog` folder next to `WinVelo.exe`; it holds the tweak definitions.
+
+The zip also contains `winvelo-cli.exe`, `LICENSE` and `THIRD-PARTY-NOTICES.md`. SHA-256 checksums are listed in `SHA256SUMS.txt` on the release page.
+
+To build the portable package yourself: `.\build\publish.ps1` (output in `dist\`).
 
 ---
 

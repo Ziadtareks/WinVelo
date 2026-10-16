@@ -58,7 +58,7 @@ git push origin v0.9.0-beta
    - Compile Release binaries.
    - Run the test suite.
    - Check for code signing secrets (or skip cleanly if unsigned).
-   - Package `WinVelo-v0.9.0-beta-win-x64-portable.zip` and `WinVelo-v0.9.0-beta-win-x64-small.zip`.
+   - Package `WinVelo-v0.9.0-beta-portable.zip` (single-file `WinVelo.exe` + `winvelo-cli.exe`, `Catalog/`, license files).
    - Calculate SHA-256 hashes and update `dist/SHA256SUMS.txt`.
    - Cryptographically attest build provenance via GitHub OIDC (`actions/attest-build-provenance`).
    - Create a **Draft** GitHub Release with all assets attached.
@@ -69,13 +69,11 @@ git push origin v0.9.0-beta
 
 1. Go to `https://github.com/winvelo/winvelo/releases`.
 2. Locate the **Draft** release titled `WinVelo v0.9.0-beta`.
-3. Verify that the three release artifacts are attached:
-   - `WinVelo-v0.9.0-beta-win-x64-portable.zip`
-   - `WinVelo-v0.9.0-beta-win-x64-small.zip`
+3. Verify that the two release artifacts are attached:
+   - `WinVelo-v0.9.0-beta-portable.zip`
    - `SHA256SUMS.txt`
 4. Confirm that the SHA-256 hashes in `SHA256SUMS.txt` match your local build output:
-   - Portable: `CEC61EA16AC0E23DA94E0989D1F7B9B77422E277D178781C8B94A06E3BB21D8B`
-   - Small: `1627628D267FADA729C94AA1BDD56BD9E91AD3AAAAEA6D828AE8F12C617E419C`
+   - The zip hash printed at the end of `build\publish.ps1`
 5. Click **"Publish release"**.
 
 ---
