@@ -437,7 +437,7 @@ public sealed class TweakExplanationTests
         var uiTweaks = tweaks.Where(t => string.Equals(t.Evidence, "ui-equivalent", StringComparison.OrdinalIgnoreCase)).ToList();
 
         Assert.NotEmpty(uiTweaks);
-        Assert.Equal(61, uiTweaks.Count);
+        Assert.Equal(63, uiTweaks.Count);
 
         foreach (var t in uiTweaks)
         {
