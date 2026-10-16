@@ -157,9 +157,7 @@
                     <!-- App Brand Header -->
                     <DockPanel Grid.Row="0" Margin="4,0,4,16" LastChildFill="False">
                         <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" VerticalAlignment="Center">
-                            <Border Background="{DynamicResource AccentPrimaryBrush}" CornerRadius="6" Width="28" Height="28" Margin="0,0,8,0">
-                                <ui:SymbolIcon Symbol="Shield24" Foreground="White" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                            </Border>
+                            <Image Source="pack://application:,,,/WinVelo;component/Assets/winvelo-64.png" Width="28" Height="28" Margin="0,0,8,0" RenderOptions.BitmapScalingMode="HighQuality" />
                             <TextBlock Text="WINVELO" FontSize="16" FontWeight="ExtraBold"
                                        Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" />
                         </StackPanel>
