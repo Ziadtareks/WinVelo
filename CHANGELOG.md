@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.1] - 2026-10-16
+
+### Fixed
+- Taskbar, Start and File Explorer tweaks (for example the taskbar search box) did not show any change until you signed out, because Explorer was never restarted. WinVelo now restarts Explorer once after applying or undoing them.
+- "Taskbar Search" now hides search when turned on. It used to switch the search box to an icon, so search never disappeared.
+- "Visual Effects - Set to Best Performance" showed an explanation and source about display-driver timeouts instead of what it changes.
+
 ## [1.0.0] - 2026-10-16
 
 First stable release.

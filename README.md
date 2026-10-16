@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Ziadtareks/WinVelo/releases/latest"><img src="https://img.shields.io/badge/release-v1.0.0-2563EB.svg" alt="Release v1.0.0"></a>
+  <a href="https://github.com/Ziadtareks/WinVelo/releases/latest"><img src="https://img.shields.io/badge/release-v1.0.1-2563EB.svg" alt="Release v1.0.0"></a>
   <img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10 | 11">
   <img src="https://img.shields.io/badge/tweaks-152-10B981.svg" alt="152 tweaks">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green.svg" alt="MIT License"></a>
@@ -22,7 +22,7 @@
 
 ## Download
 
-1. Download **`WinVelo-v1.0.0-portable.zip`** from the [latest release](https://github.com/Ziadtareks/WinVelo/releases/latest).
+1. Download **`WinVelo-v<version>-portable.zip`** from the [latest release](https://github.com/Ziadtareks/WinVelo/releases/latest).
 2. Unzip it anywhere: your Desktop, a tools folder, or a USB stick.
 3. Run **`WinVelo.exe`** and accept the administrator prompt.
 
@@ -93,7 +93,7 @@ There is nothing to install and you don't need to download .NET, because the run
 
 WinVelo أداة مفتوحة المصدر لضبط Windows 10 و 11. تعرض لك كل تعديل بالتفصيل قبل تطبيقه، وتتيح لك التراجع عنه في أي وقت.
 
-1. نزّل **`WinVelo-v1.0.0-portable.zip`** من [صفحة الإصدارات](https://github.com/Ziadtareks/WinVelo/releases/latest).
+1. نزّل **`WinVelo-v<version>-portable.zip`** من [صفحة الإصدارات](https://github.com/Ziadtareks/WinVelo/releases/latest).
 2. فك الضغط في أي مكان، وشغّل **`WinVelo.exe`**. لا يحتاج إلى تثبيت ولا إلى تنزيل .NET.
 3. لتحويل الواجهة إلى العربية: **Settings › Language › العربية**، ثم أعد تشغيل البرنامج.
 
