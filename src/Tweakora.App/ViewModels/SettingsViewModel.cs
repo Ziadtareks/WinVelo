@@ -60,8 +60,9 @@ public sealed partial class SettingsViewModel : ObservableObject
         _showExperimental = s.ShowExperimental;
         _isDryRun = _tweaksVM.IsDryRun;
 
-        string savedLanguage = LocalizationManager.NormalizeCode(s.Language);
-        _selectedLanguage = Languages.FirstOrDefault(l => l.Code == savedLanguage) ?? Languages[0];
+        // Show the language the app is running in right now (it can differ from the saved one with --lang).
+        string running = LocalizationManager.Instance.CurrentLanguage;
+        _selectedLanguage = Languages.FirstOrDefault(l => l.Code == running) ?? Languages[0];
     }
 
     partial void OnAppModeChanged(string value)
@@ -78,35 +79,9 @@ public sealed partial class SettingsViewModel : ObservableObject
         _appSettings.SaveSettings(s);
     }
 
-    /// <summary>Restarts WinVelo with the same arguments so the new language is applied everywhere.</summary>
+    /// <summary>Restarts WinVelo so the new language is applied everywhere.</summary>
     [RelayCommand]
-    public void RestartToApplyLanguage()
-    {
-        try
-        {
-            var args = Environment.GetCommandLineArgs().Skip(1).ToList();
-            int idx = args.FindIndex(a => string.Equals(a, "--lang", StringComparison.OrdinalIgnoreCase));
-            if (idx >= 0)
-            {
-                args.RemoveAt(idx);
-                if (idx < args.Count) args.RemoveAt(idx);
-            }
-
-            var psi = new ProcessStartInfo
-            {
-                FileName = Environment.ProcessPath ?? "WinVelo.exe",
-                UseShellExecute = true
-            };
-            foreach (var a in args) psi.ArgumentList.Add(a);
-
-            Process.Start(psi);
-            Application.Current?.Shutdown();
-        }
-        catch (Exception ex)
-        {
-            Log.Warning(ex, "Failed to restart WinVelo to apply the language.");
-        }
-    }
+    public void RestartToApplyLanguage() => LanguageSwitcher.Restart();
 
     [RelayCommand]
     public void SetSimpleMode()

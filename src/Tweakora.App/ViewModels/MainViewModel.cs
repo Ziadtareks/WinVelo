@@ -118,6 +118,17 @@ public sealed partial class MainViewModel : ObservableObject
 
     public string AppVersion => Tweakora.Core.AppInfo.DisplayVersion;
 
+    /// <summary>Label of the title-bar language button: the language you would switch to.</summary>
+    public string OtherLanguageName => LocalizationManager.Instance.IsRightToLeft ? "English" : "العربية";
+
+    /// <summary>Switches between English and Arabic (saved, then WinVelo restarts).</summary>
+    [RelayCommand]
+    public void SwitchLanguage()
+    {
+        string next = LocalizationManager.Instance.IsRightToLeft ? "en" : "ar";
+        LanguageSwitcher.SaveAndRestart(_appSettings, next);
+    }
+
     [ObservableProperty]
     private bool _isWizardOpen;
 
