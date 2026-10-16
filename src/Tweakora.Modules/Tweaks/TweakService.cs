@@ -334,7 +334,7 @@ public sealed class TweakService : ITweakService
             },
             cancellationToken);
 
-        _ = WindowsSettingNotifier.NotifySettingsChangedAsync();
+        _ = WindowsSettingNotifier.NotifySettingsChangedForKeysAsync(tweaks.SelectMany(t => t.Apply.Concat(t.Undo)).Select(a => a.Key ?? string.Empty));
         RestartExplorerIfNeeded(tweaks, report);
         return report;
     }
@@ -360,7 +360,7 @@ public sealed class TweakService : ITweakService
             },
             cancellationToken);
 
-        _ = WindowsSettingNotifier.NotifySettingsChangedAsync();
+        _ = WindowsSettingNotifier.NotifySettingsChangedForKeysAsync(tweaks.SelectMany(t => t.Apply.Concat(t.Undo)).Select(a => a.Key ?? string.Empty));
         RestartExplorerIfNeeded(tweaks, report);
         return report;
     }

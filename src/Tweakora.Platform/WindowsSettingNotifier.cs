@@ -83,6 +83,40 @@ public static class WindowsSettingNotifier
     }
 
     /// <summary>
+    /// Broadcasts WM_SETTINGCHANGE once without an area and once for every area that the
+    /// changed registry keys belong to (theme colors, policies, taskbar), so open windows,
+    /// the taskbar and apps re-read the new values instead of waiting for a sign-out.
+    /// </summary>
+    public static async Task NotifySettingsChangedForKeysAsync(IEnumerable<string> registryKeys)
+    {
+        var keys = registryKeys?.Where(k => !string.IsNullOrWhiteSpace(k)).ToList() ?? new List<string>();
+        await NotifySettingsChangedAsync().ConfigureAwait(false);
+        if (keys.Any(k => k.Contains("Personalize", StringComparison.OrdinalIgnoreCase) || k.Contains("Themes", StringComparison.OrdinalIgnoreCase)))
+            await NotifySettingsChangedAsync("Personalize").ConfigureAwait(false);
+        if (keys.Any(k => k.Contains("Policies", StringComparison.OrdinalIgnoreCase)))
+            await NotifySettingsChangedAsync("Policies").ConfigureAwait(false);
+        if (keys.Any(k => k.Contains(@"Explorer\Advanced", StringComparison.OrdinalIgnoreCase) || k.Contains("Search", StringComparison.OrdinalIgnoreCase)))
+            await BroadcastAreaAsync("TraySettings").ConfigureAwait(false);
+    }
+
+    private static Task BroadcastAreaAsync(string area)
+    {
+        return Task.Run(() =>
+        {
+            try
+            {
+                if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return;
+                SendMessageTimeout(new IntPtr(HWND_BROADCAST), WM_SETTINGCHANGE, UIntPtr.Zero, area,
+                    SMTO_ABORTIFHUNG | SMTO_NOTIMEOUTIFNOTHUNG, 50, out _);
+            }
+            catch
+            {
+                // Non-fatal
+            }
+        });
+    }
+
+    /// <summary>
     /// Fire-and-forget non-blocking setting change notification.
     /// </summary>
     public static void NotifySettingChanged(string? registryKey = null)
