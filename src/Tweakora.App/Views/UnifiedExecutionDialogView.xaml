@@ -1,6 +1,7 @@
 <UserControl x:Class="Tweakora.App.Views.UnifiedExecutionDialogView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="clr-namespace:Tweakora.App.Localization"
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              xmlns:vm="clr-namespace:Tweakora.App.ViewModels"
              AutomationProperties.AutomationId="UnifiedExecutionDialogView">
@@ -70,7 +71,7 @@
                         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,30"
                                     Visibility="{Binding IsPreviewLoading, Converter={StaticResource BoolToVisConverter}}">
                             <ui:ProgressRing IsIndeterminate="True" Width="28" Height="28" Margin="0,0,0,10" />
-                            <TextBlock Text="Analyzing system states..." FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" />
+                            <TextBlock Text="{loc:Tr Home_AnalyzingSystemStates}" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" />
                         </StackPanel>
 
                         <!-- Items ScrollViewer -->
@@ -86,10 +87,10 @@
                                                     <!-- Section Header -->
                                                     <DockPanel LastChildFill="True" Margin="0,0,0,8">
                                                         <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
-                                                            <Button Content="Select all" Style="{DynamicResource ModernGhostBtn}"
+                                                            <Button Content="{loc:Tr Preview_SelectAll}" Style="{DynamicResource ModernGhostBtn}"
                                                                     AutomationProperties.Name="{Binding Subcategory, StringFormat='Select all in {0}'}"
                                                                     Command="{Binding SelectAllCommand}" Padding="6,2" FontSize="11" Margin="0,0,6,0" />
-                                                            <Button Content="Select none" Style="{DynamicResource ModernGhostBtn}"
+                                                            <Button Content="{loc:Tr Preview_SelectNone}" Style="{DynamicResource ModernGhostBtn}"
                                                                     AutomationProperties.Name="{Binding Subcategory, StringFormat='Select none in {0}'}"
                                                                     Command="{Binding SelectNoneCommand}" Padding="6,2" FontSize="11" />
                                                         </StackPanel>
@@ -124,12 +125,12 @@
                                                                         <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                                                             <TextBlock Text="{Binding Name}" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" />
                                                                             <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
-                                                                                <TextBlock Text="{Binding Id}" FontSize="11" Foreground="#94A3B8" Margin="0,0,10,0" FontFamily="Consolas, Cascadia Code, Courier New" />
-                                                                                <TextBlock Text="{Binding ReversibleText, StringFormat='Reversible: {0}'}" FontSize="11" Foreground="#94A3B8" Margin="0,0,10,0" />
-                                                                                <TextBlock Text="Reboot Required" FontSize="11" Foreground="#F87171" FontWeight="SemiBold" Margin="0,0,10,0"
+                                                                                <TextBlock FlowDirection="LeftToRight" Text="{Binding Id}" FontSize="11" Foreground="#94A3B8" Margin="0,0,10,0" FontFamily="Consolas, Cascadia Code, Courier New" />
+                                                                                <TextBlock Text="{Binding ReversibleText, Converter={StaticResource Tr}, StringFormat={loc:Tr Home_Reversible0}}" FontSize="11" Foreground="#94A3B8" Margin="0,0,10,0" />
+                                                                                <TextBlock Text="{loc:Tr Home_RebootRequired}" FontSize="11" Foreground="#F87171" FontWeight="SemiBold" Margin="0,0,10,0"
                                                                                            Visibility="{Binding RequiresReboot, Converter={StaticResource BoolToVisConverter}}" />
-                                                                                <TextBlock Text="Restarts Explorer" FontSize="11" Foreground="#60A5FA" FontWeight="SemiBold"
-                                                                                           ToolTip="Windows Explorer will be restarted automatically when this tweak is applied or undone"
+                                                                                <TextBlock Text="{loc:Tr Home_RestartsExplorer}" FontSize="11" Foreground="#60A5FA" FontWeight="SemiBold"
+                                                                                           ToolTip="{loc:Tr Home_WindowsExplorerWillBeRestarted}"
                                                                                            Visibility="{Binding RequiresExplorerRestart, Converter={StaticResource BoolToVisConverter}}" />
                                                                             </StackPanel>
                                                                         </StackPanel>
@@ -138,12 +139,12 @@
                                                                         <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
                                                                             <!-- State Badge -->
                                                                             <Border Background="{Binding StateBg}" CornerRadius="4" Padding="8,3" Margin="0,0,8,0">
-                                                                                <TextBlock Text="{Binding StateText}" FontSize="10" FontWeight="Bold" Foreground="{Binding StateFg}" />
+                                                                                <TextBlock Text="{Binding StateText, Converter={StaticResource Tr}}" FontSize="10" FontWeight="Bold" Foreground="{Binding StateFg}" />
                                                                             </Border>
 
                                                                             <!-- Risk Badge (Safe green / Low blue / Medium amber / High red) -->
                                                                             <Border Background="{Binding RiskBadgeBg}" BorderBrush="{Binding RiskBadgeBorder}" BorderThickness="1" CornerRadius="4" Padding="8,3">
-                                                                                <TextBlock Text="{Binding Risk}" FontSize="10" FontWeight="Bold" Foreground="{Binding RiskBadgeFg}" />
+                                                                                <TextBlock Text="{Binding Risk, Converter={StaticResource Tr}}" FontSize="10" FontWeight="Bold" Foreground="{Binding RiskBadgeFg}" />
                                                                             </Border>
                                                                         </StackPanel>
                                                                     </Grid>
@@ -171,7 +172,7 @@
                                                 <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" VerticalAlignment="Center">
                                                     <ui:SymbolIcon Symbol="DismissCircle24" Foreground="#EF4444" FontSize="16" Margin="0,0,8,0" VerticalAlignment="Center" />
                                                     <TextBlock Text="{Binding ExcludedSectionHeader}" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" />
-                                                    <TextBlock Text="— Excluded for system stability and safety" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" Margin="8,0,0,0" VerticalAlignment="Center" />
+                                                    <TextBlock Text="{loc:Tr Preview_ExcludedForSystemStabilityAnd}" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" Margin="8,0,0,0" VerticalAlignment="Center" />
                                                 </StackPanel>
                                                 <TextBlock DockPanel.Dock="Right" Text="{Binding ExcludedChevronText}" FontSize="12" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" />
                                             </DockPanel>
@@ -189,7 +190,7 @@
                                                             </Border>
                                                             <StackPanel VerticalAlignment="Center">
                                                                 <TextBlock Text="{Binding Name}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" />
-                                                                <TextBlock Text="{Binding Id}" FontSize="10" Foreground="#94A3B8" FontFamily="Consolas, Cascadia Code, Courier New" />
+                                                                <TextBlock FlowDirection="LeftToRight" Text="{Binding Id}" FontSize="10" Foreground="#94A3B8" FontFamily="Consolas, Cascadia Code, Courier New" />
                                                             </StackPanel>
                                                         </DockPanel>
                                                     </Border>
@@ -204,7 +205,7 @@
 
                     <!-- Pinned Actions Footer -->
                     <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,18,0,0">
-                        <ui:Button Content="Cancel" Appearance="Secondary" Margin="0,0,10,0"
+                        <ui:Button Content="{loc:Tr Config_Cancel}" Appearance="Secondary" Margin="0,0,10,0"
                                    AutomationProperties.AutomationId="PreviewCancelButton"
                                    AutomationProperties.Name="Cancel Preview"
                                    Command="{Binding CancelPreviewCommand}" />
@@ -267,12 +268,12 @@
                                             </Grid.ColumnDefinitions>
                                             <StackPanel Grid.Column="0">
                                                 <TextBlock Text="{Binding Name}" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" />
-                                                <TextBlock Text="{Binding Id}" FontSize="11" Foreground="#94A3B8" FontFamily="Consolas, Cascadia Code, Courier New" Margin="0,2,0,0" />
+                                                <TextBlock FlowDirection="LeftToRight" Text="{Binding Id}" FontSize="11" Foreground="#94A3B8" FontFamily="Consolas, Cascadia Code, Courier New" Margin="0,2,0,0" />
                                                 <TextBlock Text="{Binding Reason}" FontSize="11" Foreground="#F87171" TextWrapping="Wrap" Margin="0,4,0,0"
                                                            Visibility="{Binding HasReason, Converter={StaticResource BoolToVisConverter}}" />
                                             </StackPanel>
                                             <Border Grid.Column="1" Background="{Binding StatusBg}" CornerRadius="4" Padding="8,4" VerticalAlignment="Center">
-                                                <TextBlock Text="{Binding StatusText}" FontSize="11" FontWeight="Bold" Foreground="{Binding StatusFg}" />
+                                                <TextBlock Text="{Binding StatusText, Converter={StaticResource Tr}}" FontSize="11" FontWeight="Bold" Foreground="{Binding StatusFg}" />
                                             </Border>
                                         </Grid>
                                     </Border>
@@ -300,7 +301,7 @@
                         <StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
                                 <ui:SymbolIcon Symbol="ShieldCheckmark24" Foreground="#10B981" FontSize="16" Margin="0,0,8,0" VerticalAlignment="Center" />
-                                <TextBlock Text="Windows Servicing Health Check" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" />
+                                <TextBlock Text="{loc:Tr Preview_WindowsServicingHealthCheck}" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" />
                             </StackPanel>
                             <TextBlock Text="{Binding ServicingHealthSummary}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" />
 
@@ -316,7 +317,7 @@
 
                     <!-- Actions -->
                     <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
-                        <ui:Button Content="Done" Appearance="Primary"
+                        <ui:Button Content="{loc:Tr Preview_Done}" Appearance="Primary"
                                    AutomationProperties.Name="Done and Close Results"
                                    Command="{Binding CloseResultCommand}" />
                     </StackPanel>

@@ -5,7 +5,7 @@
     1. Builds the solution (Release).
     2. Validates the tweak catalog and checks that the committed presets match the generator.
     3. Runs the unit tests.
-    4. Retakes the README screenshots in test mode (no system changes). Skip with -SkipScreenshots.
+    4. Retakes the README screenshots (English and Arabic) in test mode (no system changes). Skip with -SkipScreenshots.
     5. Builds the portable package (build\publish.ps1).
     6. Creates dist\WinVelo-v<Version>-GitHub\ with:
          source\     the open-source repository files (tracked files only, no build output)
@@ -63,7 +63,10 @@ if (-not $SkipScreenshots) {
     if (-not (Test-Path $appExe)) { throw "Built app not found at $appExe" }
     $shotDir = Join-Path $repoRoot "docs\screenshots"
     $p = Start-Process -FilePath $appExe -ArgumentList @("--test-mode", "--capture-screenshots", "`"$shotDir`"") -PassThru -Wait
-    if ($p.ExitCode -ne 0) { throw "Screenshot capture failed (exit code $($p.ExitCode))." }
+    if ($null -ne $p.ExitCode -and $p.ExitCode -ne 0) { throw "Screenshot capture failed (exit code $($p.ExitCode))." }
+    $shotDirAr = Join-Path $shotDir "ar"
+    $pAr = Start-Process -FilePath $appExe -ArgumentList @("--test-mode", "--lang", "ar", "--capture-screenshots", "`"$shotDirAr`"") -PassThru -Wait
+    if ($null -ne $pAr.ExitCode -and $pAr.ExitCode -ne 0) { throw "Arabic screenshot capture failed (exit code $($pAr.ExitCode))." }
     Write-Host "[OK] Screenshots updated in docs\screenshots. Commit them if they changed." -ForegroundColor Green
 } else {
     Write-Host "`n(Skipping screenshots)" -ForegroundColor Yellow
@@ -114,6 +117,7 @@ SHA-256: ``$zipHash``
 - Presets (Recommended, Privacy, AI & Copilot, Clean UI, Performance, Gaming) with a preview before applying
 - Rollback journal with undo for single tweaks, sessions or everything
 - App installer (winget), startup, services, cleaner, DNS, fixes, updates, optional features, restore points
+- English and Arabic interface (Settings > Language)
 - No telemetry, ads or update checks
 
 See [CHANGELOG.md](https://github.com/Ziadtareks/WinVelo/blob/main/CHANGELOG.md) for the full list of changes.

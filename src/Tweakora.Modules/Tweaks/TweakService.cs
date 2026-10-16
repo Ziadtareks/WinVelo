@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Tweakora.Core;
 using Tweakora.Core.Engine;
 using Tweakora.Core.Engine.Handlers;
 using Tweakora.Core.Engine.Runners;
@@ -143,6 +144,7 @@ public sealed class TweakService : ITweakService
                 }
                 catch { }
             }
+            CatalogTranslations.Apply(list, Path.GetDirectoryName(tweaksDir) ?? string.Empty);
         }
 
         return list;
@@ -194,6 +196,7 @@ public sealed class TweakService : ITweakService
                 }
                 catch { }
             }
+            CatalogTranslations.Apply(list, Path.GetDirectoryName(presetsDir) ?? string.Empty);
         }
 
         return list;

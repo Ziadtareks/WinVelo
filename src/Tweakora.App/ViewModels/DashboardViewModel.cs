@@ -16,6 +16,7 @@ using Tweakora.Modules.Advisor;
 using Tweakora.Modules.Memory;
 using Tweakora.Modules.Tweaks;
 using Tweakora.Platform;
+using Tweakora.App.Localization;
 
 namespace Tweakora.App.ViewModels;
 
@@ -58,12 +59,12 @@ public sealed partial class QuickToggleCardModel : ObservableObject
     {
         get
         {
-            if (IsApplying) return "Applying...";
+            if (IsApplying) return LocalizationManager.T("Applying...");
             return State switch
             {
-                TweakState.Applied => "On",
-                TweakState.Partial => "Partial",
-                _ => "Off"
+                TweakState.Applied => LocalizationManager.T("On"),
+                TweakState.Partial => LocalizationManager.T("Partial"),
+                _ => LocalizationManager.T("Off")
             };
         }
     }
@@ -173,11 +174,11 @@ public sealed partial class ProfileCardModel : ObservableObject
         int remainingCount = activeTweaks.Count - first4.Count;
         if (first4.Count == 0)
         {
-            PreviewTweakSummary = "No tweaks in standard tier.";
+            PreviewTweakSummary = LocalizationManager.T("No tweaks in standard tier.");
         }
         else if (remainingCount > 0)
         {
-            PreviewTweakSummary = $"{string.Join(", ", first4)}, and {remainingCount} more";
+            PreviewTweakSummary = LocalizationManager.T("{0}, and {1} more", string.Join(", ", first4), remainingCount);
         }
         else
         {
@@ -261,7 +262,7 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
     private DateTime? _latestRestorePointDate;
 
     [ObservableProperty]
-    private string _systemRestoreStatusText = "Checking System Restore...";
+    private string _systemRestoreStatusText = LocalizationManager.T("Checking System Restore...");
 
     [ObservableProperty]
     private string _systemRestoreBadgeBg = "#064E3B";
@@ -285,13 +286,13 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
     private bool _isRebootPending;
 
     [ObservableProperty]
-    private string _rebootPendingMessage = "A system reboot is required to complete active modifications.";
+    private string _rebootPendingMessage = LocalizationManager.T("A system reboot is required to complete active modifications.");
 
     [ObservableProperty]
     private bool _isExplorerRestartPending;
 
     [ObservableProperty]
-    private string _explorerRestartPendingMessage = "Explorer restart recommended for settings to take effect.";
+    private string _explorerRestartPendingMessage = LocalizationManager.T("Explorer restart recommended for settings to take effect.");
 
     [ObservableProperty]
     private SystemInfoSummary _systemInfo = SystemInfoHelper.GetSystemInfo();
@@ -312,22 +313,22 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
 
     public string AdminBadgeBg => IsAdmin ? "#064E3B" : "#7F1D1D";
     public string AdminBadgeFg => IsAdmin ? "#10B981" : "#F87171";
-    public string AdminStatusText => IsAdmin ? "Administrator Active" : "Standard User (Limited)";
+    public string AdminStatusText => IsAdmin ? LocalizationManager.T("Administrator Active") : LocalizationManager.T("Standard User (Limited)");
 
     [ObservableProperty]
     private int _configuredSettingsPercentage = 0;
 
     [ObservableProperty]
-    private string _configuredSettingsStatusText = "Scanning settings...";
+    private string _configuredSettingsStatusText = LocalizationManager.T("Scanning settings...");
 
     [ObservableProperty]
     private string _configuredSettingsBrush = "#10B981";
 
     [ObservableProperty]
-    private string _configuredSettingsDetailText = "Scanning settings...";
+    private string _configuredSettingsDetailText = LocalizationManager.T("Scanning settings...");
 
     [ObservableProperty]
-    private string _appliedTweaksSummaryText = "0 tweaks applied by WinVelo";
+    private string _appliedTweaksSummaryText = LocalizationManager.T("0 tweaks applied by WinVelo");
 
     // Backward-compatibility aliases
     public int OptimizationScore
@@ -355,7 +356,7 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
     }
 
     [ObservableProperty]
-    private string _smartAdvisorSummary = "Ready to review recommended hardware settings.";
+    private string _smartAdvisorSummary = LocalizationManager.T("Ready to review recommended hardware settings.");
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsNotSmartOptimizing))]
@@ -370,19 +371,19 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
     public bool IsNotPurgingRam => !IsPurgingRam;
 
     [ObservableProperty]
-    private string _restorePointStatus = "Restore point ready.";
+    private string _restorePointStatus = LocalizationManager.T("Restore point ready.");
 
     [ObservableProperty]
     private bool _isCreatingRestorePoint;
 
     [ObservableProperty]
-    private string _globalStatusMessage = "Ready. Select a preset or review individual settings below.";
+    private string _globalStatusMessage = LocalizationManager.T("Ready. Select a preset or review individual settings below.");
 
     [ObservableProperty]
     private bool _isDetailsDialogOpen;
 
     [ObservableProperty]
-    private string _detailsDialogTitle = "Execution Details";
+    private string _detailsDialogTitle = LocalizationManager.T("Execution Details");
 
     [ObservableProperty]
     private bool _hasFailedDetails;
@@ -408,7 +409,7 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
     private bool _isIrreversibleDialogOpen;
 
     [ObservableProperty]
-    private string _irreversibleDialogTitle = "Irreversible Action Warning";
+    private string _irreversibleDialogTitle = LocalizationManager.T("Irreversible Action Warning");
 
     public ObservableCollection<IrreversibleItemModel> IrreversibleWarningItems { get; } = new();
 
@@ -440,13 +441,13 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
             {
                 Id = t.Id,
                 Name = t.Name,
-                Reason = t.IrreversibleReason ?? "Permanent system modification."
+                Reason = t.IrreversibleReason ?? LocalizationManager.T("Permanent system modification.")
             });
         }
 
         IrreversibleDialogTitle = irreversible.Count == 1
-            ? $"Irreversible Action — {irreversible[0].Name}"
-            : $"Irreversible Actions Warning ({irreversible.Count} tweaks)";
+            ? LocalizationManager.T("Irreversible Action — {0}", irreversible[0].Name)
+            : LocalizationManager.T("Irreversible Actions Warning ({0} tweaks)", irreversible.Count);
 
         _irreversibleConfirmTcs = new TaskCompletionSource<bool>();
         IsIrreversibleDialogOpen = true;
@@ -458,7 +459,7 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
     private bool _isProfilePreviewOpen;
 
     [ObservableProperty]
-    private string _profilePreviewTitle = "Profile Preview";
+    private string _profilePreviewTitle = LocalizationManager.T("Profile Preview");
 
     [ObservableProperty]
     private string _profilePreviewDescription = string.Empty;
@@ -467,7 +468,7 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
     private string _profilePreviewNotice = string.Empty;
 
     [ObservableProperty]
-    private string _profilePreviewConfirmText = "Confirm & Apply";
+    private string _profilePreviewConfirmText = LocalizationManager.T("Confirm & Apply");
 
     [ObservableProperty]
     private bool _isProfilePreviewUndo;
@@ -479,10 +480,10 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
     private string? _servicingHealthSummary;
 
     [ObservableProperty]
-    private string _servicingHealthShortStatus = "All OK";
+    private string _servicingHealthShortStatus = LocalizationManager.T("All OK");
 
     [ObservableProperty]
-    private string _servicingHealthDetails = "Windows Update, BITS, Microsoft Store, and Defender are operational.";
+    private string _servicingHealthDetails = LocalizationManager.T("Windows Update, BITS, Microsoft Store, and Defender are operational.");
 
     [ObservableProperty]
     private ServicingHealthReport? _lastServicingHealthReport;
@@ -503,7 +504,7 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
 
         if (selected.Count == 0)
         {
-            GlobalStatusMessage = "No tweaks selected to execute.";
+            GlobalStatusMessage = LocalizationManager.T("No tweaks selected to execute.");
             return;
         }
 
@@ -513,10 +514,10 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
         if (card != null)
         {
             card.IsBusy = true;
-            card.StatusMessage = isUndo ? "Reverting selected tweaks..." : "Applying selected tweaks...";
+            card.StatusMessage = isUndo ? LocalizationManager.T("Reverting selected tweaks...") : LocalizationManager.T("Applying selected tweaks...");
         }
 
-        GlobalStatusMessage = isUndo ? $"Reverting {selected.Count} tweak(s)..." : $"Applying {selected.Count} tweak(s)...";
+        GlobalStatusMessage = isUndo ? LocalizationManager.T("Reverting {0} tweak(s)...", selected.Count) : LocalizationManager.T("Applying {0} tweak(s)...", selected.Count);
 
         using var activity = _activityTracker?.BeginActivity(isUndo ? "Reverting WinVelo Tweaks..." : "Applying Profile Tweaks...");
         await Task.Yield();
@@ -536,8 +537,8 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
                     bool confirmed = await RequestIrreversibleConfirmationAsync(irreversible);
                     if (!confirmed)
                     {
-                        if (card != null) card.StatusMessage = "Cancelled by user.";
-                        GlobalStatusMessage = "Operation cancelled.";
+                        if (card != null) card.StatusMessage = LocalizationManager.T("Cancelled by user.");
+                        GlobalStatusMessage = LocalizationManager.T("Operation cancelled.");
                         return;
                     }
                 }
@@ -551,8 +552,8 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
             else
             {
                 GlobalStatusMessage = isUndo
-                    ? $"Restored {report.SucceededCount} of {report.TotalRequested} changes."
-                    : $"Applied {report.SucceededCount} of {report.TotalRequested} optimizations.";
+                    ? LocalizationManager.T("Restored {0} of {1} changes.", report.SucceededCount, report.TotalRequested)
+                    : LocalizationManager.T("Applied {0} of {1} optimizations.", report.SucceededCount, report.TotalRequested);
             }
 
             try
@@ -563,16 +564,16 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
 
                 if (!healthReport.IsHealthy)
                 {
-                    GlobalStatusMessage += $" | Servicing Alert: {string.Join("; ", healthReport.Warnings)}";
+                    GlobalStatusMessage += LocalizationManager.T(" | Servicing Alert: {0}", string.Join("; ", healthReport.Warnings));
                     if (card != null)
                     {
-                        card.StatusMessage += " (Servicing issues detected)";
+                        card.StatusMessage += LocalizationManager.T(" (Servicing issues detected)");
                         card.HasFailures = true;
                     }
                 }
                 else if (card != null && !card.HasFailures)
                 {
-                    card.StatusMessage += " | Servicing: Healthy";
+                    card.StatusMessage += LocalizationManager.T(" | Servicing: Healthy");
                 }
             }
             catch { }
@@ -587,9 +588,9 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
             {
                 card.HasFailures = true;
                 card.StatusColor = "#EF4444";
-                card.StatusMessage = $"Error: {ex.Message}";
+                card.StatusMessage = LocalizationManager.T("Error: {0}", ex.Message);
             }
-            GlobalStatusMessage = $"Execution failed: {ex.Message}";
+            GlobalStatusMessage = LocalizationManager.T("Execution failed: {0}", ex.Message);
         }
         finally
         {
@@ -601,7 +602,7 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
     public void CancelProfilePreview()
     {
         IsProfilePreviewOpen = false;
-        GlobalStatusMessage = "Profile preview cancelled.";
+        GlobalStatusMessage = LocalizationManager.T("Profile preview cancelled.");
     }
 
     public async Task OpenProfilePreviewAsync(
@@ -628,7 +629,7 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
                     if (card != null)
                     {
                         card.IsBusy = true;
-                        card.StatusMessage = isUndo ? "Reverting selected tweaks..." : "Applying selected tweaks...";
+                        card.StatusMessage = isUndo ? LocalizationManager.T("Reverting selected tweaks...") : LocalizationManager.T("Applying selected tweaks...");
                     }
                     try
                     {
@@ -668,8 +669,8 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
                 },
                 onCancelled: () =>
                 {
-                    if (card != null) card.StatusMessage = "Cancelled by user.";
-                    GlobalStatusMessage = "Operation cancelled.";
+                    if (card != null) card.StatusMessage = LocalizationManager.T("Cancelled by user.");
+                    GlobalStatusMessage = LocalizationManager.T("Operation cancelled.");
                 });
             return;
         }
@@ -719,9 +720,9 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
                         {
                             item.StateText = state switch
                             {
-                                TweakState.Applied => "Applied (In Journal)",
-                                TweakState.Partial => "Partial (In Journal)",
-                                _ => "Modified in Journal"
+                                TweakState.Applied => LocalizationManager.T("Applied (In Journal)"),
+                                TweakState.Partial => LocalizationManager.T("Partial (In Journal)"),
+                                _ => LocalizationManager.T("Modified in Journal")
                             };
                             item.StateBg = "#1E3A8A";
                             item.StateFg = "#60A5FA";
@@ -737,28 +738,28 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
                             switch (state)
                             {
                                 case TweakState.Applied:
-                                    item.StateText = "Applied";
+                                    item.StateText = LocalizationManager.T("Applied");
                                     item.StateBg = "#064E3B";
                                     item.StateFg = "#10B981";
                                     item.IsAlreadyApplied = true;
                                     item.IsSelected = false;
                                     break;
                                 case TweakState.Partial:
-                                    item.StateText = "Partial";
+                                    item.StateText = LocalizationManager.T("Partial");
                                     item.StateBg = "#78350F";
                                     item.StateFg = "#FBBF24";
                                     item.IsAlreadyApplied = false;
                                     item.IsSelected = true;
                                     break;
                                 case TweakState.NotApplied:
-                                    item.StateText = "Not Applied";
+                                    item.StateText = LocalizationManager.T("Not Applied");
                                     item.StateBg = "#1E222D";
                                     item.StateFg = "#94A3B8";
                                     item.IsAlreadyApplied = false;
                                     item.IsSelected = true;
                                     break;
                                 default:
-                                    item.StateText = "Unknown";
+                                    item.StateText = LocalizationManager.T("Unknown");
                                     item.StateBg = "#334155";
                                     item.StateFg = "#CBD5E1";
                                     item.IsAlreadyApplied = false;
@@ -827,11 +828,11 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
         {
             _shellService?.RestartExplorer();
             IsExplorerRestartPending = false;
-            GlobalStatusMessage = "Windows Explorer restarted successfully.";
+            GlobalStatusMessage = LocalizationManager.T("Windows Explorer restarted successfully.");
         }
         catch (Exception ex)
         {
-            GlobalStatusMessage = $"Failed to restart Explorer: {ex.Message}";
+            GlobalStatusMessage = LocalizationManager.T("Failed to restart Explorer: {0}", ex.Message);
         }
     }
 
@@ -853,38 +854,38 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
                 LatestRestorePointDate = latestDate;
                 if (!srEnabled)
                 {
-                    SystemRestoreStatusText = "System Restore: Disabled";
+                    SystemRestoreStatusText = LocalizationManager.T("System Restore: Disabled");
                     SystemRestoreBadgeBg = "#7F1D1D";
                     SystemRestoreBadgeFg = "#F87171";
                 }
                 else if (latestDate.HasValue)
                 {
-                    SystemRestoreStatusText = $"System Restore: Active (Latest: {latestDate.Value:MMM d, yyyy h:mm tt})";
+                    SystemRestoreStatusText = LocalizationManager.T("System Restore: Active (Latest: {0:MMM d, yyyy h:mm tt})", latestDate.Value);
                     SystemRestoreBadgeBg = "#064E3B";
                     SystemRestoreBadgeFg = "#10B981";
                 }
                 else
                 {
-                    SystemRestoreStatusText = "System Restore: Active (No restore points yet)";
+                    SystemRestoreStatusText = LocalizationManager.T("System Restore: Active (No restore points yet)");
                     SystemRestoreBadgeBg = "#064E3B";
                     SystemRestoreBadgeFg = "#10B981";
                 }
 
                 AppliedTweaksCount = activeTweaks.Count;
-                AppliedTweaksSummaryText = $"{activeTweaks.Count} tweak{(activeTweaks.Count == 1 ? "" : "s")} applied by WinVelo";
+                AppliedTweaksSummaryText = LocalizationManager.T("{0} tweak{1} applied by WinVelo", activeTweaks.Count, (activeTweaks.Count == 1 ? "" : "s"));
 
                 LastServicingHealthReport = health;
                 IsServicingHealthy = health.IsHealthy;
                 if (health.IsHealthy)
                 {
-                    ServicingHealthShortStatus = "All OK";
-                    ServicingHealthDetails = "Normal — Windows Update, BITS, Microsoft Store, and Defender are operational.";
-                    ServicingHealthSummary = "Normal — Windows Update, BITS, Microsoft Store, and Defender are operational.";
+                    ServicingHealthShortStatus = LocalizationManager.T("All OK");
+                    ServicingHealthDetails = LocalizationManager.T("Normal — Windows Update, BITS, Microsoft Store, and Defender are operational.");
+                    ServicingHealthSummary = LocalizationManager.T("Normal — Windows Update, BITS, Microsoft Store, and Defender are operational.");
                 }
                 else
                 {
                     int issueCount = health.Warnings?.Count ?? 1;
-                    ServicingHealthShortStatus = issueCount == 1 ? "1 issue" : $"{issueCount} issues";
+                    ServicingHealthShortStatus = issueCount == 1 ? LocalizationManager.T("1 issue") : LocalizationManager.T("{0} issues", issueCount);
                     ServicingHealthDetails = health.Warnings != null && health.Warnings.Count > 0
                         ? string.Join("\n", health.Warnings)
                         : health.SummaryText;
@@ -993,8 +994,8 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
                 Id = preset.Id,
                 Title = preset.Name,
                 Description = preset.Description,
-                TiersSubtitle = $"Standard: {standardTweaks.Count} tweaks · Full: {fullTweaks.Count} tweaks",
-                ButtonText = "Review",
+                TiersSubtitle = LocalizationManager.T("Standard: {0} tweaks · Full: {1} tweaks", standardTweaks.Count, fullTweaks.Count),
+                ButtonText = LocalizationManager.T("Review"),
                 IconSymbol = icon,
                 StandardTweaks = standardTweaks,
                 FullTweaks = fullTweaks,
@@ -1003,12 +1004,12 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
                 OnApplyAsync = async (c) =>
                 {
                     var tweaks = c.IsFullTier ? c.FullTweaks : c.StandardTweaks;
-                    string tierName = c.IsFullTier ? "Full" : "Standard";
+                    string tierName = c.IsFullTier ? LocalizationManager.T("Full") : LocalizationManager.T("Standard");
                     await OpenProfilePreviewAsync(
                         $"{preset.Name} ({tierName})",
                         preset.Description,
-                        "Already applied tweaks are skipped. You may untick any items before applying.",
-                        "Apply Selected Tweaks",
+                        LocalizationManager.T("Already applied tweaks are skipped. You may untick any items before applying."),
+                        LocalizationManager.T("Apply Selected Tweaks"),
                         tweaks,
                         isUndo: false,
                         c,
@@ -1031,8 +1032,8 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
         {
             Id = "tweak.classic-menu",
             OriginKey = "WPFTweaksRightClickMenu",
-            Title = "Classic Right-Click Menu",
-            Description = "Restore the classic full context menu without having to click 'Show more options'.",
+            Title = LocalizationManager.T("Classic Right-Click Menu"),
+            Description = LocalizationManager.T("Restore the classic full context menu without having to click 'Show more options'."),
             IconSymbol = "AppsList24",
             OnToggleAsync = HandleQuickToggleAsync
         });
@@ -1042,8 +1043,8 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
         {
             Id = "tweak.bing-search",
             OriginKey = "WPFToggleBingSearch",
-            Title = "Disable Bing in Search",
-            Description = "Restrict Start Menu search exclusively to local apps, settings, and documents.",
+            Title = LocalizationManager.T("Disable Bing in Search"),
+            Description = LocalizationManager.T("Restrict Start Menu search exclusively to local apps, settings, and documents."),
             IconSymbol = "Search24",
             OnToggleAsync = HandleQuickToggleAsync
         });
@@ -1053,8 +1054,8 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
         {
             Id = "tweak.file-extensions",
             OriginKey = "WPFToggleShowExt",
-            Title = "Show File Extensions",
-            Description = "Always display full file extensions (.txt, .exe, .pdf, .zip) in File Explorer.",
+            Title = LocalizationManager.T("Show File Extensions"),
+            Description = LocalizationManager.T("Always display full file extensions (.txt, .exe, .pdf, .zip) in File Explorer."),
             IconSymbol = "Document24",
             OnToggleAsync = HandleQuickToggleAsync
         });
@@ -1064,8 +1065,8 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
         {
             Id = "tweak.telemetry",
             OriginKey = "WPFTweaksTelemetry",
-            Title = "Disable Telemetry Data",
-            Description = "Stop Microsoft diagnostic data collection and customer experience reporting.",
+            Title = LocalizationManager.T("Disable Telemetry Data"),
+            Description = LocalizationManager.T("Stop Microsoft diagnostic data collection and customer experience reporting."),
             IconSymbol = "EyeOff24",
             OnToggleAsync = HandleQuickToggleAsync
         });
@@ -1075,8 +1076,8 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
         {
             Id = "tweak.spotlight-ads",
             OriginKey = "privacy.spotlight.lockscreen-ads",
-            Title = "Disable Lockscreen Ads",
-            Description = "Disable tips, suggested promotions, and Spotlight advertisements on the lock screen.",
+            Title = LocalizationManager.T("Disable Lockscreen Ads"),
+            Description = LocalizationManager.T("Disable tips, suggested promotions, and Spotlight advertisements on the lock screen."),
             IconSymbol = "LockClosed24",
             OnToggleAsync = HandleQuickToggleAsync
         });
@@ -1086,8 +1087,8 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
         {
             Id = "tweak.end-task",
             OriginKey = "WPFTweaksEndTaskOnTaskbar",
-            Title = "End Task on Taskbar",
-            Description = "Add an instant 'End Task' option to right-click menus on taskbar application icons.",
+            Title = LocalizationManager.T("End Task on Taskbar"),
+            Description = LocalizationManager.T("Add an instant 'End Task' option to right-click menus on taskbar application icons."),
             IconSymbol = "DismissCircle24",
             OnToggleAsync = HandleQuickToggleAsync
         });
@@ -1097,8 +1098,8 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
         {
             Id = "tweak.background-apps",
             OriginKey = "WPFTweaksDisableBGapps",
-            Title = "Disable Background Apps",
-            Description = "Prevent Store apps from continuously consuming RAM and CPU in the background.",
+            Title = LocalizationManager.T("Disable Background Apps"),
+            Description = LocalizationManager.T("Prevent Store apps from continuously consuming RAM and CPU in the background."),
             IconSymbol = "Power24",
             OnToggleAsync = HandleQuickToggleAsync
         });
@@ -1108,8 +1109,8 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
         {
             Id = "tweak.dark-mode",
             OriginKey = "WPFToggleDarkMode",
-            Title = "System Dark Mode",
-            Description = "Enable modern dark theme across Windows system surfaces and supported apps.",
+            Title = LocalizationManager.T("System Dark Mode"),
+            Description = LocalizationManager.T("Enable modern dark theme across Windows system surfaces and supported apps."),
             IconSymbol = "DarkTheme24",
             OnToggleAsync = HandleQuickToggleAsync
         });
@@ -1169,7 +1170,7 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
         var tweak = FindTweak(model.OriginKey);
         if (tweak == null)
         {
-            GlobalStatusMessage = $"Configuration not found for {model.Title}.";
+            GlobalStatusMessage = LocalizationManager.T("Configuration not found for {0}.", model.Title);
             return;
         }
 
@@ -1181,7 +1182,7 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
             bool confirmed = await RequestIrreversibleConfirmationAsync(new[] { tweak });
             if (!confirmed)
             {
-                GlobalStatusMessage = $"Cancelled {model.Title}.";
+                GlobalStatusMessage = LocalizationManager.T("Cancelled {0}.", model.Title);
                 return;
             }
         }
@@ -1189,7 +1190,7 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
         model.IsBusy = true;
         model.IsApplying = true;
 
-        string verb = targetState ? "Enabling" : "Disabling";
+        string verb = targetState ? LocalizationManager.T("Enabling") : LocalizationManager.T("Disabling");
         GlobalStatusMessage = $"{verb} {model.Title}...";
 
         using var activity = _activityTracker?.BeginActivity($"{verb} {model.Title}...");
@@ -1223,15 +1224,15 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
             bool succeeded = res != null && (res.Status is OperationItemStatus.Succeeded or OperationItemStatus.Applied or OperationItemStatus.Restored);
             if (succeeded)
             {
-                GlobalStatusMessage = $"{model.Title} is now {(actualState == TweakState.Applied ? "enabled" : (actualState == TweakState.Partial ? "partially enabled" : "reverted to default"))}.";
+                GlobalStatusMessage = LocalizationManager.T("{0} is now {1}.", model.Title, (actualState == TweakState.Applied ? "enabled" : (actualState == TweakState.Partial ? LocalizationManager.T("partially enabled") : LocalizationManager.T("reverted to default"))));
                 HasFailedDetails = false;
             }
             else
             {
-                GlobalStatusMessage = $"Status for {model.Title}: {res?.Reason ?? "System policy updated."}";
+                GlobalStatusMessage = LocalizationManager.T("Status for {0}: {1}", model.Title, res?.Reason ?? LocalizationManager.T("System policy updated."));
                 if (res != null && res.IsFailure)
                 {
-                    DetailsDialogTitle = $"Execution Details — {model.Title}";
+                    DetailsDialogTitle = LocalizationManager.T("Execution Details — {0}", model.Title);
                     ExecutionDetailsItems.Clear();
                     ExecutionDetailsItems.Add(res);
                     HasFailedDetails = true;
@@ -1240,7 +1241,7 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
         }
         catch (Exception ex)
         {
-            GlobalStatusMessage = $"Failed to toggle {model.Title}: {ex.Message}";
+            GlobalStatusMessage = LocalizationManager.T("Failed to toggle {0}: {1}", model.Title, ex.Message);
             try
             {
                 bool actualActive = await Task.Run(() => _tweakService.DetectStateAsync(tweak));
@@ -1264,7 +1265,7 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
     {
         if (IsCreatingRestorePoint) return;
         IsCreatingRestorePoint = true;
-        RestorePointStatus = "Creating system restore point...";
+        RestorePointStatus = LocalizationManager.T("Creating system restore point...");
 
         using var activity = _activityTracker?.BeginActivity("Creating System Restore Point...");
         await Task.Yield();
@@ -1274,20 +1275,20 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
             var res = await Task.Run(() => _restoreService.CreateRestorePoint("WinVelo System Health Snapshot"));
             if (res.Success)
             {
-                RestorePointStatus = $"Restore point created successfully (Seq #{res.SequenceNumber}).";
+                RestorePointStatus = LocalizationManager.T("Restore point created successfully (Seq #{0}).", res.SequenceNumber);
             }
             else if (res.WasThrottledOrSkipped)
             {
-                RestorePointStatus = "Windows throttled restore point creation (a recent snapshot already exists).";
+                RestorePointStatus = LocalizationManager.T("Windows throttled restore point creation (a recent snapshot already exists).");
             }
             else
             {
-                RestorePointStatus = $"Restore point creation notice: {res.ErrorMessage ?? "Standard policy"}";
+                RestorePointStatus = LocalizationManager.T("Restore point creation notice: {0}", res.ErrorMessage ?? LocalizationManager.T("Standard policy"));
             }
         }
         catch (Exception ex)
         {
-            RestorePointStatus = $"Failed to create restore point: {ex.Message}";
+            RestorePointStatus = LocalizationManager.T("Failed to create restore point: {0}", ex.Message);
         }
         finally
         {
@@ -1306,8 +1307,8 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
         if (fail > 0)
         {
             card.SetStatusMessage($"{actionVerb} {succ} of {total} — {fail} failed (details)", "#EF4444", hasFailures: true);
-            GlobalStatusMessage = $"{actionVerb} {succ} of {total} — {fail} failed (details)";
-            DetailsDialogTitle = $"Execution Details — {card.Title}";
+            GlobalStatusMessage = LocalizationManager.T("{0} {1} of {2} — {3} failed (details)", actionVerb, succ, total, fail);
+            DetailsDialogTitle = LocalizationManager.T("Execution Details — {0}", card.Title);
             ExecutionDetailsItems.Clear();
             foreach (var item in report.Results.Where(r => r.IsFailure))
             {
@@ -1318,14 +1319,14 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
         else if (report.SkippedCount > 0)
         {
             card.SetStatusMessage($"{actionVerb} {succ} of {total} ({report.SkippedCount} skipped)", "#60A5FA");
-            GlobalStatusMessage = $"{card.Title}: {actionVerb} {succ} of {total} ({report.SkippedCount} skipped).";
+            GlobalStatusMessage = LocalizationManager.T("{0}: {1} {2} of {3} ({4} skipped).", card.Title, actionVerb, succ, total, report.SkippedCount);
             HasFailedDetails = false;
             ExecutionDetailsItems.Clear();
         }
         else
         {
             card.SetStatusMessage(isRestore ? "Defaults restored!" : "Profile applied successfully!", "#34D399");
-            GlobalStatusMessage = isRestore ? "Windows defaults restored successfully." : $"{card.Title} applied successfully.";
+            GlobalStatusMessage = isRestore ? LocalizationManager.T("Windows defaults restored successfully.") : LocalizationManager.T("{0} applied successfully.", card.Title);
             HasFailedDetails = false;
             ExecutionDetailsItems.Clear();
         }
@@ -1336,7 +1337,7 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
     {
         if (IsPurgingRam) return;
         IsPurgingRam = true;
-        GlobalStatusMessage = "Purging memory cache and trimming process working sets...";
+        GlobalStatusMessage = LocalizationManager.T("Purging memory cache and trimming process working sets...");
 
         using var activity = _activityTracker?.BeginActivity("Purging Standby RAM Cache...");
         await Task.Yield();
@@ -1347,11 +1348,11 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
             var sysInfo = await Task.Run(() => SystemInfoHelper.GetSystemInfo());
             SystemInfo = sysInfo;
             UpdateRamMetrics();
-            GlobalStatusMessage = $"RAM Purge Complete: Freed {result.FormattedFreed} of Standby & Working Set Memory.";
+            GlobalStatusMessage = LocalizationManager.T("RAM Purge Complete: Freed {0} of Standby & Working Set Memory.", result.FormattedFreed);
         }
         catch (Exception ex)
         {
-            GlobalStatusMessage = $"RAM Purge Notice: {ex.Message}";
+            GlobalStatusMessage = LocalizationManager.T("RAM Purge Notice: {0}", ex.Message);
         }
         finally
         {
@@ -1365,15 +1366,15 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
         var activeTweaks = _tweakService.GetActiveJournalTweaks();
         if (activeTweaks.Count == 0)
         {
-            GlobalStatusMessage = "No active tweaks found in WinVelo journal to undo. Changes made by other tools are not covered.";
+            GlobalStatusMessage = LocalizationManager.T("No active tweaks found in WinVelo journal to undo. Changes made by other tools are not covered.");
             return;
         }
 
         await OpenProfilePreviewAsync(
-            "Undo all WinVelo changes",
-            "Revert applied tweaks recorded in the journal (newest first).",
-            "Only tweaks modified and tracked by WinVelo are restored. Changes made by other tools or Windows updates are not covered.",
-            "Revert Selected Tweaks",
+            LocalizationManager.T("Undo all WinVelo changes"),
+            LocalizationManager.T("Revert applied tweaks recorded in the journal (newest first)."),
+            LocalizationManager.T("Only tweaks modified and tracked by WinVelo are restored. Changes made by other tools or Windows updates are not covered."),
+            LocalizationManager.T("Revert Selected Tweaks"),
             activeTweaks,
             isUndo: true,
             card: null);
@@ -1390,7 +1391,7 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
     {
         if (IsSmartOptimizing) return;
         IsSmartOptimizing = true;
-        GlobalStatusMessage = "Analyzing system profile and generating recommendations...";
+        GlobalStatusMessage = LocalizationManager.T("Analyzing system profile and generating recommendations...");
 
         using var activity = _activityTracker?.BeginActivity("Generating recommendations...");
         await Task.Yield();
@@ -1400,24 +1401,24 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
             var recommended = await Task.Run(() => _advisorService.GetSmartRecommendationsAsync(_catalog, _tweakService));
             if (recommended.Count == 0)
             {
-                GlobalStatusMessage = "All recommended settings are already applied on this PC.";
+                GlobalStatusMessage = LocalizationManager.T("All recommended settings are already applied on this PC.");
                 return;
             }
 
             await OpenProfilePreviewAsync(
-                "Hardware Recommendations",
-                "Based on your hardware profile and system assessment, the following tweaks are recommended for review.",
-                "Already applied tweaks are skipped. You may untick any settings before applying.",
-                "Apply Recommended Tweaks",
+                LocalizationManager.T("Hardware Recommendations"),
+                LocalizationManager.T("Based on your hardware profile and system assessment, the following tweaks are recommended for review."),
+                LocalizationManager.T("Already applied tweaks are skipped. You may untick any settings before applying."),
+                LocalizationManager.T("Apply Recommended Tweaks"),
                 recommended,
                 isUndo: false,
                 card: null);
 
-            GlobalStatusMessage = $"{recommended.Count} recommendations ready for review.";
+            GlobalStatusMessage = LocalizationManager.T("{0} recommendations ready for review.", recommended.Count);
         }
         catch (Exception ex)
         {
-            GlobalStatusMessage = $"Recommendations notice: {ex.Message}";
+            GlobalStatusMessage = LocalizationManager.T("Recommendations notice: {0}", ex.Message);
         }
         finally
         {
@@ -1433,10 +1434,10 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
         {
             var assessment = await Task.Run(() => _advisorService.CalculateOptimizationScoreAsync(_catalog, _tweakService));
             ConfiguredSettingsPercentage = assessment.ScorePercent;
-            ConfiguredSettingsDetailText = $"{assessment.AppliedCount} of {assessment.TotalScoredCount} settings configured";
-            ConfiguredSettingsStatusText = $"{assessment.AppliedCount} active";
+            ConfiguredSettingsDetailText = LocalizationManager.T("{0} of {1} settings configured", assessment.AppliedCount, assessment.TotalScoredCount);
+            ConfiguredSettingsStatusText = LocalizationManager.T("{0} active", assessment.AppliedCount);
             ConfiguredSettingsBrush = "#10B981";
-            AppliedTweaksSummaryText = $"{assessment.AppliedCount} tweaks applied by WinVelo";
+            AppliedTweaksSummaryText = LocalizationManager.T("{0} tweaks applied by WinVelo", assessment.AppliedCount);
 
             if (assessment.TailoredRecommendationNotes.Count > 0)
             {

@@ -462,20 +462,20 @@ public sealed partial class MainViewModel : ObservableObject
         _allPaletteItems.Add(new PaletteItem { Title = "Restore Points", Subtitle = "Windows System Protection checkpoints", Category = "Tool", IconSymbol = "ShieldCheckmark24", ActionToExecute = () => SwitchTab("RestorePoints") });
 
         // Tweak Categories
-        _allPaletteItems.Add(new PaletteItem { Title = "All Tweaks", Subtitle = "View all system tweaks", Category = "Category", ActionToExecute = () => NavigateCategory("All") });
-        _allPaletteItems.Add(new PaletteItem { Title = "Essential Tweaks", Subtitle = "Core safe optimizations", Category = "Category", ActionToExecute = () => NavigateCategory("Essential") });
-        _allPaletteItems.Add(new PaletteItem { Title = "Privacy & Telemetry", Subtitle = "Disable telemetry and tracking", Category = "Category", ActionToExecute = () => NavigateCategory("Privacy") });
-        _allPaletteItems.Add(new PaletteItem { Title = "Performance Tweaks", Subtitle = "System speed and memory optimizations", Category = "Category", ActionToExecute = () => NavigateCategory("Performance") });
-        _allPaletteItems.Add(new PaletteItem { Title = "Customize UI", Subtitle = "Taskbar, Explorer and desktop style", Category = "Category", ActionToExecute = () => NavigateCategory("Customize UI") });
-        _allPaletteItems.Add(new PaletteItem { Title = "Advanced / Caution", Subtitle = "Deep optimizations and power user tweaks", Category = "Category", ActionToExecute = () => NavigateCategory("Advanced") });
+        _allPaletteItems.Add(new PaletteItem { Title = LocalizationManager.T("All Tweaks"), Subtitle = LocalizationManager.T("View all system tweaks"), Category = LocalizationManager.T("Category"), ActionToExecute = () => NavigateCategory(LocalizationManager.T("All")) });
+        _allPaletteItems.Add(new PaletteItem { Title = LocalizationManager.T("Essential Tweaks"), Subtitle = LocalizationManager.T("Core safe optimizations"), Category = LocalizationManager.T("Category"), ActionToExecute = () => NavigateCategory(LocalizationManager.T("Essential")) });
+        _allPaletteItems.Add(new PaletteItem { Title = LocalizationManager.T("Privacy & Telemetry"), Subtitle = LocalizationManager.T("Disable telemetry and tracking"), Category = LocalizationManager.T("Category"), ActionToExecute = () => NavigateCategory(LocalizationManager.T("Privacy")) });
+        _allPaletteItems.Add(new PaletteItem { Title = LocalizationManager.T("Performance Tweaks"), Subtitle = LocalizationManager.T("System speed and memory optimizations"), Category = LocalizationManager.T("Category"), ActionToExecute = () => NavigateCategory(LocalizationManager.T("Performance")) });
+        _allPaletteItems.Add(new PaletteItem { Title = LocalizationManager.T("Customize UI"), Subtitle = LocalizationManager.T("Taskbar, Explorer and desktop style"), Category = LocalizationManager.T("Category"), ActionToExecute = () => NavigateCategory(LocalizationManager.T("Customize UI")) });
+        _allPaletteItems.Add(new PaletteItem { Title = LocalizationManager.T("Advanced / Caution"), Subtitle = LocalizationManager.T("Deep optimizations and power user tweaks"), Category = LocalizationManager.T("Category"), ActionToExecute = () => NavigateCategory(LocalizationManager.T("Advanced")) });
 
         // Quick Actions
-        _allPaletteItems.Add(new PaletteItem { Title = "Undo All WinVelo Changes", Subtitle = "Revert all active changes recorded in the journal", Category = "Action", ActionToExecute = () => _ = HistoryVM.UndoAllChangesAsync() });
-        _allPaletteItems.Add(new PaletteItem { Title = "Standard Preset", Subtitle = "Select recommended desktop tweaks", Category = "Action", ActionToExecute = () => TweaksVM.ApplyPreset("Standard") });
-        _allPaletteItems.Add(new PaletteItem { Title = "Minimal Preset", Subtitle = "Select essential telemetry reductions", Category = "Action", ActionToExecute = () => TweaksVM.ApplyPreset("Minimal") });
-        _allPaletteItems.Add(new PaletteItem { Title = "Clear Selection", Subtitle = "Deselect all tweaks", Category = "Action", ActionToExecute = () => TweaksVM.ClearSelection() });
-        _allPaletteItems.Add(new PaletteItem { Title = "Create Restore Point", Subtitle = "Create a Windows System Restore point", Category = "Action", ActionToExecute = () => _ = TweaksVM.CreateRestorePointAsync() });
-        _allPaletteItems.Add(new PaletteItem { Title = "Re-Scan System", Subtitle = "Detect currently active tweaks on this PC", Category = "Action", ActionToExecute = () => _ = TweaksVM.RescanSystemAsync() });
+        _allPaletteItems.Add(new PaletteItem { Title = LocalizationManager.T("Undo All WinVelo Changes"), Subtitle = LocalizationManager.T("Revert all active changes recorded in the journal"), Category = LocalizationManager.T("Action"), ActionToExecute = () => _ = HistoryVM.UndoAllChangesAsync() });
+        _allPaletteItems.Add(new PaletteItem { Title = LocalizationManager.T("Standard Preset"), Subtitle = LocalizationManager.T("Select recommended desktop tweaks"), Category = LocalizationManager.T("Action"), ActionToExecute = () => TweaksVM.ApplyPreset(LocalizationManager.T("Standard")) });
+        _allPaletteItems.Add(new PaletteItem { Title = LocalizationManager.T("Minimal Preset"), Subtitle = LocalizationManager.T("Select essential telemetry reductions"), Category = LocalizationManager.T("Action"), ActionToExecute = () => TweaksVM.ApplyPreset(LocalizationManager.T("Minimal")) });
+        _allPaletteItems.Add(new PaletteItem { Title = LocalizationManager.T("Clear Selection"), Subtitle = LocalizationManager.T("Deselect all tweaks"), Category = LocalizationManager.T("Action"), ActionToExecute = () => TweaksVM.ClearSelection() });
+        _allPaletteItems.Add(new PaletteItem { Title = LocalizationManager.T("Create Restore Point"), Subtitle = LocalizationManager.T("Create a Windows System Restore point"), Category = LocalizationManager.T("Action"), ActionToExecute = () => _ = TweaksVM.CreateRestorePointAsync() });
+        _allPaletteItems.Add(new PaletteItem { Title = LocalizationManager.T("Re-Scan System"), Subtitle = LocalizationManager.T("Detect currently active tweaks on this PC"), Category = LocalizationManager.T("Action"), ActionToExecute = () => _ = TweaksVM.RescanSystemAsync() });
 
         FilterPalette();
     }
@@ -532,7 +532,7 @@ public sealed partial class MainViewModel : ObservableObject
             int actionCount = _unfinishedSessions.Sum(s => s.Records.Count);
             string tweakNames = string.Join(", ", touchedTweaks);
 
-            RecoveryDialogMessage = $"A previous session did not finish. {actionCount} actions were applied to [{tweakNames}].";
+            RecoveryDialogMessage = LocalizationManager.T("A previous session did not finish. {0} actions were applied to [{1}].", actionCount, tweakNames);
             IsRecoveryDialogOpen = true;
         }
     }

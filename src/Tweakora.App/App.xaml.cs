@@ -10,6 +10,7 @@ using System.Windows.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
+using Tweakora.App.Localization;
 using Tweakora.App.Services;
 using Tweakora.App.ViewModels;
 using Tweakora.App.Views;
@@ -158,6 +159,37 @@ public partial class App : Application
     [System.Runtime.InteropServices.DllImport("kernel32.dll", SetLastError = true)]
     private static extern bool AttachConsole(int dwProcessId);
 
+    /// <summary>
+    /// Picks the UI language before any window or view model is created:
+    /// "--lang ar" on the command line wins, otherwise the saved setting (default English).
+    /// </summary>
+    private void ApplyLanguage(string[] args)
+    {
+        string? lang = null;
+        int idx = Array.FindIndex(args, a => string.Equals(a, "--lang", StringComparison.OrdinalIgnoreCase));
+        if (idx >= 0 && idx + 1 < args.Length)
+        {
+            lang = args[idx + 1];
+        }
+
+        if (lang == null)
+        {
+            try
+            {
+                lang = _host.Services.GetRequiredService<IAppSettingsService>().GetSettings().Language;
+            }
+            catch (Exception ex)
+            {
+                Log.Warning(ex, "Could not read the language setting; using English.");
+            }
+        }
+
+        string code = LocalizationManager.NormalizeCode(lang);
+        LocalizationManager.Instance.SetLanguage(code);
+        Tweakora.Core.CatalogTranslations.Language = code;
+        Log.Information("UI language: {Language}", code);
+    }
+
     protected override async void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
@@ -166,6 +198,8 @@ public partial class App : Application
         {
             Log.Information("Starting WinVelo application host (TestMode={IsTestMode})...", TestModeManager.IsTestMode);
             await _host.StartAsync();
+
+            ApplyLanguage(e.Args);
 
             MainWindow window = _host.Services.GetRequiredService<MainWindow>();
             MainWindow = window;

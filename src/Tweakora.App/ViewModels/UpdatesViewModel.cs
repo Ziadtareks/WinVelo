@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Tweakora.Core.Operations;
 using Tweakora.Modules.Updates;
+using Tweakora.App.Localization;
 
 namespace Tweakora.App.ViewModels;
 
@@ -20,7 +21,7 @@ public sealed partial class UpdatesViewModel : ObservableObject
     private UpdateProfileMode _activeMode = UpdateProfileMode.Default;
 
     [ObservableProperty]
-    private string _activeModeTitle = "Default (Out of Box)";
+    private string _activeModeTitle = LocalizationManager.T("Default (Out of Box)");
 
     [ObservableProperty]
     private string _typedConfirmation = string.Empty;
@@ -36,7 +37,7 @@ public sealed partial class UpdatesViewModel : ObservableObject
     private bool _isBusy;
 
     [ObservableProperty]
-    private string _statusMessage = "Select a Windows Update profile to configure update delivery policy.";
+    private string _statusMessage = LocalizationManager.T("Select a Windows Update profile to configure update delivery policy.");
 
     public ObservableCollection<string> UpdateLogs { get; } = new();
 
@@ -63,9 +64,9 @@ public sealed partial class UpdatesViewModel : ObservableObject
         ActiveMode = _updatesService.DetectCurrentMode();
         ActiveModeTitle = ActiveMode switch
         {
-            UpdateProfileMode.Security => "Security (Recommended)",
-            UpdateProfileMode.DisableAll => "Updates Disabled (Caution)",
-            _ => "Default (Out of Box)"
+            UpdateProfileMode.Security => LocalizationManager.T("Security (Recommended)"),
+            UpdateProfileMode.DisableAll => LocalizationManager.T("Updates Disabled (Caution)"),
+            _ => LocalizationManager.T("Default (Out of Box)")
         };
     }
 
@@ -105,7 +106,7 @@ public sealed partial class UpdatesViewModel : ObservableObject
 
         if (!Tweakora.App.Services.AppAdminGuard.EnsureAdmin("modify Windows Update policies"))
         {
-            StatusMessage = "Administrator privileges required to modify update policies.";
+            StatusMessage = LocalizationManager.T("Administrator privileges required to modify update policies.");
             return;
         }
 
@@ -114,22 +115,22 @@ public sealed partial class UpdatesViewModel : ObservableObject
 
         try
         {
-            StatusMessage = $"Applying {SelectedMode} updates profile...";
+            StatusMessage = LocalizationManager.T("Applying {0} updates profile...", SelectedMode);
             var report = await Task.Run(async () => await _updatesService.ApplyModeAsync(SelectedMode, _runner));
             ActiveMode = SelectedMode;
             ActiveModeTitle = SelectedMode switch
             {
-                UpdateProfileMode.Security => "Security (Recommended)",
-                UpdateProfileMode.DisableAll => "Updates Disabled (Caution)",
-                _ => "Default (Out of Box)"
+                UpdateProfileMode.Security => LocalizationManager.T("Security (Recommended)"),
+                UpdateProfileMode.DisableAll => LocalizationManager.T("Updates Disabled (Caution)"),
+                _ => LocalizationManager.T("Default (Out of Box)")
             };
-            StatusMessage = $"Applied {ActiveModeTitle} profile: {report.Summary}.";
+            StatusMessage = LocalizationManager.T("Applied {0} profile: {1}.", ActiveModeTitle, report.Summary);
             TypedConfirmation = string.Empty;
             UpdateApplyEnabled();
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Error applying update profile: {ex.Message}";
+            StatusMessage = LocalizationManager.T("Error applying update profile: {0}", ex.Message);
         }
         finally
         {

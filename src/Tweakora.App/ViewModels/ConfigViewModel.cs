@@ -7,6 +7,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Tweakora.Core.Operations;
 using Tweakora.Modules.Config;
+using Tweakora.App.Localization;
 
 namespace Tweakora.App.ViewModels;
 
@@ -31,7 +32,7 @@ public sealed partial class ConfigViewModel : ObservableObject
     private bool _isBusy;
 
     [ObservableProperty]
-    private string _statusMessage = "Select Windows features to install or run system maintenance fixes.";
+    private string _statusMessage = LocalizationManager.T("Select Windows features to install or run system maintenance fixes.");
 
     [ObservableProperty]
     private bool _hasFailedDetails;
@@ -40,7 +41,7 @@ public sealed partial class ConfigViewModel : ObservableObject
     private bool _isDetailsDialogOpen;
 
     [ObservableProperty]
-    private string _detailsDialogTitle = "Execution Details";
+    private string _detailsDialogTitle = LocalizationManager.T("Execution Details");
 
     public ObservableCollection<OperationItemResult> ExecutionDetailsItems { get; } = new();
 
@@ -144,14 +145,14 @@ public sealed partial class ConfigViewModel : ObservableObject
     {
         if (!Tweakora.App.Services.AppAdminGuard.EnsureAdmin("enable Windows features"))
         {
-            StatusMessage = "Administrator privileges required to enable features.";
+            StatusMessage = LocalizationManager.T("Administrator privileges required to enable features.");
             return;
         }
 
         var selected = _allFeatures.Where(f => f.IsSelected).ToList();
         if (selected.Count == 0)
         {
-            StatusMessage = "No features selected.";
+            StatusMessage = LocalizationManager.T("No features selected.");
             return;
         }
 
@@ -160,26 +161,26 @@ public sealed partial class ConfigViewModel : ObservableObject
 
         try
         {
-            StatusMessage = $"Enabling {selected.Count} Windows feature(s)...";
+            StatusMessage = LocalizationManager.T("Enabling {0} Windows feature(s)...", selected.Count);
             var report = await Task.Run(async () => await _featureService.EnableFeaturesAsync(selected, _runner));
             if (report.FailedCount > 0)
             {
-                StatusMessage = $"Applied {report.SucceededCount} of {report.TotalRequested} — {report.FailedCount} failed (details)";
+                StatusMessage = LocalizationManager.T("Applied {0} of {1} — {2} failed (details)", report.SucceededCount, report.TotalRequested, report.FailedCount);
                 HasFailedDetails = true;
-                DetailsDialogTitle = "Execution Details — Windows Features";
+                DetailsDialogTitle = LocalizationManager.T("Execution Details — Windows Features");
                 ExecutionDetailsItems.Clear();
                 foreach (var f in report.Results.Where(r => r.IsFailure)) ExecutionDetailsItems.Add(f);
             }
             else
             {
-                StatusMessage = $"Enabled all {report.SucceededCount} feature(s) successfully.";
+                StatusMessage = LocalizationManager.T("Enabled all {0} feature(s) successfully.", report.SucceededCount);
                 HasFailedDetails = false;
                 ExecutionDetailsItems.Clear();
             }
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Error enabling features: {ex.Message}";
+            StatusMessage = LocalizationManager.T("Error enabling features: {0}", ex.Message);
         }
         finally
         {
@@ -192,14 +193,14 @@ public sealed partial class ConfigViewModel : ObservableObject
     {
         if (!Tweakora.App.Services.AppAdminGuard.EnsureAdmin("disable Windows features"))
         {
-            StatusMessage = "Administrator privileges required to disable features.";
+            StatusMessage = LocalizationManager.T("Administrator privileges required to disable features.");
             return;
         }
 
         var selected = _allFeatures.Where(f => f.IsSelected).ToList();
         if (selected.Count == 0)
         {
-            StatusMessage = "No features selected.";
+            StatusMessage = LocalizationManager.T("No features selected.");
             return;
         }
 
@@ -208,26 +209,26 @@ public sealed partial class ConfigViewModel : ObservableObject
 
         try
         {
-            StatusMessage = $"Disabling {selected.Count} Windows feature(s)...";
+            StatusMessage = LocalizationManager.T("Disabling {0} Windows feature(s)...", selected.Count);
             var report = await Task.Run(async () => await _featureService.DisableFeaturesAsync(selected, _runner));
             if (report.FailedCount > 0)
             {
-                StatusMessage = $"Restored {report.SucceededCount} of {report.TotalRequested} — {report.FailedCount} failed (details)";
+                StatusMessage = LocalizationManager.T("Restored {0} of {1} — {2} failed (details)", report.SucceededCount, report.TotalRequested, report.FailedCount);
                 HasFailedDetails = true;
-                DetailsDialogTitle = "Execution Details — Windows Features";
+                DetailsDialogTitle = LocalizationManager.T("Execution Details — Windows Features");
                 ExecutionDetailsItems.Clear();
                 foreach (var f in report.Results.Where(r => r.IsFailure)) ExecutionDetailsItems.Add(f);
             }
             else
             {
-                StatusMessage = $"Disabled all {report.SucceededCount} feature(s) successfully.";
+                StatusMessage = LocalizationManager.T("Disabled all {0} feature(s) successfully.", report.SucceededCount);
                 HasFailedDetails = false;
                 ExecutionDetailsItems.Clear();
             }
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Error disabling features: {ex.Message}";
+            StatusMessage = LocalizationManager.T("Error disabling features: {0}", ex.Message);
         }
         finally
         {
@@ -241,13 +242,13 @@ public sealed partial class ConfigViewModel : ObservableObject
         if (string.Equals(fixKey, "autologon", StringComparison.OrdinalIgnoreCase))
         {
             _fixService.OpenUrl("https://learn.microsoft.com/en-us/sysinternals/downloads/autologon");
-            StatusMessage = "Opened Sysinternals AutoLogon page in browser.";
+            StatusMessage = LocalizationManager.T("Opened Sysinternals AutoLogon page in browser.");
             return;
         }
 
         if (!Tweakora.App.Services.AppAdminGuard.EnsureAdmin("run system maintenance fixes"))
         {
-            StatusMessage = "Administrator privileges required to run fixes.";
+            StatusMessage = LocalizationManager.T("Administrator privileges required to run fixes.");
             return;
         }
 
@@ -256,26 +257,26 @@ public sealed partial class ConfigViewModel : ObservableObject
 
         try
         {
-            StatusMessage = $"Running maintenance fix: {fixKey}...";
+            StatusMessage = LocalizationManager.T("Running maintenance fix: {0}...", fixKey);
             var report = await Task.Run(async () => await _fixService.RunFixAsync(fixKey, _runner));
             if (report.FailedCount > 0)
             {
-                StatusMessage = $"Fix {fixKey} failed (details)";
+                StatusMessage = LocalizationManager.T("Fix {0} failed (details)", fixKey);
                 HasFailedDetails = true;
-                DetailsDialogTitle = $"Execution Details — Fix: {fixKey}";
+                DetailsDialogTitle = LocalizationManager.T("Execution Details — Fix: {0}", fixKey);
                 ExecutionDetailsItems.Clear();
                 foreach (var f in report.Results.Where(r => r.IsFailure)) ExecutionDetailsItems.Add(f);
             }
             else
             {
-                StatusMessage = $"Fix {fixKey} completed successfully.";
+                StatusMessage = LocalizationManager.T("Fix {0} completed successfully.", fixKey);
                 HasFailedDetails = false;
                 ExecutionDetailsItems.Clear();
             }
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Error executing {fixKey}: {ex.Message}";
+            StatusMessage = LocalizationManager.T("Error executing {0}: {1}", fixKey, ex.Message);
         }
         finally
         {
@@ -286,7 +287,7 @@ public sealed partial class ConfigViewModel : ObservableObject
     [RelayCommand]
     private void LaunchPanel(LegacyAppletDefinition panel)
     {
-        StatusMessage = $"Opening {panel.Name}...";
+        StatusMessage = LocalizationManager.T("Opening {0}...", panel.Name);
         _fixService.LaunchApplet(panel.Command);
     }
 
@@ -303,13 +304,13 @@ public sealed partial class ConfigViewModel : ObservableObject
         IsBusy = true;
         try
         {
-            StatusMessage = "Configuring OpenSSH Server...";
+            StatusMessage = LocalizationManager.T("Configuring OpenSSH Server...");
             bool success = await _featureService.ConfigureOpenSshAsync(true);
-            StatusMessage = success ? "OpenSSH Server configured successfully." : "OpenSSH configuration encountered warnings.";
+            StatusMessage = success ? LocalizationManager.T("OpenSSH Server configured successfully.") : LocalizationManager.T("OpenSSH configuration encountered warnings.");
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Error configuring OpenSSH: {ex.Message}";
+            StatusMessage = LocalizationManager.T("Error configuring OpenSSH: {0}", ex.Message);
         }
         finally
         {

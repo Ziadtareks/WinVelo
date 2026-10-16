@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Tweakora.Core.Models;
+using Tweakora.App.Localization;
 
 namespace Tweakora.App.ViewModels;
 
@@ -14,7 +15,7 @@ public sealed partial class ProfilePreviewItemModel : ObservableObject
     public required bool RequiresExplorerRestart { get; init; }
 
     [ObservableProperty]
-    private string _stateText = "Detecting...";
+    private string _stateText = LocalizationManager.T("Detecting...");
 
     [ObservableProperty]
     private string _stateBg = "#334155";
@@ -38,7 +39,7 @@ public sealed partial class ProfilePreviewItemModel : ObservableObject
 
     public string Subcategory => ToDisplayGroup(!string.IsNullOrWhiteSpace(Tweak.Subcategory)
         ? Tweak.Subcategory
-        : (!string.IsNullOrWhiteSpace(Tweak.Category) ? Tweak.Category : "General"));
+        : (!string.IsNullOrWhiteSpace(Tweak.Category) ? Tweak.Category : LocalizationManager.T("General")));
 
     private static readonly Dictionary<string, string> GroupNames = new(StringComparer.OrdinalIgnoreCase)
     {
@@ -53,18 +54,18 @@ public sealed partial class ProfilePreviewItemModel : ObservableObject
     /// <summary>Turns raw catalog subcategory keys (e.g. "copilot", "z__Advanced Tweaks - CAUTION") into readable group titles.</summary>
     public static string ToDisplayGroup(string raw)
     {
-        if (GroupNames.TryGetValue(raw, out var name)) return name;
+        if (GroupNames.TryGetValue(raw, out var name)) return LocalizationManager.T(name);
         string s = raw.StartsWith("z__", StringComparison.Ordinal) ? raw[3..] : raw;
-        return s.Length > 0 && s == s.ToLowerInvariant()
+        return LocalizationManager.T(s.Length > 0 && s == s.ToLowerInvariant()
             ? System.Globalization.CultureInfo.InvariantCulture.TextInfo.ToTitleCase(s)
-            : s;
+            : s);
     }
 
     public bool IsSelectable => !IsAlreadyApplied;
 
-    public string ReversibleText => Reversible ? "Yes" : "No";
-    public string RequiresRebootText => RequiresReboot ? "Yes" : "No";
-    public string RequiresExplorerRestartText => RequiresExplorerRestart ? "Yes" : "No";
+    public string ReversibleText => Reversible ? LocalizationManager.T("Yes") : LocalizationManager.T("No");
+    public string RequiresRebootText => RequiresReboot ? LocalizationManager.T("Yes") : LocalizationManager.T("No");
+    public string RequiresExplorerRestartText => RequiresExplorerRestart ? LocalizationManager.T("Yes") : LocalizationManager.T("No");
 
     public string RiskBadgeBg => Risk switch
     {

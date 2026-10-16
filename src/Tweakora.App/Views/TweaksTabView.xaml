@@ -1,6 +1,7 @@
 <UserControl x:Class="Tweakora.App.Views.TweaksTabView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="clr-namespace:Tweakora.App.Localization"
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              xmlns:vm="clr-namespace:Tweakora.App.ViewModels"
              xmlns:converters="clr-namespace:Tweakora.App.Converters"
@@ -28,7 +29,7 @@
                 </Grid.RowDefinitions>
 
                 <Border Grid.Row="0" Padding="16,14,16,10" BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="0,0,0,1">
-                    <TextBlock Text="CATEGORIES" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" />
+                    <TextBlock Text="{loc:Tr Tweaks_Categories}" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" />
                 </Border>
 
                 <ListBox Grid.Row="1" ItemsSource="{Binding CategoryOptions}"
@@ -66,6 +67,11 @@
                             </Setter>
                         </Style>
                     </ListBox.ItemContainerStyle>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Converter={StaticResource Tr}}" />
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
                 </ListBox>
             </Grid>
         </Border>
@@ -89,7 +95,7 @@
                         <!-- Search Box -->
                         <ui:TextBox AutomationProperties.AutomationId="TweaksSearchBox"
                                     AutomationProperties.Name="Search tweaks"
-                                    PlaceholderText="Search tweaks..."
+                                    PlaceholderText="{loc:Tr Tweaks_SearchTweaks}"
                                     Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                     Width="160" Margin="0,0,10,0" VerticalAlignment="Center" />
 
@@ -103,41 +109,53 @@
                         <!-- Recommended Only Toggle -->
                         <CheckBox AutomationProperties.AutomationId="RecommendedOnlyToggle"
                                   AutomationProperties.Name="Recommended only"
-                                  Content="Recommended only"
+                                  Content="{loc:Tr Tweaks_RecommendedOnly}"
                                   IsChecked="{Binding IsRecommendedOnly, Mode=TwoWay}"
                                   Margin="0,0,10,0" VerticalAlignment="Center"
                                   FontSize="12" Foreground="{DynamicResource RiskSafeFgBrush}" FontWeight="SemiBold"
-                                  ToolTip="Show only safe, reversible, well-tested tweaks" />
+                                  ToolTip="{loc:Tr Tweaks_ShowOnlySafeReversibleWell}" />
 
                         <!-- Risk Filter Dropdown: Labeled ("Risk: All") -->
                         <ComboBox AutomationProperties.AutomationId="RiskFilterComboBox"
                                   AutomationProperties.Name="Filter by risk level"
                                   ItemsSource="{Binding RiskOptions}"
                                   SelectedItem="{Binding SelectedRisk, Mode=TwoWay}"
-                                  ItemStringFormat="Risk: {0}"
-                                  Width="110" Margin="0,0,10,0" VerticalAlignment="Center" />
+
+                                  Width="140" Margin="0,0,10,0" VerticalAlignment="Center">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Converter={StaticResource Tr}, ConverterParameter='Risk: {0}'}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
 
                         <!-- Status Filter Dropdown: Labeled ("Status: All") -->
                         <ComboBox AutomationProperties.AutomationId="StatusFilterComboBox"
                                   AutomationProperties.Name="Filter by status"
                                   ItemsSource="{Binding StateOptions}"
                                   SelectedItem="{Binding SelectedState, Mode=TwoWay}"
-                                  ItemStringFormat="Status: {0}"
-                                  Width="130" Margin="0,0,10,0" VerticalAlignment="Center" />
+
+                                  Width="170" Margin="0,0,10,0" VerticalAlignment="Center">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Converter={StaticResource Tr}, ConverterParameter='Status: {0}'}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
 
                         <!-- Show Experimental Tweaks CheckBox -->
                         <CheckBox AutomationProperties.AutomationId="ShowExperimentalTweaksCheckBox"
                                   AutomationProperties.Name="Show experimental"
-                                  Content="Show experimental"
+                                  Content="{loc:Tr Tweaks_ShowExperimental}"
                                   IsChecked="{Binding ShowExperimentalTweaks, Mode=TwoWay}"
                                   Margin="0,0,8,0" VerticalAlignment="Center"
                                   FontSize="12" Foreground="{DynamicResource TextMutedBrush}"
-                                  ToolTip="Display unproven community tweaks" />
+                                  ToolTip="{loc:Tr Tweaks_DisplayUnprovenCommunityTweaks}" />
                     </WrapPanel>
 
                     <!-- Right: Count -->
                     <Border DockPanel.Dock="Right" Background="{DynamicResource StatusDefaultBgBrush}" CornerRadius="10" Padding="10,3" VerticalAlignment="Center">
-                        <TextBlock Text="{Binding FilteredTweaks.Count, StringFormat='{}{0} tweaks'}"
+                        <TextBlock Text="{Binding FilteredTweaks.Count, StringFormat={loc:Tr Tweaks_0Tweaks}}"
                                    FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" FontWeight="SemiBold" />
                     </Border>
                 </DockPanel>
@@ -218,14 +236,14 @@
                                                     <!-- Reboot badge icon if needed -->
                                                     <Border Background="{DynamicResource RiskCautionBgBrush}" CornerRadius="3" Padding="4,1" Margin="0,0,6,0"
                                                             Visibility="{Binding RequiresReboot, Converter={StaticResource BoolToVis}}" VerticalAlignment="Center">
-                                                        <TextBlock Text="Reboot" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource RiskCautionFgBrush}" />
+                                                        <TextBlock Text="{loc:Tr Tweaks_Reboot}" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource RiskCautionFgBrush}" />
                                                     </Border>
 
                                                     <!-- Explorer restart badge icon if needed -->
                                                     <Border Background="{DynamicResource RiskLowBgBrush}" CornerRadius="3" Padding="4,1" Margin="0,0,6,0"
-                                                            ToolTip="Windows Explorer will be restarted automatically when this tweak is applied or undone"
+                                                            ToolTip="{loc:Tr Home_WindowsExplorerWillBeRestarted}"
                                                             Visibility="{Binding RequiresExplorerRestart, Converter={StaticResource BoolToVis}}" VerticalAlignment="Center">
-                                                        <TextBlock Text="Restarts Explorer" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource RiskLowFgBrush}" />
+                                                        <TextBlock Text="{loc:Tr Home_RestartsExplorer}" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource RiskLowFgBrush}" />
                                                     </Border>
                                                 </StackPanel>
 
@@ -241,7 +259,7 @@
                                                 BorderBrush="{Binding RiskBadgeBorder}"
                                                 BorderThickness="1" CornerRadius="10" Padding="8,2"
                                                 HorizontalAlignment="Right" VerticalAlignment="Center">
-                                            <TextBlock Text="{Binding Risk}"
+                                            <TextBlock Text="{Binding Risk, Converter={StaticResource Tr}}"
                                                        Foreground="{Binding RiskBadgeForeground}"
                                                        FontSize="10" FontWeight="Bold" HorizontalAlignment="Center" />
                                         </Border>
@@ -294,13 +312,13 @@
                                         <StackPanel>
                                             <!-- What It Does Section -->
                                             <StackPanel Margin="0,0,0,8">
-                                                <TextBlock Text="WHAT IT DOES" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,3" />
+                                                <TextBlock Text="{loc:Tr Tweaks_WhatItDoes}" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,3" />
                                                 <TextBlock Text="{Binding WhatItDoes}" FontSize="12" Foreground="{DynamicResource TextPrimaryBrush}" LineHeight="17" TextWrapping="Wrap" />
                                             </StackPanel>
 
                                             <!-- Side Effects Section -->
                                             <StackPanel Margin="0,0,0,8">
-                                                <TextBlock Text="SIDE EFFECTS / POTENTIAL IMPACT" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource RiskModerateFgBrush}" Margin="0,0,0,3" />
+                                                <TextBlock Text="{loc:Tr Tweaks_SideEffectsPotentialImpact}" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource RiskModerateFgBrush}" Margin="0,0,0,3" />
                                                 <TextBlock Text="{Binding SideEffects}" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" LineHeight="17" TextWrapping="Wrap" />
                                             </StackPanel>
 
@@ -316,7 +334,7 @@
                                                     BorderThickness="1" CornerRadius="4" Padding="8,6" Margin="0,0,0,8"
                                                     Visibility="{Binding HasUiEquivalentLocation, Converter={StaticResource BoolToVis}}">
                                                 <StackPanel Orientation="Horizontal">
-                                                    <TextBlock Text="⚙️ WHERE TO FIND THIS IN WINDOWS: " FontSize="10" FontWeight="Bold" Foreground="{DynamicResource RiskSafeFgBrush}" VerticalAlignment="Center" />
+                                                    <TextBlock Text="{loc:Tr Tweaks_WhereToFindThisIn}" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource RiskSafeFgBrush}" VerticalAlignment="Center" />
                                                     <TextBlock Text="{Binding UiEquivalentLocation}" FontSize="11" Foreground="{DynamicResource TextPrimaryBrush}" TextWrapping="Wrap" VerticalAlignment="Center" />
                                                 </StackPanel>
                                             </Border>
@@ -326,18 +344,18 @@
                                                     BorderThickness="1" CornerRadius="4" Padding="8,6" Margin="0,0,0,8"
                                                     Visibility="{Binding HasRelatedTweaks, Converter={StaticResource BoolToVis}}">
                                                 <StackPanel Orientation="Horizontal">
-                                                    <TextBlock Text="🔄 Overlaps with: " FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" />
+                                                    <TextBlock Text="{loc:Tr Tweaks_OverlapsWith}" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" />
                                                     <TextBlock Text="{Binding RelatedTweaksText}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" VerticalAlignment="Center" />
                                                 </StackPanel>
                                             </Border>
 
                                             <!-- Exact Changes (Registry paths, values, policies) -->
                                             <StackPanel Margin="0,0,0,8" Visibility="{Binding HasExactChanges, Converter={StaticResource BoolToVis}}">
-                                                <TextBlock Text="EXACT CHANGES" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" Margin="0,0,0,3" />
+                                                <TextBlock Text="{loc:Tr Tweaks_ExactChanges}" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" Margin="0,0,0,3" />
                                                 <ItemsControl ItemsSource="{Binding ExactChanges}">
                                                     <ItemsControl.ItemTemplate>
                                                         <DataTemplate>
-                                                            <TextBlock Text="{Binding StringFormat='• {0}'}"
+                                                            <TextBlock FlowDirection="LeftToRight" Text="{Binding StringFormat='• {0}'}"
                                                                        FontFamily="Consolas, Cascadia Code, monospace"
                                                                        FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" LineHeight="16" TextWrapping="Wrap" Margin="0,1,0,1" />
                                                         </DataTemplate>
@@ -347,7 +365,7 @@
 
                                             <!-- Sources & Documentation -->
                                             <StackPanel Visibility="{Binding HasSources, Converter={StaticResource BoolToVis}}">
-                                                <TextBlock Text="DOCUMENTATION &amp; SOURCES" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,4" />
+                                                <TextBlock Text="{loc:Tr Tweaks_DocumentationSources}" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,4" />
                                                 <Border Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
                                                         BorderThickness="1" CornerRadius="4" Padding="8,6" Margin="0,0,0,6"
                                                         Visibility="{Binding HasSourceQuote, Converter={StaticResource BoolToVis}}">
@@ -393,15 +411,15 @@
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center">
                         <ui:Button Appearance="Primary" Command="{Binding ReviewAndApplySelectedCommand}"
                                    AutomationProperties.Name="Review and apply selected tweaks"
-                                   Content="Review &amp; apply" Margin="0,0,8,0" />
+                                   Content="{loc:Tr Tweaks_ReviewApply}" Margin="0,0,8,0" />
 
                         <ui:Button Appearance="Secondary" Command="{Binding UndoSelectedTweaksCommand}"
                                    AutomationProperties.Name="Undo selected tweaks"
-                                   Content="Undo selected" Margin="0,0,8,0" />
+                                   Content="{loc:Tr Tweaks_UndoSelected}" Margin="0,0,8,0" />
 
                         <Button Style="{DynamicResource ModernGhostBtn}" Command="{Binding ClearSelectionCommand}"
                                 AutomationProperties.Name="Clear selection"
-                                Content="Clear" Padding="8,4" VerticalAlignment="Center" />
+                                Content="{loc:Tr Apps_Clear}" Padding="8,4" VerticalAlignment="Center" />
                     </StackPanel>
                 </DockPanel>
             </Border>
@@ -474,7 +492,7 @@
                                                     <TextBlock Text="{Binding Id, StringFormat=' ({0})'}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" />
                                                 </StackPanel>
                                             </DockPanel>
-                                            <TextBlock Grid.Row="1" Text="{Binding Reason}" FontSize="11" Foreground="{DynamicResource RiskHighFgBrush}"
+                                            <TextBlock FlowDirection="LeftToRight" Grid.Row="1" Text="{Binding Reason}" FontSize="11" Foreground="{DynamicResource RiskHighFgBrush}"
                                                        TextWrapping="Wrap" Margin="0,6,0,0" FontFamily="Consolas, Cascadia Code, Courier New" />
                                         </Grid>
                                     </Border>
@@ -484,7 +502,7 @@
                     </ScrollViewer>
 
                     <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,14,0,0">
-                        <ui:Button Content="Close" Appearance="Secondary"
+                        <ui:Button Content="{loc:Tr Config_Close}" Appearance="Secondary"
                                    AutomationProperties.Name="Close execution details dialog"
                                    Command="{Binding CloseDetailsDialogCommand}" />
                     </StackPanel>
@@ -518,7 +536,7 @@
                                 Command="{Binding CancelIrreversibleCommand}" />
                     </DockPanel>
 
-                    <TextBlock Grid.Row="1" Text="The following action(s) make permanent system changes that cannot be fully restored by Undo. Please review the details below before proceeding:"
+                    <TextBlock Grid.Row="1" Text="{loc:Tr Home_TheFollowingActionSMake}"
                                FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,0,0,12" />
 
                     <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" MaxHeight="300">
@@ -529,7 +547,7 @@
                                             CornerRadius="6" Padding="12,10" Margin="0,0,0,8">
                                         <StackPanel>
                                             <TextBlock Text="{Binding Name}" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource RiskHighFgBrush}" />
-                                            <TextBlock Text="{Binding Id, StringFormat='ID: {0}'}" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" Margin="0,2,0,4" />
+                                            <TextBlock Text="{Binding Id, StringFormat={loc:Tr Home_Id0}}" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" Margin="0,2,0,4" />
                                             <TextBlock Text="{Binding Reason}" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" />
                                         </StackPanel>
                                     </Border>
@@ -539,10 +557,10 @@
                     </ScrollViewer>
 
                     <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
-                        <ui:Button Content="Cancel" Appearance="Secondary" Margin="0,0,10,0"
+                        <ui:Button Content="{loc:Tr Config_Cancel}" Appearance="Secondary" Margin="0,0,10,0"
                                    AutomationProperties.Name="Cancel irreversible tweaks"
                                    Command="{Binding CancelIrreversibleCommand}" />
-                        <ui:Button Content="I Understand, Apply Changes" Appearance="Danger"
+                        <ui:Button Content="{loc:Tr Home_IUnderstandApplyChanges}" Appearance="Danger"
                                    AutomationProperties.Name="Confirm irreversible tweaks"
                                    Command="{Binding ConfirmIrreversibleCommand}" />
                     </StackPanel>

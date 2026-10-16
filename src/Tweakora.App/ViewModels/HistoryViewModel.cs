@@ -15,6 +15,7 @@ using Tweakora.Core.Models;
 using Tweakora.Core.Operations;
 using Tweakora.Core.Safety;
 using Tweakora.Modules.Tweaks;
+using Tweakora.App.Localization;
 
 namespace Tweakora.App.ViewModels;
 
@@ -24,7 +25,7 @@ public sealed class HistoryTweakItemModel
     public required string TweakName { get; init; }
     public required int ActionCount { get; init; }
     public required bool IsReverted { get; init; }
-    public string StatusText => IsReverted ? "Reverted" : "Active";
+    public string StatusText => IsReverted ? LocalizationManager.T("Reverted") : LocalizationManager.T("Active");
     public string StatusBg => IsReverted ? "#374151" : "#064E3B";
     public string StatusFg => IsReverted ? "#9CA3AF" : "#10B981";
     public required IReadOnlyList<JournalActionRecord> Records { get; init; }
@@ -45,7 +46,7 @@ public sealed class HistorySessionCardModel
     public int TotalActions => Records.Count;
     public int ActiveActions => Records.Count(r => !r.IsReverted);
     public int RevertedActions => Records.Count(r => r.IsReverted);
-    public string StatusText => IsLegacy ? "Legacy (Read Only)" : (ActiveActions == 0 ? "Reverted" : (RevertedActions > 0 ? "Partially Reverted" : (IsCompleted ? "Active" : "Unfinished")));
+    public string StatusText => IsLegacy ? LocalizationManager.T("Legacy (Read Only)") : (ActiveActions == 0 ? LocalizationManager.T("Reverted") : (RevertedActions > 0 ? LocalizationManager.T("Partially Reverted") : (IsCompleted ? LocalizationManager.T("Active") : LocalizationManager.T("Unfinished"))));
     public string StatusBg => IsLegacy ? "#1F2937" : (ActiveActions == 0 ? "#374151" : (RevertedActions > 0 ? "#451A03" : "#064E3B"));
     public string StatusFg => IsLegacy ? "#9CA3AF" : (ActiveActions == 0 ? "#9CA3AF" : (RevertedActions > 0 ? "#FBBF24" : "#10B981"));
     public string DistinctTweaksSummary => string.Join(", ", Tweaks.Select(t => t.TweakName));
@@ -85,7 +86,7 @@ public sealed partial class HistoryViewModel : ObservableObject
     private bool _isBusy;
 
     [ObservableProperty]
-    private string _statusMessage = "Review changes applied by WinVelo with rollback journal protection.";
+    private string _statusMessage = LocalizationManager.T("Review changes applied by WinVelo with rollback journal protection.");
 
     [ObservableProperty]
     private int _restorePointCount;
@@ -209,7 +210,7 @@ public sealed partial class HistoryViewModel : ObservableObject
 
         if (_tweakService == null)
         {
-            StatusMessage = "Tweak engine not available.";
+            StatusMessage = LocalizationManager.T("Tweak engine not available.");
             return;
         }
 
@@ -224,7 +225,7 @@ public sealed partial class HistoryViewModel : ObservableObject
 
             foreach (var s in rawSessions)
             {
-                string trigger = "Manual";
+                string trigger = LocalizationManager.T("Manual");
                 if (s.SessionId.StartsWith("cli", StringComparison.OrdinalIgnoreCase) ||
                     s.SessionId.Contains("_cli", StringComparison.OrdinalIgnoreCase))
                 {
@@ -232,15 +233,15 @@ public sealed partial class HistoryViewModel : ObservableObject
                 }
                 else if (s.Records.Any(r => r.TweakId.Contains("gaming", StringComparison.OrdinalIgnoreCase)))
                 {
-                    trigger = "Preset (Gaming)";
+                    trigger = LocalizationManager.T("Preset (Gaming)");
                 }
                 else if (s.Records.Any(r => r.TweakId.Contains("privacy", StringComparison.OrdinalIgnoreCase)))
                 {
-                    trigger = "Preset (Privacy)";
+                    trigger = LocalizationManager.T("Preset (Privacy)");
                 }
                 else if (s.Records.Any(r => r.TweakId.Contains("recommended", StringComparison.OrdinalIgnoreCase)))
                 {
-                    trigger = "Preset (Recommended)";
+                    trigger = LocalizationManager.T("Preset (Recommended)");
                 }
 
                 var tweakGroups = s.Records
@@ -313,13 +314,13 @@ public sealed partial class HistoryViewModel : ObservableObject
                 SelectedSnapshot = Snapshots[0];
             }
 
-            StatusMessage = $"Loaded {Sessions.Count} active journal session(s)" +
-                            (LegacySessions.Count > 0 ? $" and {LegacySessions.Count} legacy session(s)" : "") +
-                            $" ({RestorePoints.Count} restore point(s)).";
+            StatusMessage = LocalizationManager.T("Loaded {0} active journal session(s)", Sessions.Count) +
+                            (LegacySessions.Count > 0 ? LocalizationManager.T(" and {0} legacy session(s)", LegacySessions.Count) : "") +
+                            LocalizationManager.T(" ({0} restore point(s)).", RestorePoints.Count);
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Failed to load history: {ex.Message}";
+            StatusMessage = LocalizationManager.T("Failed to load history: {0}", ex.Message);
         }
     }
 
@@ -329,25 +330,25 @@ public sealed partial class HistoryViewModel : ObservableObject
         session ??= SelectedSession;
         if (session == null)
         {
-            StatusMessage = "Please select a session to undo.";
+            StatusMessage = LocalizationManager.T("Please select a session to undo.");
             return;
         }
 
         if (session.IsLegacy)
         {
-            StatusMessage = "Legacy sessions are read-only and cannot be reverted automatically.";
+            StatusMessage = LocalizationManager.T("Legacy sessions are read-only and cannot be reverted automatically.");
             return;
         }
 
         if (!AppAdminGuard.EnsureAdmin("revert a journal session"))
         {
-            StatusMessage = "Administrator privileges required to undo session changes.";
+            StatusMessage = LocalizationManager.T("Administrator privileges required to undo session changes.");
             return;
         }
 
         if (_tweakService == null)
         {
-            StatusMessage = "Tweak engine not available.";
+            StatusMessage = LocalizationManager.T("Tweak engine not available.");
             return;
         }
 
@@ -358,10 +359,10 @@ public sealed partial class HistoryViewModel : ObservableObject
         if (_executionDialog != null && sessionTweaks.Count > 0)
         {
             await _executionDialog.OpenPreviewAsync(
-                title: $"Undo Session — {session.SessionId}",
-                description: $"Revert all {session.TotalActions} actions across {sessionTweaks.Count} tweak(s) recorded in this session.",
-                notice: "All baseline registry values and service configurations from this session will be restored.",
-                confirmText: "Confirm & Revert Session",
+                title: LocalizationManager.T("Undo Session — {0}", session.SessionId),
+                description: LocalizationManager.T("Revert all {0} actions across {1} tweak(s) recorded in this session.", session.TotalActions, sessionTweaks.Count),
+                notice: LocalizationManager.T("All baseline registry values and service configurations from this session will be restored."),
+                confirmText: LocalizationManager.T("Confirm & Revert Session"),
                 tweaks: sessionTweaks,
                 isUndo: true,
                 onConfirmed: async (_) =>
@@ -377,7 +378,7 @@ public sealed partial class HistoryViewModel : ObservableObject
                     var healthReport = await _tweakService.CheckServicingHealthAsync();
                     var report = new OperationExecutionReport
                     {
-                        Title = $"Undo Session {session.SessionId}",
+                        Title = LocalizationManager.T("Undo Session {0}", session.SessionId),
                         StartTime = DateTime.UtcNow,
                         EndTime = DateTime.UtcNow,
                         Results = sessionTweaks.Select(t => new OperationItemResult
@@ -395,7 +396,7 @@ public sealed partial class HistoryViewModel : ObservableObject
         }
 
         IsBusy = true;
-        StatusMessage = $"Reverting changes from session {session.SessionId}...";
+        StatusMessage = LocalizationManager.T("Reverting changes from session {0}...", session.SessionId);
         await Task.Yield();
 
         try
@@ -410,14 +411,14 @@ public sealed partial class HistoryViewModel : ObservableObject
 
             var result = await _tweakService.RollbackSessionAsync(underlying);
             StatusMessage = result.Success
-                ? $"Session {session.SessionId} reverted successfully."
-                : $"Session undo partially failed: {result.Message ?? "Some actions could not be reverted"}";
+                ? LocalizationManager.T("Session {0} reverted successfully.", session.SessionId)
+                : LocalizationManager.T("Session undo partially failed: {0}", result.Message ?? LocalizationManager.T("Some actions could not be reverted"));
 
             RefreshHistory();
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Undo failed: {ex.Message}";
+            StatusMessage = LocalizationManager.T("Undo failed: {0}", ex.Message);
         }
         finally
         {
@@ -432,13 +433,13 @@ public sealed partial class HistoryViewModel : ObservableObject
 
         if (!AppAdminGuard.EnsureAdmin($"revert tweak '{tweakId}'"))
         {
-            StatusMessage = "Administrator privileges required to undo tweak.";
+            StatusMessage = LocalizationManager.T("Administrator privileges required to undo tweak.");
             return;
         }
 
         if (_tweakService == null)
         {
-            StatusMessage = "Tweak engine not available.";
+            StatusMessage = LocalizationManager.T("Tweak engine not available.");
             return;
         }
 
@@ -455,7 +456,7 @@ public sealed partial class HistoryViewModel : ObservableObject
             }
             else
             {
-                StatusMessage = $"Tweak '{tweakId}' not found in catalog.";
+                StatusMessage = LocalizationManager.T("Tweak '{0}' not found in catalog.", tweakId);
             }
             return;
         }
@@ -463,10 +464,10 @@ public sealed partial class HistoryViewModel : ObservableObject
         if (_executionDialog != null)
         {
             await _executionDialog.OpenPreviewAsync(
-                title: $"Undo Tweak — {tweak.Name}",
-                description: $"Revert '{tweak.Name}' to its pre-WinVelo baseline state.",
-                notice: "WinVelo will restore the pre-application registry and service baseline values.",
-                confirmText: "Confirm & Revert",
+                title: LocalizationManager.T("Undo Tweak — {0}", tweak.Name),
+                description: LocalizationManager.T("Revert '{0}' to its pre-WinVelo baseline state.", tweak.Name),
+                notice: LocalizationManager.T("WinVelo will restore the pre-application registry and service baseline values."),
+                confirmText: LocalizationManager.T("Confirm & Revert"),
                 tweaks: new[] { tweak },
                 isUndo: true,
                 onConfirmed: async (confirmedTweaks) =>
@@ -478,21 +479,21 @@ public sealed partial class HistoryViewModel : ObservableObject
         }
 
         IsBusy = true;
-        StatusMessage = $"Undoing tweak {tweakId}...";
+        StatusMessage = LocalizationManager.T("Undoing tweak {0}...", tweakId);
         await Task.Yield();
 
         try
         {
             var report = await _tweakService.UndoTweaksAsync(new[] { tweak }, _runner);
             StatusMessage = report.FailedCount == 0
-                ? $"Tweak '{tweak.Name}' reverted successfully."
-                : $"Undo failed for '{tweak.Name}': {report.Summary}";
+                ? LocalizationManager.T("Tweak '{0}' reverted successfully.", tweak.Name)
+                : LocalizationManager.T("Undo failed for '{0}': {1}", tweak.Name, report.Summary);
 
             RefreshHistory();
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Undo error: {ex.Message}";
+            StatusMessage = LocalizationManager.T("Undo error: {0}", ex.Message);
         }
         finally
         {
@@ -505,30 +506,30 @@ public sealed partial class HistoryViewModel : ObservableObject
     {
         if (!AppAdminGuard.EnsureAdmin("revert all WinVelo changes"))
         {
-            StatusMessage = "Administrator privileges required to undo all changes.";
+            StatusMessage = LocalizationManager.T("Administrator privileges required to undo all changes.");
             return;
         }
 
         if (_tweakService == null)
         {
-            StatusMessage = "Tweak engine not available.";
+            StatusMessage = LocalizationManager.T("Tweak engine not available.");
             return;
         }
 
         var activeTweaks = _tweakService.GetActiveJournalTweaks();
         if (activeTweaks.Count == 0)
         {
-            StatusMessage = "No active WinVelo changes found in the journal.";
+            StatusMessage = LocalizationManager.T("No active WinVelo changes found in the journal.");
             return;
         }
 
         if (_executionDialog != null)
         {
             await _executionDialog.OpenPreviewAsync(
-                title: "Undo All WinVelo Changes",
-                description: $"Revert all {activeTweaks.Count} tweak(s) recorded in the WinVelo rollback journal.",
-                notice: "This will revert all tweaks recorded in the WinVelo rollback journal. Changes made by other tools or Windows Settings are not covered.",
-                confirmText: "Confirm & Revert All",
+                title: LocalizationManager.T("Undo All WinVelo Changes"),
+                description: LocalizationManager.T("Revert all {0} tweak(s) recorded in the WinVelo rollback journal.", activeTweaks.Count),
+                notice: LocalizationManager.T("This will revert all tweaks recorded in the WinVelo rollback journal. Changes made by other tools or Windows Settings are not covered."),
+                confirmText: LocalizationManager.T("Confirm & Revert All"),
                 tweaks: activeTweaks,
                 isUndo: true,
                 onConfirmed: async (confirmedTweaks) =>
@@ -540,21 +541,21 @@ public sealed partial class HistoryViewModel : ObservableObject
         }
 
         IsBusy = true;
-        StatusMessage = $"Undoing all {activeTweaks.Count} active tweak(s)...";
+        StatusMessage = LocalizationManager.T("Undoing all {0} active tweak(s)...", activeTweaks.Count);
         await Task.Yield();
 
         try
         {
             var report = await _tweakService.UndoTweaksAsync(activeTweaks, _runner);
             StatusMessage = report.FailedCount == 0
-                ? $"Successfully reverted all {activeTweaks.Count} WinVelo tweaks."
-                : $"Reverted with warnings: {report.Summary}";
+                ? LocalizationManager.T("Successfully reverted all {0} WinVelo tweaks.", activeTweaks.Count)
+                : LocalizationManager.T("Reverted with warnings: {0}", report.Summary);
 
             RefreshHistory();
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Failed to undo all changes: {ex.Message}";
+            StatusMessage = LocalizationManager.T("Failed to undo all changes: {0}", ex.Message);
         }
         finally
         {
@@ -599,11 +600,11 @@ public sealed partial class HistoryViewModel : ObservableObject
             Directory.CreateDirectory(exportDir);
             string filePath = Path.Combine(exportDir, $"session-{session.SessionId}.txt");
             File.WriteAllText(filePath, ExportedLogContent);
-            StatusMessage = $"Session log exported to: {filePath}";
+            StatusMessage = LocalizationManager.T("Session log exported to: {0}", filePath);
         }
         catch
         {
-            StatusMessage = "Session log exported to preview window.";
+            StatusMessage = LocalizationManager.T("Session log exported to preview window.");
         }
     }
 
@@ -618,28 +619,28 @@ public sealed partial class HistoryViewModel : ObservableObject
     {
         if (!AppAdminGuard.EnsureAdmin("create a Windows System Restore point"))
         {
-            StatusMessage = "Administrator privileges required to create a restore point.";
+            StatusMessage = LocalizationManager.T("Administrator privileges required to create a restore point.");
             return;
         }
 
         if (_restoreService == null)
         {
-            StatusMessage = "System Restore service not available.";
+            StatusMessage = LocalizationManager.T("System Restore service not available.");
             return;
         }
 
         IsBusy = true;
-        StatusMessage = "Creating Windows System Restore point...";
+        StatusMessage = LocalizationManager.T("Creating Windows System Restore point...");
         await Task.Yield();
 
         try
         {
             var result = await Task.Run(() => _restoreService.CreateRestorePoint("WinVelo Manual Checkpoint"));
             StatusMessage = result.Success
-                ? $"Restore point created successfully (Seq #{result.SequenceNumber})."
+                ? LocalizationManager.T("Restore point created successfully (Seq #{0}).", result.SequenceNumber)
                 : (result.WasThrottledOrSkipped
-                    ? "Windows throttled restore point creation (24h limit). Existing point preserved."
-                    : $"Failed to create restore point: {result.ErrorMessage ?? "Unknown error"}");
+                    ? LocalizationManager.T("Windows throttled restore point creation (24h limit). Existing point preserved.")
+                    : LocalizationManager.T("Failed to create restore point: {0}", result.ErrorMessage ?? LocalizationManager.T("Unknown error")));
 
             IsRestoreEnabled = _restoreService.IsSystemRestoreEnabled();
             RestorePointCount = _restoreService.GetRestorePointCount();
@@ -651,7 +652,7 @@ public sealed partial class HistoryViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Restore point error: {ex.Message}";
+            StatusMessage = LocalizationManager.T("Restore point error: {0}", ex.Message);
         }
         finally
         {
@@ -665,24 +666,24 @@ public sealed partial class HistoryViewModel : ObservableObject
         snapshot ??= SelectedSnapshot;
         if (snapshot == null)
         {
-            StatusMessage = "Please select a backup snapshot to restore.";
+            StatusMessage = LocalizationManager.T("Please select a backup snapshot to restore.");
             return;
         }
 
         if (!AppAdminGuard.EnsureAdmin("restore a system backup snapshot"))
         {
-            StatusMessage = "Administrator privileges required to restore snapshots.";
+            StatusMessage = LocalizationManager.T("Administrator privileges required to restore snapshots.");
             return;
         }
 
         if (_tweakService?.BackupManager == null)
         {
-            StatusMessage = "Backup manager not available.";
+            StatusMessage = LocalizationManager.T("Backup manager not available.");
             return;
         }
 
         IsBusy = true;
-        StatusMessage = $"Restoring backup snapshot {snapshot.Id}...";
+        StatusMessage = LocalizationManager.T("Restoring backup snapshot {0}...", snapshot.Id);
         await Task.Yield();
 
         try
@@ -693,14 +694,14 @@ public sealed partial class HistoryViewModel : ObservableObject
             }));
 
             StatusMessage = success
-                ? $"Backup snapshot {snapshot.Id} restored successfully."
-                : "Failed to restore backup snapshot.";
+                ? LocalizationManager.T("Backup snapshot {0} restored successfully.", snapshot.Id)
+                : LocalizationManager.T("Failed to restore backup snapshot.");
 
             RefreshHistory();
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Snapshot restore error: {ex.Message}";
+            StatusMessage = LocalizationManager.T("Snapshot restore error: {0}", ex.Message);
         }
         finally
         {
