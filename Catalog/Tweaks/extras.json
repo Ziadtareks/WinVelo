@@ -1,4 +1,4 @@
-﻿[
+[
     {
         "schemaVersion": "1.0.0",
         "id": "ai.copilot.disable-taskbar-button",
@@ -854,7 +854,8 @@
         "needsReview": false,
         "relatedTweaks": [
             "performance.network.delivery-optimization-simple"
-        ]
+        ],
+        "oppositeOf": "performance.network.delivery-optimization-simple"
     },
     {
         "schemaVersion": "1.0.0",
@@ -988,6 +989,11 @@
         "relatedTweaks": [
             "advanced.ipv46",
             "advanced.disableipv6",
+            "advanced.teredo"
+        ],
+        "oppositeOf": [
+            "advanced.disableipv6",
+            "advanced.ipv46",
             "advanced.teredo"
         ]
     },

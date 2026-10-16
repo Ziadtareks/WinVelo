@@ -133,6 +133,10 @@ public sealed class TweakDefinition
     [JsonPropertyName("relatedTweaks")]
     public List<string>? RelatedTweaks { get; set; }
 
+    [JsonPropertyName("oppositeOf")]
+    [JsonConverter(typeof(SingleOrListStringConverter))]
+    public List<string>? OppositeOf { get; set; }
+
     [JsonPropertyName("windows")]
     public WindowsRequirements Windows { get; set; } = new();
 
@@ -186,4 +190,54 @@ public sealed class TweakDefinition
 
     [JsonPropertyName("sourceQuote")]
     public string? SourceQuote { get; set; }
+}
+
+public sealed class SingleOrListStringConverter : JsonConverter<List<string>>
+{
+    public override List<string>? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        if (reader.TokenType == JsonTokenType.Null) return null;
+        if (reader.TokenType == JsonTokenType.String)
+        {
+            var str = reader.GetString();
+            return str == null ? null : new List<string> { str };
+        }
+        if (reader.TokenType == JsonTokenType.StartArray)
+        {
+            var list = new List<string>();
+            while (reader.Read())
+            {
+                if (reader.TokenType == JsonTokenType.EndArray) break;
+                if (reader.TokenType == JsonTokenType.String)
+                {
+                    var item = reader.GetString();
+                    if (item != null) list.Add(item);
+                }
+            }
+            return list;
+        }
+        return null;
+    }
+
+    public override void Write(Utf8JsonWriter writer, List<string>? value, JsonSerializerOptions options)
+    {
+        if (value == null)
+        {
+            writer.WriteNullValue();
+            return;
+        }
+        if (value.Count == 1)
+        {
+            writer.WriteStringValue(value[0]);
+        }
+        else
+        {
+            writer.WriteStartArray();
+            foreach (var item in value)
+            {
+                writer.WriteStringValue(item);
+            }
+            writer.WriteEndArray();
+        }
+    }
 }

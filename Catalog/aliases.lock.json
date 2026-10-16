@@ -1,0 +1,65 @@
+{
+    "gaming.mode.enable": {
+        "aliases": [
+            "pref.gamemode",
+            "WPFToggleGameMode"
+        ],
+        "signature": "REG:HKCU\\SOFTWARE\\MICROSOFT\\GAMEBAR\\ALLOWAUTOGAMEMODE=1;REG:HKCU\\SOFTWARE\\MICROSOFT\\GAMEBAR\\AUTOGAMEMODEENABLED=1",
+        "sha256": "85b861f13482e5fab0abbc61d2bed294f697afd1954f34f4f62caf010f76f201"
+    },
+    "gaming.input.disable-mouse-acceleration": {
+        "aliases": [
+            "performance.input.raw-mouse"
+        ],
+        "signature": "REG:HKCU\\CONTROL PANEL\\MOUSE\\MOUSESPEED=0;REG:HKCU\\CONTROL PANEL\\MOUSE\\MOUSETHRESHOLD1=0;REG:HKCU\\CONTROL PANEL\\MOUSE\\MOUSETHRESHOLD2=0",
+        "sha256": "4ca3b3b16dab7e60e68e17cc34272940e98ddf34b92d13316cbac5e057be24b0"
+    },
+    "performance.network.delivery-optimization-simple": {
+        "aliases": [
+            "essential.deliveryoptimization",
+            "WPFTweaksDeliveryOptimization"
+        ],
+        "signature": "REG:HKLM\\SOFTWARE\\POLICIES\\MICROSOFT\\WINDOWS\\DELIVERYOPTIMIZATION\\DODOWNLOADMODE=0",
+        "sha256": "0e62c9540874b0b8f486728dc82d631f0beb8aa504b0653c6f6564f26e1fffc8"
+    },
+    "ui.explorer.classic-context-menu": {
+        "aliases": [
+            "advanced.rightclickmenu",
+            "WPFTweaksRightClickMenu"
+        ],
+        "signature": "REG:HKCU\\SOFTWARE\\CLASSES\\CLSID\\{86CA1AA0-34AA-4E8B-A509-50C905BAE2A2}\\INPROCSERVER32\\@DEFAULT=",
+        "sha256": "6719cb11a617158b44d3bd6442d920dd0a2b7613d6fbcb393fde8748e0e2ff33"
+    },
+    "ui.explorer.show-file-extensions": {
+        "aliases": [
+            "pref.showext",
+            "WPFToggleShowExt"
+        ],
+        "signature": "REG:HKCU\\SOFTWARE\\MICROSOFT\\WINDOWS\\CURRENTVERSION\\EXPLORER\\ADVANCED\\HIDEFILEEXT=0",
+        "sha256": "1f6412593a4ba4bda79cf8843fea4142211f2f19980ffd4f2749dfe912644c33"
+    },
+    "ui.explorer.show-hidden-files": {
+        "aliases": [
+            "pref.hiddenfiles",
+            "WPFToggleHiddenFiles"
+        ],
+        "signature": "REG:HKCU\\SOFTWARE\\MICROSOFT\\WINDOWS\\CURRENTVERSION\\EXPLORER\\ADVANCED\\HIDDEN=1",
+        "sha256": "3efb071b87d2b711d3ba2cbc2fe61038695294e8940c6ea6554807d2fec745db"
+    },
+    "ui.taskbar.end-task-right-click": {
+        "aliases": [
+            "essential.endtaskontaskbar",
+            "WPFTweaksEndTaskOnTaskbar"
+        ],
+        "signature": "REG:HKCU\\SOFTWARE\\MICROSOFT\\WINDOWS\\CURRENTVERSION\\EXPLORER\\ADVANCED\\TASKBARDEVELOPERSETTINGS\\TASKBARENDTASK=1",
+        "sha256": "8724d0fb9fb32a1b65a21b6ff72cd2fafc1cb96ae5f6511a884ea244f3bd4544"
+    },
+    "ui.system.enable-long-paths": {
+        "aliases": [
+            "pref.longpaths",
+            "WPFToggleLongPaths"
+        ],
+        "signature": "REG:HKLM\\SYSTEM\\CURRENTCONTROLSET\\CONTROL\\FILESYSTEM\\LONGPATHSENABLED=1",
+        "sha256": "9f940c431b1663e2e6309fa6ec24d3d2eb2127ff1ac3518bfba1e5e9895e9ea0"
+    }
+}

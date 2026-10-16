@@ -82,6 +82,10 @@
       "type": "array",
       "items": { "type": "string" }
     },
+    "oppositeOf": {
+      "type": ["string", "array"],
+      "items": { "type": "string" }
+    },
     "windows": {
       "type": "object",
       "additionalProperties": false,

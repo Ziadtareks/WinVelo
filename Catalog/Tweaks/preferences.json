@@ -503,7 +503,8 @@
         "needsReview": false,
         "relatedTweaks": [
             "performance.gpu.disable-mpo"
-        ]
+        ],
+        "oppositeOf": "performance.gpu.disable-mpo"
     },
     {
         "schemaVersion": "1.0.0",
@@ -1231,6 +1232,7 @@
             "https://learn.microsoft.com/en-us/windows/win32/shell/taskbar-extensions"
         ],
         "needsReview": false,
-        "uiEquivalentLocation": "Settings \u203a Personalization \u203a Taskbar \u203a Taskbar items \u203a Search"
+        "uiEquivalentLocation": "Settings \u203a Personalization \u203a Taskbar \u203a Taskbar items \u203a Search",
+        "oppositeOf": "advanced.display"
     }
 ]

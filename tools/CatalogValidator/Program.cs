@@ -406,6 +406,8 @@ public static class Program
         }
 
         ValidateNoExactDuplicates(tweakMap, ref errorCount);
+        ValidateAliasesLock(tweakMap, tweaksDir, ref errorCount);
+        ValidateNoConflictingRegistryData(tweakMap, ref errorCount);
 
         Console.WriteLine("\n----------------------------------------");
         Console.WriteLine($"Summary: {totalTweaks} tweak(s) and {totalPresets} preset(s) validated. {errorCount} error(s).");
@@ -662,6 +664,55 @@ public static class Program
         }
     }
 
+    public static (string Signature, string Sha256) ComputeApplySignature(JsonNode item)
+    {
+        var applyArray = item["apply"]?.AsArray();
+        if (applyArray == null || applyArray.Count == 0) return (string.Empty, string.Empty);
+
+        var targets = new List<string>();
+        foreach (var action in applyArray)
+        {
+            if (action == null) continue;
+            string? hive = action["hive"]?.ToString();
+            string? key = action["key"]?.ToString();
+            string? val = action["valueName"]?.ToString();
+            string? svc = action["serviceName"]?.ToString();
+
+            if (!string.IsNullOrWhiteSpace(hive) || !string.IsNullOrWhiteSpace(key))
+            {
+                string h = (hive ?? "").ToUpperInvariant().Replace("HKEY_LOCAL_MACHINE", "HKLM").Replace("HKEY_CURRENT_USER", "HKCU");
+                string k = (key ?? "").Trim('\\').ToUpperInvariant();
+                string v = string.IsNullOrWhiteSpace(val) ? "@DEFAULT" : val.ToUpperInvariant();
+                string data = action["data"]?.ToString() ?? "";
+                targets.Add($"REG:{h}\\{k}\\{v}={data}");
+            }
+            else if (!string.IsNullOrWhiteSpace(svc))
+            {
+                string s = svc.ToUpperInvariant();
+                string startup = action["startupType"]?.ToString() ?? "";
+                targets.Add($"SVC:{s}={startup}");
+            }
+            else
+            {
+                string? type = action["type"]?.ToString();
+                string? script = action["script"]?.ToString();
+                if (string.Equals(type, "PowerShell", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrWhiteSpace(script))
+                {
+                    targets.Add($"PS:{script.Trim()}");
+                }
+            }
+        }
+
+        targets.Sort(StringComparer.Ordinal);
+        string signature = string.Join(";", targets);
+        if (string.IsNullOrWhiteSpace(signature)) return (string.Empty, string.Empty);
+
+        using var sha256 = System.Security.Cryptography.SHA256.Create();
+        byte[] hashBytes = sha256.ComputeHash(System.Text.Encoding.UTF8.GetBytes(signature));
+        string hash = Convert.ToHexString(hashBytes).ToLowerInvariant();
+        return (signature, hash);
+    }
+
     private static void ValidateNoExactDuplicates(Dictionary<string, JsonNode> tweakMap, ref int errorCount)
     {
         Console.WriteLine("\n[CHECKING DUPLICATES] Validating that catalog contains zero exact duplicates...");
@@ -669,45 +720,7 @@ public static class Program
 
         foreach (var (id, item) in tweakMap)
         {
-            var applyArray = item["apply"]?.AsArray();
-            if (applyArray == null || applyArray.Count == 0) continue;
-
-            var targets = new List<string>();
-            foreach (var action in applyArray)
-            {
-                if (action == null) continue;
-                string? hive = action["hive"]?.ToString();
-                string? key = action["key"]?.ToString();
-                string? val = action["valueName"]?.ToString();
-                string? svc = action["serviceName"]?.ToString();
-
-                if (!string.IsNullOrWhiteSpace(hive) || !string.IsNullOrWhiteSpace(key))
-                {
-                    string h = (hive ?? "").ToUpperInvariant().Replace("HKEY_LOCAL_MACHINE", "HKLM").Replace("HKEY_CURRENT_USER", "HKCU");
-                    string k = (key ?? "").Trim('\\').ToUpperInvariant();
-                    string v = string.IsNullOrWhiteSpace(val) ? "@DEFAULT" : val.ToUpperInvariant();
-                    string data = action["data"]?.ToString() ?? "";
-                    targets.Add($"REG:{h}\\{k}\\{v}={data}");
-                }
-                else if (!string.IsNullOrWhiteSpace(svc))
-                {
-                    string s = svc.ToUpperInvariant();
-                    string startup = action["startupType"]?.ToString() ?? "";
-                    targets.Add($"SVC:{s}={startup}");
-                }
-                else
-                {
-                    string? type = action["type"]?.ToString();
-                    string? script = action["script"]?.ToString();
-                    if (string.Equals(type, "PowerShell", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrWhiteSpace(script))
-                    {
-                        targets.Add($"PS:{script.Trim()}");
-                    }
-                }
-            }
-
-            targets.Sort(StringComparer.Ordinal);
-            string signature = string.Join(";", targets);
+            var (signature, _) = ComputeApplySignature(item);
             if (string.IsNullOrWhiteSpace(signature)) continue;
 
             if (!actionSignatures.TryGetValue(signature, out var list))
@@ -735,6 +748,214 @@ public static class Program
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("  [PASS] Zero exact duplicate tweaks found.");
+            Console.ResetColor();
+        }
+    }
+
+    private static void ValidateAliasesLock(Dictionary<string, JsonNode> tweakMap, string tweaksDir, ref int errorCount)
+    {
+        Console.WriteLine("\n[CHECKING ALIASES LOCK] Validating catalog aliases against Catalog/aliases.lock.json...");
+        string catalogDir = Path.GetDirectoryName(tweaksDir) ?? tweaksDir;
+        string lockFilePath = Path.Combine(catalogDir, "aliases.lock.json");
+
+        if (!File.Exists(lockFilePath))
+        {
+            errorCount++;
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"  [FAIL] Missing aliases lock file: {lockFilePath}");
+            Console.ResetColor();
+            return;
+        }
+
+        JsonNode? lockRoot;
+        try
+        {
+            lockRoot = JsonNode.Parse(File.ReadAllText(lockFilePath));
+        }
+        catch (Exception ex)
+        {
+            errorCount++;
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"  [FAIL] Failed to parse aliases lock file: {ex.Message}");
+            Console.ResetColor();
+            return;
+        }
+
+        if (lockRoot is not JsonObject lockObj)
+        {
+            errorCount++;
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("  [FAIL] Aliases lock file root must be a JSON object.");
+            Console.ResetColor();
+            return;
+        }
+
+        var lockedTweakIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        // Verify each entry in the lockfile
+        foreach (var (canonicalId, entryNode) in lockObj)
+        {
+            lockedTweakIds.Add(canonicalId);
+            if (!tweakMap.TryGetValue(canonicalId, out var canonicalTweak))
+            {
+                errorCount++;
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"  [FAIL] Locked alias tweak '{canonicalId}' does not exist in catalog.");
+                Console.ResetColor();
+                continue;
+            }
+
+            var lockedAliases = entryNode?["aliases"]?.AsArray()
+                ?.Select(n => n?.ToString())
+                ?.Where(s => !string.IsNullOrWhiteSpace(s))
+                ?.ToList() ?? new List<string?>();
+
+            string? lockedSig = entryNode?["signature"]?.ToString();
+            string? lockedHash = entryNode?["sha256"]?.ToString();
+
+            var actualAliases = canonicalTweak["aliases"]?.AsArray()
+                ?.Select(n => n?.ToString())
+                ?.Where(s => !string.IsNullOrWhiteSpace(s))
+                ?.ToList() ?? new List<string?>();
+
+            var lockedAliasSet = new HashSet<string>(lockedAliases!, StringComparer.OrdinalIgnoreCase);
+            var actualAliasSet = new HashSet<string>(actualAliases!, StringComparer.OrdinalIgnoreCase);
+
+            if (!lockedAliasSet.SetEquals(actualAliasSet))
+            {
+                errorCount++;
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"  [FAIL] Tweak '{canonicalId}' declared aliases [{string.Join(", ", actualAliases)}] do not match locked aliases [{string.Join(", ", lockedAliases)}].");
+                Console.ResetColor();
+            }
+
+            var (actualSig, actualHash) = ComputeApplySignature(canonicalTweak);
+            if (!string.Equals(actualSig, lockedSig, StringComparison.Ordinal) ||
+                !string.Equals(actualHash, lockedHash, StringComparison.OrdinalIgnoreCase))
+            {
+                errorCount++;
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"  [FAIL] Tweak '{canonicalId}' apply signature changed from locked signature!");
+                Console.WriteLine($"    Expected SHA256: {lockedHash}");
+                Console.WriteLine($"    Actual SHA256:   {actualHash}");
+                Console.ResetColor();
+            }
+        }
+
+        // Verify that NO tweak in the catalog has aliases that are not locked
+        foreach (var (id, item) in tweakMap)
+        {
+            var aliasesArr = item["aliases"]?.AsArray();
+            if (aliasesArr != null && aliasesArr.Count > 0)
+            {
+                if (!lockedTweakIds.Contains(id))
+                {
+                    errorCount++;
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"  [FAIL] Tweak '{id}' has aliases [{string.Join(", ", aliasesArr.Select(x => x?.ToString()))}] which are not locked in aliases.lock.json!");
+                    Console.ResetColor();
+                }
+            }
+        }
+
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine($"  [PASS] Verified {lockedTweakIds.Count} locked alias definitions and signatures.");
+        Console.ResetColor();
+    }
+
+    private static void ValidateNoConflictingRegistryData(Dictionary<string, JsonNode> tweakMap, ref int errorCount)
+    {
+        Console.WriteLine("\n[CHECKING CONFLICTING DATA] Validating that tweaks setting same registry value with different data declare oppositeOf...");
+
+        var regValues = new Dictionary<string, List<(string TweakId, string Data, JsonNode TweakNode)>>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var (id, item) in tweakMap)
+        {
+            var applyArray = item["apply"]?.AsArray();
+            if (applyArray == null || applyArray.Count == 0) continue;
+
+            foreach (var action in applyArray)
+            {
+                if (action == null) continue;
+                string? hive = action["hive"]?.ToString();
+                string? key = action["key"]?.ToString();
+                string? val = action["valueName"]?.ToString();
+
+                if (!string.IsNullOrWhiteSpace(hive) || !string.IsNullOrWhiteSpace(key))
+                {
+                    string h = (hive ?? "").ToUpperInvariant().Replace("HKEY_LOCAL_MACHINE", "HKLM").Replace("HKEY_CURRENT_USER", "HKCU");
+                    string k = (key ?? "").Trim('\\').ToUpperInvariant();
+                    string v = string.IsNullOrWhiteSpace(val) ? "@DEFAULT" : val.ToUpperInvariant();
+                    string data = action["data"]?.ToString() ?? "";
+                    string target = $"REG:{h}\\{k}\\{v}";
+
+                    if (!regValues.TryGetValue(target, out var list))
+                    {
+                        list = new List<(string, string, JsonNode)>();
+                        regValues[target] = list;
+                    }
+
+                    if (!list.Any(x => string.Equals(x.TweakId, id, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        list.Add((id, data, item));
+                    }
+                }
+            }
+        }
+
+        bool HasOppositeMarking(JsonNode tweakA, string idA, JsonNode tweakB, string idB)
+        {
+            bool Matches(JsonNode t, string targetId)
+            {
+                var opp = t["oppositeOf"];
+                if (opp is JsonValue val && val.TryGetValue<string>(out var s))
+                {
+                    return string.Equals(s, targetId, StringComparison.OrdinalIgnoreCase);
+                }
+                if (opp is JsonArray arr)
+                {
+                    return arr.Any(n => string.Equals(n?.ToString(), targetId, StringComparison.OrdinalIgnoreCase));
+                }
+                return false;
+            }
+
+            return Matches(tweakA, idB) || Matches(tweakB, idA);
+        }
+
+        int conflictCount = 0;
+        foreach (var (target, entries) in regValues)
+        {
+            if (entries.Count < 2) continue;
+
+            for (int i = 0; i < entries.Count; i++)
+            {
+                for (int j = i + 1; j < entries.Count; j++)
+                {
+                    var a = entries[i];
+                    var b = entries[j];
+
+                    if (!string.Equals(a.Data, b.Data, StringComparison.Ordinal))
+                    {
+                        if (!HasOppositeMarking(a.TweakNode, a.TweakId, b.TweakNode, b.TweakId))
+                        {
+                            conflictCount++;
+                            errorCount++;
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine($"  [FAIL] Conflicting registry setting without oppositeOf declaration:");
+                            Console.WriteLine($"    Target:   {target}");
+                            Console.WriteLine($"    Tweak 1:  '{a.TweakId}' sets data: '{a.Data}'");
+                            Console.WriteLine($"    Tweak 2:  '{b.TweakId}' sets data: '{b.Data}'");
+                            Console.ResetColor();
+                        }
+                    }
+                }
+            }
+        }
+
+        if (conflictCount == 0)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("  [PASS] All conflicting registry settings have valid oppositeOf declarations.");
             Console.ResetColor();
         }
     }
