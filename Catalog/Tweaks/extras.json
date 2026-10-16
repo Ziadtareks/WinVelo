@@ -1667,104 +1667,6 @@
   },
   {
     "schemaVersion": "1.0.0",
-    "id": "privacy.activity.activity-history",
-    "name": "Disable Activity History Publishing",
-    "description": "Stops Windows from collecting and storing your activity history (apps, files and sites you used) on this PC.",
-    "category": "privacy",
-    "subcategory": "activity",
-    "risk": "Low",
-    "impacts": [
-      "privacy"
-    ],
-    "tags": [
-      "privacy"
-    ],
-    "presets": [
-      "recommended",
-      "privacy"
-    ],
-    "windows": {
-      "minBuild": 19041
-    },
-    "requiresReboot": false,
-    "requiresExplorerRestart": false,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKLM",
-      "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\System",
-      "valueName": "PublishUserActivities",
-      "matchType": "Equals",
-      "expectedValue": 0
-    },
-    "apply": [
-      {
-        "type": "Policy",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\System",
-        "operation": "Set",
-        "valueName": "PublishUserActivities",
-        "valueKind": "DWord",
-        "data": 0
-      },
-      {
-        "type": "Policy",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\System",
-        "operation": "Set",
-        "valueName": "UploadUserActivities",
-        "valueKind": "DWord",
-        "data": 0
-      },
-      {
-        "type": "Policy",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\System",
-        "operation": "Set",
-        "valueName": "EnableActivityFeed",
-        "valueKind": "DWord",
-        "data": 0
-      }
-    ],
-    "undo": [
-      {
-        "type": "Policy",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\System",
-        "operation": "DeleteValue",
-        "valueName": "PublishUserActivities"
-      },
-      {
-        "type": "Policy",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\System",
-        "operation": "DeleteValue",
-        "valueName": "UploadUserActivities"
-      },
-      {
-        "type": "Policy",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\System",
-        "operation": "DeleteValue",
-        "valueName": "EnableActivityFeed"
-      }
-    ],
-    "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-system#publishuseractivities",
-    "verifiedOnBuild": "22631.4317",
-    "evidence": "documented",
-    "whatItDoes": "Disables activity history collection and publishing to Microsoft account.",
-    "sideEffects": "Features that use recent activity history, such as resuming recent activities, stop working. Settings shows the option as managed by your organization.",
-    "sources": [
-      "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services#bkmk-activity-history"
-    ],
-    "needsReview": false,
-    "sourceQuote": "eate a REG_DWORD registry setting named PublishUserActivities in HKEY_LOCAL_MACHINE\\Software\\Policies\\Microsoft\\Windows\\System with a value o",
-    "relatedTweaks": [
-      "essential.activity"
-    ],
-    "presetRole": "optimization"
-  },
-  {
-    "schemaVersion": "1.0.0",
     "id": "privacy.speech.online-speech-recognition",
     "name": "Disable Online Speech Recognition",
     "description": "Disables cloud-based speech services, keeping dictation and speech processing offline.",
@@ -4530,7 +4432,10 @@
     "relatedTweaks": [
       "essential.widget"
     ],
-    "presetRole": "optimization"
+    "presetRole": "optimization",
+    "aliases": [
+      "ui.widgets.disable-policy"
+    ]
   },
   {
     "schemaVersion": "1.0.0",
@@ -6077,73 +5982,6 @@
     "needsReview": false,
     "uiEquivalentLocation": "Control Panel › Power Options › Choose what the power buttons do › Turn on fast startup",
     "presetRole": "fix"
-  },
-  {
-    "schemaVersion": "1.0.0",
-    "id": "ui.widgets.disable-policy",
-    "name": "Widgets Board - Disable by Policy",
-    "description": "Turns off the Widgets board and its news feed with a policy, without uninstalling anything.",
-    "category": "ui",
-    "subcategory": "widgets",
-    "risk": "Medium",
-    "impacts": [
-      "ui",
-      "privacy",
-      "performance"
-    ],
-    "tags": [
-      "ui",
-      "privacy"
-    ],
-    "windows": {
-      "minBuild": 22000
-    },
-    "requiresReboot": true,
-    "requiresExplorerRestart": true,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKLM",
-      "key": "SOFTWARE\\Policies\\Microsoft\\Dsh",
-      "valueName": "AllowNewsAndInterests",
-      "matchType": "Equals",
-      "expectedValue": 0
-    },
-    "apply": [
-      {
-        "type": "Policy",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Policies\\Microsoft\\Dsh",
-        "operation": "Set",
-        "valueName": "AllowNewsAndInterests",
-        "valueKind": "DWord",
-        "data": 0
-      }
-    ],
-    "undo": [
-      {
-        "type": "Policy",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Policies\\Microsoft\\Dsh",
-        "operation": "DeleteValue",
-        "valueName": "AllowNewsAndInterests"
-      }
-    ],
-    "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-newsandinterests",
-    "verifiedOnBuild": "unverified",
-    "warnings": "Windows Settings will display 'Some settings are managed by your organization'. This is normal when Group Policy registry keys are set.",
-    "evidence": "situational",
-    "whatItDoes": "Sets the policy AllowNewsAndInterests so the Widgets board, its taskbar button and the news feed are turned off.",
-    "sideEffects": "Widgets cannot be opened until the tweak is undone. Takes full effect after a restart.",
-    "sources": [
-      "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-newsandinterests",
-      "https://cloudinfra.net/disable-news-and-interests-on-windows-using-intune/"
-    ],
-    "needsReview": false,
-    "relatedTweaks": [
-      "essential.widget",
-      "ui.taskbar.disable-widgets-button"
-    ],
-    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",

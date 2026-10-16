@@ -8,7 +8,6 @@
     "essential.consumerfeatures",
     "essential.preventdevicemetadatafromnetwork",
     "essential.telemetry",
-    "privacy.activity.activity-history",
     "privacy.ads.explorer-sync-notifications",
     "privacy.advertising.advertising-id",
     "privacy.clipboard.cloud-clipboard-sync",
@@ -36,7 +35,6 @@
     "essential.preventdevicemetadatafromnetwork",
     "essential.telemetry",
     "pref.bingsearch",
-    "privacy.activity.activity-history",
     "privacy.ads.explorer-sync-notifications",
     "privacy.advertising.advertising-id",
     "privacy.clipboard.cloud-clipboard-sync",
@@ -59,8 +57,7 @@
     "privacy.typing.inking-typing-personalization",
     "ui.explorer.hide-frequent-folders",
     "ui.explorer.hide-recent-files",
-    "ui.search.disable-search-highlights",
-    "ui.widgets.disable-policy"
+    "ui.search.disable-search-highlights"
   ],
   "excluded": [
     {

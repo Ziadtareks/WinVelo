@@ -273,16 +273,17 @@
       "https://learn.microsoft.com/en-us/windows-hardware/drivers/display/multiplane-overlay-support"
     ],
     "needsReview": false,
-    "relatedTweaks": [
-      "pref.multiplaneoverlay"
-    ],
     "tags": [
       "gaming",
       "performance",
       "ui"
     ],
     "presetRole": "fix",
-    "effectNote": "OverlayTestMode 5 is reported to no longer disable MPO on recent Windows 11 builds. Check MaxPlanes in DxDiag after rebooting."
+    "effectNote": "OverlayTestMode 5 is reported to no longer disable MPO on recent Windows 11 builds. Check MaxPlanes in DxDiag after rebooting.",
+    "aliases": [
+      "pref.multiplaneoverlay",
+      "WPFMultiplaneOverlay"
+    ]
   },
   {
     "schemaVersion": "1.0.0",

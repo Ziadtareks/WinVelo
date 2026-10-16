@@ -86,13 +86,13 @@
     ],
     "needsReview": false,
     "sourceQuote": "eate a REG_DWORD registry setting named EnableActivityFeed in HKEY_LOCAL_MACHINE\\Software\\Policies\\Microsoft\\Windows\\System with a value o",
-    "relatedTweaks": [
-      "privacy.activity.activity-history"
-    ],
     "tags": [
       "privacy"
     ],
-    "presetRole": "optimization"
+    "presetRole": "optimization",
+    "aliases": [
+      "privacy.activity.activity-history"
+    ]
   },
   {
     "schemaVersion": "1.0.0",

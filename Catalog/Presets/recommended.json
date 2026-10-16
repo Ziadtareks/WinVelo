@@ -222,10 +222,6 @@
       "reason": "Personal preference — choose it yourself in Tweaks"
     },
     {
-      "id": "pref.multiplaneoverlay",
-      "reason": "Fix for a specific problem — apply it only if you have that problem"
-    },
-    {
       "id": "pref.newoutlook",
       "reason": "Personal preference — choose it yourself in Tweaks"
     },
@@ -252,10 +248,6 @@
     {
       "id": "pref.windowsnapping",
       "reason": "Personal preference — choose it yourself in Tweaks"
-    },
-    {
-      "id": "privacy.activity.activity-history",
-      "reason": "Recommended Baseline only includes Safe tweaks — find it in the topic presets or Tweaks"
     },
     {
       "id": "privacy.clipboard.cloud-clipboard-sync",
@@ -388,10 +380,6 @@
     {
       "id": "ui.taskbar.show-seconds-clock",
       "reason": "Personal preference — choose it yourself in Tweaks"
-    },
-    {
-      "id": "ui.widgets.disable-policy",
-      "reason": "Recommended Baseline only includes Safe tweaks — find it in the topic presets or Tweaks"
     }
   ]
 }

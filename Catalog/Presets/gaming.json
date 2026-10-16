@@ -35,10 +35,6 @@
     {
       "id": "performance.power.disable-throttling",
       "reason": "Advanced tuning — apply it individually after reading the details"
-    },
-    {
-      "id": "pref.multiplaneoverlay",
-      "reason": "Fix for a specific problem — apply it only if you have that problem"
     }
   ]
 }

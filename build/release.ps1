@@ -113,7 +113,7 @@ A transparent, open-source tweak tool for Windows 10 and 11. See exactly what ev
 SHA-256: ``$zipHash``
 
 ### Highlights
-- 143 tweaks, each showing its exact registry/service changes, risk, side effects and source
+- 140 tweaks, each showing its exact registry/service changes, risk, side effects and source
 - Presets (Recommended, Privacy, AI & Copilot, Clean UI, Performance, Gaming) with a preview before applying
 - Rollback journal with undo for single tweaks, sessions or everything
 - App installer (winget), startup, services, cleaner, DNS, fixes, updates, optional features, restore points

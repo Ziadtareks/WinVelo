@@ -165,7 +165,7 @@ public sealed class ValidatorRulesTests
         Assert.True(File.Exists(lockPath), "Catalog/aliases.lock.json must exist.");
 
         var lockObj = JsonNode.Parse(File.ReadAllText(lockPath))!.AsObject();
-        Assert.Equal(8, lockObj.Count);
+        Assert.Equal(11, lockObj.Count);
 
         // Load all catalog tweaks
         var catalogMap = new Dictionary<string, JsonNode>(StringComparer.OrdinalIgnoreCase);

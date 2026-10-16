@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Every tweak was re-checked against Microsoft documentation and what Windows actually reads. Tweaks that change nothing were removed, and the ones that were wired wrong were fixed.
 
 ### Removed
-- 9 tweaks that have no real effect on current Windows 10/11: Wi-Fi Sense hotspot reporting and auto-connect (the feature was removed from Windows), Remote Differential Compression, the CEIP policy, Win32 priority separation, CPU core unparking, the SvcHost split threshold tweak, the mouse/keyboard buffer queue, and "Settings Home Page" (it wrote a value Windows does not accept). The catalog now has 143 tweaks.
+- 9 tweaks that have no real effect on current Windows 10/11: Wi-Fi Sense hotspot reporting and auto-connect (the feature was removed from Windows), Remote Differential Compression, the CEIP policy, Win32 priority separation, CPU core unparking, the SvcHost split threshold tweak, the mouse/keyboard buffer queue, and "Settings Home Page" (it wrote a value Windows does not accept). Three exact duplicates were merged into one tweak each (Activity History, Widgets policy, MPO workaround); the old IDs still work as aliases. The catalog now has 140 tweaks.
 - Smart Boost no longer writes `SvcHostSplitThresholdInKB` directly, outside the journal, and no longer recommends experimental tweaks.
 
 ### Changed

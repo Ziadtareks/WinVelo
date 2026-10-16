@@ -50,7 +50,7 @@ public sealed class ProfileManager
                     "privacy.telemetry.diagnostic-data",
                     "privacy.advertising.advertising-id",
                     "privacy.experiences.tailored-experiences",
-                    "privacy.activity.activity-history",
+                    "essential.activity",
                     "privacy.speech.online-speech-recognition",
                     "privacy.typing.inking-typing-personalization",
                     "privacy.feedback.feedback-prompts",

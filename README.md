@@ -12,7 +12,7 @@
 <p align="center">
   <a href="https://github.com/Ziadtareks/WinVelo/releases/latest"><img src="https://img.shields.io/badge/release-v1.0.1-2563EB.svg" alt="Release v1.0.1"></a>
   <img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10 | 11">
-  <img src="https://img.shields.io/badge/tweaks-143-10B981.svg" alt="143 tweaks">
+  <img src="https://img.shields.io/badge/tweaks-140-10B981.svg" alt="140 tweaks">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green.svg" alt="MIT License"></a>
 </p>
 
@@ -55,7 +55,7 @@ There is nothing to install and you don't need to download .NET, because the run
 |---|---|
 | **Home** | System status: administrator rights, restore point, number of WinVelo changes and servicing health. It also holds the presets. |
 | **Presets** | Recommended, Privacy, AI & Copilot, Clean UI, Performance and Gaming, each with a *Standard* and a *Full* level. A preview shows every tweak before anything is applied, plus a "Not included" list that explains what was left out and why. |
-| **Tweaks** | All 143 tweaks, searchable and filterable by category, risk (Safe, Low, Medium, High) and status (Applied, Partial, Not applied, Can't verify). **Simple mode** shows only Safe and Low tweaks that have strong evidence. |
+| **Tweaks** | All 140 tweaks, searchable and filterable by category, risk (Safe, Low, Medium, High) and status (Applied, Partial, Not applied, Can't verify). **Simple mode** shows only Safe and Low tweaks that have strong evidence. |
 | **Apps** | Install 36 popular apps in one go with `winget` (or Chocolatey). |
 | **Tools** | Startup apps, Windows services, cleaner, DNS benchmark and switcher, common fixes, Windows Update settings, optional features and restore points. |
 | **History** | Every session WinVelo ran, with one-click undo. |

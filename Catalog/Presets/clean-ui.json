@@ -51,8 +51,7 @@
     "ui.taskbar.disable-chat-button",
     "ui.taskbar.disable-task-view-button",
     "ui.taskbar.disable-widgets-button",
-    "ui.taskbar.end-task-right-click",
-    "ui.widgets.disable-policy"
+    "ui.taskbar.end-task-right-click"
   ],
   "excluded": [
     {
@@ -118,10 +117,6 @@
     {
       "id": "pref.loginblur",
       "reason": "Personal preference — choose it yourself in Tweaks"
-    },
-    {
-      "id": "pref.multiplaneoverlay",
-      "reason": "Fix for a specific problem — apply it only if you have that problem"
     },
     {
       "id": "pref.newoutlook",

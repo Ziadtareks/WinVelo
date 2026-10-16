@@ -41,6 +41,11 @@ The following 3 items from WinUtil were intentionally excluded based on safety, 
 - **Upstream Action**: Deletes the CTT PowerShell profile.
 - **Reason Not Ported**: Paired with the install script above; not applicable to Tweakora.
 
+### 5. `WPFToggleHideSettingsHome` ("Settings Home Page")
+- **Source**: `config/tweaks.json`
+- **Upstream Action**: Writes `SettingsPageVisibility` with a `show:home` value.
+- **Reason Not Ported**: `SettingsPageVisibility` only accepts the `showonly:` and `hide:` prefixes, so the value has no defined effect. Removed in WinVelo 1.0.1 as a no-effect tweak.
+
 ### 4. Dedicated WinUtil UI Button Controls (`WPFchangedns`, `WPFAddUltPerf`, `WPFRemoveUltPerf`)
 - **Source**: `config/tweaks.json`
 - **Upstream Action**: Upstream uses button handlers in PowerShell (`WPFchangedns` for setting network adapter DNS, `WPFAddUltPerf` for duplicating the Ultimate Performance GUID, `WPFRemoveUltPerf` for deleting it).
