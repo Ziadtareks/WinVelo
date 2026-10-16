@@ -86,6 +86,15 @@
                                Command="{Binding ToggleThemeCommand}"
                                Appearance="Transparent" Margin="0,0,4,0" />
 
+                    <!-- Language Switch (English / Arabic) -->
+                    <ui:Button AutomationProperties.AutomationId="SwitchLanguageButton"
+                               AutomationProperties.Name="Switch language"
+                               Icon="{ui:SymbolIcon Globe24}"
+                               Content="{Binding OtherLanguageName}"
+                               ToolTip="{loc:Tr Main_SwitchLanguage}"
+                               Command="{Binding SwitchLanguageCommand}"
+                               Appearance="Transparent" Margin="0,0,4,0" />
+
                     <!-- Config / Settings Menu Button -->
                     <ui:Button AutomationProperties.AutomationId="ConfigMenuButton"
                                AutomationProperties.Name="Options and Settings"
