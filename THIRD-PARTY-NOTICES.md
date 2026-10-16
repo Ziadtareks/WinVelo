@@ -40,7 +40,11 @@ SOFTWARE.
 - **Wpf.Ui** (MIT License) - https://github.com/lepoco/wpfui
 - **CommunityToolkit.Mvvm** (MIT License) - https://github.com/CommunityToolkit/dotnet
 - **Microsoft.Extensions.DependencyInjection** (MIT License) - https://github.com/dotnet/runtime
+- **Microsoft.Extensions.Hosting** (MIT License) - https://github.com/dotnet/runtime
+- **.NET Runtime and Windows Desktop (WPF)**, bundled inside the portable executables (MIT License) - https://github.com/dotnet/runtime, https://github.com/dotnet/wpf
 - **Serilog** (Apache 2.0 License) - https://github.com/serilog/serilog
-- **JsonSchema.Net** (MIT License) - https://github.com/gregsdennis/json-everything
+- **Serilog.Sinks.File** (Apache 2.0 License) - https://github.com/serilog/serilog-sinks-file
+- **JsonSchema.Net** (MIT License) - https://github.com/gregsdennis/json-everything (includes Json.More.Net and JsonPointer.Net)
+- **Humanizer** (MIT License) - https://github.com/Humanizr/Humanizer
 - **xUnit** (Apache 2.0 License) - https://github.com/xunit/xunit
 - **FlaUI** (MIT License) - https://github.com/FlaUI/FlaUI

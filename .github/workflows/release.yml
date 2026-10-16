@@ -80,7 +80,7 @@ jobs:
           artifact-path: 'src/Tweakora.App/bin/Release/net10.0-windows/win-x64/publish/WinVelo.exe'
           output-path: 'src/Tweakora.App/bin/Release/net10.0-windows/win-x64/publish/WinVelo.exe'
 
-      - name: Package Release Archives (Portable & Small)
+      - name: Package Portable Release
         shell: pwsh
         run: |
           .\build\publish.ps1 -Version "${{ steps.version_step.outputs.version }}"
@@ -89,8 +89,7 @@ jobs:
         uses: actions/attest-build-provenance@v1
         with:
           subject-path: |
-            dist/WinVelo-*-win-x64-portable.zip
-            dist/WinVelo-*-win-x64-small.zip
+            dist/WinVelo-*-portable.zip
 
       - name: Create Draft GitHub Release
         id: create_release
@@ -114,8 +113,7 @@ jobs:
           WinVelo is an honest, calm, open-source Windows 10/11 configuration utility with write-ahead rollback journaling, verified evidence, and zero placebos.
 
           ### 📦 Packages Included
-          - `WinVelo-v$ver-win-x64-portable.zip` — Standalone portable bundle (includes .NET 10 runtime, no installation required).
-          - `WinVelo-v$ver-win-x64-small.zip` — Framework-dependent package (requires [.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/10.0)).
+          - `WinVelo-v$ver-portable.zip` — Portable: unzip and run `WinVelo.exe`. No installation and no .NET download needed.
           - `SHA256SUMS.txt` — SHA-256 checksums for package integrity verification.
 
           ### 🛡️ Verification & Security
@@ -124,8 +122,7 @@ jobs:
           See [docs/SIGNING.md](https://github.com/winvelo/winvelo/blob/main/docs/SIGNING.md) for verification instructions and code signing details.
           "@
 
-          $portable = Get-Item "dist\WinVelo-*-win-x64-portable.zip" | Select-Object -First 1
-          $small = Get-Item "dist\WinVelo-*-win-x64-small.zip" | Select-Object -First 1
+          $portable = Get-Item "dist\WinVelo-*-portable.zip" | Select-Object -First 1
           $shaSums = Get-Item "dist\SHA256SUMS.txt"
 
           gh release create $tag `
@@ -134,5 +131,4 @@ jobs:
             --title "WinVelo $tag" `
             --notes $notes `
             "$($portable.FullName)" `
-            "$($small.FullName)" `
             "$($shaSums.FullName)"
