@@ -133,6 +133,7 @@ public static class Program
                         ValidateEvidenceField(item, id, ref errorCount);
                         ValidateRiskFloors(item, id, ref errorCount);
                         ValidateExplanations(item, id, ref errorCount);
+                        ValidateRegistryKeys(item, id, ref errorCount);
 
                         if (!result.IsValid)
                         {
@@ -188,6 +189,7 @@ public static class Program
                     ValidateEvidenceField(single, id, ref errorCount);
                     ValidateRiskFloors(single, id, ref errorCount);
                     ValidateExplanations(single, id, ref errorCount);
+                    ValidateRegistryKeys(single, id, ref errorCount);
 
                     if (!result.IsValid)
                     {
@@ -734,6 +736,78 @@ public static class Program
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("  [PASS] Zero exact duplicate tweaks found.");
             Console.ResetColor();
+        }
+    }
+
+    private static void ValidateRegistryKeys(JsonNode tweak, string id, ref int errorCount)
+    {
+        var keyNodes = new List<(string Location, string Key)>();
+
+        void InspectAction(JsonNode? action, string loc)
+        {
+            if (action == null) return;
+            var keyNode = action["key"];
+            if (keyNode != null)
+            {
+                keyNodes.Add((loc, keyNode.ToString()));
+            }
+        }
+
+        if (tweak["detect"] is JsonObject det)
+        {
+            InspectAction(det, "detect");
+            if (det["any"] is JsonArray anyArr)
+            {
+                int i = 0;
+                foreach (var a in anyArr) InspectAction(a, $"detect.any[{i++}]");
+            }
+            if (det["all"] is JsonArray allArr)
+            {
+                int i = 0;
+                foreach (var a in allArr) InspectAction(a, $"detect.all[{i++}]");
+            }
+        }
+
+        if (tweak["apply"] is JsonArray applyArr)
+        {
+            int i = 0;
+            foreach (var a in applyArr) InspectAction(a, $"apply[{i++}]");
+        }
+
+        if (tweak["undo"] is JsonArray undoArr)
+        {
+            int i = 0;
+            foreach (var a in undoArr) InspectAction(a, $"undo[{i++}]");
+        }
+
+        foreach (var (loc, key) in keyNodes)
+        {
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                errorCount++;
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"  [FAIL] Tweak '{id}' {loc} has an empty or whitespace registry key.");
+                Console.ResetColor();
+                continue;
+            }
+
+            if (key.StartsWith('\\') || key.EndsWith('\\') || key.Contains(@"\\"))
+            {
+                errorCount++;
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"  [FAIL] Tweak '{id}' {loc} contains malformed registry key with empty path segments or repeated backslashes: '{key}'");
+                Console.ResetColor();
+                continue;
+            }
+
+            var segments = key.Split('\\');
+            if (segments.Any(s => string.IsNullOrWhiteSpace(s)))
+            {
+                errorCount++;
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"  [FAIL] Tweak '{id}' {loc} has empty path segment in registry key: '{key}'");
+                Console.ResetColor();
+            }
         }
     }
 }

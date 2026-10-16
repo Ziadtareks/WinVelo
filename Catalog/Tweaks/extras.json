@@ -1,4 +1,4 @@
-[
+﻿[
     {
         "schemaVersion": "1.0.0",
         "id": "ai.copilot.disable-taskbar-button",
@@ -315,7 +315,7 @@
             {
                 "type": "Registry",
                 "hive": "HKCU",
-                "key": "Software\\\\Microsoft\\\\GameBar",
+                "key": "Software\\Microsoft\\GameBar",
                 "operation": "Set",
                 "valueName": "AllowAutoGameMode",
                 "valueKind": "DWord",
@@ -335,7 +335,7 @@
             {
                 "type": "Registry",
                 "hive": "HKCU",
-                "key": "Software\\\\Microsoft\\\\GameBar",
+                "key": "Software\\Microsoft\\GameBar",
                 "operation": "Set",
                 "valueName": "AllowAutoGameMode",
                 "valueKind": "DWord",
@@ -1900,7 +1900,7 @@
             {
                 "type": "Policy",
                 "hive": "HKLM",
-                "key": "SOFTWARE\\\\Policies\\\\Microsoft\\\\Windows\\\\System",
+                "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\System",
                 "operation": "Set",
                 "valueName": "UploadUserActivities",
                 "valueKind": "DWord",
@@ -1909,7 +1909,7 @@
             {
                 "type": "Policy",
                 "hive": "HKLM",
-                "key": "SOFTWARE\\\\Policies\\\\Microsoft\\\\Windows\\\\System",
+                "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\System",
                 "operation": "Set",
                 "valueName": "EnableActivityFeed",
                 "valueKind": "DWord",
@@ -1927,14 +1927,14 @@
             {
                 "type": "Policy",
                 "hive": "HKLM",
-                "key": "SOFTWARE\\\\Policies\\\\Microsoft\\\\Windows\\\\System",
+                "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\System",
                 "operation": "DeleteValue",
                 "valueName": "UploadUserActivities"
             },
             {
                 "type": "Policy",
                 "hive": "HKLM",
-                "key": "SOFTWARE\\\\Policies\\\\Microsoft\\\\Windows\\\\System",
+                "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\System",
                 "operation": "DeleteValue",
                 "valueName": "EnableActivityFeed"
             }

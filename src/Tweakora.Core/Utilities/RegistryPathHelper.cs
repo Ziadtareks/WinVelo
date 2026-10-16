@@ -37,7 +37,7 @@ public static class RegistryPathHelper
             _ => h
         };
 
-        k = k.TrimStart('\\').TrimEnd('\\');
+        k = System.Text.RegularExpressions.Regex.Replace(k, @"\\+", @"\").Trim('\\');
         return (h, k);
     }
 
