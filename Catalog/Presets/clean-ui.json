@@ -1,28 +1,14 @@
 {
   "id": "preset.clean-ui",
   "name": "Clean UI: Distraction-Free Shell",
-  "description": "Streamlines the Windows 11 interface with classic menus, file extensions, and distraction-free taskbar.",
+  "description": "Removes taskbar clutter, ads and suggestions in Start, File Explorer and the lock screen, and restores the classic right-click menu.",
   "standard": [
-    "advanced.display",
-    "advanced.removehomeandgallery",
-    "advanced.utc",
+    "apps.edge.disable-sidebar",
     "essential.consumerfeatures",
     "essential.disableexplorerautodiscovery",
-    "gaming.input.disable-mouse-acceleration",
     "performance.visual.disable-animations",
     "performance.visual.disable-transparency",
-    "pref.batterypercentage",
-    "pref.darkmode",
-    "pref.detailedbsod",
-    "pref.hidesettingshome",
-    "pref.multiplaneoverlay",
-    "pref.newoutlook",
-    "pref.numlock",
-    "pref.scrollbars",
-    "pref.stickykeys",
-    "pref.taskbarsearch",
-    "pref.verboselogon",
-    "pref.windowsnapping",
+    "privacy.ads.explorer-sync-notifications",
     "privacy.feedback.feedback-prompts",
     "privacy.search.device-search-history",
     "privacy.tracking.app-launch-tracking",
@@ -30,51 +16,24 @@
     "ui.explorer.hide-frequent-folders",
     "ui.explorer.hide-gallery",
     "ui.explorer.hide-recent-files",
-    "ui.explorer.open-to-this-pc",
     "ui.explorer.show-file-extensions",
-    "ui.explorer.show-full-path-title",
-    "ui.explorer.show-hidden-files",
-    "ui.logon.hide-fast-user-switching",
     "ui.search.disable-search-highlights",
     "ui.system.disable-tips-suggestions",
     "ui.system.disable-welcome-experience",
-    "ui.system.enable-long-paths",
-    "ui.taskbar.alignment-left",
-    "ui.taskbar.end-task-right-click",
-    "ui.taskbar.show-seconds-clock"
+    "ui.taskbar.end-task-right-click"
   ],
   "full": [
-    "advanced.disablenotifications",
-    "advanced.display",
-    "advanced.removehomeandgallery",
-    "advanced.utc",
     "ai.copilot.disable-policy",
     "ai.copilot.disable-taskbar-button",
     "ai.search.disable-bing-web-search",
+    "apps.edge.disable-sidebar",
     "essential.consumerfeatures",
     "essential.disableexplorerautodiscovery",
-    "essential.revertstartmenu",
-    "gaming.input.disable-mouse-acceleration",
     "gaming.xbox.disable-game-bar",
-    "performance.gpu.disable-mpo",
     "performance.visual.disable-animations",
     "performance.visual.disable-transparency",
-    "pref.batterypercentage",
     "pref.bingsearch",
-    "pref.darkmode",
-    "pref.detailedbsod",
-    "pref.disablelockscreen",
-    "pref.hidesettingshome",
-    "pref.loginblur",
-    "pref.multiplaneoverlay",
-    "pref.newoutlook",
-    "pref.numlock",
-    "pref.scrollbars",
-    "pref.startmenurecommendations",
-    "pref.stickykeys",
-    "pref.taskbarsearch",
-    "pref.verboselogon",
-    "pref.windowsnapping",
+    "privacy.ads.explorer-sync-notifications",
     "privacy.consent.deny-notifications",
     "privacy.feedback.feedback-prompts",
     "privacy.search.device-search-history",
@@ -85,30 +44,40 @@
     "ui.explorer.hide-frequent-folders",
     "ui.explorer.hide-gallery",
     "ui.explorer.hide-recent-files",
-    "ui.explorer.open-to-this-pc",
     "ui.explorer.show-file-extensions",
-    "ui.explorer.show-full-path-title",
-    "ui.explorer.show-hidden-files",
-    "ui.logon.hide-fast-user-switching",
     "ui.search.disable-search-highlights",
     "ui.system.disable-tips-suggestions",
     "ui.system.disable-welcome-experience",
-    "ui.system.enable-long-paths",
-    "ui.taskbar.alignment-left",
     "ui.taskbar.disable-chat-button",
     "ui.taskbar.disable-task-view-button",
     "ui.taskbar.disable-widgets-button",
     "ui.taskbar.end-task-right-click",
-    "ui.taskbar.show-seconds-clock"
+    "ui.widgets.disable-policy"
   ],
   "excluded": [
+    {
+      "id": "advanced.disablenotifications",
+      "reason": "Personal preference — choose it yourself in Tweaks"
+    },
     {
       "id": "advanced.disablewarningforunsignedrdp",
       "reason": "High risk — enable individually from Tweaks"
     },
     {
+      "id": "advanced.display",
+      "reason": "Personal preference — choose it yourself in Tweaks"
+    },
+    {
       "id": "advanced.edgedebloat",
       "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "advanced.removehomeandgallery",
+      "reason": "Personal preference — choose it yourself in Tweaks"
+    },
+    {
+      "id": "advanced.utc",
+      "reason": "Fix for a specific problem — apply it only if you have that problem"
     },
     {
       "id": "advanced.windowsai",
@@ -119,8 +88,72 @@
       "reason": "High risk — enable individually from Tweaks"
     },
     {
+      "id": "essential.revertstartmenu",
+      "reason": "Personal preference — choose it yourself in Tweaks"
+    },
+    {
       "id": "essential.widget",
       "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "performance.gpu.disable-mpo",
+      "reason": "Fix for a specific problem — apply it only if you have that problem"
+    },
+    {
+      "id": "pref.batterypercentage",
+      "reason": "Personal preference — choose it yourself in Tweaks"
+    },
+    {
+      "id": "pref.darkmode",
+      "reason": "Personal preference — choose it yourself in Tweaks"
+    },
+    {
+      "id": "pref.detailedbsod",
+      "reason": "Fix for a specific problem — apply it only if you have that problem"
+    },
+    {
+      "id": "pref.disablelockscreen",
+      "reason": "Personal preference — choose it yourself in Tweaks"
+    },
+    {
+      "id": "pref.hidesettingshome",
+      "reason": "Personal preference — choose it yourself in Tweaks"
+    },
+    {
+      "id": "pref.loginblur",
+      "reason": "Personal preference — choose it yourself in Tweaks"
+    },
+    {
+      "id": "pref.multiplaneoverlay",
+      "reason": "Fix for a specific problem — apply it only if you have that problem"
+    },
+    {
+      "id": "pref.newoutlook",
+      "reason": "Personal preference — choose it yourself in Tweaks"
+    },
+    {
+      "id": "pref.numlock",
+      "reason": "Personal preference — choose it yourself in Tweaks"
+    },
+    {
+      "id": "pref.scrollbars",
+      "reason": "Personal preference — choose it yourself in Tweaks"
+    },
+    {
+      "id": "pref.startmenurecommendations",
+      "reason": "Personal preference — choose it yourself in Tweaks"
+    },
+    {
+      "id": "pref.taskbarsearch",
+      "reason": "Personal preference — choose it yourself in Tweaks"
+    },
+    {
+      "id": "pref.verboselogon",
+      "reason": "Fix for a specific problem — apply it only if you have that problem"
+    },
+    {
+      "id": "pref.windowsnapping",
+      "reason": "Personal preference — choose it yourself in Tweaks"
     },
     {
       "id": "system.security.disable-autorun",
@@ -129,6 +162,42 @@
     {
       "id": "system.security.disable-lockscreen-camera",
       "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "ui.explorer.hide-onedrive-nav",
+      "reason": "Personal preference — choose it yourself in Tweaks"
+    },
+    {
+      "id": "ui.explorer.open-to-this-pc",
+      "reason": "Personal preference — choose it yourself in Tweaks"
+    },
+    {
+      "id": "ui.explorer.show-full-path-title",
+      "reason": "Personal preference — choose it yourself in Tweaks"
+    },
+    {
+      "id": "ui.explorer.show-hidden-files",
+      "reason": "Personal preference — choose it yourself in Tweaks"
+    },
+    {
+      "id": "ui.logon.hide-fast-user-switching",
+      "reason": "Personal preference — choose it yourself in Tweaks"
+    },
+    {
+      "id": "ui.system.enable-long-paths",
+      "reason": "Fix for a specific problem — apply it only if you have that problem"
+    },
+    {
+      "id": "ui.taskbar.alignment-left",
+      "reason": "Personal preference — choose it yourself in Tweaks"
+    },
+    {
+      "id": "ui.taskbar.last-active-click",
+      "reason": "Personal preference — choose it yourself in Tweaks"
+    },
+    {
+      "id": "ui.taskbar.show-seconds-clock",
+      "reason": "Personal preference — choose it yourself in Tweaks"
     }
   ]
 }

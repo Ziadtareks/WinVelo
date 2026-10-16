@@ -1,29 +1,29 @@
 {
   "id": "preset.gaming",
   "name": "Gaming: Fewer Background Interruptions",
-  "description": "Disables background Xbox Game Bar recording overlays, Game DVR background captures, and optimizes system responsiveness and raw input for gaming.",
+  "description": "Turns off Game Bar and background game recording, keeps Game Mode on, and stops the Sticky Keys shortcut from interrupting games.",
   "standard": [
     "gaming.input.disable-mouse-acceleration",
     "gaming.mode.enable",
-    "pref.multiplaneoverlay",
     "pref.stickykeys"
   ],
   "full": [
-    "advanced.disablenotifications",
-    "advanced.logiblock",
-    "advanced.razerblock",
+    "advanced.disablebgapps",
     "gaming.dvr.disable-background-recording",
     "gaming.input.disable-mouse-acceleration",
     "gaming.mode.enable",
     "gaming.xbox.disable-game-bar",
-    "performance.cpu.priority-separation",
-    "performance.gpu.disable-mpo",
-    "performance.gpu.hags",
-    "performance.power.disable-throttling",
-    "pref.multiplaneoverlay",
     "pref.stickykeys"
   ],
   "excluded": [
+    {
+      "id": "advanced.disablenotifications",
+      "reason": "Personal preference — choose it yourself in Tweaks"
+    },
+    {
+      "id": "performance.cpu.priority-separation",
+      "reason": "Advanced tuning — apply it individually after reading the details"
+    },
     {
       "id": "performance.cpu.unpark-cores",
       "reason": "Experimental tweak — requires manual testing"
@@ -33,8 +33,24 @@
       "reason": "Experimental tweak — requires manual testing"
     },
     {
+      "id": "performance.gpu.disable-mpo",
+      "reason": "Fix for a specific problem — apply it only if you have that problem"
+    },
+    {
+      "id": "performance.gpu.hags",
+      "reason": "Personal preference — choose it yourself in Tweaks"
+    },
+    {
       "id": "performance.input.buffer-queue",
       "reason": "Experimental tweak — requires manual testing"
+    },
+    {
+      "id": "performance.power.disable-throttling",
+      "reason": "Advanced tuning — apply it individually after reading the details"
+    },
+    {
+      "id": "pref.multiplaneoverlay",
+      "reason": "Fix for a specific problem — apply it only if you have that problem"
     }
   ]
 }

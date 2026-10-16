@@ -3,12 +3,12 @@
   "name": "Privacy: Telemetry & Activity Shield",
   "description": "Minimizes diagnostic collection, tailored experiences, advertising identifiers, and activity history tracking.",
   "standard": [
+    "ai.clicktodo.disable",
     "essential.activity",
     "essential.consumerfeatures",
     "essential.preventdevicemetadatafromnetwork",
     "essential.telemetry",
-    "pref.hidesettingshome",
-    "privacy.activity.activity-history",
+    "privacy.ads.explorer-sync-notifications",
     "privacy.advertising.advertising-id",
     "privacy.ceip.customer-experience-improvement",
     "privacy.clipboard.cloud-clipboard-sync",
@@ -26,7 +26,9 @@
   ],
   "full": [
     "advanced.disablebgapps",
+    "ai.clicktodo.disable",
     "ai.copilot.disable-policy",
+    "ai.recall.disable-availability",
     "ai.recall.disable-snapshots",
     "ai.search.disable-bing-web-search",
     "essential.activity",
@@ -34,9 +36,7 @@
     "essential.preventdevicemetadatafromnetwork",
     "essential.telemetry",
     "pref.bingsearch",
-    "pref.hidesettingshome",
-    "pref.startmenurecommendations",
-    "privacy.activity.activity-history",
+    "privacy.ads.explorer-sync-notifications",
     "privacy.advertising.advertising-id",
     "privacy.ceip.customer-experience-improvement",
     "privacy.clipboard.cloud-clipboard-sync",
@@ -45,9 +45,7 @@
     "privacy.consent.deny-contacts",
     "privacy.consent.deny-diagnostics",
     "privacy.consent.deny-location",
-    "privacy.consent.deny-microphone",
     "privacy.consent.deny-notifications",
-    "privacy.consent.deny-webcam",
     "privacy.experiences.tailored-experiences",
     "privacy.feedback.feedback-prompts",
     "privacy.location.disable-sensor",
@@ -61,7 +59,8 @@
     "privacy.typing.inking-typing-personalization",
     "ui.explorer.hide-frequent-folders",
     "ui.explorer.hide-recent-files",
-    "ui.search.disable-search-highlights"
+    "ui.search.disable-search-highlights",
+    "ui.widgets.disable-policy"
   ],
   "excluded": [
     {
@@ -111,6 +110,26 @@
     {
       "id": "network.wifi.disable-hotspot-reporting",
       "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "pref.startmenurecommendations",
+      "reason": "Personal preference — choose it yourself in Tweaks"
+    },
+    {
+      "id": "privacy.activity.activity-history",
+      "reason": "Conflicts with essential.activity (changes the same setting differently)"
+    },
+    {
+      "id": "privacy.consent.deny-microphone",
+      "reason": "Personal preference — choose it yourself in Tweaks"
+    },
+    {
+      "id": "privacy.consent.deny-webcam",
+      "reason": "Personal preference — choose it yourself in Tweaks"
+    },
+    {
+      "id": "privacy.findmydevice.disable",
+      "reason": "Personal preference — choose it yourself in Tweaks"
     },
     {
       "id": "system.security.disable-lockscreen-camera",

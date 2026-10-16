@@ -1,47 +1,30 @@
 {
   "id": "preset.performance",
-  "name": "Performance: System Responsiveness",
-  "description": "Optimizes background services, power management, storage cleanup, and system responsiveness.",
+  "name": "Performance: Fewer Background Tasks",
+  "description": "Reduces background work such as Edge preloading, maintenance wake-ups and indexing on battery, and turns off visual effects that cost resources.",
   "standard": [
-    "advanced.display",
+    "apps.edge.disable-background-mode",
+    "apps.edge.disable-startup-boost",
     "essential.disableexplorerautodiscovery",
-    "essential.restorepoint",
-    "essential.telemetry",
     "gaming.mode.enable",
     "performance.network.delivery-optimization-simple",
     "performance.visual.disable-animations",
-    "performance.visual.disable-transparency",
-    "pref.multiplaneoverlay",
-    "ui.taskbar.end-task-right-click"
+    "performance.visual.disable-transparency"
   ],
   "full": [
     "advanced.disablebgapps",
-    "advanced.display",
-    "advanced.reservedstorage",
+    "apps.edge.disable-background-mode",
+    "apps.edge.disable-startup-boost",
     "essential.disableexplorerautodiscovery",
-    "essential.hiber",
-    "essential.restorepoint",
-    "essential.telemetry",
     "gaming.dvr.disable-background-recording",
     "gaming.mode.enable",
     "gaming.xbox.disable-game-bar",
-    "performance.cpu.priority-separation",
-    "performance.gpu.disable-mpo",
-    "performance.gpu.hags",
-    "performance.memory.svchost-split-threshold",
     "performance.network.delivery-optimization-simple",
-    "performance.ntfs.disable-8dot3-names",
-    "performance.ntfs.disable-last-access",
-    "performance.power.disable-throttling",
     "performance.search.prevent-indexing-on-battery",
     "performance.system.disable-maintenance-wake",
-    "performance.system.storage-sense",
     "performance.visual.disable-animations",
     "performance.visual.disable-transparency",
-    "pref.loginblur",
-    "pref.multiplaneoverlay",
-    "ui.taskbar.disable-widgets-button",
-    "ui.taskbar.end-task-right-click"
+    "ui.taskbar.disable-widgets-button"
   ],
   "excluded": [
     {
@@ -49,8 +32,16 @@
       "reason": "High risk — enable individually from Tweaks"
     },
     {
+      "id": "advanced.display",
+      "reason": "Personal preference — choose it yourself in Tweaks"
+    },
+    {
       "id": "advanced.removeonedrive",
       "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "advanced.reservedstorage",
+      "reason": "Advanced tuning — apply it individually after reading the details"
     },
     {
       "id": "essential.deletetempfiles",
@@ -59,6 +50,14 @@
     {
       "id": "essential.diskcleanup",
       "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "essential.hiber",
+      "reason": "Personal preference — choose it yourself in Tweaks"
+    },
+    {
+      "id": "essential.restorepoint",
+      "reason": "One-time action — run it from Tweaks when you need it"
     },
     {
       "id": "essential.services",
@@ -73,6 +72,10 @@
       "reason": "Needs manual review before applying"
     },
     {
+      "id": "performance.cpu.priority-separation",
+      "reason": "Advanced tuning — apply it individually after reading the details"
+    },
+    {
       "id": "performance.cpu.unpark-cores",
       "reason": "Experimental tweak — requires manual testing"
     },
@@ -81,12 +84,52 @@
       "reason": "Experimental tweak — requires manual testing"
     },
     {
+      "id": "performance.gpu.disable-mpo",
+      "reason": "Fix for a specific problem — apply it only if you have that problem"
+    },
+    {
+      "id": "performance.gpu.hags",
+      "reason": "Personal preference — choose it yourself in Tweaks"
+    },
+    {
       "id": "performance.input.buffer-queue",
       "reason": "Experimental tweak — requires manual testing"
     },
     {
+      "id": "performance.memory.svchost-split-threshold",
+      "reason": "Advanced tuning — apply it individually after reading the details"
+    },
+    {
       "id": "performance.network.disable-remote-differential-compression",
       "reason": "High risk — enable individually from Tweaks"
+    },
+    {
+      "id": "performance.ntfs.disable-8dot3-names",
+      "reason": "Advanced tuning — apply it individually after reading the details"
+    },
+    {
+      "id": "performance.ntfs.disable-last-access",
+      "reason": "Advanced tuning — apply it individually after reading the details"
+    },
+    {
+      "id": "performance.power.disable-throttling",
+      "reason": "Advanced tuning — apply it individually after reading the details"
+    },
+    {
+      "id": "performance.startup.remove-startup-delay",
+      "reason": "Experimental tweak — requires manual testing"
+    },
+    {
+      "id": "performance.system.storage-sense",
+      "reason": "Personal preference — choose it yourself in Tweaks"
+    },
+    {
+      "id": "pref.loginblur",
+      "reason": "Personal preference — choose it yourself in Tweaks"
+    },
+    {
+      "id": "pref.multiplaneoverlay",
+      "reason": "Fix for a specific problem — apply it only if you have that problem"
     },
     {
       "id": "pref.s3sleep",
@@ -95,6 +138,14 @@
     {
       "id": "pref.standbyfix",
       "reason": "Needs manual review before applying"
+    },
+    {
+      "id": "system.power.disable-fast-startup",
+      "reason": "Fix for a specific problem — apply it only if you have that problem"
+    },
+    {
+      "id": "system.shutdown.auto-end-tasks",
+      "reason": "Personal preference — choose it yourself in Tweaks"
     }
   ]
 }

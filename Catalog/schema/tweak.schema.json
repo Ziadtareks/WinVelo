@@ -166,6 +166,11 @@
     },
     "sourceQuote": {
       "type": "string"
+    },
+    "presetRole": {
+      "type": "string",
+      "enum": ["optimization", "preference", "fix", "action", "advanced"],
+      "description": "Whether generated presets may include this tweak. Only \"optimization\" tweaks are eligible."
     }
   },
   "allOf": [
