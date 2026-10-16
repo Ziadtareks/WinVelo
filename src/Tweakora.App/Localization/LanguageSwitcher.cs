@@ -13,11 +13,14 @@ public static class LanguageSwitcher
         var s = settings.GetSettings();
         s.Language = LocalizationManager.NormalizeCode(languageCode);
         settings.SaveSettings(s);
-        Restart();
+        Restart(s.Language);
     }
 
-    /// <summary>Starts a new WinVelo with the same arguments (minus any --lang override) and closes this one.</summary>
-    public static void Restart()
+    /// <summary>
+    /// Starts a new WinVelo with the same arguments plus "--lang &lt;code&gt;" and closes this one.
+    /// The language is passed explicitly because test mode starts with fresh settings on every launch.
+    /// </summary>
+    public static void Restart(string languageCode)
     {
         try
         {
@@ -35,6 +38,8 @@ public static class LanguageSwitcher
                 UseShellExecute = true
             };
             foreach (var a in args) psi.ArgumentList.Add(a);
+            psi.ArgumentList.Add("--lang");
+            psi.ArgumentList.Add(LocalizationManager.NormalizeCode(languageCode));
 
             Process.Start(psi);
             Application.Current?.Shutdown();

@@ -81,7 +81,7 @@ public sealed partial class SettingsViewModel : ObservableObject
 
     /// <summary>Restarts WinVelo so the new language is applied everywhere.</summary>
     [RelayCommand]
-    public void RestartToApplyLanguage() => LanguageSwitcher.Restart();
+    public void RestartToApplyLanguage() => LanguageSwitcher.Restart(SelectedLanguage?.Code ?? "en");
 
     [RelayCommand]
     public void SetSimpleMode()
