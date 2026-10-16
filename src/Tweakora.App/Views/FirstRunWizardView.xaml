@@ -117,7 +117,7 @@
                         </Border>
                         <StackPanel Grid.Column="1" VerticalAlignment="Center">
                             <TextBlock Text="Transparent, Evidence-Based Settings" FontWeight="SemiBold" FontSize="13" Foreground="{DynamicResource TextPrimaryBrush}" />
-                            <TextBlock Text="Every setting is backed by Microsoft documentation or direct Windows Settings equivalents. No placebo RAM cleaners or unproven claims."
+                            <TextBlock Text="Every tweak shows its source, risk level and the exact changes it makes before you apply it. No placebo RAM cleaners; unproven tweaks stay hidden under Experimental."
                                        FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,2,0,0" LineHeight="16" />
                         </StackPanel>
                     </Grid>
@@ -259,7 +259,7 @@
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding IsSimpleMode}" Value="True">
                                     <Setter Property="BorderBrush" Value="{DynamicResource AccentPrimaryBrush}" />
-                                    <Setter Property="Background" Value="#0A2540" />
+                                    <Setter Property="Background" Value="{DynamicResource AccentSubtleBrush}" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
@@ -321,7 +321,7 @@
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding IsSimpleMode}" Value="False">
                                     <Setter Property="BorderBrush" Value="{DynamicResource AccentPrimaryBrush}" />
-                                    <Setter Property="Background" Value="#0A2540" />
+                                    <Setter Property="Background" Value="{DynamicResource AccentSubtleBrush}" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>

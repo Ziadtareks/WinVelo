@@ -4,9 +4,9 @@ This document explains the code signing status of WinVelo, why Windows SmartScre
 
 ---
 
-## 1. Current Signing Status: Unsigned Beta
+## 1. Current Signing Status: Unsigned
 
-WinVelo v0.9.0-beta binaries are currently **unsigned**.
+WinVelo v1.0.0 binaries are currently **unsigned**.
 
 Because commercial Authenticode EV certificates cost between $300 and $600 per year and require formal corporate identity verification, initial open-source releases do not bundle an expensive commercial certificate.
 
@@ -22,13 +22,13 @@ To run the application:
 Even without a certificate, you can cryptographically verify that the binary was not tampered with:
 1. **SHA-256 Checksum Verification**:
    ```powershell
-   Get-FileHash -Algorithm SHA256 .\WinVelo-v0.9.0-beta-win-x64-portable.zip
+   Get-FileHash -Algorithm SHA256 .\WinVelo-v1.0.0-portable.zip
    ```
    Compare the resulting hash with `dist/SHA256SUMS.txt` or the official GitHub Release notes.
 2. **GitHub Build Provenance Attestation**:
    Every release built via GitHub Actions includes an SLSA-compliant build provenance attestation (`actions/attest-build-provenance`). You can inspect the cryptographic attestation linking the binary to the exact GitHub commit and runner via the GitHub CLI:
    ```bash
-   gh attestation verify WinVelo-v0.9.0-beta-win-x64-portable.zip --repo winvelo/winvelo
+   gh attestation verify WinVelo-v1.0.0-portable.zip --repo Ziadtareks/WinVelo
    ```
 
 ---

@@ -10,7 +10,7 @@
     Then zips it to dist/WinVelo-v<Version>-portable.zip and writes dist/SHA256SUMS.txt.
 .EXAMPLE
     .\build\publish.ps1
-    .\build\publish.ps1 -Version 0.9.1-beta
+    .\build\publish.ps1 -Version 1.0.1
 #>
 
 [CmdletBinding()]

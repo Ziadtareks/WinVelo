@@ -39,7 +39,7 @@ public static class Program
     public static async Task<int> Main(string[] args)
     {
         Console.WriteLine("========================================");
-        Console.WriteLine("         WinVelo CLI v0.9.0-beta        ");
+        Console.WriteLine($"         WinVelo CLI {Tweakora.Core.AppInfo.DisplayVersion}".PadRight(40));
         Console.WriteLine("========================================");
 
         if (args.Length == 0 || args.Contains("--help") || args.Contains("-h"))
@@ -1443,7 +1443,7 @@ public static class Program
         Console.WriteLine("  winvelo-cli --self-test --level 1        Run automated safe HKCU self-test with restore point");
         Console.WriteLine("  winvelo-cli --detect-all                 Non-destructive read-only detection across all tweaks");
         Console.WriteLine("  winvelo-cli --health-check [--restore]   Verify Windows Update, Store, and servicing integrity");
-        Console.WriteLine("  winvelo-cli --preset <name> [--dry-run]  Inspect or apply preset (Standard, Minimal, Advanced)");
+        Console.WriteLine("  winvelo-cli --preset <name> [--dry-run]  Preview or apply a preset (recommended, privacy, ai, clean-ui, performance, gaming)");
         Console.WriteLine("  winvelo-cli --list                       List all catalog tweaks");
         Console.WriteLine("  winvelo-cli --dry-run                    Preview all catalog tweaks without modifying system");
         Console.WriteLine("  winvelo-cli --tweak <id> --apply         Apply a specific tweak (add --real-mode for real OS)");

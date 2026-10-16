@@ -445,7 +445,7 @@ public partial class App : Application
 
                 // Title
                 var titleText = new FormattedText(
-                    "WINVELO v0.9.0-BETA — VISUAL CONTACT SHEET",
+                    $"WINVELO {Tweakora.Core.AppInfo.DisplayVersion.ToUpperInvariant()} — VISUAL CONTACT SHEET",
                     System.Globalization.CultureInfo.InvariantCulture,
                     FlowDirection.LeftToRight,
                     new Typeface("Segoe UI Variable Display, Segoe UI, sans-serif"),

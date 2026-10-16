@@ -1,9 +1,9 @@
 ; WinVelo Inno Setup Script
 ; Professional Windows 10/11 Installer Configuration
 #define MyAppName "WinVelo"
-#define MyAppVersion "0.9.0-beta"
+#define MyAppVersion "1.0.0"
 #define MyAppPublisher "WinVelo Team"
-#define MyAppURL "https://github.com/winvelo/winvelo"
+#define MyAppURL "https://github.com/Ziadtareks/WinVelo"
 #define MyAppExeName "WinVelo.exe"
 
 [Setup]

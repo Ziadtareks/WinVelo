@@ -4,13 +4,13 @@ PackageIdentifier: WinVelo.WinVelo
 PackageVersion: 0.9.0-beta
 PackageLocale: en-US
 Publisher: WinVelo Team
-PublisherUrl: https://github.com/winvelo/winvelo
-PublisherSupportUrl: https://github.com/winvelo/winvelo/issues
+PublisherUrl: https://github.com/Ziadtareks/WinVelo
+PublisherSupportUrl: https://github.com/Ziadtareks/WinVelo/issues
 Author: WinVelo Contributors
 PackageName: WinVelo
-PackageUrl: https://github.com/winvelo/winvelo
+PackageUrl: https://github.com/Ziadtareks/WinVelo
 License: MIT
-LicenseUrl: https://github.com/winvelo/winvelo/blob/main/LICENSE
+LicenseUrl: https://github.com/Ziadtareks/WinVelo/blob/main/LICENSE
 Copyright: Copyright (c) 2026 WinVelo Contributors
 ShortDescription: Honest, calm Windows 10/11 configuration utility and package manager.
 Description: WinVelo is a transparent, calm Windows 10/11 configuration utility with write-ahead rollback journaling, verified evidence, exact registry keys, and zero placebos.
@@ -23,6 +23,6 @@ Tags:
   - configuration
   - winget
   - open-source
-ReleaseNotesUrl: https://github.com/winvelo/winvelo/releases/tag/v0.9.0-beta
+ReleaseNotesUrl: https://github.com/Ziadtareks/WinVelo/releases/tag/v0.9.0-beta
 ManifestType: defaultLocale
 ManifestVersion: 1.6.0

@@ -38,6 +38,6 @@ Journal/
 logs/
 publish/
 dist/*
-!dist/SHA256SUMS.txt
 upstream/
 
+Claude outputs/

@@ -116,7 +116,7 @@ public sealed partial class MainViewModel : ObservableObject
     public UnifiedExecutionDialogViewModel ExecutionDialogVM { get; }
     public SettingsViewModel SettingsVM { get; }
 
-    public string AppVersion => $"v{typeof(MainViewModel).Assembly.GetName().Version?.ToString(3) ?? "0.9.0"}-beta";
+    public string AppVersion => Tweakora.Core.AppInfo.DisplayVersion;
 
     [ObservableProperty]
     private bool _isWizardOpen;
@@ -406,7 +406,7 @@ public sealed partial class MainViewModel : ObservableObject
     {
         ConfigDialogText = System.Text.Json.JsonSerializer.Serialize(new
         {
-            Version = "0.9.0-beta",
+            Version = Tweakora.Core.AppInfo.Version,
             ExportedAtUtc = DateTime.UtcNow,
             SelectedTweaks = TweaksVM.GetSelectedTweakIds()
         }, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });

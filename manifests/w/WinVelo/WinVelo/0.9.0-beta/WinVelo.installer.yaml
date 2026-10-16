@@ -15,7 +15,7 @@ Commands:
 ReleaseDate: 2026-10-15
 Installers:
   - Architecture: x64
-    InstallerUrl: https://github.com/winvelo/winvelo/releases/download/v0.9.0-beta/WinVelo-v0.9.0-beta-win-x64-portable.zip
+    InstallerUrl: https://github.com/Ziadtareks/WinVelo/releases/download/v0.9.0-beta/WinVelo-v0.9.0-beta-win-x64-portable.zip
     InstallerSha256: CEC61EA16AC0E23DA94E0989D1F7B9B77422E277D178781C8B94A06E3BB21D8B
 ManifestType: installer
 ManifestVersion: 1.6.0
