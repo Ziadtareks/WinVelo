@@ -7,6 +7,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\winvelo.ico</ApplicationIcon>
     <AssemblyName>WinVelo</AssemblyName>
     <RootNamespace>Tweakora.App</RootNamespace>
     <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
@@ -33,6 +34,11 @@
     <ProjectReference Include="..\Tweakora.Platform\Tweakora.Platform.csproj" />
     <ProjectReference Include="..\Tweakora.Modules\Tweakora.Modules.csproj" />
     <ProjectReference Include="..\Tweakora.Simulation\Tweakora.Simulation.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\winvelo.ico" />
+    <Resource Include="Assets\winvelo-64.png" />
   </ItemGroup>
 
   <ItemGroup>
