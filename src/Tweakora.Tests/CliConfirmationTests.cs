@@ -51,13 +51,13 @@ public sealed class CliConfirmationTests
         try
         {
             Console.SetOut(sw);
-            int exitCode = await Program.Main(new[] { "--info", "performance.cpu.priority-separation" });
+            int exitCode = await Program.Main(new[] { "--info", "ui.explorer.show-file-extensions" });
             Assert.Equal(0, exitCode);
 
             string output = sw.ToString();
-            Assert.Contains("TWEAK INFORMATION: performance.cpu.priority-separation", output);
+            Assert.Contains("TWEAK INFORMATION: ui.explorer.show-file-extensions", output);
             Assert.Contains("EXACT CHANGES:", output);
-            Assert.Contains("Win32PrioritySeparation = 38 (DWord)", output);
+            Assert.Contains("HideFileExt = 0 (DWord)", output);
             Assert.Contains("WHAT IT DOES:", output);
         }
         finally

@@ -54,7 +54,7 @@ public sealed class PlaceboAndClaimScrubTests
             }
         }
 
-        Assert.Equal(152, count);
+        Assert.Equal(143, count);
     }
 
     [Fact]
@@ -117,15 +117,18 @@ public sealed class PlaceboAndClaimScrubTests
             }
         }
 
-        // 1. Mouse buffer queue: anecdotal and experimental
-        var bufferQueue = allTweaks["performance.input.buffer-queue"];
-        Assert.Equal("Experimental", bufferQueue.Category);
-        Assert.Equal("anecdotal", bufferQueue.Evidence);
-
-        // 2. CPU unpark cores: anecdotal and experimental
-        var unpark = allTweaks["performance.cpu.unpark-cores"];
-        Assert.Equal("Experimental", unpark.Category);
-        Assert.Equal("anecdotal", unpark.Evidence);
+        // 1. Placebo or no-effect tweaks were removed from the catalog
+        foreach (var removed in new[]
+        {
+            "performance.cpu.unpark-cores", "performance.cpu.priority-separation",
+            "performance.memory.svchost-split-threshold", "network.wifi.disable-hotspot-reporting",
+            "network.wifi.disable-autoconnect-sense", "performance.network.disable-remote-differential-compression",
+            "privacy.ceip.customer-experience-improvement", "pref.hidesettingshome",
+            "performance.input.buffer-queue"
+        })
+        {
+            Assert.False(allTweaks.ContainsKey(removed), $"{removed} has no real effect and must stay removed");
+        }
 
         // 3. GPU MPO: situational workaround
         var mpo = allTweaks["performance.gpu.disable-mpo"];
@@ -135,17 +138,13 @@ public sealed class PlaceboAndClaimScrubTests
         var throttling = allTweaks["performance.power.disable-throttling"];
         Assert.Equal("situational", throttling.Evidence);
 
-        // 5. Priority separation: situational
-        var priority = allTweaks["performance.cpu.priority-separation"];
-        Assert.Equal("situational", priority.Evidence);
-
-        // 6. MMCSS: moved to Experimental / situational (needsReview: true)
+        // 5. MMCSS: moved to Experimental / situational (needsReview: true)
         var mmcss = allTweaks["performance.gaming.mmcss-responsiveness"];
         Assert.Equal("Experimental", mmcss.Category);
         Assert.Equal("situational", mmcss.Evidence);
         Assert.True(mmcss.NeedsReview);
 
-        // 7. Mouse acceleration & HAGS: user preferences (ui-equivalent)
+        // 6. Mouse acceleration & HAGS: user preferences (ui-equivalent)
         var mouseAcc1 = allTweaks["gaming.input.disable-mouse-acceleration"];
         Assert.Equal("preferences", mouseAcc1.Category);
         Assert.Equal("ui-equivalent", mouseAcc1.Evidence);

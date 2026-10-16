@@ -8,7 +8,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.1] - 2026-10-16
 
+Every tweak was re-checked against Microsoft documentation and what Windows actually reads. Tweaks that change nothing were removed, and the ones that were wired wrong were fixed.
+
+### Removed
+- 9 tweaks that have no real effect on current Windows 10/11: Wi-Fi Sense hotspot reporting and auto-connect (the feature was removed from Windows), Remote Differential Compression, the CEIP policy, Win32 priority separation, CPU core unparking, the SvcHost split threshold tweak, the mouse/keyboard buffer queue, and "Settings Home Page" (it wrote a value Windows does not accept). The catalog now has 143 tweaks.
+- Smart Boost no longer writes `SvcHostSplitThresholdInKB` directly, outside the journal, and no longer recommends experimental tweaks.
+
+### Changed
+- Tweaks that need a newer Windows build, an older one, or a specific edition (for example Enterprise-only policies) are now skipped on PCs where Windows ignores them. The tweak card says why.
+- Mouse acceleration, animations and Sticky Keys now take effect immediately instead of after signing out.
+- Tweak descriptions, side effects and notes were rewritten where they did not match what the tweak changes, including the Arabic texts.
+
 ### Fixed
+- Several tweaks wrote the wrong value name or type, so Windows ignored them (for example DNS over HTTPS, indexing on battery, search highlights, metered-connection downloads and Sticky Keys).
+- "Activity History - Disable" turned the activity feed on instead of off.
+- "Multiplane Overlay Workaround" wrote a value that does not disable MPO.
+- Scripts that always failed or never finished: OneDrive removal on 64-bit Windows, Edge removal, Disk Cleanup, and store.db permissions.
+- The Disk Cleanup script could take longer than the 15-minute script limit; long cleanup scripts can now run for up to an hour.
 - Taskbar, Start and File Explorer tweaks (for example the taskbar search box) did not show any change until you signed out, because Explorer was never restarted. WinVelo now restarts Explorer once after applying or undoing them.
 - "Taskbar Search" now hides search when turned on. It used to switch the search box to an icon, so search never disappeared.
 - "Visual Effects - Set to Best Performance" showed an explanation and source about display-driver timeouts instead of what it changes.

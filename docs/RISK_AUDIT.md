@@ -67,23 +67,18 @@ The following table lists every tweak whose risk classification was updated duri
 | `ai.search.disable-bing-web-search` | Disable Bing Web Search in Start Menu | `extras.json` | **Safe** | **Medium** | Turns off web search integration in Start Menu |
 | `gaming.xbox.disable-game-bar` | Disable Xbox Game Bar Overlay | `extras.json` | **Safe** | **Medium** | Turns off Xbox Game Bar and background gameplay clip recording |
 | `gaming.dvr.disable-background-recording` | Disable Background Game DVR Recording | `extras.json` | **Safe** | **Medium** | Turns off Xbox Game Bar and background gameplay clip recording |
-| `network.wifi.disable-hotspot-reporting` | Disable Wi-Fi Sense Hotspot Reporting | `extras.json` | **Safe** | **High** | Modifies core networking protocol stack, DNS, or interface parameters |
 | `network.probing.disable-active-probing` | Disable NCSI Active Internet Probing | `extras.json` | **Medium** | **High** | Modifies core networking protocol stack, DNS, or interface parameters |
-| `network.wifi.disable-autoconnect-sense` | Disable Auto-Connect to Suggested Open Wi-Fi | `extras.json` | **Safe** | **High** | Modifies core networking protocol stack, DNS, or interface parameters |
 | `network.optimization.limit-peering-lan` | Restrict Delivery Optimization to Local Network Only | `extras.json` | **Safe** | **High** | Modifies core networking protocol stack, DNS, or interface parameters |
 | `network.dns.enable-doh` | Enable DNS over HTTPS (DoH) System Fallback | `extras.json` | **Safe** | **High** | Modifies core networking protocol stack, DNS, or interface parameters |
 | `network.teredo.disable-tunneling` | Disable Teredo IPv6 Tunneling | `extras.json` | **Safe** | **High** | Modifies core networking protocol stack, DNS, or interface parameters |
 | `performance.system.storage-sense` | Enable Storage Sense Auto-Cleanup | `extras.json` | **Safe** | **Medium** | Alters disk storage allocation, NTFS behavior, or maintenance wake timers |
 | `performance.network.delivery-optimization-simple` | Disable Delivery Optimization Peer-to-Peer (HTTP Only) | `extras.json` | **Safe** | **Low** | Reversible machine policy (HKLM) where no relied-upon user feature is lost |
-| `performance.memory.svchost-split-threshold` | Tune SvcHost Split Threshold | `extras.json` | **Low** | **Medium** | Requires system reboot to take effect |
 | `performance.system.disable-maintenance-wake` | Disable Automatic Maintenance Wake-Up Timers | `extras.json` | **Safe** | **Medium** | Alters disk storage allocation, NTFS behavior, or maintenance wake timers |
 | `performance.search.prevent-indexing-on-battery` | Prevent Search Indexing While on Battery Power | `extras.json` | **Safe** | **Medium** | Alters disk storage allocation, NTFS behavior, or maintenance wake timers |
 | `performance.ntfs.disable-last-access` | Disable NTFS Last Access Time Updates | `extras.json` | **Safe** | **Medium** | Alters disk storage allocation, NTFS behavior, or maintenance wake timers |
 | `performance.ntfs.disable-8dot3-names` | Disable 8.3 Short File Name Creation | `extras.json` | **Safe** | **Medium** | Alters disk storage allocation, NTFS behavior, or maintenance wake timers |
-| `performance.network.disable-remote-differential-compression` | Disable Remote Differential Compression API | `extras.json` | **Safe** | **High** | Modifies core networking protocol stack, DNS, or interface parameters |
 | `privacy.telemetry.diagnostic-data` | Diagnostic Data Level | `extras.json` | **Safe** | **Low** | Reversible machine policy (HKLM) where no relied-upon user feature is lost |
 | `privacy.activity.activity-history` | Disable Activity History Publishing | `extras.json` | **Safe** | **Low** | Reversible machine policy (HKLM) where no relied-upon user feature is lost |
-| `privacy.ceip.customer-experience-improvement` | Disable Customer Experience Program (CEIP) | `extras.json` | **Safe** | **Low** | Reversible machine policy (HKLM) where no relied-upon user feature is lost |
 | `privacy.clipboard.cloud-clipboard-sync` | Disable Cloud Clipboard Sync | `extras.json` | **Safe** | **Low** | Reversible machine policy (HKLM) where no relied-upon user feature is lost |
 | `privacy.spotlight.lockscreen-ads` | Disable Lock Screen Tips & Spotlight Ads | `extras.json` | **Safe** | **Medium** | Alters Windows lock screen behavior or visual presentation |
 | `privacy.suggestions.start-menu-promotions` | Disable Start Menu Suggested App Ads | `extras.json` | **Safe** | **Medium** | Alters Start Menu layout or recommendations |
@@ -114,12 +109,10 @@ The following table lists every tweak whose risk classification was updated duri
 | `updates.peering.metered-connections` | Block Delivery Optimization on Metered Connections | `extras.json` | **Safe** | **High** | Modifies Windows Update delivery or servicing policies |
 | `updates.activehours.enable-policy` | Enforce Active Hours Policy Against Mid-Day Restarts | `extras.json` | **Safe** | **High** | Modifies Windows servicing component or policy (minimum floor) |
 | `updates.preview.disable-optional-content` | Disable Optional Preview Updates & Beta Rollouts | `extras.json` | **Safe** | **High** | Modifies Windows servicing component or policy (minimum floor) |
-| `performance.cpu.priority-separation` | Adjust Win32 Priority Separation | `performance.json` | **Safe** | **Medium** | Modifies hardware power state, thread quantum, or multimedia scheduler responsiveness |
 | `performance.gaming.mmcss-responsiveness` | Multimedia Class Scheduler Service (MMCSS) Gaming Priority | `performance.json` | **Safe** | **Medium** | Modifies hardware power state, thread quantum, or multimedia scheduler responsiveness |
 | `performance.gpu.hags` | Hardware-Accelerated GPU Scheduling (HAGS) | `performance.json` | **Safe** | **Medium** | Requires system reboot to take effect |
 | `performance.gpu.disable-mpo` | Disable Multi-Plane Overlay (MPO Workaround) | `performance.json` | **Safe** | **Medium** | Requires system reboot to take effect |
 | `performance.input.buffer-queue` | Mouse & Keyboard Buffer Queue (Experimental) | `performance.json` | **Safe** | **Medium** | Requires system reboot to take effect |
-| `performance.cpu.unpark-cores` | Disable CPU Core Parking (Experimental) | `performance.json` | **Low** | **Medium** | Modifies hardware power state, thread quantum, or multimedia scheduler responsiveness |
 | `performance.power.disable-throttling` | Disable Windows Power Throttling | `performance.json` | **Safe** | **Medium** | Modifies hardware power state, thread quantum, or multimedia scheduler responsiveness |
 | `pref.detailedbsod` | BSoD Verbose Mode | `preferences.json` | **Safe** | **Low** | Reversible machine policy (HKLM) where no relied-upon user feature is lost |
 | `pref.verboselogon` | Logon Verbose Mode | `preferences.json` | **Safe** | **Low** | Reversible machine policy (HKLM) where no relied-upon user feature is lost |

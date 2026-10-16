@@ -22,7 +22,7 @@
       "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\System",
       "valueName": "EnableActivityFeed",
       "matchType": "Equals",
-      "expectedValue": 1
+      "expectedValue": 0
     },
     "apply": [
       {
@@ -32,7 +32,7 @@
         "operation": "Set",
         "valueName": "EnableActivityFeed",
         "valueKind": "DWord",
-        "data": 1
+        "data": 0
       },
       {
         "type": "Registry",
@@ -89,7 +89,6 @@
     "relatedTweaks": [
       "privacy.activity.activity-history"
     ],
-    "oppositeOf": "privacy.activity.activity-history",
     "tags": [
       "privacy"
     ],
@@ -100,7 +99,7 @@
     "id": "essential.hiber",
     "origin": "WPFTweaksHiber",
     "name": "Hibernation - Disable",
-    "description": "Hibernation is really meant for laptops as it saves what's in memory before turning the PC off. It really should never be used.",
+    "description": "Turns off hibernation and Fast Startup and deletes hiberfil.sys to free disk space. Laptops lose the Hibernate option.",
     "category": "system",
     "subcategory": "Essential Tweaks",
     "risk": "Medium",
@@ -199,10 +198,10 @@
       "ui"
     ],
     "windows": {
-      "minBuild": 19041
+      "minBuild": 22000
     },
     "requiresReboot": false,
-    "requiresExplorerRestart": false,
+    "requiresExplorerRestart": true,
     "detect": {
       "type": "Registry",
       "hive": "HKLM",
@@ -226,15 +225,6 @@
         "valueName": "AllowNewsAndInterests",
         "valueKind": "DWord",
         "data": 0
-      },
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-        "operation": "Set",
-        "valueName": "TaskbarDa",
-        "valueKind": "DWord",
-        "data": 0
       }
     ],
     "undo": [
@@ -244,15 +234,6 @@
         "key": "SOFTWARE\\Policies\\Microsoft\\Dsh",
         "operation": "DeleteValue",
         "valueName": "AllowNewsAndInterests"
-      },
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-        "operation": "Set",
-        "valueName": "TaskbarDa",
-        "valueKind": "DWord",
-        "data": 1
       }
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/widget",
@@ -276,7 +257,8 @@
       "ui",
       "performance"
     ],
-    "presetRole": "optimization"
+    "presetRole": "optimization",
+    "effectNote": "Windows 11 only. Windows 10 News and Interests is not affected."
   },
   {
     "schemaVersion": "1.0.0",
@@ -291,9 +273,9 @@
       "ui"
     ],
     "windows": {
-      "minBuild": 19041
+      "minBuild": 26100
     },
-    "requiresReboot": false,
+    "requiresReboot": true,
     "requiresExplorerRestart": true,
     "detect": {
       "type": "Registry",
@@ -335,7 +317,8 @@
     "tags": [
       "ui"
     ],
-    "presetRole": "preference"
+    "presetRole": "preference",
+    "effectNote": "Only works on Windows 11 24H2/25H2 builds where the new Start menu is rolling out and the override is still honored."
   },
   {
     "schemaVersion": "1.0.0",
@@ -367,7 +350,7 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "icacls \"$Env:LocalAppData\\Packages\\Microsoft.WindowsStore_8wekyb3d8bbwe\\LocalState\\store.db\" /deny *S-1-1-0:F -ErrorAction SilentlyContinue",
+        "script": "$db = \"$Env:LocalAppData\\Packages\\Microsoft.WindowsStore_8wekyb3d8bbwe\\LocalState\\store.db\"\nif (Test-Path $db) {\n    icacls $db /deny \"*S-1-1-0:F\" | Out-Null\n    if ($LASTEXITCODE -ne 0) { throw \"icacls failed with exit code $LASTEXITCODE\" }\n}",
         "timeoutSeconds": 60
       },
       {
@@ -384,7 +367,7 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "icacls \"$Env:LocalAppData\\Packages\\Microsoft.WindowsStore_8wekyb3d8bbwe\\LocalState\\store.db\" /grant *S-1-1-0:F -ErrorAction SilentlyContinue",
+        "script": "$db = \"$Env:LocalAppData\\Packages\\Microsoft.WindowsStore_8wekyb3d8bbwe\\LocalState\\store.db\"\nif (Test-Path $db) {\n    icacls $db /remove:d \"*S-1-1-0\" | Out-Null\n}",
         "timeoutSeconds": 60
       },
       {
@@ -527,8 +510,8 @@
     "schemaVersion": "1.0.0",
     "id": "essential.services",
     "origin": "WPFTweaksServices",
-    "name": "Services - Set to Manual",
-    "description": "Sets some services to Manual startup and adjusts the SvcHostSplitThresholdInKB registry value to better match system memory, which can significantly reduce the number of svchost.exe processes.",
+    "name": "Services - Disable or Set to Manual",
+    "description": "Disables Offline Files, telemetry and Internet Connection Sharing services, sets Maps and Storage services to Manual, and raises SvcHostSplitThresholdInKB to the installed RAM to reduce svchost.exe processes. Restart required.",
     "category": "performance",
     "subcategory": "Essential Tweaks",
     "risk": "High",
@@ -538,7 +521,7 @@
     "windows": {
       "minBuild": 19041
     },
-    "requiresReboot": false,
+    "requiresReboot": true,
     "requiresExplorerRestart": false,
     "detect": {
       "type": "Service",
@@ -606,13 +589,19 @@
         "type": "Service",
         "operation": "SetStartup",
         "serviceName": "StorSvc",
-        "startupType": "Automatic"
+        "startupType": "Manual"
       },
       {
         "type": "Service",
         "operation": "SetStartup",
         "serviceName": "SharedAccess",
-        "startupType": "Automatic"
+        "startupType": "Manual"
+      },
+      {
+        "type": "PowerShell",
+        "operation": "Execute",
+        "script": "Set-ItemProperty -Path \"HKLM:\\SYSTEM\\CurrentControlSet\\Control\" -Name SvcHostSplitThresholdInKB -Value 3670016 -Type DWord",
+        "timeoutSeconds": 60
       }
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/services",
@@ -644,7 +633,12 @@
       "ui"
     ],
     "windows": {
-      "minBuild": 19041
+      "minBuild": 19041,
+      "editions": [
+        "Enterprise",
+        "Education",
+        "IoTEnterprise"
+      ]
     },
     "requiresReboot": false,
     "requiresExplorerRestart": false,
@@ -690,7 +684,8 @@
       "privacy",
       "ui"
     ],
-    "presetRole": "optimization"
+    "presetRole": "optimization",
+    "effectNote": "Ignored on Home and Pro; works only on Enterprise and Education."
   },
   {
     "schemaVersion": "1.0.0",
@@ -707,18 +702,10 @@
     "windows": {
       "minBuild": 19041
     },
-    "requiresReboot": false,
+    "requiresReboot": true,
     "requiresExplorerRestart": false,
     "detect": {
-      "any": [
-        {
-          "type": "Registry",
-          "hive": "HKLM",
-          "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection",
-          "valueName": "AllowTelemetry",
-          "matchType": "Equals",
-          "expectedValue": 0
-        },
+      "all": [
         {
           "type": "Registry",
           "hive": "HKLM",
@@ -941,14 +928,14 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "# Enable Defender Auto Sample Submission\n      if (Get-Command Set-MpPreference -ErrorAction SilentlyContinue) {\n          Set-MpPreference -SubmitSamplesConsent 1 -ErrorAction SilentlyContinue\n      }\n\n      # Enable (Connected User Experiences and Telemetry) Service\n      if (Get-Service -Name diagtrack -ErrorAction SilentlyContinue) {\n          Set-Service -Name diagtrack -StartupType Automatic -ErrorAction SilentlyContinue\n      }\n\n      # Enable (Windows Error Reporting Service)\n      if (Get-Service -Name WerSvc -ErrorAction SilentlyContinue) {\n          Set-Service -Name WerSvc -StartupType Automatic -ErrorAction SilentlyContinue\n      }\n\n      # Enable PowerShell 7 telemetry\n      [Environment]::SetEnvironmentVariable('POWERSHELL_TELEMETRY_OPTOUT', '', 'Machine')",
+        "script": "# Enable Defender Auto Sample Submission\n      if (Get-Command Set-MpPreference -ErrorAction SilentlyContinue) {\n          Set-MpPreference -SubmitSamplesConsent 1 -ErrorAction SilentlyContinue\n      }\n\n      # Enable (Connected User Experiences and Telemetry) Service\n      if (Get-Service -Name diagtrack -ErrorAction SilentlyContinue) {\n          Set-Service -Name diagtrack -StartupType Automatic -ErrorAction SilentlyContinue\n      }\n\n      # Enable (Windows Error Reporting Service)\n      if (Get-Service -Name WerSvc -ErrorAction SilentlyContinue) {\n          Set-Service -Name WerSvc -StartupType Manual -ErrorAction SilentlyContinue\n      }\n\n      # Enable PowerShell 7 telemetry\n      [Environment]::SetEnvironmentVariable('POWERSHELL_TELEMETRY_OPTOUT', '', 'Machine')",
         "timeoutSeconds": 60
       }
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/telemetry",
     "verifiedOnBuild": "26100",
     "evidence": "documented",
-    "whatItDoes": "Configures diagnostic data collection to security/minimum level and disables CEIP scheduled tasks.",
+    "whatItDoes": "Sets AllowTelemetry to 0, turns off advertising ID, tailored experiences, online speech, inking and typing data collection, disables the DiagTrack and WerSvc services and Defender automatic sample submission.",
     "sideEffects": "Reduces telemetry reported to Microsoft; Windows Insider preview builds and Feedback Hub may show diagnostic warnings.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/privacy/configure-windows-diagnostic-data-in-your-organization"
@@ -961,14 +948,15 @@
     "tags": [
       "privacy"
     ],
-    "presetRole": "optimization"
+    "presetRole": "optimization",
+    "effectNote": "On Home and Pro the lowest diagnostic level is Required; AllowTelemetry 0 is treated as 1."
   },
   {
     "schemaVersion": "1.0.0",
     "id": "essential.restorepoint",
     "origin": "WPFTweaksRestorePoint",
     "name": "Restore Point - Create",
-    "description": "Creates a restore point at runtime in case a revert is needed from WinUtil modifications.",
+    "description": "Creates a System Restore point now (turning on System Restore for the system drive if needed) and removes the 24-hour limit between restore points.",
     "category": "system",
     "subcategory": "Essential Tweaks",
     "risk": "Low",
@@ -1002,7 +990,7 @@
         "type": "PowerShell",
         "operation": "Execute",
         "script": "if (-not (Get-ComputerRestorePoint)) {\n          Enable-ComputerRestore -Drive $Env:SystemDrive\n      }\n\n      Checkpoint-Computer -Description \"System Restore Point created by WinUtil\" -RestorePointType MODIFY_SETTINGS\n      Write-Host \"System Restore Point Created Successfully\" -ForegroundColor Green",
-        "timeoutSeconds": 60
+        "timeoutSeconds": 300
       }
     ],
     "undo": [
@@ -1045,7 +1033,7 @@
     "windows": {
       "minBuild": 19041
     },
-    "requiresReboot": false,
+    "requiresReboot": true,
     "requiresExplorerRestart": false,
     "detect": {
       "type": "Registry",
@@ -1095,7 +1083,7 @@
     "id": "essential.preventdevicemetadatafromnetwork",
     "origin": "WPFTweaksPreventDeviceMetadataFromNetwork",
     "name": "Prevent Device Companion Apps",
-    "description": "Prevents additional software from being installed when plugging in devices (e.g. Ads when plugging in a monitor). Poses potential security risk.",
+    "description": "Stops Windows from downloading device metadata (pictures, info and associated device apps) from the internet when you connect a device.",
     "category": "system",
     "subcategory": "Essential Tweaks",
     "risk": "Low",
@@ -1179,8 +1167,8 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "cleanmgr.exe /d C: /VERYLOWDISK\n      if ($LASTEXITCODE -ne 0) { throw \"cleanmgr failed with exit code $LASTEXITCODE\" }\n      Dism.exe /online /Cleanup-Image /StartComponentCleanup /ResetBase\n      if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 3010) { throw \"Dism failed with exit code $LASTEXITCODE\" }",
-        "timeoutSeconds": 600
+        "script": "Start-Process -FilePath \"$Env:SystemRoot\\System32\\cleanmgr.exe\" -ArgumentList '/d C: /VERYLOWDISK' -Wait\nDism.exe /online /Cleanup-Image /StartComponentCleanup /ResetBase\nif ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 3010) { throw \"Dism failed with exit code $LASTEXITCODE\" }",
+        "timeoutSeconds": 1800
       },
       {
         "type": "Registry",
@@ -1238,8 +1226,8 @@
     "detect": {
       "type": "Registry",
       "hive": "HKCU",
-      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\StorageSense\\Parameters\\StoragePolicy",
-      "valueName": "01",
+      "key": "Software\\WinVelo\\Actions",
+      "valueName": "TempFilesCleaned",
       "matchType": "Equals",
       "expectedValue": 1
     },
@@ -1247,15 +1235,15 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "Remove-Item -Path \"$Env:Temp\\*\" -Recurse -Force -ErrorAction SilentlyContinue\n      Remove-Item -Path \"$Env:SystemRoot\\Temp\\*\" -Recurse -Force -ErrorAction SilentlyContinue",
+        "script": "Remove-Item -Path \"$Env:Temp\\*\" -Recurse -Force -ErrorAction SilentlyContinue\nRemove-Item -Path \"$Env:SystemRoot\\Temp\\*\" -Recurse -Force -ErrorAction SilentlyContinue",
         "timeoutSeconds": 60
       },
       {
         "type": "Registry",
         "hive": "HKCU",
-        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\StorageSense\\Parameters\\StoragePolicy",
+        "key": "Software\\WinVelo\\Actions",
         "operation": "Set",
-        "valueName": "01",
+        "valueName": "TempFilesCleaned",
         "valueKind": "DWord",
         "data": 1
       }
@@ -1264,9 +1252,9 @@
       {
         "type": "Registry",
         "hive": "HKCU",
-        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\StorageSense\\Parameters\\StoragePolicy",
+        "key": "Software\\WinVelo\\Actions",
         "operation": "DeleteValue",
-        "valueName": "01"
+        "valueName": "TempFilesCleaned"
       }
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/deletetempfiles",
@@ -1276,7 +1264,7 @@
     "irreversibleReason": "Permanently deletes all files in user and system TEMP directories; deleted temporary files cannot be restored.",
     "evidence": "situational",
     "whatItDoes": "Clears temporary files from %TEMP% and %WINDIR%\\Temp.",
-    "sideEffects": "Closes or clears temporary application caches; running programs using active temp files are skipped safely.",
+    "sideEffects": "Deletes files in the user and Windows temp folders. Files in use by running programs are skipped. Deleted files cannot be restored.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/client-management/mdm/storage-csp"
     ],
@@ -1349,8 +1337,8 @@
     "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/disableexplorerautodiscovery",
     "verifiedOnBuild": "26100",
     "evidence": "situational",
-    "whatItDoes": "Disables SSDP and UPnP network device auto-discovery in File Explorer.",
-    "sideEffects": "Network-attached media servers and smart TVs will not automatically pop up in File Explorer until manually addressed.",
+    "whatItDoes": "Resets saved folder views and sets FolderType to NotSpecified for all folders, so File Explorer stops guessing folder types (Pictures, Music, etc.) from their contents.",
+    "sideEffects": "All saved folder view settings are reset. Folders use the generic layout; date grouping in Downloads and media columns are no longer applied automatically.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/win32/upnp/about-upnp"
     ],

@@ -166,6 +166,8 @@ public static class Program
             tasks = new WindowsTaskSchedulerService();
             restore = new WindowsRestoreService();
             shell = new WindowsShellService();
+            var (winBuild, winEdition) = WindowsVersionInfo.Read();
+            Tweakora.Core.WindowsCompatibility.Configure(winBuild, winEdition);
         }
         else
         {

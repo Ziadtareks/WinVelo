@@ -331,16 +331,10 @@ The following 85 tweaks carry **Medium** risk, **High** risk, are **irreversible
 | `network.optimization.limit-peering-lan` | Restrict Delivery Optimization to Local Network Only | Medium | Yes | No |
 | `network.probing.disable-active-probing` | Disable NCSI Active Internet Probing | Medium | Yes | No |
 | `network.teredo.disable-tunneling` | Disable Teredo IPv6 Tunneling | Medium | Yes | No |
-| `network.wifi.disable-autoconnect-sense` | Disable Auto-Connect to Suggested Open Wi-Fi | Medium | Yes | No |
-| `network.wifi.disable-hotspot-reporting` | Disable Wi-Fi Sense Hotspot Reporting | Medium | Yes | No |
-| `performance.cpu.priority-separation` | Adjust Win32 Priority Separation | Medium | Yes | No |
-| `performance.cpu.unpark-cores` | Disable CPU Core Parking | Medium | Yes | Yes |
 | `performance.gaming.mmcss-responsiveness` | MMCSS Gaming Network Throttling | Medium | Yes | No |
 | `performance.gpu.disable-mpo` | Disable Multi-Plane Overlay (MPO Workaround) | Medium | Yes | No |
 | `performance.gpu.hags` | Hardware-Accelerated GPU Scheduling (HAGS) | Medium | Yes | No |
 | `performance.input.buffer-queue` | Mouse & Keyboard Buffer Queue | Medium | Yes | Yes |
-| `performance.memory.svchost-split-threshold` | Tune SvcHost Split Threshold | Medium | Yes | No |
-| `performance.network.disable-remote-differential-compression` | Disable Remote Differential Compression API | Medium | Yes | No |
 | `performance.ntfs.disable-8dot3-names` | Disable 8.3 Short File Name Creation | Medium | Yes | No |
 | `performance.ntfs.disable-last-access` | Disable NTFS Last Access Time Updates | Medium | Yes | No |
 | `performance.power.disable-throttling` | Disable Windows Power Throttling | Medium | Yes | No |
@@ -350,7 +344,6 @@ The following 85 tweaks carry **Medium** risk, **High** risk, are **irreversible
 | `pref.batterypercentage` | Battery Percentage on Taskbar | Safe | Yes | No |
 | `pref.bingsearch` | Start Menu Bing Search | Medium | Yes | No |
 | `pref.disablelockscreen` | Lock Screen - Disable | Medium | Yes | No |
-| `pref.hidesettingshome` | Hide Settings Home Page | Safe | Yes | No |
 | `pref.loginblur` | Logon Screen Acrylic Blur | Medium | Yes | No |
 | `pref.multiplaneoverlay` | Multiplane Overlay Workaround | Low | Yes | No |
 | `pref.newoutlook` | Hide Try New Outlook Toggle | Safe | Yes | No |

@@ -21,14 +21,6 @@
       "reason": "Personal preference — choose it yourself in Tweaks"
     },
     {
-      "id": "performance.cpu.priority-separation",
-      "reason": "Advanced tuning — apply it individually after reading the details"
-    },
-    {
-      "id": "performance.cpu.unpark-cores",
-      "reason": "Experimental tweak — requires manual testing"
-    },
-    {
       "id": "performance.gaming.mmcss-responsiveness",
       "reason": "Experimental tweak — requires manual testing"
     },
@@ -39,10 +31,6 @@
     {
       "id": "performance.gpu.hags",
       "reason": "Personal preference — choose it yourself in Tweaks"
-    },
-    {
-      "id": "performance.input.buffer-queue",
-      "reason": "Experimental tweak — requires manual testing"
     },
     {
       "id": "performance.power.disable-throttling",

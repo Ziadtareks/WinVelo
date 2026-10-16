@@ -20,7 +20,8 @@
       "minimal"
     ],
     "windows": {
-      "minBuild": 22621
+      "minBuild": 22621,
+      "maxBuild": 22631
     },
     "requiresReboot": false,
     "requiresExplorerRestart": true,
@@ -64,7 +65,8 @@
     ],
     "needsReview": false,
     "uiEquivalentLocation": "Settings › Personalization › Taskbar › Taskbar items › Copilot",
-    "presetRole": "optimization"
+    "presetRole": "optimization",
+    "effectNote": "Works only on Windows 11 22H2/23H2 with the old Copilot button. On 24H2 and later Copilot is a regular app; unpin it from the taskbar instead."
   },
   {
     "schemaVersion": "1.0.0",
@@ -88,19 +90,14 @@
     ],
     "windows": {
       "minBuild": 22621,
-      "editions": [
-        "Pro",
-        "Enterprise",
-        "Education",
-        "IoTEnterprise"
-      ]
+      "maxBuild": 22631
     },
     "requiresReboot": false,
     "requiresExplorerRestart": true,
     "detect": {
       "type": "Registry",
-      "hive": "HKLM",
-      "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsCopilot",
+      "hive": "HKCU",
+      "key": "Software\\Policies\\Microsoft\\Windows\\WindowsCopilot",
       "valueName": "TurnOffWindowsCopilot",
       "matchType": "Equals",
       "expectedValue": 1
@@ -108,8 +105,8 @@
     "apply": [
       {
         "type": "Policy",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsCopilot",
+        "hive": "HKCU",
+        "key": "Software\\Policies\\Microsoft\\Windows\\WindowsCopilot",
         "operation": "Set",
         "valueName": "TurnOffWindowsCopilot",
         "valueKind": "DWord",
@@ -119,8 +116,8 @@
     "undo": [
       {
         "type": "Policy",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsCopilot",
+        "hive": "HKCU",
+        "key": "Software\\Policies\\Microsoft\\Windows\\WindowsCopilot",
         "operation": "DeleteValue",
         "valueName": "TurnOffWindowsCopilot"
       }
@@ -128,13 +125,14 @@
     "source": "https://learn.microsoft.com/en-us/windows/client-management/manage-windows-copilot",
     "verifiedOnBuild": "22631.4317",
     "evidence": "situational",
-    "whatItDoes": "Disables Windows Copilot globally through Group Policy registry keys.",
+    "whatItDoes": "Sets the TurnOffWindowsCopilot user policy, which turns off the Copilot sidebar in Windows 11 23H2.",
     "sideEffects": "Copilot sidebar and keyboard shortcut (Win+C) become completely disabled.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/client-management/manage-windows-copilot"
     ],
     "needsReview": false,
-    "presetRole": "optimization"
+    "presetRole": "optimization",
+    "effectNote": "Only disables the old Copilot sidebar on Windows 11 23H2. On 24H2 and later Copilot is an app that this policy does not block; uninstall the Copilot app instead."
   },
   {
     "schemaVersion": "1.0.0",
@@ -194,12 +192,13 @@
     "verifiedOnBuild": "26100.1742",
     "evidence": "situational",
     "whatItDoes": "Disables Windows Recall automated screen snapshot capture and indexing.",
-    "sideEffects": "Windows will not capture or index historical snapshots of user desktop activity.",
+    "sideEffects": "Recall stops saving snapshots and existing snapshots are deleted; the user cannot turn snapshot saving back on while the policy is set.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/client-management/manage-recall"
     ],
     "needsReview": false,
-    "presetRole": "optimization"
+    "presetRole": "optimization",
+    "effectNote": "Only has an effect on Copilot+ PCs that have Recall. Snapshots are off by default; this policy keeps them off and deletes existing ones."
   },
   {
     "schemaVersion": "1.0.0",
@@ -364,8 +363,8 @@
   {
     "schemaVersion": "1.0.0",
     "id": "gaming.xbox.disable-game-bar",
-    "name": "Disable Xbox Game Bar Overlay",
-    "description": "Disables the Game Bar overlay to prevent accidental opening and reduce background memory usage.",
+    "name": "Disable Game Bar Captures and Controller Button",
+    "description": "Turns off Game Bar game capture and stops the controller Xbox button from opening Game Bar.",
     "category": "gaming",
     "subcategory": "gamebar",
     "risk": "Medium",
@@ -387,12 +386,24 @@
     "requiresReboot": false,
     "requiresExplorerRestart": false,
     "detect": {
-      "type": "Registry",
-      "hive": "HKCU",
-      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\GameDVR",
-      "valueName": "AppCaptureEnabled",
-      "matchType": "Equals",
-      "expectedValue": 0
+      "all": [
+        {
+          "type": "Registry",
+          "hive": "HKCU",
+          "key": "Software\\Microsoft\\Windows\\CurrentVersion\\GameDVR",
+          "valueName": "AppCaptureEnabled",
+          "matchType": "Equals",
+          "expectedValue": 0
+        },
+        {
+          "type": "Registry",
+          "hive": "HKCU",
+          "key": "Software\\Microsoft\\GameBar",
+          "valueName": "UseNexusForGameBarEnabled",
+          "matchType": "Equals",
+          "expectedValue": 0
+        }
+      ]
     },
     "apply": [
       {
@@ -401,6 +412,15 @@
         "key": "Software\\Microsoft\\Windows\\CurrentVersion\\GameDVR",
         "operation": "Set",
         "valueName": "AppCaptureEnabled",
+        "valueKind": "DWord",
+        "data": 0
+      },
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\GameBar",
+        "operation": "Set",
+        "valueName": "UseNexusForGameBarEnabled",
         "valueKind": "DWord",
         "data": 0
       }
@@ -414,13 +434,22 @@
         "valueName": "AppCaptureEnabled",
         "valueKind": "DWord",
         "data": 1
+      },
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\GameBar",
+        "operation": "Set",
+        "valueName": "UseNexusForGameBarEnabled",
+        "valueKind": "DWord",
+        "data": 1
       }
     ],
     "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-applicationmanagement#allowgamedvr",
     "verifiedOnBuild": "22631.4317",
     "evidence": "ui-equivalent",
-    "whatItDoes": "Disables the Xbox Game Bar overlay in Windows gaming settings.",
-    "sideEffects": "Pressing Win+G will not open the Xbox Game Bar, audio mixer, or performance widget.",
+    "whatItDoes": "Sets AppCaptureEnabled and UseNexusForGameBarEnabled off, so Game Bar does not record and the controller button does not open it.",
+    "sideEffects": "Game clips and screenshots through Game Bar stop working. Win+G can still open the Game Bar overlay.",
     "sources": [
       "https://learn.microsoft.com/en-us/gaming/game-bar/"
     ],
@@ -432,7 +461,7 @@
     "schemaVersion": "1.0.0",
     "id": "gaming.dvr.disable-background-recording",
     "name": "Disable Background Game DVR Recording",
-    "description": "Stops Windows from constantly recording game clips in the background to eliminate disk and GPU write overhead.",
+    "description": "Turns off Game Bar background recording of recent gameplay. It is off by default, so this only matters if it was turned on.",
     "category": "gaming",
     "subcategory": "dvr",
     "risk": "Medium",
@@ -456,8 +485,8 @@
     "detect": {
       "type": "Registry",
       "hive": "HKCU",
-      "key": "System\\GameConfigStore",
-      "valueName": "GameDVR_Enabled",
+      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\GameDVR",
+      "valueName": "HistoricalCaptureEnabled",
       "matchType": "Equals",
       "expectedValue": 0
     },
@@ -465,9 +494,9 @@
       {
         "type": "Registry",
         "hive": "HKCU",
-        "key": "System\\GameConfigStore",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\GameDVR",
         "operation": "Set",
-        "valueName": "GameDVR_Enabled",
+        "valueName": "HistoricalCaptureEnabled",
         "valueKind": "DWord",
         "data": 0
       }
@@ -476,9 +505,9 @@
       {
         "type": "Registry",
         "hive": "HKCU",
-        "key": "System\\GameConfigStore",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\GameDVR",
         "operation": "Set",
-        "valueName": "GameDVR_Enabled",
+        "valueName": "HistoricalCaptureEnabled",
         "valueKind": "DWord",
         "data": 1
       }
@@ -486,8 +515,8 @@
     "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-applicationmanagement#allowgamedvr",
     "verifiedOnBuild": "22631.4317",
     "evidence": "ui-equivalent",
-    "whatItDoes": "Disables background gameplay video and audio capture in Game DVR.",
-    "sideEffects": "Background gameplay recording is disabled; retrospective gameplay clips cannot be saved.",
+    "whatItDoes": "Sets HistoricalCaptureEnabled off, the same as the 'Record what happened' switch in Settings.",
+    "sideEffects": "You cannot save a clip of gameplay that already happened. Manual recording still works.",
     "sources": [
       "https://learn.microsoft.com/en-us/gaming/game-bar/"
     ],
@@ -554,6 +583,12 @@
         "valueName": "MouseThreshold2",
         "valueKind": "String",
         "data": "0"
+      },
+      {
+        "type": "PowerShell",
+        "operation": "Execute",
+        "script": "$m = Get-ItemProperty -Path 'HKCU:\\Control Panel\\Mouse'\nAdd-Type -Namespace WinVelo -Name MouseSpi -MemberDefinition '[DllImport(\"user32.dll\")] public static extern bool SystemParametersInfo(int uiAction, int uiParam, int[] pvParam, int fWinIni);'\n[WinVelo.MouseSpi]::SystemParametersInfo(4, 0, [int[]]([int]$m.MouseThreshold1, [int]$m.MouseThreshold2, [int]$m.MouseSpeed), 3) | Out-Null",
+        "timeoutSeconds": 30
       }
     ],
     "undo": [
@@ -583,6 +618,12 @@
         "valueName": "MouseThreshold2",
         "valueKind": "String",
         "data": "10"
+      },
+      {
+        "type": "PowerShell",
+        "operation": "Execute",
+        "script": "$m = Get-ItemProperty -Path 'HKCU:\\Control Panel\\Mouse'\nAdd-Type -Namespace WinVelo -Name MouseSpi -MemberDefinition '[DllImport(\"user32.dll\")] public static extern bool SystemParametersInfo(int uiAction, int uiParam, int[] pvParam, int fWinIni);'\n[WinVelo.MouseSpi]::SystemParametersInfo(4, 0, [int[]]([int]$m.MouseThreshold1, [int]$m.MouseThreshold2, [int]$m.MouseSpeed), 3) | Out-Null",
+        "timeoutSeconds": 30
       }
     ],
     "source": "https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-systemparametersinfoa",
@@ -601,75 +642,9 @@
   },
   {
     "schemaVersion": "1.0.0",
-    "id": "network.wifi.disable-hotspot-reporting",
-    "name": "Disable Wi-Fi Sense Hotspot Reporting",
-    "description": "Prevents Windows from automatically sharing known Wi-Fi network information with Microsoft services.",
-    "category": "network",
-    "subcategory": "Wi-Fi",
-    "risk": "High",
-    "impacts": [
-      "privacy",
-      "network"
-    ],
-    "tags": [
-      "network",
-      "privacy"
-    ],
-    "presets": [
-      "recommended",
-      "privacy"
-    ],
-    "windows": {
-      "minBuild": 19041
-    },
-    "requiresReboot": false,
-    "requiresExplorerRestart": false,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKLM",
-      "key": "SOFTWARE\\Microsoft\\PolicyManager\\default\\WiFi\\AllowWiFiHotSpotReporting",
-      "valueName": "value",
-      "matchType": "Equals",
-      "expectedValue": 0
-    },
-    "apply": [
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Microsoft\\PolicyManager\\default\\WiFi\\AllowWiFiHotSpotReporting",
-        "operation": "Set",
-        "valueName": "value",
-        "valueKind": "DWord",
-        "data": 0
-      }
-    ],
-    "undo": [
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Microsoft\\PolicyManager\\default\\WiFi\\AllowWiFiHotSpotReporting",
-        "operation": "Set",
-        "valueName": "value",
-        "valueKind": "DWord",
-        "data": 1
-      }
-    ],
-    "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-wifi#allowwifihotspotreporting",
-    "verifiedOnBuild": "26100",
-    "evidence": "situational",
-    "whatItDoes": "Disables automatic Wi-Fi hotspot reporting and open hotspot connection prompts.",
-    "sideEffects": "Windows will not automatically connect to suggested public Wi-Fi hotspots.",
-    "sources": [
-      "https://learn.microsoft.com/en-us/windows-hardware/drivers/network/wi-fi-hotspot-offloading"
-    ],
-    "needsReview": false,
-    "presetRole": "optimization"
-  },
-  {
-    "schemaVersion": "1.0.0",
     "id": "network.probing.disable-active-probing",
     "name": "Disable NCSI Active Internet Probing",
-    "description": "Prevents Windows from continuously pinging msftconnecttest.com to verify connectivity.",
+    "description": "Stops Windows from sending a test request to Microsoft's connectivity server when a network connects. Windows may then show 'No Internet' even when online.",
     "category": "network",
     "subcategory": "Telemetry",
     "risk": "High",
@@ -727,73 +702,8 @@
       "https://learn.microsoft.com/en-us/windows-server/networking/ncsi/ncsi-frequently-asked-questions"
     ],
     "needsReview": false,
-    "presetRole": "optimization"
-  },
-  {
-    "schemaVersion": "1.0.0",
-    "id": "network.wifi.disable-autoconnect-sense",
-    "name": "Disable Auto-Connect to Suggested Open Wi-Fi",
-    "description": "Prevents Windows from connecting silently to unencrypted open public Wi-Fi hotspots.",
-    "category": "network",
-    "subcategory": "Wi-Fi",
-    "risk": "High",
-    "impacts": [
-      "security",
-      "network"
-    ],
-    "tags": [
-      "network",
-      "privacy"
-    ],
-    "presets": [
-      "recommended",
-      "privacy"
-    ],
-    "windows": {
-      "minBuild": 19041
-    },
-    "requiresReboot": false,
-    "requiresExplorerRestart": false,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKLM",
-      "key": "SOFTWARE\\Microsoft\\WcmSvc\\wifinetworkmanager\\config",
-      "valueName": "AutoConnectAllowedOEM",
-      "matchType": "Equals",
-      "expectedValue": 0
-    },
-    "apply": [
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Microsoft\\WcmSvc\\wifinetworkmanager\\config",
-        "operation": "Set",
-        "valueName": "AutoConnectAllowedOEM",
-        "valueKind": "DWord",
-        "data": 0
-      }
-    ],
-    "undo": [
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Microsoft\\WcmSvc\\wifinetworkmanager\\config",
-        "operation": "Set",
-        "valueName": "AutoConnectAllowedOEM",
-        "valueKind": "DWord",
-        "data": 1
-      }
-    ],
-    "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-wifi",
-    "verifiedOnBuild": "26100",
-    "evidence": "situational",
-    "whatItDoes": "Disables Wi-Fi Sense auto-connection to open shared networks.",
-    "sideEffects": "Windows will not automatically connect to open Wi-Fi networks discovered in range.",
-    "sources": [
-      "https://learn.microsoft.com/en-us/windows-hardware/drivers/network/wi-fi-hotspot-offloading"
-    ],
-    "needsReview": false,
-    "presetRole": "optimization"
+    "presetRole": "optimization",
+    "effectNote": "Takes effect the next time a network connects; restart the PC if the status does not change."
   },
   {
     "schemaVersion": "1.0.0",
@@ -861,7 +771,8 @@
       "performance.network.delivery-optimization-simple"
     ],
     "oppositeOf": "performance.network.delivery-optimization-simple",
-    "presetRole": "optimization"
+    "presetRole": "optimization",
+    "effectNote": "Local-network-only peering is already the default. This only changes something if 'Devices on my local network and the Internet' was turned on."
   },
   {
     "schemaVersion": "1.0.0",
@@ -893,28 +804,28 @@
       "type": "Registry",
       "hive": "HKLM",
       "key": "SOFTWARE\\Policies\\Microsoft\\Windows NT\\DNSClient",
-      "valueName": "DnsOverHttps",
+      "valueName": "DoHPolicy",
       "matchType": "Equals",
       "expectedValue": 2
     },
     "apply": [
       {
-        "type": "Registry",
+        "type": "Policy",
         "hive": "HKLM",
         "key": "SOFTWARE\\Policies\\Microsoft\\Windows NT\\DNSClient",
         "operation": "Set",
-        "valueName": "DnsOverHttps",
+        "valueName": "DoHPolicy",
         "valueKind": "DWord",
         "data": 2
       }
     ],
     "undo": [
       {
-        "type": "Registry",
+        "type": "Policy",
         "hive": "HKLM",
         "key": "SOFTWARE\\Policies\\Microsoft\\Windows NT\\DNSClient",
         "operation": "DeleteValue",
-        "valueName": "DnsOverHttps"
+        "valueName": "DoHPolicy"
       }
     ],
     "source": "https://learn.microsoft.com/en-us/windows-server/networking/dns/doh-client-support",
@@ -927,7 +838,8 @@
     ],
     "needsReview": false,
     "uiEquivalentLocation": "Settings › Network & internet › Wi-Fi / Ethernet › DNS server assignment › Encrypted only (DNS over HTTPS)",
-    "presetRole": "optimization"
+    "presetRole": "optimization",
+    "effectNote": "DoH is used only when your DNS server supports it (for example Cloudflare, Google or Quad9). With your router or ISP DNS this changes nothing."
   },
   {
     "schemaVersion": "1.0.0",
@@ -950,7 +862,7 @@
     "windows": {
       "minBuild": 19041
     },
-    "requiresReboot": false,
+    "requiresReboot": true,
     "requiresExplorerRestart": false,
     "detect": {
       "type": "Registry",
@@ -1026,7 +938,7 @@
       "minBuild": 19041
     },
     "requiresReboot": false,
-    "requiresExplorerRestart": false,
+    "requiresExplorerRestart": true,
     "detect": {
       "type": "Registry",
       "hive": "HKCU",
@@ -1093,7 +1005,7 @@
       "minBuild": 19041
     },
     "requiresReboot": false,
-    "requiresExplorerRestart": true,
+    "requiresExplorerRestart": false,
     "detect": {
       "type": "Registry",
       "hive": "HKCU",
@@ -1111,6 +1023,12 @@
         "valueName": "MinAnimate",
         "valueKind": "String",
         "data": "0"
+      },
+      {
+        "type": "PowerShell",
+        "operation": "Execute",
+        "script": "$v = [int](Get-ItemProperty -Path 'HKCU:\\Control Panel\\Desktop\\WindowMetrics').MinAnimate\nAdd-Type -Namespace WinVelo -Name AnimSpi -MemberDefinition '[StructLayout(LayoutKind.Sequential)] public struct ANIMATIONINFO { public uint cbSize; public int iMinAnimate; } [DllImport(\"user32.dll\")] public static extern bool SystemParametersInfo(uint uiAction, uint uiParam, ref ANIMATIONINFO pvParam, uint fWinIni);'\n$ai = New-Object WinVelo.AnimSpi+ANIMATIONINFO\n$ai.cbSize = 8\n$ai.iMinAnimate = $v\n[WinVelo.AnimSpi]::SystemParametersInfo(0x49, 8, [ref]$ai, 3) | Out-Null",
+        "timeoutSeconds": 30
       }
     ],
     "undo": [
@@ -1122,6 +1040,12 @@
         "valueName": "MinAnimate",
         "valueKind": "String",
         "data": "1"
+      },
+      {
+        "type": "PowerShell",
+        "operation": "Execute",
+        "script": "$v = [int](Get-ItemProperty -Path 'HKCU:\\Control Panel\\Desktop\\WindowMetrics').MinAnimate\nAdd-Type -Namespace WinVelo -Name AnimSpi -MemberDefinition '[StructLayout(LayoutKind.Sequential)] public struct ANIMATIONINFO { public uint cbSize; public int iMinAnimate; } [DllImport(\"user32.dll\")] public static extern bool SystemParametersInfo(uint uiAction, uint uiParam, ref ANIMATIONINFO pvParam, uint fWinIni);'\n$ai = New-Object WinVelo.AnimSpi+ANIMATIONINFO\n$ai.cbSize = 8\n$ai.iMinAnimate = $v\n[WinVelo.AnimSpi]::SystemParametersInfo(0x49, 8, [ref]$ai, 3) | Out-Null",
+        "timeoutSeconds": 30
       }
     ],
     "source": "https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-systemparametersinfoa",
@@ -1133,7 +1057,7 @@
       "https://learn.microsoft.com/en-us/windows/win32/winmsg/about-windows"
     ],
     "needsReview": false,
-    "uiEquivalentLocation": "Settings › Accessibility › Visual effects › Animation effects",
+    "uiEquivalentLocation": "Control Panel › System › Advanced system settings › Performance › Animate windows when minimizing and maximizing",
     "presetRole": "optimization"
   },
   {
@@ -1193,7 +1117,7 @@
     "verifiedOnBuild": "22631.4317",
     "evidence": "ui-equivalent",
     "whatItDoes": "Enables automated Windows Storage Sense to clean temporary files and empty Recycle Bin.",
-    "sideEffects": "Automatically purges files older than 30 days from temporary directories and Recycle Bin.",
+    "sideEffects": "Windows deletes unused temporary app files and old Recycle Bin items automatically. With default settings it runs only when disk space is low.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/client-management/mdm/storage-csp"
     ],
@@ -1275,68 +1199,10 @@
       "essential.deliveryoptimization",
       "WPFTweaksDeliveryOptimization"
     ],
-    "presetRole": "optimization"
-  },
-  {
-    "schemaVersion": "1.0.0",
-    "id": "performance.memory.svchost-split-threshold",
-    "name": "Tune SvcHost Split Threshold",
-    "description": "Groups system services into fewer svchost processes on systems with moderate RAM to reduce memory overhead.",
-    "category": "performance",
-    "subcategory": "memory",
-    "risk": "Medium",
-    "impacts": [
-      "performance"
-    ],
-    "tags": [
-      "performance"
-    ],
-    "presets": [
-      "recommended"
-    ],
-    "windows": {
-      "minBuild": 19041
-    },
-    "requiresReboot": true,
-    "requiresExplorerRestart": false,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKLM",
-      "key": "SYSTEM\\CurrentControlSet\\Control",
-      "valueName": "SvcHostSplitThresholdInKB",
-      "matchType": "Equals",
-      "expectedValue": 380000
-    },
-    "apply": [
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SYSTEM\\CurrentControlSet\\Control",
-        "operation": "Set",
-        "valueName": "SvcHostSplitThresholdInKB",
-        "valueKind": "DWord",
-        "data": 380000
-      }
-    ],
-    "undo": [
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SYSTEM\\CurrentControlSet\\Control",
-        "operation": "DeleteValue",
-        "valueName": "SvcHostSplitThresholdInKB"
-      }
-    ],
-    "source": "https://learn.microsoft.com/en-us/windows/application-management/svchost-service-refactoring",
-    "verifiedOnBuild": "22631.4317",
-    "evidence": "situational",
-    "whatItDoes": "Sets SvcHostSplitThresholdInKB to match system physical memory, grouping service host processes.",
-    "sideEffects": "Groups background services into fewer svchost.exe processes, reducing process overhead on systems with high RAM.",
-    "sources": [
-      "https://learn.microsoft.com/en-us/troubleshoot/windows-server/performance/svchost-service-grouping"
-    ],
-    "needsReview": false,
-    "presetRole": "advanced"
+    "presetRole": "optimization",
+    "oppositeOf": [
+      "network.optimization.limit-peering-lan"
+    ]
   },
   {
     "schemaVersion": "1.0.0",
@@ -1423,40 +1289,40 @@
     "windows": {
       "minBuild": 19041
     },
-    "requiresReboot": false,
+    "requiresReboot": true,
     "requiresExplorerRestart": false,
     "detect": {
       "type": "Registry",
       "hive": "HKLM",
       "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Search",
-      "valueName": "PreventIndexingOnBattery",
+      "valueName": "PreventIndexOnBattery",
       "matchType": "Equals",
       "expectedValue": 1
     },
     "apply": [
       {
-        "type": "Registry",
+        "type": "Policy",
         "hive": "HKLM",
         "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Search",
         "operation": "Set",
-        "valueName": "PreventIndexingOnBattery",
+        "valueName": "PreventIndexOnBattery",
         "valueKind": "DWord",
         "data": 1
       }
     ],
     "undo": [
       {
-        "type": "Registry",
+        "type": "Policy",
         "hive": "HKLM",
         "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Search",
         "operation": "DeleteValue",
-        "valueName": "PreventIndexingOnBattery"
+        "valueName": "PreventIndexOnBattery"
       }
     ],
     "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-search",
     "verifiedOnBuild": "26100",
     "evidence": "situational",
-    "whatItDoes": "Prevents Windows Search Indexer from indexing files when running on battery power.",
+    "whatItDoes": "Sets the PreventIndexOnBattery policy so the Windows Search indexer pauses while the PC runs on battery.",
     "sideEffects": "Newly created or modified files will not be indexed into search results until the laptop is connected to AC power.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/win32/search/-search-indexing-process-overview"
@@ -1486,7 +1352,7 @@
     "windows": {
       "minBuild": 19041
     },
-    "requiresReboot": false,
+    "requiresReboot": true,
     "requiresExplorerRestart": false,
     "detect": {
       "type": "Registry",
@@ -1580,7 +1446,7 @@
         "operation": "Set",
         "valueName": "NtfsDisable8dot3NameCreation",
         "valueKind": "DWord",
-        "data": 0
+        "data": 2
       }
     ],
     "source": "https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/fsutil-8dot3name",
@@ -1593,69 +1459,6 @@
     ],
     "needsReview": false,
     "presetRole": "advanced"
-  },
-  {
-    "schemaVersion": "1.0.0",
-    "id": "performance.network.disable-remote-differential-compression",
-    "name": "Disable Remote Differential Compression API",
-    "description": "Disables legacy RDC protocol overhead to speed up local network file transfers on modern gigabit LANs.",
-    "category": "performance",
-    "subcategory": "network",
-    "risk": "High",
-    "impacts": [
-      "performance",
-      "network"
-    ],
-    "tags": [
-      "network",
-      "performance"
-    ],
-    "presets": [
-      "recommended"
-    ],
-    "windows": {
-      "minBuild": 19041
-    },
-    "requiresReboot": false,
-    "requiresExplorerRestart": false,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKLM",
-      "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RDC",
-      "valueName": "RdcEnabled",
-      "matchType": "Equals",
-      "expectedValue": 0
-    },
-    "apply": [
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RDC",
-        "operation": "Set",
-        "valueName": "RdcEnabled",
-        "valueKind": "DWord",
-        "data": 0
-      }
-    ],
-    "undo": [
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RDC",
-        "operation": "DeleteValue",
-        "valueName": "RdcEnabled"
-      }
-    ],
-    "source": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/rdc/about-remote-differential-compression",
-    "verifiedOnBuild": "26100",
-    "evidence": "situational",
-    "whatItDoes": "Disables Remote Differential Compression (RDC) over the network.",
-    "sideEffects": "May slightly increase bandwidth usage when copying modified files over slow network links.",
-    "sources": [
-      "https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2008-R2-and-2008/cc731518(v=ws.10)"
-    ],
-    "needsReview": false,
-    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1866,7 +1669,7 @@
     "schemaVersion": "1.0.0",
     "id": "privacy.activity.activity-history",
     "name": "Disable Activity History Publishing",
-    "description": "Prevents publishing and syncing of user activity history across devices.",
+    "description": "Stops Windows from collecting and storing your activity history (apps, files and sites you used) on this PC.",
     "category": "privacy",
     "subcategory": "activity",
     "risk": "Low",
@@ -1949,7 +1752,7 @@
     "verifiedOnBuild": "22631.4317",
     "evidence": "documented",
     "whatItDoes": "Disables activity history collection and publishing to Microsoft account.",
-    "sideEffects": "Recent activity timeline and resume-where-you-left-off features across devices will stop syncing.",
+    "sideEffects": "Features that use recent activity history, such as resuming recent activities, stop working. Settings shows the option as managed by your organization.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services#bkmk-activity-history"
     ],
@@ -2015,8 +1818,8 @@
     "source": "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services",
     "verifiedOnBuild": "22631.4317",
     "evidence": "documented",
-    "whatItDoes": "Disables cloud-based speech recognition and Cortana voice services.",
-    "sideEffects": "Cloud voice typing and Cortana voice recognition will become unavailable; local dictation remains active.",
+    "whatItDoes": "Turns off online speech recognition, the same as the switch in Settings > Privacy & security > Speech.",
+    "sideEffects": "Voice typing (Win+H) and other cloud speech features stop working. Offline features such as Voice access keep working.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services#bkmk-speech"
     ],
@@ -2048,12 +1851,32 @@
     "requiresReboot": false,
     "requiresExplorerRestart": false,
     "detect": {
-      "type": "Registry",
-      "hive": "HKCU",
-      "key": "Software\\Microsoft\\InputPersonalization",
-      "valueName": "RestrictImplicitInkCollection",
-      "matchType": "Equals",
-      "expectedValue": 1
+      "all": [
+        {
+          "type": "Registry",
+          "hive": "HKCU",
+          "key": "Software\\Microsoft\\InputPersonalization",
+          "valueName": "RestrictImplicitInkCollection",
+          "matchType": "Equals",
+          "expectedValue": 1
+        },
+        {
+          "type": "Registry",
+          "hive": "HKCU",
+          "key": "Software\\Microsoft\\InputPersonalization",
+          "valueName": "RestrictImplicitTextCollection",
+          "matchType": "Equals",
+          "expectedValue": 1
+        },
+        {
+          "type": "Registry",
+          "hive": "HKCU",
+          "key": "Software\\Microsoft\\Input\\TIPC",
+          "valueName": "Enabled",
+          "matchType": "Equals",
+          "expectedValue": 0
+        }
+      ]
     },
     "apply": [
       {
@@ -2073,6 +1896,15 @@
         "valueName": "RestrictImplicitTextCollection",
         "valueKind": "DWord",
         "data": 1
+      },
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Input\\TIPC",
+        "operation": "Set",
+        "valueName": "Enabled",
+        "valueKind": "DWord",
+        "data": 0
       }
     ],
     "undo": [
@@ -2089,12 +1921,21 @@
         "key": "Software\\Microsoft\\InputPersonalization",
         "operation": "DeleteValue",
         "valueName": "RestrictImplicitTextCollection"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Input\\TIPC",
+        "operation": "Set",
+        "valueName": "Enabled",
+        "valueKind": "DWord",
+        "data": 1
       }
     ],
     "source": "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services",
     "verifiedOnBuild": "22631.4317",
     "evidence": "documented",
-    "whatItDoes": "Disables inking and typing personalization dictionary collection.",
+    "whatItDoes": "Sets RestrictImplicitInkCollection and RestrictImplicitTextCollection to 1 to stop local inking and typing personalization, and sets Enabled to 0 to stop sending inking and typing data to Microsoft.",
     "sideEffects": "Handwriting recognition and touch keyboard text prediction will not learn your personal vocabulary or custom names.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services#bkmk-inking-typing"
@@ -2176,7 +2017,7 @@
     "description": "Disables periodic popups asking for user feedback about Windows features.",
     "category": "privacy",
     "subcategory": "feedback",
-    "risk": "Safe",
+    "risk": "Low",
     "impacts": [
       "privacy",
       "ui"
@@ -2195,12 +2036,24 @@
     "requiresReboot": false,
     "requiresExplorerRestart": false,
     "detect": {
-      "type": "Registry",
-      "hive": "HKCU",
-      "key": "Software\\Microsoft\\Siuf\\Rules",
-      "valueName": "NumberOfSIUFInPeriod",
-      "matchType": "Equals",
-      "expectedValue": 0
+      "all": [
+        {
+          "type": "Registry",
+          "hive": "HKCU",
+          "key": "Software\\Microsoft\\Siuf\\Rules",
+          "valueName": "NumberOfSIUFInPeriod",
+          "matchType": "Equals",
+          "expectedValue": 0
+        },
+        {
+          "type": "Registry",
+          "hive": "HKLM",
+          "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection",
+          "valueName": "DoNotShowFeedbackNotifications",
+          "matchType": "Equals",
+          "expectedValue": 1
+        }
+      ]
     },
     "apply": [
       {
@@ -2211,6 +2064,15 @@
         "valueName": "NumberOfSIUFInPeriod",
         "valueKind": "DWord",
         "data": 0
+      },
+      {
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection",
+        "operation": "Set",
+        "valueName": "DoNotShowFeedbackNotifications",
+        "valueKind": "DWord",
+        "data": 1
       }
     ],
     "undo": [
@@ -2220,12 +2082,19 @@
         "key": "Software\\Microsoft\\Siuf\\Rules",
         "operation": "DeleteValue",
         "valueName": "NumberOfSIUFInPeriod"
+      },
+      {
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection",
+        "operation": "DeleteValue",
+        "valueName": "DoNotShowFeedbackNotifications"
       }
     ],
     "source": "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services",
     "verifiedOnBuild": "22631.4317",
     "evidence": "documented",
-    "whatItDoes": "Sets Windows feedback frequency to 'Never'.",
+    "whatItDoes": "Sets NumberOfSIUFInPeriod to 0 and the DoNotShowFeedbackNotifications policy to 1 so Windows stops asking for feedback.",
     "sideEffects": "Windows will not display prompts asking for user ratings or feedback about features.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services#bkmk-feedback"
@@ -2292,68 +2161,6 @@
     "sideEffects": "Application crash reports will not be sent to Microsoft or software vendors for diagnosis.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/win32/wer/windows-error-reporting"
-    ],
-    "needsReview": false,
-    "presetRole": "optimization"
-  },
-  {
-    "schemaVersion": "1.0.0",
-    "id": "privacy.ceip.customer-experience-improvement",
-    "name": "Disable Customer Experience Program (CEIP)",
-    "description": "Disables participation in the Windows Customer Experience Improvement telemetry program.",
-    "category": "privacy",
-    "subcategory": "telemetry",
-    "risk": "Low",
-    "impacts": [
-      "privacy"
-    ],
-    "tags": [
-      "privacy"
-    ],
-    "presets": [
-      "recommended",
-      "privacy"
-    ],
-    "windows": {
-      "minBuild": 19041
-    },
-    "requiresReboot": false,
-    "requiresExplorerRestart": false,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKLM",
-      "key": "SOFTWARE\\Policies\\Microsoft\\SQMClient\\Windows",
-      "valueName": "CEIPEnable",
-      "matchType": "Equals",
-      "expectedValue": 0
-    },
-    "apply": [
-      {
-        "type": "Policy",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Policies\\Microsoft\\SQMClient\\Windows",
-        "operation": "Set",
-        "valueName": "CEIPEnable",
-        "valueKind": "DWord",
-        "data": 0
-      }
-    ],
-    "undo": [
-      {
-        "type": "Policy",
-        "hive": "HKLM",
-        "key": "SOFTWARE\\Policies\\Microsoft\\SQMClient\\Windows",
-        "operation": "DeleteValue",
-        "valueName": "CEIPEnable"
-      }
-    ],
-    "source": "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services#4-customer-experience-improvement-program",
-    "verifiedOnBuild": "22631.4317",
-    "evidence": "situational",
-    "whatItDoes": "Disables the Customer Experience Improvement Program (CEIP) scheduled collection tasks.",
-    "sideEffects": "System telemetry and usage quality metrics will not be compiled for diagnostic reporting.",
-    "sources": [
-      "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services#bkmk-ceip"
     ],
     "needsReview": false,
     "presetRole": "optimization"
@@ -2514,12 +2321,24 @@
     "requiresReboot": false,
     "requiresExplorerRestart": false,
     "detect": {
-      "type": "Registry",
-      "hive": "HKCU",
-      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
-      "valueName": "RotatingLockScreenOverlayEnabled",
-      "matchType": "Equals",
-      "expectedValue": 0
+      "all": [
+        {
+          "type": "Registry",
+          "hive": "HKCU",
+          "key": "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+          "valueName": "RotatingLockScreenOverlayEnabled",
+          "matchType": "Equals",
+          "expectedValue": 0
+        },
+        {
+          "type": "Registry",
+          "hive": "HKCU",
+          "key": "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+          "valueName": "SubscribedContent-338387Enabled",
+          "matchType": "Equals",
+          "expectedValue": 0
+        }
+      ]
     },
     "apply": [
       {
@@ -2528,6 +2347,15 @@
         "key": "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
         "operation": "Set",
         "valueName": "RotatingLockScreenOverlayEnabled",
+        "valueKind": "DWord",
+        "data": 0
+      },
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+        "operation": "Set",
+        "valueName": "SubscribedContent-338387Enabled",
         "valueKind": "DWord",
         "data": 0
       }
@@ -2541,13 +2369,22 @@
         "valueName": "RotatingLockScreenOverlayEnabled",
         "valueKind": "DWord",
         "data": 1
+      },
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+        "operation": "Set",
+        "valueName": "SubscribedContent-338387Enabled",
+        "valueKind": "DWord",
+        "data": 1
       }
     ],
     "source": "https://learn.microsoft.com/en-us/windows/configuration/windows-spotlight",
     "verifiedOnBuild": "22631.4317",
     "evidence": "ui-equivalent",
-    "whatItDoes": "Disables suggested content, tips, and promotional ads on the Windows lock screen.",
-    "sideEffects": "Lock screen will only show standard wallpapers without interactive tips or suggested links.",
+    "whatItDoes": "Sets RotatingLockScreenOverlayEnabled and SubscribedContent-338387Enabled to 0 to turn off lock screen fun facts, tips and suggestions.",
+    "sideEffects": "Spotlight pictures can still rotate, but tip and ad overlays are removed from the lock screen.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-personalization#personalization-nolockscreencamera"
     ],
@@ -2583,12 +2420,24 @@
     "requiresReboot": false,
     "requiresExplorerRestart": true,
     "detect": {
-      "type": "Registry",
-      "hive": "HKCU",
-      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
-      "valueName": "SubscribedContent-338388Enabled",
-      "matchType": "Equals",
-      "expectedValue": 0
+      "all": [
+        {
+          "type": "Registry",
+          "hive": "HKCU",
+          "key": "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+          "valueName": "SubscribedContent-338388Enabled",
+          "matchType": "Equals",
+          "expectedValue": 0
+        },
+        {
+          "type": "Registry",
+          "hive": "HKCU",
+          "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+          "valueName": "Start_IrisRecommendations",
+          "matchType": "Equals",
+          "expectedValue": 0
+        }
+      ]
     },
     "apply": [
       {
@@ -2597,6 +2446,15 @@
         "key": "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
         "operation": "Set",
         "valueName": "SubscribedContent-338388Enabled",
+        "valueKind": "DWord",
+        "data": 0
+      },
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "operation": "Set",
+        "valueName": "Start_IrisRecommendations",
         "valueKind": "DWord",
         "data": 0
       }
@@ -2610,19 +2468,29 @@
         "valueName": "SubscribedContent-338388Enabled",
         "valueKind": "DWord",
         "data": 1
+      },
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "operation": "Set",
+        "valueName": "Start_IrisRecommendations",
+        "valueKind": "DWord",
+        "data": 1
       }
     ],
     "source": "https://learn.microsoft.com/en-us/windows/configuration/windows-spotlight",
     "verifiedOnBuild": "22631.4317",
     "evidence": "ui-equivalent",
-    "whatItDoes": "Disables suggested apps and promotional app recommendations in the Start Menu.",
+    "whatItDoes": "Sets SubscribedContent-338388Enabled to 0 (Windows 10 Start suggestions) and Start_IrisRecommendations to 0 (Windows 11 Start recommendations for tips and new apps).",
     "sideEffects": "Promoted third-party apps will not be recommended in the Start Menu.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-start#start-hideshareddocuments"
     ],
     "needsReview": false,
     "uiEquivalentLocation": "Settings › Personalization › Start › Show recommendations for tips, shortcuts, new apps, and more",
-    "presetRole": "optimization"
+    "presetRole": "optimization",
+    "effectNote": "On Windows 11 the Start_IrisRecommendations toggle only exists on newer builds (23H2/24H2)."
   },
   {
     "schemaVersion": "1.0.0",
@@ -2647,12 +2515,24 @@
     "requiresReboot": false,
     "requiresExplorerRestart": false,
     "detect": {
-      "type": "Registry",
-      "hive": "HKLM",
-      "key": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Sensor\\Overrides\\{BFA794E4-F964-4FDB-90F6-51056BFE4B44}",
-      "valueName": "SensorPermissionState",
-      "matchType": "Equals",
-      "expectedValue": 0
+      "all": [
+        {
+          "type": "Registry",
+          "hive": "HKLM",
+          "key": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Sensor\\Overrides\\{BFA794E4-F964-4FDB-90F6-51056BFE4B44}",
+          "valueName": "SensorPermissionState",
+          "matchType": "Equals",
+          "expectedValue": 0
+        },
+        {
+          "type": "Registry",
+          "hive": "HKLM",
+          "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\location",
+          "valueName": "Value",
+          "matchType": "Equals",
+          "expectedValue": "Deny"
+        }
+      ]
     },
     "apply": [
       {
@@ -2663,6 +2543,15 @@
         "valueName": "SensorPermissionState",
         "valueKind": "DWord",
         "data": 0
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\location",
+        "operation": "Set",
+        "valueName": "Value",
+        "valueKind": "String",
+        "data": "Deny"
       }
     ],
     "undo": [
@@ -2674,14 +2563,23 @@
         "valueName": "SensorPermissionState",
         "valueKind": "DWord",
         "data": 1
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\location",
+        "operation": "Set",
+        "valueName": "Value",
+        "valueKind": "String",
+        "data": "Allow"
       }
     ],
     "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-system#system-allowlocation",
     "verifiedOnBuild": "26100",
     "warnings": "Disables location sensor for apps like Maps, Weather, and Time Zone sync.",
     "evidence": "ui-equivalent",
-    "whatItDoes": "Disables the Windows sensor platform and master location service.",
-    "sideEffects": "Desktop applications and Windows features cannot access physical GPS or network-triangulated location sensors.",
+    "whatItDoes": "Turns off the device-wide Location services switch (Value set to Deny) and sets SensorPermissionState to 0.",
+    "sideEffects": "Apps and Windows features such as Maps, Weather, Find my device and automatic time zone cannot get your location.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services#bkmk-location"
     ],
@@ -2695,7 +2593,7 @@
   {
     "schemaVersion": "1.0.0",
     "id": "privacy.consent.deny-location",
-    "name": "Deny Apps Access to Location by Default",
+    "name": "Deny Apps Access to Location",
     "description": "Sets default capability store permission to deny apps access to user physical location.",
     "category": "privacy",
     "subcategory": "permissions",
@@ -2748,8 +2646,8 @@
     "source": "https://learn.microsoft.com/en-us/windows/uwp/packaging/app-capability-declarations",
     "verifiedOnBuild": "26100",
     "evidence": "ui-equivalent",
-    "whatItDoes": "Denies Windows Store and desktop apps default permission to access location.",
-    "sideEffects": "Apps will be blocked from accessing your current geographic location until explicitly granted in Settings.",
+    "whatItDoes": "Turns off 'Let apps access your location' for Store apps for the current user.",
+    "sideEffects": "Store apps such as Maps and Weather cannot get your location. Classic desktop apps are not affected.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-privacy#privacy-letappsaccesslocation"
     ],
@@ -2760,7 +2658,7 @@
   {
     "schemaVersion": "1.0.0",
     "id": "privacy.consent.deny-microphone",
-    "name": "Deny UWP Apps Access to Microphone by Default",
+    "name": "Deny Store Apps Access to Microphone",
     "description": "Restricts UWP Store apps from silently listening to or accessing audio recording hardware.",
     "category": "privacy",
     "subcategory": "permissions",
@@ -2814,7 +2712,7 @@
     "verifiedOnBuild": "26100",
     "evidence": "ui-equivalent",
     "whatItDoes": "Denies default application access to system microphone devices.",
-    "sideEffects": "Applications will be blocked from capturing audio until explicitly granted permission in Windows Settings.",
+    "sideEffects": "Store apps such as Voice Recorder and Camera cannot record audio. Classic desktop apps are not affected.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-privacy#privacy-letappsaccessmicrophone"
     ],
@@ -2825,8 +2723,8 @@
   {
     "schemaVersion": "1.0.0",
     "id": "privacy.consent.deny-webcam",
-    "name": "Deny UWP Apps Access to Webcam by Default",
-    "description": "Blocks background UWP applications from capturing video frames through connected webcams.",
+    "name": "Deny Store Apps Access to Camera",
+    "description": "Blocks Store apps from using connected cameras.",
     "category": "privacy",
     "subcategory": "permissions",
     "risk": "Medium",
@@ -2879,7 +2777,7 @@
     "verifiedOnBuild": "26100",
     "evidence": "ui-equivalent",
     "whatItDoes": "Denies default application access to camera and webcam hardware.",
-    "sideEffects": "Applications will be blocked from accessing webcam video streams until explicitly granted in Settings.",
+    "sideEffects": "Store apps such as the Camera app cannot use the webcam. Classic desktop apps are not affected.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-privacy#privacy-letappsaccesscamera"
     ],
@@ -2890,7 +2788,7 @@
   {
     "schemaVersion": "1.0.0",
     "id": "privacy.consent.deny-notifications",
-    "name": "Deny UWP Apps Access to User Notifications",
+    "name": "Deny Apps Access to Read Your Notifications",
     "description": "Blocks applications from intercepting or reading private notification listener messages.",
     "category": "privacy",
     "subcategory": "permissions",
@@ -2944,8 +2842,8 @@
     "source": "https://learn.microsoft.com/en-us/windows/uwp/packaging/app-capability-declarations",
     "verifiedOnBuild": "26100",
     "evidence": "ui-equivalent",
-    "whatItDoes": "Denies default application permission to display user notifications.",
-    "sideEffects": "Applications will not be permitted to show push notifications on the desktop.",
+    "whatItDoes": "Turns off 'Let apps access your notifications' so Store apps cannot read your notifications.",
+    "sideEffects": "Apps that mirror notifications (Phone Link, smartwatch companions) cannot read them. Apps can still show their own notifications.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-privacy#privacy-letappsaccessnotifications"
     ],
@@ -3328,16 +3226,14 @@
         "type": "Registry",
         "hive": "HKLM",
         "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
-        "operation": "Set",
-        "valueName": "NoDriveTypeAutoRun",
-        "valueKind": "DWord",
-        "data": 145
+        "operation": "DeleteValue",
+        "valueName": "NoDriveTypeAutoRun"
       }
     ],
     "source": "https://learn.microsoft.com/en-us/windows/win32/shell/autoplay-reg",
     "verifiedOnBuild": "26100",
     "evidence": "ui-equivalent",
-    "whatItDoes": "Disables AutoRun and AutoPlay execution on optical and removable USB media.",
+    "whatItDoes": "Sets NoDriveTypeAutoRun to 255 to turn off AutoRun and AutoPlay on all drive types.",
     "sideEffects": "Removable drives and CDs will not automatically launch executable media installers upon insertion.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/win32/shell/autoplay"
@@ -3367,18 +3263,39 @@
     "requiresReboot": false,
     "requiresExplorerRestart": false,
     "detect": {
-      "type": "Registry",
-      "hive": "HKLM",
-      "key": "SOFTWARE\\Microsoft\\Windows Script Host\\Settings",
-      "valueName": "Enabled",
-      "matchType": "Equals",
-      "expectedValue": 0
+      "all": [
+        {
+          "type": "Registry",
+          "hive": "HKLM",
+          "key": "SOFTWARE\\Microsoft\\Windows Script Host\\Settings",
+          "valueName": "Enabled",
+          "matchType": "Equals",
+          "expectedValue": 0
+        },
+        {
+          "type": "Registry",
+          "hive": "HKLM",
+          "key": "SOFTWARE\\WOW6432Node\\Microsoft\\Windows Script Host\\Settings",
+          "valueName": "Enabled",
+          "matchType": "Equals",
+          "expectedValue": 0
+        }
+      ]
     },
     "apply": [
       {
         "type": "Registry",
         "hive": "HKLM",
         "key": "SOFTWARE\\Microsoft\\Windows Script Host\\Settings",
+        "operation": "Set",
+        "valueName": "Enabled",
+        "valueKind": "DWord",
+        "data": 0
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\WOW6432Node\\Microsoft\\Windows Script Host\\Settings",
         "operation": "Set",
         "valueName": "Enabled",
         "valueKind": "DWord",
@@ -3390,10 +3307,15 @@
         "type": "Registry",
         "hive": "HKLM",
         "key": "SOFTWARE\\Microsoft\\Windows Script Host\\Settings",
-        "operation": "Set",
-        "valueName": "Enabled",
-        "valueKind": "DWord",
-        "data": 1
+        "operation": "DeleteValue",
+        "valueName": "Enabled"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\WOW6432Node\\Microsoft\\Windows Script Host\\Settings",
+        "operation": "DeleteValue",
+        "valueName": "Enabled"
       }
     ],
     "source": "https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/wscript",
@@ -3463,8 +3385,8 @@
     "verifiedOnBuild": "26100",
     "warnings": "This setting is enforced by policy and locks the SmartScreen toggle in Windows Security settings.",
     "evidence": "situational",
-    "whatItDoes": "Enforces Windows Defender SmartScreen protection for Microsoft Edge and downloaded executables.",
-    "sideEffects": "Blocks execution of unrecognized or untrusted downloaded programs until explicitly overridden.",
+    "whatItDoes": "Turns on SmartScreen checks for downloaded apps and files opened from File Explorer (EnableSmartScreen = 1) and locks the setting.",
+    "sideEffects": "Unrecognized downloaded programs show a SmartScreen warning before they run. Microsoft Edge SmartScreen is not changed.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/security/operating-system-security/virus-and-threat-protection/windows-defender-smartscreen/"
     ],
@@ -3491,7 +3413,7 @@
     "windows": {
       "minBuild": 19041
     },
-    "requiresReboot": false,
+    "requiresReboot": true,
     "requiresExplorerRestart": false,
     "detect": {
       "type": "Registry",
@@ -3550,7 +3472,13 @@
       "recommended"
     ],
     "windows": {
-      "minBuild": 19041
+      "minBuild": 19041,
+      "editions": [
+        "Pro",
+        "Enterprise",
+        "Education",
+        "IoTEnterprise"
+      ]
     },
     "requiresReboot": false,
     "requiresExplorerRestart": false,
@@ -3588,20 +3516,21 @@
     "verifiedOnBuild": "26100",
     "warnings": "Remote Desktop to this PC will stop working.",
     "evidence": "ui-equivalent",
-    "whatItDoes": "Disables automatic Remote Desktop service activation and denies inbound RDP connections.",
+    "whatItDoes": "Sets fDenyTSConnections to 1 so this PC rejects incoming Remote Desktop connections.",
     "sideEffects": "Inbound Remote Desktop connections to this computer will be rejected.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/welcome-to-rds"
     ],
     "needsReview": false,
     "uiEquivalentLocation": "Settings › System › Remote Desktop",
-    "presetRole": "optimization"
+    "presetRole": "optimization",
+    "effectNote": "Windows Home cannot accept Remote Desktop connections, so this has no effect there."
   },
   {
     "schemaVersion": "1.0.0",
     "id": "system.security.disable-lockscreen-camera",
     "name": "Disable Camera Access on Lock Screen",
-    "description": "Prevents anyone from launching or accessing the webcam when the computer is locked.",
+    "description": "Removes the camera shortcut from the lock screen on devices that show it.",
     "category": "system",
     "subcategory": "Security",
     "risk": "High",
@@ -3660,7 +3589,8 @@
     ],
     "needsReview": false,
     "uiEquivalentLocation": "Settings › Accounts › Sign-in options › Dynamic lock",
-    "presetRole": "optimization"
+    "presetRole": "optimization",
+    "effectNote": "The lock screen camera shortcut appears mainly on tablets and 2-in-1 devices; on most PCs this changes nothing visible."
   },
   {
     "schemaVersion": "1.0.0",
@@ -3952,7 +3882,7 @@
       "minimal"
     ],
     "windows": {
-      "minBuild": 22621
+      "minBuild": 22631
     },
     "requiresReboot": false,
     "requiresExplorerRestart": true,
@@ -4000,7 +3930,8 @@
       "essential.endtaskontaskbar",
       "WPFTweaksEndTaskOnTaskbar"
     ],
-    "presetRole": "optimization"
+    "presetRole": "optimization",
+    "effectNote": "Requires Windows 11 23H2 (build 22631) or later."
   },
   {
     "schemaVersion": "1.0.0",
@@ -4020,7 +3951,7 @@
       "minimal"
     ],
     "windows": {
-      "minBuild": 22621
+      "minBuild": 19041
     },
     "requiresReboot": false,
     "requiresExplorerRestart": true,
@@ -4064,13 +3995,14 @@
     ],
     "needsReview": false,
     "uiEquivalentLocation": "Settings › Personalization › Taskbar › Taskbar behaviors › Show seconds in system tray clock",
-    "presetRole": "preference"
+    "presetRole": "preference",
+    "effectNote": "Not supported on Windows 11 21H2 (build 22000) or early 22H2 builds."
   },
   {
     "schemaVersion": "1.0.0",
     "id": "ui.system.enable-long-paths",
     "name": "Enable Win32 Long Paths (>260 Chars)",
-    "description": "Removes the historical 260-character path length limitation for Win32 file APIs.",
+    "description": "Lets apps that support long paths use paths longer than 260 characters.",
     "category": "system",
     "subcategory": "filesystem",
     "risk": "Low",
@@ -4088,7 +4020,7 @@
       "minBuild": 19041
     },
     "requiresReboot": false,
-    "requiresExplorerRestart": true,
+    "requiresExplorerRestart": false,
     "detect": {
       "type": "Registry",
       "hive": "HKLM",
@@ -4122,8 +4054,8 @@
     "source": "https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation",
     "verifiedOnBuild": "22631.4317",
     "evidence": "documented",
-    "whatItDoes": "Enables Win32 long path support (>260 characters) in system policies.",
-    "sideEffects": "Allows applications to access deep directory paths; legacy 16-bit software may not handle long paths.",
+    "whatItDoes": "Sets LongPathsEnabled so apps that opt in to long path support can open paths longer than 260 characters.",
+    "sideEffects": "Only apps built for long paths benefit; File Explorer and older apps still use the old limit. Restart open apps to apply it.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation"
     ],
@@ -4455,7 +4387,7 @@
     "source": "https://learn.microsoft.com/en-us/windows-hardware/customize/desktop/unattend/microsoft-windows-shell-setup",
     "verifiedOnBuild": "26100",
     "evidence": "ui-equivalent",
-    "whatItDoes": "Displays the full directory path in the File Explorer title bar.",
+    "whatItDoes": "Sets FullPath so File Explorer shows the full folder path in the title bar (Windows 10) or in the tab name (Windows 11).",
     "sideEffects": "None known.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/win32/shell/manage-the-desktop"
@@ -4494,7 +4426,7 @@
       "type": "Registry",
       "hive": "HKCU",
       "key": "Software\\Microsoft\\Windows\\CurrentVersion\\SearchSettings",
-      "valueName": "IsShellSearchAddInSearchBoxEnabled",
+      "valueName": "IsDynamicSearchBoxEnabled",
       "matchType": "Equals",
       "expectedValue": 0
     },
@@ -4504,7 +4436,7 @@
         "hive": "HKCU",
         "key": "Software\\Microsoft\\Windows\\CurrentVersion\\SearchSettings",
         "operation": "Set",
-        "valueName": "IsShellSearchAddInSearchBoxEnabled",
+        "valueName": "IsDynamicSearchBoxEnabled",
         "valueKind": "DWord",
         "data": 0
       }
@@ -4515,7 +4447,7 @@
         "hive": "HKCU",
         "key": "Software\\Microsoft\\Windows\\CurrentVersion\\SearchSettings",
         "operation": "Set",
-        "valueName": "IsShellSearchAddInSearchBoxEnabled",
+        "valueName": "IsDynamicSearchBoxEnabled",
         "valueKind": "DWord",
         "data": 1
       }
@@ -4523,7 +4455,7 @@
     "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-search#allowsearchhighlights",
     "verifiedOnBuild": "26100",
     "evidence": "ui-equivalent",
-    "whatItDoes": "Disables colorful search highlights and daily doodles in the Windows search box.",
+    "whatItDoes": "Sets IsDynamicSearchBoxEnabled so search highlights and daily illustrations are turned off in Windows search.",
     "sideEffects": "None known.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-admx-search#search-allowsearchhighlights"
@@ -4535,8 +4467,8 @@
   {
     "schemaVersion": "1.0.0",
     "id": "ui.taskbar.disable-widgets-button",
-    "name": "Hide Widgets Weather Icon from Taskbar",
-    "description": "Hides the weather forecast and MSN feed widget button on Windows 11 taskbar.",
+    "name": "Disable Widgets and Weather Icon on Taskbar",
+    "description": "Turns off Windows 11 Widgets, which removes the weather / MSN feed button from the taskbar.",
     "category": "ui",
     "subcategory": "taskbar",
     "risk": "Medium",
@@ -4559,39 +4491,37 @@
     "requiresExplorerRestart": true,
     "detect": {
       "type": "Registry",
-      "hive": "HKCU",
-      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-      "valueName": "TaskbarDa",
+      "hive": "HKLM",
+      "key": "SOFTWARE\\Policies\\Microsoft\\Dsh",
+      "valueName": "AllowNewsAndInterests",
       "matchType": "Equals",
       "expectedValue": 0
     },
     "apply": [
       {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Dsh",
         "operation": "Set",
-        "valueName": "TaskbarDa",
+        "valueName": "AllowNewsAndInterests",
         "valueKind": "DWord",
         "data": 0
       }
     ],
     "undo": [
       {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-        "operation": "Set",
-        "valueName": "TaskbarDa",
-        "valueKind": "DWord",
-        "data": 1
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Dsh",
+        "operation": "DeleteValue",
+        "valueName": "AllowNewsAndInterests"
       }
     ],
     "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-newsandinterests#allownewsandinterests",
     "verifiedOnBuild": "26100",
     "evidence": "ui-equivalent",
-    "whatItDoes": "Hides the Widgets icon from the Windows 11 taskbar.",
-    "sideEffects": "Removes the Widgets weather button from the taskbar.",
+    "whatItDoes": "Sets the policy AllowNewsAndInterests so Widgets are turned off and the taskbar button is removed.",
+    "sideEffects": "The Widgets board cannot be opened and the taskbar toggle is locked in Settings.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/apps/design/shell/widgets/"
     ],
@@ -4621,7 +4551,8 @@
       "minimal"
     ],
     "windows": {
-      "minBuild": 22000
+      "minBuild": 22000,
+      "maxBuild": 22621
     },
     "requiresReboot": false,
     "requiresExplorerRestart": true,
@@ -4665,7 +4596,8 @@
     ],
     "needsReview": false,
     "uiEquivalentLocation": "Settings › Personalization › Taskbar › Taskbar items › Chat",
-    "presetRole": "optimization"
+    "presetRole": "optimization",
+    "effectNote": "Only Windows 11 21H2 and 22H2 have the Chat icon. Newer versions removed it."
   },
   {
     "schemaVersion": "1.0.0",
@@ -4722,7 +4654,7 @@
     "source": "https://learn.microsoft.com/en-us/windows-hardware/customize/desktop/unattend/microsoft-windows-shell-setup-taskbarlinks",
     "verifiedOnBuild": "26100",
     "evidence": "ui-equivalent",
-    "whatItDoes": "Hides the Task View button from the Windows 11 taskbar.",
+    "whatItDoes": "Hides the Task View button from the taskbar on Windows 10 and 11.",
     "sideEffects": "Removes the Task View icon from the taskbar; virtual desktops can still be switched using Win+Tab.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/win32/shell/taskbar-extensions"
@@ -5045,7 +4977,8 @@
     ],
     "needsReview": false,
     "sourceQuote": "date\\AU , set AuOptions to 4 and enable NoAutoRebootWithLoggedOnUsers . As with group policy, if a user schedules the restart in the update notificat",
-    "presetRole": "optimization"
+    "presetRole": "optimization",
+    "effectNote": "Documented for scheduled automatic installs. Windows may still restart outside active hours on some setups."
   },
   {
     "schemaVersion": "1.0.0",
@@ -5112,8 +5045,8 @@
   {
     "schemaVersion": "1.0.0",
     "id": "updates.peering.metered-connections",
-    "name": "Block Delivery Optimization on Metered Connections",
-    "description": "Prevents Windows Update from downloading or sharing update files when connected to metered networks or hotspots.",
+    "name": "Block Windows Update Downloads on Metered Connections",
+    "description": "Makes sure Windows Update does not download updates automatically on metered networks or hotspots.",
     "category": "updates",
     "subcategory": "bandwidth",
     "risk": "High",
@@ -5136,41 +5069,41 @@
     "detect": {
       "type": "Registry",
       "hive": "HKLM",
-      "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\DeliveryOptimization",
-      "valueName": "AllowServerFiles",
+      "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate",
+      "valueName": "AllowAutoWindowsUpdateDownloadOverMeteredNetwork",
       "matchType": "Equals",
       "expectedValue": 0
     },
     "apply": [
       {
-        "type": "Registry",
+        "type": "Policy",
         "hive": "HKLM",
-        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\DeliveryOptimization",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate",
         "operation": "Set",
-        "valueName": "AllowServerFiles",
+        "valueName": "AllowAutoWindowsUpdateDownloadOverMeteredNetwork",
         "valueKind": "DWord",
         "data": 0
       }
     ],
     "undo": [
       {
-        "type": "Registry",
+        "type": "Policy",
         "hive": "HKLM",
-        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\DeliveryOptimization",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate",
         "operation": "DeleteValue",
-        "valueName": "AllowServerFiles"
+        "valueName": "AllowAutoWindowsUpdateDownloadOverMeteredNetwork"
       }
     ],
     "source": "https://learn.microsoft.com/en-us/windows/deployment/do/waas-delivery-optimization-reference",
     "verifiedOnBuild": "26100",
     "evidence": "ui-equivalent",
-    "whatItDoes": "Disables Windows Update downloads over metered or cellular network connections.",
-    "sideEffects": "Updates will not download while the active internet connection is marked as metered.",
+    "whatItDoes": "Sets the policy AllowAutoWindowsUpdateDownloadOverMeteredNetwork so updates are not downloaded automatically on metered connections.",
+    "sideEffects": "Updates wait until you are on an unmetered network. This matches the Windows default but locks the setting.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/deployment/do/waas-delivery-optimization"
     ],
     "needsReview": false,
-    "uiEquivalentLocation": "Settings › Windows Update › Advanced options › Delivery Optimization › Advanced options › Download settings",
+    "uiEquivalentLocation": "Settings › Windows Update › Advanced options › Download updates over metered connections",
     "presetRole": "optimization"
   },
   {
@@ -5196,37 +5129,89 @@
     "requiresReboot": false,
     "requiresExplorerRestart": false,
     "detect": {
-      "type": "Registry",
-      "hive": "HKLM",
-      "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate",
-      "valueName": "SetActiveHours",
-      "matchType": "Equals",
-      "expectedValue": 1
+      "all": [
+        {
+          "type": "Registry",
+          "hive": "HKLM",
+          "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate",
+          "valueName": "SetActiveHours",
+          "matchType": "Equals",
+          "expectedValue": 1
+        },
+        {
+          "type": "Registry",
+          "hive": "HKLM",
+          "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate",
+          "valueName": "ActiveHoursStart",
+          "matchType": "Equals",
+          "expectedValue": 8
+        },
+        {
+          "type": "Registry",
+          "hive": "HKLM",
+          "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate",
+          "valueName": "ActiveHoursEnd",
+          "matchType": "Equals",
+          "expectedValue": 22
+        }
+      ]
     },
     "apply": [
       {
-        "type": "Registry",
+        "type": "Policy",
         "hive": "HKLM",
         "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate",
         "operation": "Set",
         "valueName": "SetActiveHours",
         "valueKind": "DWord",
         "data": 1
+      },
+      {
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate",
+        "operation": "Set",
+        "valueName": "ActiveHoursStart",
+        "valueKind": "DWord",
+        "data": 8
+      },
+      {
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate",
+        "operation": "Set",
+        "valueName": "ActiveHoursEnd",
+        "valueKind": "DWord",
+        "data": 22
       }
     ],
     "undo": [
       {
-        "type": "Registry",
+        "type": "Policy",
         "hive": "HKLM",
         "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate",
         "operation": "DeleteValue",
         "valueName": "SetActiveHours"
+      },
+      {
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate",
+        "operation": "DeleteValue",
+        "valueName": "ActiveHoursStart"
+      },
+      {
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate",
+        "operation": "DeleteValue",
+        "valueName": "ActiveHoursEnd"
       }
     ],
     "source": "https://learn.microsoft.com/en-us/windows/deployment/update/waas-wu-settings#turn-off-auto-restart-for-updates-during-active-hours",
     "verifiedOnBuild": "26100",
     "evidence": "documented",
-    "whatItDoes": "Enforces configured Active Hours range during which automatic restart will never occur.",
+    "whatItDoes": "Sets SetActiveHours with ActiveHoursStart 8 and ActiveHoursEnd 22, so automatic update restarts are avoided between 8 and 22.",
     "sideEffects": "Windows Update will refrain from restarting the computer during the specified working hours.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/deployment/update/waas-restart#active-hours"
@@ -5239,7 +5224,7 @@
     "schemaVersion": "1.0.0",
     "id": "updates.preview.disable-optional-content",
     "name": "Disable Optional Preview Updates & Beta Rollouts",
-    "description": "Prevents installation of untested preview quality updates (C/D week optional releases).",
+    "description": "Keeps Windows from automatically receiving optional preview updates (already the default).",
     "category": "updates",
     "subcategory": "quality",
     "risk": "High",
@@ -5289,7 +5274,7 @@
     "verifiedOnBuild": "26100",
     "evidence": "situational",
     "whatItDoes": "Disables automatic installation of preview and optional non-security update content.",
-    "sideEffects": "Windows Update will only install cumulative monthly security updates, ignoring preview feature rollouts.",
+    "sideEffects": "Optional preview updates are not installed automatically; you can still install them by hand from Windows Update.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/deployment/update/waas-wu-policies#allow-optional-content"
     ],
@@ -5715,7 +5700,8 @@
     ],
     "needsReview": false,
     "sourceQuote": "When the policy is enabled, the Click to Do component and entry points won't be available to users.",
-    "presetRole": "optimization"
+    "presetRole": "optimization",
+    "effectNote": "Only has an effect on Copilot+ PCs that include Click to Do."
   },
   {
     "schemaVersion": "1.0.0",
@@ -5780,7 +5766,8 @@
     "relatedTweaks": [
       "ai.recall.disable-snapshots"
     ],
-    "presetRole": "optimization"
+    "presetRole": "optimization",
+    "effectNote": "Only has an effect on Copilot+ PCs that include Recall."
   },
   {
     "schemaVersion": "1.0.0",
@@ -6112,7 +6099,7 @@
       "minBuild": 22000
     },
     "requiresReboot": true,
-    "requiresExplorerRestart": false,
+    "requiresExplorerRestart": true,
     "detect": {
       "type": "Registry",
       "hive": "HKLM",

@@ -63,6 +63,8 @@ public partial class App : Application
         {
             TestModeManager.DisableTestMode();
             WinVeloStoragePaths.InitializeStorage(false);
+            var (winBuild, winEdition) = Tweakora.Platform.WindowsVersionInfo.Read();
+            Tweakora.Core.WindowsCompatibility.Configure(winBuild, winEdition);
         }
 
         // 2. Initialize logging so all crashes are recorded in the isolated log directory

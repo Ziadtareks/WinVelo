@@ -61,17 +61,11 @@ Total catalog tweaks audited: **152**.
 | `network.optimization.limit-peering-lan` | Restrict Delivery Optimization to Local Network Only | `network, updates` | Restricts Delivery Optimization update peering strictly to computers on the local subnet. |
 | `network.probing.disable-active-probing` | Disable NCSI Active Internet Probing | `network, privacy` | Disables periodic HTTP probes to msftconnecttest.com for internet reachability checks. |
 | `network.teredo.disable-tunneling` | Disable Teredo IPv6 Tunneling | `network` | Disables Teredo tunneling transition protocol to prevent unwanted IPv6 encapsulated traffic. |
-| `network.wifi.disable-autoconnect-sense` | Disable Auto-Connect to Suggested Open Wi-Fi | `network, privacy` | Disables automatic connection to open public Wi-Fi hotspots recommended by Wi-Fi Sense. |
-| `network.wifi.disable-hotspot-reporting` | Disable Wi-Fi Sense Hotspot Reporting | `network, privacy` | Prevents automatic reporting of available open Wi-Fi network locations to Microsoft. |
-| `performance.cpu.priority-separation` | Adjust Win32 Priority Separation | `performance, gaming` | Allocates longer CPU scheduling quanta to foreground games and interactive apps. |
-| `performance.cpu.unpark-cores` | Disable CPU Core Parking (Experimental) | `performance, gaming` | Prevents CPU cores from parking to avoid micro-stutter when CPU loads fluctuate. |
 | `performance.gaming.mmcss-responsiveness` | Multimedia Class Scheduler Service (MMCSS) Gaming Priority | `gaming, performance, network` | Boosts MMCSS thread priority and disables network throttling during gameplay. |
 | `performance.gpu.disable-mpo` | Disable Multi-Plane Overlay (MPO Workaround) | `gaming, performance, ui` | Disables Multi-Plane Overlay to resolve display stuttering and black-screen glitches in games. |
 | `performance.gpu.hags` | Hardware-Accelerated GPU Scheduling (HAGS) | `gaming, performance` | Enables hardware-accelerated GPU scheduling to reduce frame latency in modern games. |
 | `performance.input.buffer-queue` | Mouse & Keyboard Buffer Queue (Experimental) | `gaming, performance` | Reduces mouse and keyboard input buffer queue size for lower input processing latency. |
-| `performance.memory.svchost-split-threshold` | Tune SvcHost Split Threshold | `performance` | Tunes service host memory thresholds to group svchost processes and lower memory footprint. |
 | `performance.network.delivery-optimization-simple` | Disable Delivery Optimization Peer-to-Peer (HTTP Only) | `network, performance, updates` | Configures Delivery Optimization to simple HTTP download mode, disabling peer uploads. |
-| `performance.network.disable-remote-differential-compression` | Disable Remote Differential Compression API | `network, performance` | Disables Remote Differential Compression network algorithms to improve LAN transfer speeds. |
 | `performance.ntfs.disable-8dot3-names` | Disable 8.3 Short File Name Creation | `performance` | Disables legacy 8.3 short filename generation to speed up NTFS directory operations. |
 | `performance.ntfs.disable-last-access` | Disable NTFS Last Access Time Updates | `performance` | Disables NTFS last access timestamp updates on files to reduce disk write activity. |
 | `performance.power.disable-throttling` | Disable Windows Power Throttling | `performance, gaming` | Disables Windows Power Throttling to keep background threads operating at full frequency. |
@@ -86,7 +80,6 @@ Total catalog tweaks audited: **152**.
 | `pref.darkmode` | Dark Theme for Windows | `ui` | Applies dark color palette across Windows shell, taskbar, and modern applications. |
 | `pref.detailedbsod` | BSoD Verbose Mode | `ui` | Replaces standard simplified crash screen with detailed technical stop error codes. |
 | `pref.disablelockscreen` | Lock Screen - Disable | `ui` | Bypasses the initial lock screen image to display the sign-in password prompt directly. |
-| `pref.hidesettingshome` | Settings Home Page - Show | `ui` | Hides the recommended content and promotional cards page in Windows 11 Settings. |
 | `pref.loginblur` | Logon Screen Acrylic Blur - Enable | `ui, performance` | Removes blur rendering on the login screen for faster transition and clear background image. |
 | `pref.multiplaneoverlay` | Multiplane Overlay Workaround | `gaming, performance, ui` | Workaround for GPU stutter and desktop flickering by disabling Multi-Plane Overlay. |
 | `pref.newoutlook` | Microsoft Outlook - Use New Version | `apps, ui` | Prevents automatic forced migration from classic Outlook to the web-based New Outlook app. |
@@ -102,7 +95,6 @@ Total catalog tweaks audited: **152**.
 | `privacy.activity.activity-history` | Disable Activity History Publishing | `privacy` | Disables publishing and cloud uploading of user application activity history. |
 | `privacy.ads.explorer-sync-notifications` | File Explorer Sync Provider Ads - Disable | `privacy, ui` | Stops File Explorer from showing OneDrive and Microsoft 365 promotions at the top of the window. |
 | `privacy.advertising.advertising-id` | Disable Advertising ID | `privacy` | Disables unique advertising identifiers used for targeted cross-application tracking. |
-| `privacy.ceip.customer-experience-improvement` | Disable Customer Experience Program (CEIP) | `privacy` | Disables participation in the Customer Experience Improvement Program (CEIP). |
 | `privacy.clipboard.cloud-clipboard-sync` | Disable Cloud Clipboard Sync | `privacy` | Prevents clipboard copy history from synchronizing across multiple Windows devices. |
 | `privacy.consent.deny-account-info` | Deny Apps Access to Account Information | `privacy, apps` | Configures default application permission to deny access to account profile details. |
 | `privacy.consent.deny-calendar` | Deny Apps Access to User Calendar & Appointments | `privacy, apps` | Configures default application permission to deny access to user calendar appointments. |

@@ -10,9 +10,9 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Ziadtareks/WinVelo/releases/latest"><img src="https://img.shields.io/badge/release-v1.0.1-2563EB.svg" alt="Release v1.0.0"></a>
+  <a href="https://github.com/Ziadtareks/WinVelo/releases/latest"><img src="https://img.shields.io/badge/release-v1.0.1-2563EB.svg" alt="Release v1.0.1"></a>
   <img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10 | 11">
-  <img src="https://img.shields.io/badge/tweaks-152-10B981.svg" alt="152 tweaks">
+  <img src="https://img.shields.io/badge/tweaks-143-10B981.svg" alt="143 tweaks">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green.svg" alt="MIT License"></a>
 </p>
 
@@ -55,7 +55,7 @@ There is nothing to install and you don't need to download .NET, because the run
 |---|---|
 | **Home** | System status: administrator rights, restore point, number of WinVelo changes and servicing health. It also holds the presets. |
 | **Presets** | Recommended, Privacy, AI & Copilot, Clean UI, Performance and Gaming, each with a *Standard* and a *Full* level. A preview shows every tweak before anything is applied, plus a "Not included" list that explains what was left out and why. |
-| **Tweaks** | All 152 tweaks, searchable and filterable by category, risk (Safe, Low, Medium, High) and status (Applied, Partial, Not applied, Can't verify). **Simple mode** shows only Safe and Low tweaks that have strong evidence. |
+| **Tweaks** | All 143 tweaks, searchable and filterable by category, risk (Safe, Low, Medium, High) and status (Applied, Partial, Not applied, Can't verify). **Simple mode** shows only Safe and Low tweaks that have strong evidence. |
 | **Apps** | Install 36 popular apps in one go with `winget` (or Chocolatey). |
 | **Tools** | Startup apps, Windows services, cleaner, DNS benchmark and switcher, common fixes, Windows Update settings, optional features and restore points. |
 | **History** | Every session WinVelo ran, with one-click undo. |
@@ -107,6 +107,7 @@ WinVelo أداة مفتوحة المصدر لضبط Windows 10 و 11. تعرض �
 - Start with a preset's **Standard** level or with **Simple mode**.
 - **High**-risk tweaks and irreversible actions (for example removing Edge or OneDrive) are never part of a preset and ask for extra confirmation.
 - Some tweaks need a restart or an Explorer restart. The preview tells you which ones.
+- Tweaks that only work on a certain Windows build or edition are skipped on other PCs, and the tweak card says why.
 - You can try the whole interface without touching your system: `WinVelo.exe --test-mode`.
 
 ---

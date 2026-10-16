@@ -61,7 +61,11 @@ public sealed partial class TweakCardModel : ObservableObject
     public bool RequiresReboot => Tweak.RequiresReboot;
     public bool RequiresExplorerRestart => Tweak.RequiresExplorerRestart;
     public string? Warnings => Tweak.Warnings;
-    public string? EffectNote => Tweak.EffectNote;
+    public string? CompatibilityNote { get; }
+    public bool IsUnavailable => CompatibilityNote != null;
+    public string? EffectNote => CompatibilityNote == null
+        ? Tweak.EffectNote
+        : string.IsNullOrWhiteSpace(Tweak.EffectNote) ? CompatibilityNote : CompatibilityNote + " " + Tweak.EffectNote;
     public bool HasWarning => !string.IsNullOrWhiteSpace(Warnings);
     public bool HasEffectNote => !string.IsNullOrWhiteSpace(EffectNote);
     public bool IsBitLocker => Id.Contains("bitlocker", StringComparison.OrdinalIgnoreCase) ||
@@ -262,7 +266,15 @@ public sealed partial class TweakCardModel : ObservableObject
     {
         Tweak = tweak;
         CategoryGroup = ClassifyCategory(tweak);
+        CompatibilityNote = DescribeCompatibility(Tweakora.Core.WindowsCompatibility.Check(tweak));
     }
+
+    private static string? DescribeCompatibility(Tweakora.Core.CompatibilityIssue? issue) => issue == null ? null : issue.Kind switch
+    {
+        Tweakora.Core.CompatibilityIssueKind.BuildTooOld => LocalizationManager.T("Not available on this PC: needs Windows build {0} or newer (this PC has {1}).", issue.RequiredBuild, issue.CurrentBuild),
+        Tweakora.Core.CompatibilityIssueKind.BuildTooNew => LocalizationManager.T("Not available on this PC: only works up to Windows build {0} (this PC has {1}).", issue.RequiredBuild, issue.CurrentBuild),
+        _ => LocalizationManager.T("Not available on this PC: not supported on Windows {0} (needs {1}).", issue.CurrentEdition, string.Join(", ", issue.SupportedEditions))
+    };
 
     private static string ClassifyCategory(TweakDefinition tweak)
     {

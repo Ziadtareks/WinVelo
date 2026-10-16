@@ -8,9 +8,9 @@
     "essential.consumerfeatures",
     "essential.preventdevicemetadatafromnetwork",
     "essential.telemetry",
+    "privacy.activity.activity-history",
     "privacy.ads.explorer-sync-notifications",
     "privacy.advertising.advertising-id",
-    "privacy.ceip.customer-experience-improvement",
     "privacy.clipboard.cloud-clipboard-sync",
     "privacy.experiences.tailored-experiences",
     "privacy.feedback.feedback-prompts",
@@ -36,9 +36,9 @@
     "essential.preventdevicemetadatafromnetwork",
     "essential.telemetry",
     "pref.bingsearch",
+    "privacy.activity.activity-history",
     "privacy.ads.explorer-sync-notifications",
     "privacy.advertising.advertising-id",
-    "privacy.ceip.customer-experience-improvement",
     "privacy.clipboard.cloud-clipboard-sync",
     "privacy.consent.deny-account-info",
     "privacy.consent.deny-calendar",
@@ -104,20 +104,8 @@
       "reason": "High risk — enable individually from Tweaks"
     },
     {
-      "id": "network.wifi.disable-autoconnect-sense",
-      "reason": "High risk — enable individually from Tweaks"
-    },
-    {
-      "id": "network.wifi.disable-hotspot-reporting",
-      "reason": "High risk — enable individually from Tweaks"
-    },
-    {
       "id": "pref.startmenurecommendations",
       "reason": "Personal preference — choose it yourself in Tweaks"
-    },
-    {
-      "id": "privacy.activity.activity-history",
-      "reason": "Conflicts with essential.activity (changes the same setting differently)"
     },
     {
       "id": "privacy.consent.deny-microphone",

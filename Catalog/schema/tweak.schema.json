@@ -420,7 +420,7 @@
           "properties": {
             "type": { "const": "PowerShell" },
             "script": { "type": "string" },
-            "timeoutSeconds": { "type": "integer", "minimum": 1, "maximum": 900 },
+            "timeoutSeconds": { "type": "integer", "minimum": 1, "maximum": 3600 },
             "operation": { "type": "string", "enum": ["Execute"] }
           }
         }

@@ -796,5 +796,8 @@
   "Ui": "الواجهة",
   "UI": "الواجهة",
   "AI": "الذكاء الاصطناعي",
-  "Main_SwitchLanguage": "تغيير اللغة (سيُعاد تشغيل WinVelo)"
+  "Main_SwitchLanguage": "تغيير اللغة (سيُعاد تشغيل WinVelo)",
+  "Not available on this PC: needs Windows build {0} or newer (this PC has {1}).": "غير متاح على هذا الجهاز: يحتاج Windows إصدار {0} أو أحدث (هذا الجهاز إصداره {1}).",
+  "Not available on this PC: only works up to Windows build {0} (this PC has {1}).": "غير متاح على هذا الجهاز: يعمل فقط حتى Windows إصدار {0} (هذا الجهاز إصداره {1}).",
+  "Not available on this PC: not supported on Windows {0} (needs {1}).": "غير متاح على هذا الجهاز: غير مدعوم في Windows {0} (يحتاج {1})."
 }

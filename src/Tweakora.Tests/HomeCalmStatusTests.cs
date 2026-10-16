@@ -114,7 +114,7 @@ public sealed class HomeCalmStatusTests
 
             // When a WinVelo tweak requiring reboot is applied, banner is shown
             var catalog = tweakSvc.LoadCatalog();
-            var rebootTweak = catalog.FirstOrDefault(t => t.RequiresReboot);
+            var rebootTweak = catalog.FirstOrDefault(t => t.RequiresReboot && !t.RequiresExplorerRestart && t.Reversible);
             Assert.NotNull(rebootTweak);
             await tweakSvc.ApplyTweaksAsync(new[] { rebootTweak }, new OperationRunner());
             await vm.RefreshCalmStatusAsync();

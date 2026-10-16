@@ -9,7 +9,6 @@
     "privacy.ads.explorer-sync-notifications",
     "privacy.advertising.advertising-id",
     "privacy.experiences.tailored-experiences",
-    "privacy.feedback.feedback-prompts",
     "privacy.search.device-search-history",
     "privacy.speech.online-speech-recognition",
     "privacy.tracking.app-launch-tracking",
@@ -31,7 +30,6 @@
     "privacy.ads.explorer-sync-notifications",
     "privacy.advertising.advertising-id",
     "privacy.experiences.tailored-experiences",
-    "privacy.feedback.feedback-prompts",
     "privacy.search.device-search-history",
     "privacy.speech.online-speech-recognition",
     "privacy.tracking.app-launch-tracking",
@@ -196,14 +194,6 @@
       "reason": "High risk — enable individually from Tweaks"
     },
     {
-      "id": "network.wifi.disable-autoconnect-sense",
-      "reason": "High risk — enable individually from Tweaks"
-    },
-    {
-      "id": "network.wifi.disable-hotspot-reporting",
-      "reason": "High risk — enable individually from Tweaks"
-    },
-    {
       "id": "performance.gpu.disable-mpo",
       "reason": "Fix for a specific problem — apply it only if you have that problem"
     },
@@ -225,10 +215,6 @@
     },
     {
       "id": "pref.disablelockscreen",
-      "reason": "Personal preference — choose it yourself in Tweaks"
-    },
-    {
-      "id": "pref.hidesettingshome",
       "reason": "Personal preference — choose it yourself in Tweaks"
     },
     {
@@ -272,10 +258,6 @@
       "reason": "Recommended Baseline only includes Safe tweaks — find it in the topic presets or Tweaks"
     },
     {
-      "id": "privacy.ceip.customer-experience-improvement",
-      "reason": "Recommended Baseline only includes Safe tweaks — find it in the topic presets or Tweaks"
-    },
-    {
       "id": "privacy.clipboard.cloud-clipboard-sync",
       "reason": "Recommended Baseline only includes Safe tweaks — find it in the topic presets or Tweaks"
     },
@@ -310,6 +292,10 @@
     {
       "id": "privacy.consent.deny-webcam",
       "reason": "Personal preference — choose it yourself in Tweaks"
+    },
+    {
+      "id": "privacy.feedback.feedback-prompts",
+      "reason": "Recommended Baseline only includes Safe tweaks — find it in the topic presets or Tweaks"
     },
     {
       "id": "privacy.findmydevice.disable",

@@ -81,7 +81,7 @@ public sealed class WindowsShellService : IShellService
     {
         EnsureNotTestMode();
 
-        int effectiveTimeout = timeoutSeconds <= 0 ? 60 : Math.Min(timeoutSeconds, 900);
+        int effectiveTimeout = timeoutSeconds <= 0 ? 60 : Math.Min(timeoutSeconds, 3600);
 
         string wrappedScript =
             "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';\r\n" +

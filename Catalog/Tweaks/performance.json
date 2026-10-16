@@ -1,74 +1,10 @@
 [
   {
     "schemaVersion": "1.0.0",
-    "id": "performance.cpu.priority-separation",
-    "origin": "performance.cpu.priority-separation",
-    "name": "Adjust Win32 Priority Separation",
-    "description": "Configures thread scheduling quantum length for foreground applications (0x26 = short, variable quantum with high foreground boost). Situational: may improve foreground responsiveness in specific scenarios, but can starve background threads and cause audio dropouts or micro-stutters in multi-threaded modern games.",
-    "category": "performance",
-    "subcategory": "Gaming & CPU",
-    "risk": "Medium",
-    "evidence": "situational",
-    "sideEffects": "May slightly reduce throughput for heavy background processing, video encoding, or continuous background rendering.",
-    "impacts": [
-      "performance",
-      "gaming"
-    ],
-    "windows": {
-      "minBuild": 19041
-    },
-    "requiresReboot": false,
-    "requiresExplorerRestart": false,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKLM",
-      "key": "SYSTEM\\CurrentControlSet\\Control\\PriorityControl",
-      "valueName": "Win32PrioritySeparation",
-      "matchType": "Equals",
-      "expectedValue": 38
-    },
-    "apply": [
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SYSTEM\\CurrentControlSet\\Control\\PriorityControl",
-        "operation": "Set",
-        "valueName": "Win32PrioritySeparation",
-        "valueKind": "DWord",
-        "data": 38
-      }
-    ],
-    "undo": [
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SYSTEM\\CurrentControlSet\\Control\\PriorityControl",
-        "operation": "Set",
-        "valueName": "Win32PrioritySeparation",
-        "valueKind": "DWord",
-        "data": 2
-      }
-    ],
-    "source": "https://github.com/hellzerg/optimizer",
-    "verifiedOnBuild": "22631",
-    "whatItDoes": "Sets Win32PrioritySeparation to 38 (0x26), optimizing processor thread quantum duration for foreground interactive applications.",
-    "sources": [
-      "https://learn.microsoft.com/en-us/windows/win32/procthread/priority-classes",
-      "https://learn.microsoft.com/en-us/windows-server/administration/performance-tuning/subsystem/processor"
-    ],
-    "needsReview": false,
-    "tags": [
-      "performance",
-      "gaming"
-    ],
-    "presetRole": "advanced"
-  },
-  {
-    "schemaVersion": "1.0.0",
     "id": "performance.gaming.mmcss-responsiveness",
     "origin": "performance.gaming.mmcss-responsiveness",
     "name": "Multimedia Class Scheduler Service (MMCSS) Gaming Priority",
-    "description": "Disables network throttling index and raises multimedia task scheduling priority for games to grant more CPU time.",
+    "description": "Turns off MMCSS network throttling and lowers the CPU share reserved for background tasks. It also raises the Games task priority, which only affects programs that register with MMCSS as a game. Most games do not.",
     "category": "Experimental",
     "subcategory": "Gaming & CPU",
     "risk": "Medium",
@@ -82,7 +18,7 @@
     "windows": {
       "minBuild": 19041
     },
-    "requiresReboot": false,
+    "requiresReboot": true,
     "requiresExplorerRestart": false,
     "detect": {
       "type": "Registry",
@@ -345,151 +281,8 @@
       "performance",
       "ui"
     ],
-    "presetRole": "fix"
-  },
-  {
-    "schemaVersion": "1.0.0",
-    "id": "performance.input.buffer-queue",
-    "origin": "performance.input.buffer-queue",
-    "name": "Mouse & Keyboard Buffer Queue (Experimental)",
-    "description": "Reduces input driver queue sizes from 100 to 20 packets. Community tweak with no empirical evidence of latency reduction; may cause dropped inputs under high interrupt load.",
-    "category": "Experimental",
-    "subcategory": "Gaming & Input",
-    "risk": "Medium",
-    "evidence": "anecdotal",
-    "sideEffects": "If mouse input events exceed the reduced buffer during heavy system load, mouse clicks or cursor movements will be dropped. Unverified community claim.",
-    "impacts": [
-      "gaming",
-      "performance"
-    ],
-    "windows": {
-      "minBuild": 19041
-    },
-    "requiresReboot": true,
-    "requiresExplorerRestart": false,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKLM",
-      "key": "SYSTEM\\CurrentControlSet\\Services\\mouclass\\Parameters",
-      "valueName": "MouseDataQueueSize",
-      "matchType": "Equals",
-      "expectedValue": 20
-    },
-    "apply": [
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SYSTEM\\CurrentControlSet\\Services\\mouclass\\Parameters",
-        "operation": "Set",
-        "valueName": "MouseDataQueueSize",
-        "valueKind": "DWord",
-        "data": 20
-      },
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SYSTEM\\CurrentControlSet\\Services\\kbdclass\\Parameters",
-        "operation": "Set",
-        "valueName": "KeyboardDataQueueSize",
-        "valueKind": "DWord",
-        "data": 20
-      }
-    ],
-    "undo": [
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SYSTEM\\CurrentControlSet\\Services\\mouclass\\Parameters",
-        "operation": "Set",
-        "valueName": "MouseDataQueueSize",
-        "valueKind": "DWord",
-        "data": 100
-      },
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SYSTEM\\CurrentControlSet\\Services\\kbdclass\\Parameters",
-        "operation": "Set",
-        "valueName": "KeyboardDataQueueSize",
-        "valueKind": "DWord",
-        "data": 100
-      }
-    ],
-    "source": "https://github.com/hellzerg/optimizer",
-    "verifiedOnBuild": "22631",
-    "whatItDoes": "Sets MouseDataQueueSize to 20 in Mouclass and KeyboardDataQueueSize to 20 in Kbdclass driver service parameters.",
-    "sources": [
-      "https://learn.microsoft.com/en-us/windows-hardware/drivers/hid/keyboard-and-mouse-class-drivers"
-    ],
-    "needsReview": true,
-    "tags": [
-      "gaming",
-      "performance"
-    ],
-    "presetRole": "advanced"
-  },
-  {
-    "schemaVersion": "1.0.0",
-    "id": "performance.cpu.unpark-cores",
-    "origin": "performance.cpu.unpark-cores",
-    "name": "Disable CPU Core Parking (Experimental)",
-    "description": "Forces all CPU cores unparked. On modern Windows, the thread scheduler already unparks cores dynamically within microseconds. Disabling parking wastes significant battery and power on laptops with no measurable gaming performance uplift.",
-    "category": "Experimental",
-    "subcategory": "Gaming & CPU",
-    "risk": "Medium",
-    "evidence": "anecdotal",
-    "sideEffects": "Keeps all CPU logical cores unparked at all times, preventing deeper C-states and increasing power consumption and heat output, particularly on laptops. Unverified benefit on modern schedulers.",
-    "impacts": [
-      "performance",
-      "gaming"
-    ],
-    "windows": {
-      "minBuild": 19041
-    },
-    "requiresReboot": false,
-    "requiresExplorerRestart": false,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKLM",
-      "key": "SYSTEM\\CurrentControlSet\\Control\\Power\\PowerSettings\\54533251-82be-4824-96c1-47b60b740d00\\0cc5b647-c1df-4637-891a-dec35c318583",
-      "valueName": "ValueMax",
-      "matchType": "Equals",
-      "expectedValue": 0
-    },
-    "apply": [
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SYSTEM\\CurrentControlSet\\Control\\Power\\PowerSettings\\54533251-82be-4824-96c1-47b60b740d00\\0cc5b647-c1df-4637-891a-dec35c318583",
-        "operation": "Set",
-        "valueName": "ValueMax",
-        "valueKind": "DWord",
-        "data": 0
-      }
-    ],
-    "undo": [
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SYSTEM\\CurrentControlSet\\Control\\Power\\PowerSettings\\54533251-82be-4824-96c1-47b60b740d00\\0cc5b647-c1df-4637-891a-dec35c318583",
-        "operation": "Set",
-        "valueName": "ValueMax",
-        "valueKind": "DWord",
-        "data": 100
-      }
-    ],
-    "source": "https://github.com/hellzerg/optimizer",
-    "verifiedOnBuild": "22631",
-    "whatItDoes": "Sets the processor performance core parking minimum cores unparked percentage (ValueMax) to 0 in system power settings.",
-    "sources": [
-      "https://learn.microsoft.com/en-us/windows-server/administration/performance-tuning/hardware/power/"
-    ],
-    "needsReview": true,
-    "tags": [
-      "performance",
-      "gaming"
-    ],
-    "presetRole": "advanced"
+    "presetRole": "fix",
+    "effectNote": "OverlayTestMode 5 is reported to no longer disable MPO on recent Windows 11 builds. Check MaxPlanes in DxDiag after rebooting."
   },
   {
     "schemaVersion": "1.0.0",
@@ -509,7 +302,7 @@
     "windows": {
       "minBuild": 19041
     },
-    "requiresReboot": false,
+    "requiresReboot": true,
     "requiresExplorerRestart": false,
     "detect": {
       "type": "Registry",

@@ -202,6 +202,7 @@ public sealed class RealRegistrySyncTests
 
         // 1. External change: Bing disabled via policy
         _registry.SetValue("HKCU", "Software\\Policies\\Microsoft\\Windows\\Explorer", "DisableSearchBoxSuggestions", 1, "DWord");
+        _registry.SetValue("HKCU", "Software\\Microsoft\\Windows\\CurrentVersion\\Search", "BingSearchEnabled", 0, "DWord");
         bool active = await _detector.IsTweakActiveAsync(tweak, useCache: false);
         Assert.True(active);
 
@@ -232,6 +233,7 @@ public sealed class RealRegistrySyncTests
         var tweak = GetTweak("privacy.spotlight.lockscreen-ads");
 
         _registry.SetValue("HKCU", "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager", "RotatingLockScreenOverlayEnabled", 0, "DWord");
+        _registry.SetValue("HKCU", "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager", "SubscribedContent-338387Enabled", 0, "DWord");
         bool active = await _detector.IsTweakActiveAsync(tweak, useCache: false);
         Assert.True(active);
 
@@ -261,28 +263,28 @@ public sealed class RealRegistrySyncTests
     }
 
     [Fact]
-    public async Task MultiPlaneOverlay_ExternalRegistrySync_DetectsPartialAndAppliedState()
+    public async Task LockScreenAds_ExternalRegistrySync_DetectsPartialAndAppliedState()
     {
-        var tweak = GetTweak("pref.multiplaneoverlay");
+        var tweak = GetTweak("privacy.spotlight.lockscreen-ads");
 
-        // 1. Setting only 1 of 2 registry keys -> reports Partial, NOT Applied (engine honesty)
-        _registry.SetValue("HKLM", "SOFTWARE\\Microsoft\\Windows\\Dwm", "OverlayTestMode", 1, "DWord");
-        _registry.DeleteValue("HKLM", "SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers", "DisableOverlays");
+        // 1. Setting only 1 of 2 registry values -> reports Partial, NOT Applied (engine honesty)
+        _registry.SetValue("HKCU", "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager", "RotatingLockScreenOverlayEnabled", 0, "DWord");
+        _registry.DeleteValue("HKCU", "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager", "SubscribedContent-338387Enabled");
         var state1 = await _detector.DetectTweakStateAsync(tweak, useCache: false);
         Assert.Equal(TweakState.Partial, state1);
         bool active1 = await _detector.IsTweakActiveAsync(tweak, useCache: false);
         Assert.False(active1);
 
-        // 2. Setting all keys -> reports Applied
-        _registry.SetValue("HKLM", "SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers", "DisableOverlays", 1, "DWord");
+        // 2. Setting all values -> reports Applied
+        _registry.SetValue("HKCU", "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager", "SubscribedContent-338387Enabled", 0, "DWord");
         var state2 = await _detector.DetectTweakStateAsync(tweak, useCache: false);
         Assert.Equal(TweakState.Applied, state2);
         bool active2 = await _detector.IsTweakActiveAsync(tweak, useCache: false);
         Assert.True(active2);
 
         // 3. Default / unapplied state
-        _registry.DeleteValue("HKLM", "SOFTWARE\\Microsoft\\Windows\\Dwm", "OverlayTestMode");
-        _registry.DeleteValue("HKLM", "SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers", "DisableOverlays");
+        _registry.DeleteValue("HKCU", "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager", "RotatingLockScreenOverlayEnabled");
+        _registry.DeleteValue("HKCU", "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager", "SubscribedContent-338387Enabled");
         var state3 = await _detector.DetectTweakStateAsync(tweak, useCache: false);
         Assert.Equal(TweakState.NotApplied, state3);
         bool active3 = await _detector.IsTweakActiveAsync(tweak, useCache: false);

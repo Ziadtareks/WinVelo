@@ -14,7 +14,7 @@
     "windows": {
       "minBuild": 19041
     },
-    "requiresReboot": false,
+    "requiresReboot": true,
     "requiresExplorerRestart": false,
     "detect": {
       "type": "Registry",
@@ -91,7 +91,7 @@
       "ui"
     ],
     "windows": {
-      "minBuild": 19041
+      "minBuild": 26100
     },
     "requiresReboot": false,
     "requiresExplorerRestart": false,
@@ -132,11 +132,12 @@
       "https://learn.microsoft.com/en-us/windows/apps/design/controls/progress-bar"
     ],
     "needsReview": false,
-    "uiEquivalentLocation": "Settings › Personalization › Taskbar › Other system tray icons",
+    "uiEquivalentLocation": "Settings > System > Power & battery > Battery percentage",
     "tags": [
       "ui"
     ],
-    "presetRole": "preference"
+    "presetRole": "preference",
+    "effectNote": "Needs Windows 11 24H2 build 26100.7019 or 25H2 build 26200.7019 or newer, and a device with a battery."
   },
   {
     "schemaVersion": "1.0.0",
@@ -392,7 +393,8 @@
       "apps",
       "ui"
     ],
-    "presetRole": "preference"
+    "presetRole": "preference",
+    "effectNote": "Only has an effect if classic Outlook (Microsoft 365 or Office 2016 or newer) is installed."
   },
   {
     "schemaVersion": "1.0.0",
@@ -444,7 +446,7 @@
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/scrollbars",
     "verifiedOnBuild": "26100",
     "evidence": "ui-equivalent",
-    "whatItDoes": "Always displays full scrollbars in Windows 11 apps instead of hiding them until hovered.",
+    "whatItDoes": "Always shows full scrollbars instead of hiding them until hovered (DynamicScrollbars). Open apps may need to be restarted.",
     "sideEffects": "None known.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/apps/design/controls/scroll-bar"
@@ -473,7 +475,7 @@
     "windows": {
       "minBuild": 19041
     },
-    "requiresReboot": false,
+    "requiresReboot": true,
     "requiresExplorerRestart": false,
     "detect": {
       "type": "Registry",
@@ -481,7 +483,7 @@
       "key": "SOFTWARE\\Microsoft\\Windows\\Dwm",
       "valueName": "OverlayTestMode",
       "matchType": "Equals",
-      "expectedValue": 1
+      "expectedValue": 5
     },
     "apply": [
       {
@@ -491,16 +493,7 @@
         "operation": "Set",
         "valueName": "OverlayTestMode",
         "valueKind": "DWord",
-        "data": 1
-      },
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers",
-        "operation": "Set",
-        "valueName": "DisableOverlays",
-        "valueKind": "DWord",
-        "data": 1
+        "data": 5
       }
     ],
     "undo": [
@@ -510,18 +503,11 @@
         "key": "SOFTWARE\\Microsoft\\Windows\\Dwm",
         "operation": "DeleteValue",
         "valueName": "OverlayTestMode"
-      },
-      {
-        "type": "Registry",
-        "hive": "HKLM",
-        "key": "SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers",
-        "operation": "DeleteValue",
-        "valueName": "DisableOverlays"
       }
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/multiplaneoverlay",
     "verifiedOnBuild": "26100",
-    "whatItDoes": "Sets OverlayTestMode to 1 in DWM and DisableOverlays to 1 in GraphicsDrivers to disable Multi-Plane Overlay (MPO).",
+    "whatItDoes": "Sets OverlayTestMode to 5 in DWM to disable Multi-Plane Overlay (MPO).",
     "sources": [
       "https://learn.microsoft.com/en-us/windows-hardware/drivers/display/multiplane-overlay-support"
     ],
@@ -529,13 +515,13 @@
     "relatedTweaks": [
       "performance.gpu.disable-mpo"
     ],
-    "oppositeOf": "performance.gpu.disable-mpo",
     "tags": [
       "gaming",
       "performance",
       "ui"
     ],
-    "presetRole": "fix"
+    "presetRole": "fix",
+    "effectNote": "OverlayTestMode 5 is reported to no longer disable MPO on recent Windows 11 builds. Check MaxPlanes in DxDiag after rebooting."
   },
   {
     "schemaVersion": "1.0.0",
@@ -552,7 +538,7 @@
     "windows": {
       "minBuild": 19041
     },
-    "requiresReboot": false,
+    "requiresReboot": true,
     "requiresExplorerRestart": false,
     "detect": {
       "type": "Registry",
@@ -632,7 +618,7 @@
     "windows": {
       "minBuild": 19041
     },
-    "requiresReboot": false,
+    "requiresReboot": true,
     "requiresExplorerRestart": false,
     "detect": {
       "type": "Registry",
@@ -677,14 +663,15 @@
     "tags": [
       "ui"
     ],
-    "presetRole": "preference"
+    "presetRole": "preference",
+    "effectNote": "Takes effect after signing out and back in."
   },
   {
     "schemaVersion": "1.0.0",
     "id": "pref.standbyfix",
     "origin": "WPFToggleStandbyFix",
-    "name": "S0 Sleep Network Connectivity",
-    "description": "Toggles network connectivity during S0 Sleep which is low power idle in modern laptops.",
+    "name": "Modern Standby Network - Disable",
+    "description": "Turns off network connectivity while a Modern Standby (S0) laptop sleeps, to reduce battery drain.",
     "category": "ui",
     "subcategory": "Customize Preferences",
     "risk": "Medium",
@@ -697,40 +684,66 @@
     "requiresReboot": false,
     "requiresExplorerRestart": false,
     "detect": {
-      "type": "Registry",
-      "hive": "HKCU",
-      "key": "SOFTWARE\\Policies\\Microsoft\\Power\\PowerSettings\\f15576e8-98b7-4186-b944-eafa664402d9",
-      "valueName": "ACSettingIndex",
-      "matchType": "Equals",
-      "expectedValue": 1
+      "all": [
+        {
+          "type": "Registry",
+          "hive": "HKLM",
+          "key": "SOFTWARE\\Policies\\Microsoft\\Power\\PowerSettings\\f15576e8-98b7-4186-b944-eafa664402d9",
+          "valueName": "ACSettingIndex",
+          "matchType": "Equals",
+          "expectedValue": 0
+        },
+        {
+          "type": "Registry",
+          "hive": "HKLM",
+          "key": "SOFTWARE\\Policies\\Microsoft\\Power\\PowerSettings\\f15576e8-98b7-4186-b944-eafa664402d9",
+          "valueName": "DCSettingIndex",
+          "matchType": "Equals",
+          "expectedValue": 0
+        }
+      ]
     },
     "apply": [
       {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "SOFTWARE\\Policies\\Microsoft\\Power\\PowerSettings\\f15576e8-98b7-4186-b944-eafa664402d9",
-        "operation": "Set",
-        "valueName": "ACSettingIndex",
-        "valueKind": "DWord",
-        "data": 1
-      }
-    ],
-    "undo": [
-      {
-        "type": "Registry",
-        "hive": "HKCU",
+        "type": "Policy",
+        "hive": "HKLM",
         "key": "SOFTWARE\\Policies\\Microsoft\\Power\\PowerSettings\\f15576e8-98b7-4186-b944-eafa664402d9",
         "operation": "Set",
         "valueName": "ACSettingIndex",
         "valueKind": "DWord",
         "data": 0
+      },
+      {
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Power\\PowerSettings\\f15576e8-98b7-4186-b944-eafa664402d9",
+        "operation": "Set",
+        "valueName": "DCSettingIndex",
+        "valueKind": "DWord",
+        "data": 0
+      }
+    ],
+    "undo": [
+      {
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Power\\PowerSettings\\f15576e8-98b7-4186-b944-eafa664402d9",
+        "operation": "DeleteValue",
+        "valueName": "ACSettingIndex"
+      },
+      {
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Power\\PowerSettings\\f15576e8-98b7-4186-b944-eafa664402d9",
+        "operation": "DeleteValue",
+        "valueName": "DCSettingIndex"
       }
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/standbyfix",
     "verifiedOnBuild": "26100",
     "evidence": "situational",
-    "whatItDoes": "Applies power configuration parameters to mitigate modern standby connected sleep drain.",
-    "sideEffects": "Alters modern standby network sleep state; behavior depends on laptop motherboard firmware.",
+    "whatItDoes": "Sets the policy values ACSettingIndex and DCSettingIndex to 0, so the network is off during Modern Standby when plugged in and on battery.",
+    "sideEffects": "Mail, chat and other notifications do not arrive while the laptop sleeps. Does nothing on PCs without Modern Standby.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows-hardware/design/device-experiences/modern-standby"
     ],
@@ -739,7 +752,8 @@
       "network",
       "performance"
     ],
-    "presetRole": "fix"
+    "presetRole": "fix",
+    "effectNote": "Only affects devices that use Modern Standby (S0 low power idle)."
   },
   {
     "schemaVersion": "1.0.0",
@@ -756,7 +770,7 @@
     "windows": {
       "minBuild": 19041
     },
-    "requiresReboot": false,
+    "requiresReboot": true,
     "requiresExplorerRestart": false,
     "detect": {
       "type": "Registry",
@@ -798,74 +812,14 @@
     "tags": [
       "performance"
     ],
-    "presetRole": "fix"
-  },
-  {
-    "schemaVersion": "1.0.0",
-    "id": "pref.hidesettingshome",
-    "origin": "WPFToggleHideSettingsHome",
-    "name": "Settings Home Page - Show",
-    "description": "Shows the Home page in Windows 11 Settings (the Windows default). Undo hides it.",
-    "category": "ui",
-    "subcategory": "Customize Preferences",
-    "risk": "Safe",
-    "impacts": [
-      "ui"
-    ],
-    "windows": {
-      "minBuild": 19041
-    },
-    "requiresReboot": false,
-    "requiresExplorerRestart": false,
-    "detect": {
-      "type": "Registry",
-      "hive": "HKCU",
-      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
-      "valueName": "SettingsPageVisibility",
-      "matchType": "Equals",
-      "expectedValue": "show:home"
-    },
-    "apply": [
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
-        "operation": "Set",
-        "valueName": "SettingsPageVisibility",
-        "valueKind": "String",
-        "data": "show:home"
-      }
-    ],
-    "undo": [
-      {
-        "type": "Registry",
-        "hive": "HKCU",
-        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
-        "operation": "Set",
-        "valueName": "SettingsPageVisibility",
-        "valueKind": "String",
-        "data": "hide:home"
-      }
-    ],
-    "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/hidesettingshome",
-    "verifiedOnBuild": "26100",
-    "evidence": "situational",
-    "whatItDoes": "Makes the Home page visible in Windows 11 Settings by setting the page visibility policy to show it. This is the Windows default; use Undo to hide the Home page.",
-    "sideEffects": "None known. Settings opens on the Home page, which shows suggestions and account banners.",
-    "sources": [
-      "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-settings#settings-pagelist"
-    ],
-    "needsReview": false,
-    "tags": [
-      "ui"
-    ],
-    "presetRole": "preference"
+    "presetRole": "fix",
+    "effectNote": "Only works on PCs whose firmware supports S3 sleep (check with 'powercfg /a'). Needs a restart."
   },
   {
     "schemaVersion": "1.0.0",
     "id": "pref.bingsearch",
     "origin": "WPFToggleBingSearch",
-    "name": "Start Menu Bing Search",
+    "name": "Start Menu Bing Search - Disable",
     "description": "Toggles Bing web search results in Windows Search.",
     "category": "ui",
     "subcategory": "Customize Preferences",
@@ -877,9 +831,9 @@
       "minBuild": 19041
     },
     "requiresReboot": false,
-    "requiresExplorerRestart": false,
+    "requiresExplorerRestart": true,
     "detect": {
-      "any": [
+      "all": [
         {
           "type": "Registry",
           "hive": "HKCU",
@@ -942,7 +896,7 @@
     "verifiedOnBuild": "26100",
     "evidence": "situational",
     "whatItDoes": "Disables Bing web search suggestions in the Windows Start Menu search box.",
-    "sideEffects": "Start Menu search will only search local applications, settings, and personal files; web queries will not appear.",
+    "sideEffects": "Start menu search only shows local apps, settings and files. File Explorer no longer shows recent search entries in its search box.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-admx-search#search-disablesearchboxsuggestions"
     ],
@@ -1070,14 +1024,15 @@
     "whatItDoes": "Disables the swipe/key-press lock screen overlay, presenting the password prompt immediately.",
     "sideEffects": "Bypasses the lock screen clock and notifications overlay, jumping directly to user sign-in.",
     "sources": [
-      "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-personalization#personalization-nolockscreencamera"
+      "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-admx-controlpaneldisplay"
     ],
     "needsReview": false,
     "uiEquivalentLocation": "Settings › Accounts › Sign-in options",
     "tags": [
       "ui"
     ],
-    "presetRole": "preference"
+    "presetRole": "preference",
+    "effectNote": "Officially supported only on Enterprise and Education. On Home and Pro it may not work."
   },
   {
     "schemaVersion": "1.0.0",
@@ -1092,7 +1047,7 @@
       "ui"
     ],
     "windows": {
-      "minBuild": 19041
+      "minBuild": 22000
     },
     "requiresReboot": false,
     "requiresExplorerRestart": true,
@@ -1131,12 +1086,6 @@
         "valueName": "HideRecommendedSection",
         "valueKind": "DWord",
         "data": 0
-      },
-      {
-        "type": "PowerShell",
-        "operation": "Execute",
-        "script": "Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue\n      $timeout = 5; while ($timeout -gt 0 -and !(Get-Process explorer -ErrorAction SilentlyContinue)) { Start-Sleep -Milliseconds 500; $timeout -= 0.5 }\n      if (!(Get-Process explorer -ErrorAction SilentlyContinue)) { Start-Process explorer.exe }",
-        "timeoutSeconds": 60
       }
     ],
     "undo": [
@@ -1166,12 +1115,6 @@
         "valueName": "HideRecommendedSection",
         "valueKind": "DWord",
         "data": 1
-      },
-      {
-        "type": "PowerShell",
-        "operation": "Execute",
-        "script": "Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue\n      $timeout = 5; while ($timeout -gt 0 -and !(Get-Process explorer -ErrorAction SilentlyContinue)) { Start-Sleep -Milliseconds 500; $timeout -= 0.5 }\n      if (!(Get-Process explorer -ErrorAction SilentlyContinue)) { Start-Process explorer.exe }",
-        "timeoutSeconds": 60
       }
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/startmenurecommendations",
@@ -1213,7 +1156,7 @@
       "key": "Control Panel\\Accessibility\\StickyKeys",
       "valueName": "Flags",
       "matchType": "Equals",
-      "expectedValue": 506
+      "expectedValue": "506"
     },
     "apply": [
       {
@@ -1222,8 +1165,14 @@
         "key": "Control Panel\\Accessibility\\StickyKeys",
         "operation": "Set",
         "valueName": "Flags",
-        "valueKind": "DWord",
-        "data": 506
+        "valueKind": "String",
+        "data": "506"
+      },
+      {
+        "type": "PowerShell",
+        "operation": "Execute",
+        "script": "$f = [int](Get-ItemProperty -Path 'HKCU:\\Control Panel\\Accessibility\\StickyKeys').Flags\nAdd-Type -Namespace WinVelo -Name StickySpi -MemberDefinition '[StructLayout(LayoutKind.Sequential)] public struct STICKYKEYS { public uint cbSize; public uint dwFlags; } [DllImport(\"user32.dll\")] public static extern bool SystemParametersInfo(uint uiAction, uint uiParam, ref STICKYKEYS pvParam, uint fWinIni);'\n$sk = New-Object WinVelo.StickySpi+STICKYKEYS\n$sk.cbSize = 8\n$sk.dwFlags = [uint32]$f\n[WinVelo.StickySpi]::SystemParametersInfo(0x3B, 8, [ref]$sk, 3) | Out-Null",
+        "timeoutSeconds": 30
       }
     ],
     "undo": [
@@ -1233,8 +1182,14 @@
         "key": "Control Panel\\Accessibility\\StickyKeys",
         "operation": "Set",
         "valueName": "Flags",
-        "valueKind": "DWord",
-        "data": 58
+        "valueKind": "String",
+        "data": "510"
+      },
+      {
+        "type": "PowerShell",
+        "operation": "Execute",
+        "script": "$f = [int](Get-ItemProperty -Path 'HKCU:\\Control Panel\\Accessibility\\StickyKeys').Flags\nAdd-Type -Namespace WinVelo -Name StickySpi -MemberDefinition '[StructLayout(LayoutKind.Sequential)] public struct STICKYKEYS { public uint cbSize; public uint dwFlags; } [DllImport(\"user32.dll\")] public static extern bool SystemParametersInfo(uint uiAction, uint uiParam, ref STICKYKEYS pvParam, uint fWinIni);'\n$sk = New-Object WinVelo.StickySpi+STICKYKEYS\n$sk.cbSize = 8\n$sk.dwFlags = [uint32]$f\n[WinVelo.StickySpi]::SystemParametersInfo(0x3B, 8, [ref]$sk, 3) | Out-Null",
+        "timeoutSeconds": 30
       }
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/stickykeys",

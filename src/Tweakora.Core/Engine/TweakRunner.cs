@@ -120,6 +120,20 @@ public sealed class TweakRunner
                 continue;
             }
 
+            // Not available on this Windows build or edition: skip instead of writing values Windows ignores.
+            var compatibilityIssue = WindowsCompatibility.Check(tweak);
+            if (compatibilityIssue != null)
+            {
+                progress?.Report($"Skipping {tweak.Id}: {compatibilityIssue.Describe()}");
+                report.Results.Add(new TweakExecutionResult
+                {
+                    TweakId = tweak.Id,
+                    Status = TweakExecutionStatus.Skipped,
+                    Message = "Not available on this Windows version. " + compatibilityIssue.Describe()
+                });
+                continue;
+            }
+
             // Check if already active
             bool isAlreadyActive = await _detector.IsTweakActiveAsync(tweak, useCache: false);
             if (isAlreadyActive)

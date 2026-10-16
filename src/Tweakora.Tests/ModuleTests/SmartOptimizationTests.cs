@@ -146,9 +146,8 @@ public sealed class SmartOptimizationTests
             Assert.NotNull(report);
             Assert.True(report.SucceededCount > 0);
 
-            // Verify SvcHostSplitThresholdInKB was dynamically configured
-            var svchostThreshold = fakeRegistry.GetValue("HKLM", @"SYSTEM\CurrentControlSet\Control", "SvcHostSplitThresholdInKB");
-            Assert.NotNull(svchostThreshold);
+            // Smart Boost only changes settings through the tweak engine (journaled, undoable).
+            Assert.Null(fakeRegistry.GetValue("HKLM", @"SYSTEM\CurrentControlSet\Control", "SvcHostSplitThresholdInKB"));
 
             // 3. Recalculated Score should be higher
             var postAssessment = await advisor.CalculateOptimizationScoreAsync(catalog, tweakService);
@@ -162,7 +161,7 @@ public sealed class SmartOptimizationTests
     }
 
     [Fact]
-    public void Catalog_ContainsAll8SmartIqOptimizerTweaks()
+    public void Catalog_ContainsAllSmartOptimizerTweaks()
     {
         var fakeRegistry = new FakeRegistryService();
         var fakeServices = new FakeServicesService();
@@ -176,13 +175,8 @@ public sealed class SmartOptimizationTests
 
         var expectedSmartIds = new[]
         {
-            "performance.cpu.priority-separation",
-            "performance.gaming.mmcss-responsiveness",
             "performance.gpu.hags",
-            "performance.gpu.disable-mpo",
             "performance.input.raw-mouse",
-            "performance.input.buffer-queue",
-            "performance.cpu.unpark-cores",
             "performance.power.disable-throttling"
         };
 

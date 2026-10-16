@@ -59,7 +59,6 @@ public sealed class ProfileManager
                     "privacy.consent.deny-location",
                     "privacy.consent.deny-diagnostics",
                     "system.security.disable-llmnr",
-                    "network.wifi.disable-hotspot-reporting",
                     "network.dns.enable-doh"
                 }
             },
@@ -75,7 +74,6 @@ public sealed class ProfileManager
                     "gaming.dvr.disable-background-recording",
                     "gaming.input.disable-mouse-acceleration",
                     "performance.visual.disable-animations",
-                    "performance.system.disable-startup-delay",
                     "performance.ntfs.disable-last-access",
                     "performance.ntfs.disable-8dot3-names",
                     "network.optimization.limit-peering-lan"
@@ -94,7 +92,6 @@ public sealed class ProfileManager
                     "ui.taskbar.disable-task-view-button",
                     "ui.explorer.hide-gallery",
                     "ui.explorer.hide-recent-files",
-                    "ui.explorer.compact-view",
                     "ui.search.disable-search-highlights",
                     "ui.system.disable-welcome-experience",
                     "ui.system.disable-tips-suggestions"

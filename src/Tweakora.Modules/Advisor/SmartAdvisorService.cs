@@ -215,7 +215,7 @@ public sealed class SmartAdvisorService : ISmartAdvisorService
     {
         var profile = await AnalyzeHardwareAsync();
 
-        // 16 Core Essential & Smart Tweaks evaluated for Optimization Score
+        // Tweaks evaluated for the score. Only tweaks with a real, verifiable effect (no experimental or placebo entries).
         var targetIds = new List<string>
         {
             "pref.darkmode",
@@ -224,21 +224,16 @@ public sealed class SmartAdvisorService : ISmartAdvisorService
             "essential.telemetry",
             "privacy.spotlight.lockscreen-ads",
             "essential.activity",
-            "performance.cpu.priority-separation",
-            "performance.gaming.mmcss-responsiveness",
-            "performance.input.raw-mouse",
-            "performance.input.buffer-queue"
+            "performance.input.raw-mouse"
         };
 
         if (profile.GpuVendor == "NVIDIA" || profile.GpuVendor == "AMD")
         {
-            targetIds.Add("performance.gpu.disable-mpo");
             targetIds.Add("performance.gpu.hags");
         }
 
         if (profile.FormFactor == HardwareFormFactor.Desktop)
         {
-            targetIds.Add("performance.cpu.unpark-cores");
             targetIds.Add("performance.power.disable-throttling");
         }
 
@@ -274,21 +269,16 @@ public sealed class SmartAdvisorService : ISmartAdvisorService
         var notes = new List<string>();
         if (profile.FormFactor == HardwareFormFactor.Laptop)
         {
-            notes.Add("Laptop detected: Preserving battery power states while accelerating responsiveness.");
+            notes.Add("Laptop detected: power throttling is left on to protect battery life.");
         }
         else
         {
-            notes.Add("Desktop detected: Fully unlocking CPU core parking and high foreground priority.");
+            notes.Add("Desktop detected: power throttling can be turned off for background apps.");
         }
 
         if (profile.GpuVendor == "NVIDIA" || profile.GpuVendor == "AMD")
         {
-            notes.Add($"{profile.GpuVendor} GPU detected: MPO micro-stutter fix and HAGS recommended.");
-        }
-
-        if (profile.TotalPhysicalRamGb >= 16)
-        {
-            notes.Add($"High RAM Capacity ({profile.TotalPhysicalRamGb} GB): SvcHost split threshold optimized.");
+            notes.Add($"{profile.GpuVendor} GPU detected: hardware-accelerated GPU scheduling is available.");
         }
 
         return new OptimizationAssessment
@@ -308,43 +298,31 @@ public sealed class SmartAdvisorService : ISmartAdvisorService
     {
         var profile = await AnalyzeHardwareAsync();
 
-        // 1. Dynamic SvcHostSplitThresholdInKB based on actual total RAM (Windows 10/11 Architecture Standard)
-        if (profile.TotalPhysicalRamKb > 0)
-        {
-            try
-            {
-                int ramKb = (int)Math.Min((ulong)int.MaxValue, profile.TotalPhysicalRamKb);
-                _registry.SetValue("HKLM", @"SYSTEM\CurrentControlSet\Control", "SvcHostSplitThresholdInKB", ramKb, "DWord");
-            }
-            catch { }
-        }
-
-        // 2. Select hardware-tailored tweaks from catalog
+        // Select hardware-tailored tweaks from the catalog. Every change goes through the
+        // tweak engine, so it is journaled and can be undone.
         var tweakIdsToApply = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
             "pref.bingsearch",
             "essential.telemetry",
             "privacy.spotlight.lockscreen-ads",
             "essential.activity",
-            "performance.cpu.priority-separation",
-            "performance.gaming.mmcss-responsiveness",
-            "performance.input.raw-mouse",
-            "performance.input.buffer-queue"
+            "performance.input.raw-mouse"
         };
 
         if (profile.GpuVendor == "NVIDIA" || profile.GpuVendor == "AMD")
         {
-            tweakIdsToApply.Add("performance.gpu.disable-mpo");
             tweakIdsToApply.Add("performance.gpu.hags");
         }
 
         if (profile.FormFactor == HardwareFormFactor.Desktop)
         {
-            tweakIdsToApply.Add("performance.cpu.unpark-cores");
             tweakIdsToApply.Add("performance.power.disable-throttling");
         }
 
-        var tweaks = catalog.Where(t => tweakIdsToApply.Contains(t.Id)).ToList();
+        var tweaks = catalog.Where(t =>
+            tweakIdsToApply.Contains(t.Id) ||
+            (!string.IsNullOrEmpty(t.Origin) && tweakIdsToApply.Contains(t.Origin)) ||
+            (t.Aliases != null && t.Aliases.Any(a => tweakIdsToApply.Contains(a)))).ToList();
         return await tweakService.ApplyTweaksAsync(tweaks, runner);
     }
 

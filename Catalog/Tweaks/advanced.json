@@ -223,8 +223,8 @@
     "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/bravedebloat",
     "verifiedOnBuild": "26100",
     "evidence": "situational",
-    "whatItDoes": "Stops and removes Brave browser background telemetry, update services, and scheduled tasks.",
-    "sideEffects": "Brave browser automatic background updates and promotional notifications will stop functioning.",
+    "whatItDoes": "Sets Brave browser policies that turn off Rewards, Wallet, VPN, Leo AI chat, News, Talk, Tor windows, usage pings and metrics reporting.",
+    "sideEffects": "Brave shows 'Managed by your organization'. Rewards, Wallet, VPN, Leo, News, Talk and Tor windows are unavailable. Restart Brave to apply.",
     "sources": [
       "https://winutil.christitus.com/code-reference/tweaks/advanced-tweaks/bravedebloat"
     ],
@@ -301,7 +301,7 @@
     "verifiedOnBuild": "26100",
     "evidence": "situational",
     "whatItDoes": "Sets RedirectionWarningDialogVersion to 1 in HKLM Terminal Services client policies and RdpLaunchConsentAccepted to 1 in HKCU Terminal Server Client settings.",
-    "sideEffects": "Suppresses security warning dialogs when connecting to untrusted or self-signed Remote Desktop endpoints.",
+    "sideEffects": "Opening .rdp files no longer shows the newer security dialog that lists requested redirections, so a malicious .rdp file is easier to miss. Server certificate warnings are not affected.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/welcome-to-rds"
     ],
@@ -310,7 +310,8 @@
       "network",
       "ui"
     ],
-    "presetRole": "optimization"
+    "presetRole": "optimization",
+    "effectNote": "Only matters on builds that received the April 2026 Remote Desktop security update (Windows 11, Windows 10 with ESU)."
   },
   {
     "schemaVersion": "1.0.0",
@@ -616,8 +617,8 @@
     "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/edgedebloat",
     "verifiedOnBuild": "26100",
     "evidence": "situational",
-    "whatItDoes": "Disables background services, startup tasks, and promotional telemetry associated with Microsoft Edge.",
-    "sideEffects": "Disables Edge automatic background updates and may impact WebView2-dependent system widgets.",
+    "whatItDoes": "Sets Microsoft Edge policies that turn off diagnostic data, feedback, shopping, rewards, recommendations, first-run pages, Collections and similar promotions, and stops Edge updates from recreating the desktop shortcut.",
+    "sideEffects": "Edge shows 'Managed by your organization'. Collections, the shopping assistant and Rewards are unavailable. Restart Edge to apply.",
     "sources": [
       "https://winutil.christitus.com/code-reference/tweaks/advanced-tweaks/edgedebloat"
     ],
@@ -659,7 +660,7 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "$Path = Resolve-Path -Path \"$Env:ProgramFiles (x86)\\Microsoft\\Edge\\Application\\*\\Installer\\setup.exe\" -ErrorAction SilentlyContinue | Select-Object -Last 1\n\n      if ($Path -and (Test-Path $Path)) {\n          $proc = Start-Process -FilePath $Path -ArgumentList \"--uninstall --system-level --force-uninstall --delete-profile\" -Wait -PassThru\n          if ($proc.ExitCode -ne 0) { throw \"setup.exe failed with exit code $($proc.ExitCode)\" }\n      }",
+        "script": "$Path = Resolve-Path -Path \"${Env:ProgramFiles(x86)}\\Microsoft\\Edge\\Application\\*\\Installer\\setup.exe\" -ErrorAction SilentlyContinue | Select-Object -Last 1\nif ($Path) {\n    New-Item -Path \"$Env:SystemRoot\\SystemApps\\Microsoft.MicrosoftEdge_8wekyb3d8bbwe\\MicrosoftEdge.exe\" -ItemType File -Force | Out-Null\n    $proc = Start-Process -FilePath $Path -ArgumentList '--uninstall --system-level --force-uninstall --delete-profile' -Wait -PassThru\n    if ($proc.ExitCode -ne 0 -and $proc.ExitCode -ne 19) { throw \"setup.exe failed with exit code $($proc.ExitCode)\" }\n}",
         "timeoutSeconds": 300
       },
       {
@@ -693,7 +694,7 @@
     "reversible": false,
     "irreversibleReason": "Uninstalls Microsoft Edge system binaries and deletes user profiles; undo reinstalls a blank Edge browser via winget but cannot restore deleted history, cookies, or user profile data.",
     "evidence": "situational",
-    "whatItDoes": "Uninstalls Microsoft Edge using winget and package removal scripts.",
+    "whatItDoes": "Creates an empty placeholder MicrosoftEdge.exe in the legacy Edge app folder, then runs Edge's own setup.exe to uninstall Edge system-wide and delete its profile, and sets DoNotUpdateToEdgeWithChromium.",
     "sideEffects": "Microsoft Edge browser is permanently removed; system features relying on Edge or embedded WebViews may fail to open external links. Irreversible.",
     "sources": [
       "https://winutil.christitus.com/code-reference/tweaks/advanced-tweaks/removeedge"
@@ -702,7 +703,8 @@
     "tags": [
       "apps"
     ],
-    "presetRole": "optimization"
+    "presetRole": "optimization",
+    "effectNote": "Windows Update or EdgeUpdate may reinstall Edge later. WebView2 is not removed."
   },
   {
     "schemaVersion": "1.0.0",
@@ -748,12 +750,6 @@
     ],
     "undo": [
       {
-        "type": "PowerShell",
-        "operation": "Execute",
-        "script": "Enable-BitLocker -MountPoint $Env:SystemDrive -ErrorAction SilentlyContinue",
-        "timeoutSeconds": 60
-      },
-      {
         "type": "Registry",
         "hive": "HKLM",
         "key": "SYSTEM\\CurrentControlSet\\Control\\BitLocker",
@@ -765,7 +761,7 @@
     "verifiedOnBuild": "26100",
     "warnings": "Disabling BitLocker removes disk encryption and leaves drive data completely unprotected against unauthorized physical access.",
     "evidence": "documented",
-    "whatItDoes": "Decrypts and disables BitLocker drive encryption across all detected system volumes.",
+    "whatItDoes": "Starts decryption of the system drive with Disable-BitLocker and sets PreventDeviceEncryption to 1 so Windows does not turn on automatic device encryption.",
     "sideEffects": "Completely decrypts storage volumes, removing hardware-level data protection against offline physical access or theft.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/security/operating-system-security/data-protection/bitlocker/"
@@ -775,7 +771,8 @@
     "tags": [
       "performance"
     ],
-    "presetRole": "optimization"
+    "presetRole": "optimization",
+    "effectNote": "Decryption continues in the background. Turning the tweak off does not re-encrypt the drive; turn BitLocker or Device encryption back on in Settings."
   },
   {
     "schemaVersion": "1.0.0",
@@ -792,7 +789,7 @@
     "windows": {
       "minBuild": 19041
     },
-    "requiresReboot": false,
+    "requiresReboot": true,
     "requiresExplorerRestart": false,
     "detect": {
       "type": "Registry",
@@ -828,7 +825,7 @@
     "verifiedOnBuild": "26100",
     "evidence": "situational",
     "whatItDoes": "Sets RealTimeIsUniversal to 1 in HKLM system parameters, configuring the hardware RTC clock to UTC.",
-    "sideEffects": "Configures Windows hardware clock to UTC (ideal for Linux dual-boot); may cause incorrect local time display if timezone is misconfigured in firmware.",
+    "sideEffects": "Windows treats the hardware clock as UTC. If the hardware clock is still set to local time, the shown time is off until Windows syncs the time.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/set-the-time-zone-on-a-running-pc-in-windows-pe"
     ],
@@ -843,7 +840,7 @@
     "id": "advanced.removeonedrive",
     "origin": "WPFTweaksRemoveOneDrive",
     "name": "Microsoft OneDrive - Remove",
-    "description": "Denies permission to remove OneDrive user files, then uses its own uninstaller to remove it and restores the original permission afterward.",
+    "description": "Uninstalls the OneDrive client with its own uninstaller and blocks OneDrive from syncing by policy.",
     "category": "system",
     "subcategory": "z__Advanced Tweaks - CAUTION",
     "risk": "High",
@@ -855,7 +852,7 @@
       "minBuild": 19041
     },
     "requiresReboot": false,
-    "requiresExplorerRestart": false,
+    "requiresExplorerRestart": true,
     "detect": {
       "type": "Registry",
       "hive": "HKLM",
@@ -868,7 +865,7 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "$setup = Join-Path $Env:SystemRoot \"System32\\OneDriveSetup.exe\"\n      if (Test-Path $setup) {\n          $proc = Start-Process -FilePath $setup -ArgumentList '/uninstall' -Wait -PassThru\n          if ($proc.ExitCode -ne 0) { throw \"OneDriveSetup.exe failed with exit code $($proc.ExitCode)\" }\n      }\n      Stop-Process -Name FileCoAuth,OneDrive -Force -ErrorAction SilentlyContinue",
+        "script": "Stop-Process -Name FileCoAuth,OneDrive -Force -ErrorAction SilentlyContinue\n$setup = @(\"$Env:SystemRoot\\System32\\OneDriveSetup.exe\", \"$Env:SystemRoot\\SysWOW64\\OneDriveSetup.exe\") | Where-Object { Test-Path $_ } | Select-Object -First 1\nif ($setup) {\n    $proc = Start-Process -FilePath $setup -ArgumentList '/uninstall' -Wait -PassThru\n    if ($proc.ExitCode -ne 0) { throw \"OneDriveSetup.exe failed with exit code $($proc.ExitCode)\" }\n}",
         "timeoutSeconds": 300
       },
       {
@@ -931,7 +928,7 @@
       "minBuild": 19041
     },
     "requiresReboot": false,
-    "requiresExplorerRestart": false,
+    "requiresExplorerRestart": true,
     "detect": {
       "type": "Registry",
       "hive": "HKCU",
@@ -995,7 +992,7 @@
     "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/removehomeandgallery",
     "verifiedOnBuild": "26100",
     "evidence": "situational",
-    "whatItDoes": "Hides the Home and Gallery nodes from the File Explorer navigation pane.",
+    "whatItDoes": "Hides the Home and Gallery nodes from the File Explorer navigation pane and sets LaunchTo so Explorer opens to This PC.",
     "sideEffects": "None known.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/win32/shell/manage-the-desktop"
@@ -1008,14 +1005,15 @@
     "tags": [
       "ui"
     ],
-    "presetRole": "preference"
+    "presetRole": "preference",
+    "effectNote": "Home and Gallery exist only on Windows 11; on Windows 10 only the This PC start folder is changed."
   },
   {
     "schemaVersion": "1.0.0",
     "id": "advanced.display",
     "origin": "WPFTweaksDisplay",
     "name": "Visual Effects - Set to Best Performance",
-    "description": "Sets the system preferences to performance. You can do this manually with sysdm.cpl as well.",
+    "description": "Sets visual effects to best performance (like sysdm.cpl) and also hides the Search, Task View and Chat taskbar buttons and shortens the menu and keyboard delays. Sign out to apply fully.",
     "category": "system",
     "subcategory": "z__Advanced Tweaks - CAUTION",
     "risk": "Safe",
@@ -1025,8 +1023,8 @@
     "windows": {
       "minBuild": 19041
     },
-    "requiresReboot": false,
-    "requiresExplorerRestart": false,
+    "requiresReboot": true,
+    "requiresExplorerRestart": true,
     "detect": {
       "type": "Registry",
       "hive": "HKCU",
@@ -1069,8 +1067,8 @@
         "key": "Control Panel\\Keyboard",
         "operation": "Set",
         "valueName": "KeyboardDelay",
-        "valueKind": "DWord",
-        "data": 0
+        "valueKind": "String",
+        "data": "0"
       },
       {
         "type": "Registry",
@@ -1352,7 +1350,7 @@
     "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/reservedstorage",
     "verifiedOnBuild": "26100",
     "evidence": "situational",
-    "whatItDoes": "Disables Windows Reserved Storage (7GB reserved for Windows Update staging) using fsutil.",
+    "whatItDoes": "Turns off Windows Reserved Storage with DISM /Set-ReservedStorageState and sets ShippedWithReserves to 0.",
     "sideEffects": "Windows Update may fail during major feature updates if the primary storage drive runs low on free disk space.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/configure-reserved-storage"
@@ -1380,7 +1378,7 @@
     "windows": {
       "minBuild": 19041
     },
-    "requiresReboot": false,
+    "requiresReboot": true,
     "requiresExplorerRestart": false,
     "detect": {
       "type": "Registry",
@@ -1438,7 +1436,7 @@
     "reversible": false,
     "irreversibleReason": "Permanently uninstalls Windows Copilot, Recall, and AI Appx packages; undo only reverts policy registry keys and does not reinstall the removed Appx or system features.",
     "evidence": "situational",
-    "whatItDoes": "Disables Windows Copilot and Recall features machine-wide through Group Policy registry keys.",
+    "whatItDoes": "Hides the AI components Settings page, sets the Notepad DisableAIFeatures policy, uninstalls the Copilot app, the Office hub app (Microsoft.MicrosoftOfficeHub) and the CoreAI package, disables WSAIFabricSvc and turns off the Recall optional feature.",
     "sideEffects": "Copilot taskbar button, Copilot sidebar, and AI-assisted Windows features will become unavailable.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/client-management/manage-windows-copilot"
@@ -1449,7 +1447,8 @@
       "privacy",
       "ui"
     ],
-    "presetRole": "optimization"
+    "presetRole": "optimization",
+    "effectNote": "Recall, CoreAI and the AI components page exist only on Windows 11 24H2 and later."
   },
   {
     "schemaVersion": "1.0.0",
@@ -1531,8 +1530,8 @@
     "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/razerblock",
     "verifiedOnBuild": "26100",
     "evidence": "situational",
-    "whatItDoes": "Blocks Razer Synapse automatic hardware plug-and-play installer prompts in system software policies.",
-    "sideEffects": "Razer peripheral setup and RGB configuration software must be downloaded and installed manually from the manufacturer's website.",
+    "whatItDoes": "Turns off automatic driver downloads from Windows Update (SearchOrderConfig), blocks device co-installers (DisableCoInstallers) and denies write access to the Razer installer folder.",
+    "sideEffects": "Windows Update no longer installs drivers for any new device, and no device co-installer runs. Razer software must be installed manually.",
     "sources": [
       "https://winutil.christitus.com/code-reference/tweaks/advanced-tweaks/razerblock"
     ],
@@ -1588,7 +1587,7 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "$ProgramFiles64 = if ($Env:ProgramW6432) { $Env:ProgramW6432 } else { $Env:ProgramFiles }\n      $LogiPath = \"$ProgramFiles64\\LogiDownloadAssistant\"\n\n      if (Test-Path $LogiPath) {\n        icacls $LogiPath /remove:d \"*S-1-1-0\" -ErrorAction SilentlyContinue | Out-Null\n      }",
+        "script": "$ProgramFiles64 = if ($Env:ProgramW6432) { $Env:ProgramW6432 } else { $Env:ProgramFiles }\n$LogiPath = \"$ProgramFiles64\\LogiDownloadAssistant\"\nif (Test-Path $LogiPath) {\n    icacls $LogiPath /remove:d \"*S-1-1-0\" | Out-Null\n}",
         "timeoutSeconds": 60
       },
       {
@@ -1601,8 +1600,8 @@
     "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/logiblock",
     "verifiedOnBuild": "26100",
     "evidence": "situational",
-    "whatItDoes": "Blocks Logitech G-Hub and Options auto-install prompts when connecting hardware peripherals.",
-    "sideEffects": "Logitech mouse and keyboard management software will not automatically install upon plugging in the device.",
+    "whatItDoes": "Stops the Logi Download Assistant, empties its folder and denies write access to it so it cannot be reinstalled.",
+    "sideEffects": "Logitech software is not offered automatically when a Logitech device is connected.",
     "sources": [
       "https://winutil.christitus.com/code-reference/tweaks/advanced-tweaks/logiblock"
     ],
@@ -1627,8 +1626,8 @@
     "windows": {
       "minBuild": 19041
     },
-    "requiresReboot": false,
-    "requiresExplorerRestart": false,
+    "requiresReboot": true,
+    "requiresExplorerRestart": true,
     "detect": {
       "type": "Registry",
       "hive": "HKCU",
@@ -1678,7 +1677,7 @@
     "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/disablenotifications",
     "verifiedOnBuild": "26100",
     "evidence": "ui-equivalent",
-    "whatItDoes": "Globally disables the Windows notification platform and Action Center alerts via system policies.",
+    "whatItDoes": "For the current user, turns off the notification center (and the calendar flyout on Windows 11) with DisableNotificationCenter and turns off toast notifications with ToastEnabled.",
     "sideEffects": "All application notifications, system security alerts, and Action Center banners will be suppressed.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/apps/design/shell/tiles-and-notifications/"
@@ -1706,7 +1705,7 @@
     "windows": {
       "minBuild": 19041
     },
-    "requiresReboot": false,
+    "requiresReboot": true,
     "requiresExplorerRestart": false,
     "detect": {
       "type": "Registry",
@@ -1742,7 +1741,7 @@
     "verifiedOnBuild": "26100",
     "evidence": "documented",
     "whatItDoes": "Configures IPv4 as the preferred protocol over IPv6 in the Windows TCP/IP prefix policy table.",
-    "sideEffects": "Changes network routing preference; may break connectivity on modern IPv6-only networks or cellular hotspots.",
+    "sideEffects": "IPv4 is used before IPv6 when both are available. Restart required.",
     "sources": [
       "https://learn.microsoft.com/en-us/troubleshoot/windows-server/networking/configure-ipv6-in-windows"
     ],
@@ -1778,7 +1777,7 @@
     "windows": {
       "minBuild": 19041
     },
-    "requiresReboot": false,
+    "requiresReboot": true,
     "requiresExplorerRestart": false,
     "detect": {
       "type": "Registry",
@@ -1825,7 +1824,7 @@
     "source": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/teredo",
     "verifiedOnBuild": "26100",
     "evidence": "situational",
-    "whatItDoes": "Disables the Teredo tunneling transition protocol in the network stack.",
+    "whatItDoes": "Disables Teredo with netsh and sets DisabledComponents to 1, which turns off all IPv6 tunnel interfaces.",
     "sideEffects": "Disables IPv6-over-IPv4 tunneling; legacy multiplayer games or Xbox Live services that require Teredo NAT traversal may fail to connect.",
     "sources": [
       "https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2008-R2-and-2008/cc731518(v=ws.10)"
@@ -1861,7 +1860,7 @@
     "windows": {
       "minBuild": 19041
     },
-    "requiresReboot": false,
+    "requiresReboot": true,
     "requiresExplorerRestart": false,
     "detect": {
       "type": "Registry",
@@ -1946,7 +1945,7 @@
     "windows": {
       "minBuild": 19041
     },
-    "requiresReboot": false,
+    "requiresReboot": true,
     "requiresExplorerRestart": false,
     "detect": {
       "type": "Registry",
