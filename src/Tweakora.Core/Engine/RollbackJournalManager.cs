@@ -21,7 +21,7 @@ public sealed class RollbackJournalManager
         lock (_lock)
         {
             mode ??= TestModeManager.IsTestMode ? "test" : "real";
-            appVersion ??= "0.9.0-beta";
+            appVersion ??= AppInfo.Version;
 
             _currentSession = new RollbackJournalSession
             {

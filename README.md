@@ -1,153 +1,154 @@
-# WinVelo 🛡️
+<p align="center">
+  <img src="docs/branding/winvelo-256.png" width="112" alt="WinVelo logo" />
+</p>
 
-[![Release](https://img.shields.io/badge/release-v0.9.0--beta-blue.svg)](https://github.com/winvelo/winvelo/releases)
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)]()
-[![.NET Version](https://img.shields.io/badge/.NET-10.0%20LTS-purple.svg)](https://dotnet.microsoft.com/)
-[![Windows Target](https://img.shields.io/badge/Windows-10%20%7C%2011-blue.svg)]()
-[![Catalog Tweaks](https://img.shields.io/badge/verified%20tweaks-149-success.svg)]()
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+<h1 align="center">WinVelo</h1>
 
-**WinVelo** is an honest, calm, open-source Windows 10/11 configuration utility and package manager. Built in the design style of O&O ShutUp10++, it gives you full control and transparency over your system settings with verifiable evidence, exact registry keys, cited vendor documentation, and write-ahead rollback safety.
+<p align="center">
+  A transparent, open-source tweak tool for Windows 10 and 11.<br/>
+  See exactly what every setting changes, apply it, and undo it.
+</p>
 
----
+<p align="center">
+  <a href="https://github.com/Ziadtareks/WinVelo/releases/latest"><img src="https://img.shields.io/badge/release-v1.0.0-2563EB.svg" alt="Release v1.0.0"></a>
+  <img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10 | 11">
+  <img src="https://img.shields.io/badge/tweaks-152-10B981.svg" alt="152 tweaks">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green.svg" alt="MIT License"></a>
+</p>
 
-## 🎯 What WinVelo Does & Does NOT Do
-
-### What WinVelo Does
-- **Full Transparency**: Every tweak displays its exact registry keys, values, and service configurations before and after application.
-- **Evidence-Based Documentation**: Every setting cites official vendor documentation (Microsoft Learn / policy CSPs) or provides its exact breadcrumb path in Windows Settings (e.g., *Settings › Personalization › Colors*).
-- **Transactional Rollback Journal**: Logs original pre-modification system baselines to `%APPDATA%\WinVelo\Journal` to ensure true undo capability.
-- **Safety Safeguards**: Prompts for System Restore point creation and verifies restore points before making system adjustments.
-- **Curated Package Manager**: Installs verified software via standard Windows Package Manager (`winget`) without bundled adware.
-
-### What WinVelo Does NOT Do
-- ❌ **No "Speed Boosts" or Placebos**: We do not claim arbitrary "+15% FPS" gains, lower mouse input lag by 5ms, or run deceptive "RAM purges" that harm cache efficiency.
-- ❌ **No Telemetry or Phone-Homes**: WinVelo contains zero telemetry, analytics, user tracking, or third-party advertising SDKs.
-- ❌ **No Silent or Automatic Changes**: Nothing is applied without your explicit choice and confirmation.
+![WinVelo](docs/screenshots/home.png)
 
 ---
 
-## 🛡️ Safety Model
+## Download
 
-1. **Pre-Flight Restore Point**: Offers to create and verify a Windows System Restore point before applying changes.
-2. **Preview Before Applying**: High-risk, medium-risk, and batch actions enforce the Unified Execution Dialog showing the exact registry differences before applying.
-3. **Write-Ahead Baseline Journal**: Captures the state of your system before writing changes, enabling reliable single-tweak, session, or global rollbacks.
-4. **Instant Toast Undo**: Safe and Low-risk tweaks applied with a single click provide an instant "Undo" toast notification.
-5. **Crash Recovery Guard**: Interrupted or terminated sessions are detected on next launch with an automated rollback prompt.
+1. Download **`WinVelo-v1.0.0-portable.zip`** from the [latest release](https://github.com/Ziadtareks/WinVelo/releases/latest).
+2. Unzip it anywhere: your Desktop, a tools folder, or a USB stick.
+3. Run **`WinVelo.exe`** and accept the administrator prompt.
 
----
+There is nothing to install and you don't need to download .NET, because the runtime is built into the exe. Keep the `Catalog` folder next to `WinVelo.exe`, since it holds the tweak definitions.
 
-## ⚠️ Limitations & Disclaimers
+> **Windows SmartScreen:** WinVelo isn't code-signed yet, so Windows may show *"Windows protected your PC"*. Click **More info**, then **Run anyway**. You can check the download against the SHA-256 hash on the release page.
 
-- **Administrator Privileges**: Applying system-wide tweaks (`HKLM`), managing services, or creating restore points requires Administrator elevation.
-- **Irreversible Tweaks**: Certain actions (e.g., permanent Edge removal, OneDrive uninstallation, Disk Cleanup) cannot be undone via registry inversion and are strictly flagged as irreversible with extra confirmation guards.
-- **Unsigned Binaries (SmartScreen)**: As a new open-source project, binaries are not yet code-signed with an expensive EV certificate. Windows SmartScreen may display an *"Unknown Publisher"* warning. You can verify package hashes against our signed `SHA256SUMS.txt` or build directly from source.
+**Requirements:** Windows 10 version 2004 (build 19041) or newer, or Windows 11, 64-bit.
 
 ---
 
-## 📸 Screenshots
+## What WinVelo does
 
-![WinVelo Visual Overview](docs/screenshots/overview.png)
+- **Shows every change before it happens.** Each tweak lists the exact registry values, services or scheduled tasks it touches, its risk level, its side effects and where the information comes from.
+- **Lets you undo anything reversible.** Before a change is written, the original value is saved to a rollback journal (`%APPDATA%\WinVelo`). You can undo a single tweak, a whole session, or every change WinVelo has made.
+- **Is honest about evidence.** Each tweak is labelled as *documented* (Microsoft documentation, with a quote), *UI-equivalent* (the same switch exists in Windows Settings, and the path is shown), *situational* (it fixes a specific problem), or *anecdotal*. Anecdotal tweaks stay hidden under **Experimental**.
+- **Keeps Windows working.** Windows Update, the Microsoft Store, BITS and Windows Security are protected and are never disabled.
 
-### Home (Calm System Status)
-Honest status overview showing administrator privilege, System Restore state with latest restore point date, exact count of tweaks applied by WinVelo, servicing health, and preset cards.
-![WinVelo Home](docs/screenshots/home.png)
+### What it doesn't do
 
-### Tweaks (Catalog & Exact Changes)
-149 verified tweaks categorized by risk (Safe, Low, Medium, High) with honest state badges (Applied, Partial, Not applied, Can't verify), auto-generated exact changes, and cited source documentation.
-![WinVelo Tweaks](docs/screenshots/tweaks.png)
-
-### Apps (Curated Package Manager)
-Curated package installer across Browsers, Social, Media, Utilities, Gaming, and Development with live installation progress.
-![WinVelo Apps](docs/screenshots/apps.png)
-
-### Tools (Consolidated System Hub)
-Consolidated toolkit housing Startup Apps, Windows Services, System Cleaner, DNS switcher, Windows Fixes, Windows Updates mode, Optional Features, and Restore Points.
-![WinVelo Tools](docs/screenshots/tools.png)
-
-### History & Rollback Journal
-Complete rollback journal listing sessions newest first, grouped tweak statuses, single-click session and tweak undo, "Undo all WinVelo changes", and diagnostic export.
-![WinVelo History](docs/screenshots/history.png)
+- No "FPS boost", "RAM cleaner" or other placebo tweaks.
+- No telemetry, analytics, ads or update checks. WinVelo only uses the network when you install an app or run the DNS benchmark. See [PRIVACY.md](PRIVACY.md).
+- Nothing is applied without you choosing it and confirming it.
 
 ---
 
-## 💾 Download
+## Features
 
-Get **`WinVelo-v<version>-portable.zip`** from the [Releases page](../../releases/latest).
+| | |
+|---|---|
+| **Home** | System status: administrator rights, restore point, number of WinVelo changes and servicing health. It also holds the presets. |
+| **Presets** | Recommended, Privacy, AI & Copilot, Clean UI, Performance and Gaming, each with a *Standard* and a *Full* level. A preview shows every tweak before anything is applied, plus a "Not included" list that explains what was left out and why. |
+| **Tweaks** | All 152 tweaks, searchable and filterable by category, risk (Safe, Low, Medium, High) and status (Applied, Partial, Not applied, Can't verify). **Simple mode** shows only Safe and Low tweaks that have strong evidence. |
+| **Apps** | Install 36 popular apps in one go with `winget` (or Chocolatey). |
+| **Tools** | Startup apps, Windows services, cleaner, DNS benchmark and switcher, common fixes, Windows Update settings, optional features and restore points. |
+| **History** | Every session WinVelo ran, with one-click undo. |
 
-1. Unzip it anywhere (Desktop, USB drive, ...).
-2. Run `WinVelo.exe`. No installation and no .NET download needed — the runtime is built into the exe.
-3. Keep the `Catalog` folder next to `WinVelo.exe`; it holds the tweak definitions.
+<details>
+<summary><b>More screenshots</b></summary>
 
-The zip also contains `winvelo-cli.exe`, `LICENSE` and `THIRD-PARTY-NOTICES.md`. SHA-256 checksums are listed in `SHA256SUMS.txt` on the release page.
+**Tweaks**
+![Tweaks](docs/screenshots/tweaks.png)
 
-To build the portable package yourself: `.\build\publish.ps1` (output in `dist\`).
+**Preset preview**
+![Preview](docs/screenshots/preview.png)
+
+**Tools**
+![Tools](docs/screenshots/tools.png)
+
+**Apps**
+![Apps](docs/screenshots/apps.png)
+
+**History**
+![History](docs/screenshots/history.png)
+
+**Settings**
+![Settings](docs/screenshots/settings.png)
+
+</details>
 
 ---
 
-## ⌨️ Command-Line Interface (`winvelo-cli`)
+## Safety tips
 
-WinVelo includes a dedicated automation CLI (`winvelo-cli.exe`):
+- Create a restore point before your first changes. WinVelo offers to do this for you.
+- Start with a preset's **Standard** level or with **Simple mode**.
+- **High**-risk tweaks and irreversible actions (for example removing Edge or OneDrive) are never part of a preset and ask for extra confirmation.
+- Some tweaks need a restart or an Explorer restart. The preview tells you which ones.
+- You can try the whole interface without touching your system: `WinVelo.exe --test-mode`.
+
+---
+
+## Command line
+
+`winvelo-cli.exe` ships in the same zip. It runs in **simulation mode by default**. Add `--real-mode` to change the real system.
 
 ```powershell
-# Safe read-only inspection of a tweak with documentation and exact changes
-winvelo-cli.exe --info "pref.darkmode"
-
-# Non-destructive simulation preview of all tweaks
-winvelo-cli.exe --dry-run
-
-# Run safe automated self-test in simulated test mode
-winvelo-cli.exe --test-mode --self-test --level 1
-
-# Export read-only diagnostic bundle for bug reports (sanitized of user paths)
-winvelo-cli.exe --diagnostics WinVelo-Diagnostics.zip
-
-# Revert a specific tweak
-winvelo-cli.exe --undo "pref.darkmode"
+winvelo-cli --list                                # list all tweaks
+winvelo-cli --info privacy.advertising.advertising-id   # details and exact changes
+winvelo-cli --detect-all                          # read-only status of every tweak
+winvelo-cli --preset privacy --dry-run            # preview a preset
+winvelo-cli --tweak ui.explorer.show-file-extensions --apply --real-mode
+winvelo-cli --tweak ui.explorer.show-file-extensions --undo --real-mode
+winvelo-cli --diagnostics WinVelo-Diagnostics.zip # anonymised bundle for bug reports
 ```
 
+Run `winvelo-cli --help` for every option.
+
 ---
 
-## 🚀 Building from Source
+## Build from source
 
-### Prerequisites
-- Windows 10 (Build 19041+) or Windows 11
-- [.NET 10 SDK (LTS)](https://dotnet.microsoft.com/)
+You need Windows 10/11 and the [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0).
 
-### Clone and Build
 ```powershell
-git clone https://github.com/winvelo/winvelo.git
-cd winvelo
+git clone https://github.com/Ziadtareks/WinVelo.git
+cd WinVelo
 
-# Build solution (0 warnings, 0 errors)
 dotnet build Tweakora.sln -c Release
-
-# Run unit tests
 dotnet test src/Tweakora.Tests/Tweakora.Tests.csproj
-
-# Run UI tests in safe simulation test mode
-dotnet test src/Tweakora.UiTests/Tweakora.UiTests.csproj
-
-# Validate catalog schema integrity
 dotnet run --project tools/CatalogValidator/CatalogValidator.csproj
 
-# Launch WinVelo in safe simulated test mode
+# run the app without touching your system
 dotnet run --project src/Tweakora.App/Tweakora.App.csproj -- --test-mode
+
+# build the portable package into dist\
+.\build\publish.ps1
 ```
 
----
+The source folders still use the project's former name, *Tweakora*.
 
-## 🙏 Credits & Acknowledgments
+### Adding a tweak
 
-- **WinUtil (Chris Titus Tech)**: We express sincere appreciation to Chris Titus Tech and contributors to [winutil](https://github.com/ChrisTitusTech/winutil) (licensed under MIT). WinUtil inspired several foundational PowerShell and Windows servicing automation concepts ported to WinVelo's C#/.NET 10 engine.
-- **O&O ShutUp10++**: The UI design, calm aesthetic, and non-intrusive presentation were directly inspired by the clarity of O&O ShutUp10++.
-- **WPF UI**: Fluent design controls by [lepoco/wpfui](https://github.com/lepoco/wpfui).
+Tweaks are plain JSON files in [`Catalog/Tweaks`](Catalog/Tweaks), checked against [`Catalog/schema/tweak.schema.json`](Catalog/schema/tweak.schema.json). See the [tweak authoring guide](docs/TWEAK_GUIDE.md), then run the catalog validator and `tools/PresetGenerator` before you open a pull request.
 
 ---
 
-## 📄 License & Governance
+## Credits
 
-- License: [MIT License](LICENSE)
-- Privacy Policy: [PRIVACY.md](PRIVACY.md)
-- Security Policy: [SECURITY.md](SECURITY.md)
-- Contributing Guide: [CONTRIBUTING.md](CONTRIBUTING.md)
+- [WinUtil](https://github.com/ChrisTitusTech/winutil) by Chris Titus Tech (MIT). Many tweaks started from WinUtil's catalog.
+- [O&O ShutUp10++](https://www.oo-software.com/en/shutup10), which inspired the calm, transparent presentation.
+- [WPF UI](https://github.com/lepoco/wpfui) for the Fluent controls.
+- Full list: [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
+
+## License
+
+[MIT](LICENSE). See also [PRIVACY.md](PRIVACY.md), [SECURITY.md](SECURITY.md), [CONTRIBUTING.md](CONTRIBUTING.md) and the [CHANGELOG](CHANGELOG.md).
+
+WinVelo changes system settings. Use it at your own risk and keep a restore point.

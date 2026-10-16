@@ -6,7 +6,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [0.9.0-beta] - 2026-10-15
+## [1.0.0] - 2026-10-16
+
+First stable release.
+
+### Added
+- 15 commonly requested tweaks: Microsoft Edge sidebar, startup boost and background mode policies; Click to Do; Recall availability; Paint and Notepad AI features; Widgets policy; File Explorer sync-provider ads; OneDrive entry in the File Explorer navigation pane; last-active-window taskbar click; Find My Device; Fast Startup; close apps automatically at shutdown; startup-app delay (Experimental). The catalog now has 152 tweaks.
+- `presetRole` for every tweak. Presets only contain optimizations; personal preferences, problem-specific fixes, one-time actions and advanced tuning are listed under "Not included" with a reason.
+- New app icon (exe, window, taskbar and sidebar).
+- Portable single-file release: `WinVelo.exe` and `winvelo-cli.exe` with the .NET runtime built in.
+
+### Fixed
+- Settings page was blank.
+- Setup wizard: the Simple Mode option did not show its title and used a different selector than Advanced Mode.
+- Presets could contain two tweaks that change the same setting in opposite ways.
+- Misleading names and descriptions of several preference toggles; wrong topic tags.
+- Missing accent colors on the Tools page icons and Tweaks filter chips.
+- Preview dialog groups showed raw catalog keys (for example `z__Advanced Tweaks - CAUTION`).
+- Version was hard-coded as beta in several places; it now comes from one place.
+- CLI help listed preset names that do not exist.
+- Privacy policy described an update check that the app does not have.
+
+### Changed
+- Recommended Baseline preset is Safe-only and its description matches what it does.
+- Only the portable package is published (the framework-dependent package was dropped).
+
+## [0.9.0-beta] - 2026-10-15 (internal, not published)
 
 This is the first honest public beta release of WinVelo. This release completely rebuilds the core engine, audits the tweak catalog for factual accuracy and evidence, and introduces a calm, transparent user interface inspired by O&O ShutUp10++.
 

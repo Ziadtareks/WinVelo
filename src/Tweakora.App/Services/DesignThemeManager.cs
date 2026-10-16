@@ -32,6 +32,8 @@ public static class DesignThemeManager
             SetBrush(res, "AccentPrimaryBrush", "#2563EB");
             SetBrush(res, "AccentHoverBrush", "#1D4ED8");
             SetBrush(res, "AccentPressedBrush", "#1E40AF");
+            SetBrush(res, "AccentBrush", "#1D4ED8");
+            SetBrush(res, "AccentSubtleBrush", "#DBEAFE");
 
             // Status Badges
             SetBrush(res, "StatusAppliedBgBrush", "#D1FAE5");
@@ -82,6 +84,8 @@ public static class DesignThemeManager
             SetBrush(res, "AccentPrimaryBrush", "#3B82F6");
             SetBrush(res, "AccentHoverBrush", "#60A5FA");
             SetBrush(res, "AccentPressedBrush", "#2563EB");
+            SetBrush(res, "AccentBrush", "#60A5FA");
+            SetBrush(res, "AccentSubtleBrush", "#263B82F6");
 
             // Status Badges
             SetBrush(res, "StatusAppliedBgBrush", "#064E3B");

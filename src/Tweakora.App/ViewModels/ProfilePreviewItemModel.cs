@@ -36,11 +36,29 @@ public sealed partial class ProfilePreviewItemModel : ObservableObject
 
     public Action? OnSelectionChanged { get; set; }
 
-    public string Subcategory => !string.IsNullOrWhiteSpace(Tweak.Subcategory)
+    public string Subcategory => ToDisplayGroup(!string.IsNullOrWhiteSpace(Tweak.Subcategory)
         ? Tweak.Subcategory
-        : (!string.IsNullOrWhiteSpace(Tweak.Category)
-            ? System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(Tweak.Category)
-            : "General");
+        : (!string.IsNullOrWhiteSpace(Tweak.Category) ? Tweak.Category : "General"));
+
+    private static readonly Dictionary<string, string> GroupNames = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["z__Advanced Tweaks - CAUTION"] = "Advanced (use with care)",
+        ["clicktodo"] = "Click to Do",
+        ["dvr"] = "Game DVR",
+        ["gamebar"] = "Game Bar",
+        ["ui"] = "UI",
+        ["ai"] = "AI",
+    };
+
+    /// <summary>Turns raw catalog subcategory keys (e.g. "copilot", "z__Advanced Tweaks - CAUTION") into readable group titles.</summary>
+    public static string ToDisplayGroup(string raw)
+    {
+        if (GroupNames.TryGetValue(raw, out var name)) return name;
+        string s = raw.StartsWith("z__", StringComparison.Ordinal) ? raw[3..] : raw;
+        return s.Length > 0 && s == s.ToLowerInvariant()
+            ? System.Globalization.CultureInfo.InvariantCulture.TextInfo.ToTitleCase(s)
+            : s;
+    }
 
     public bool IsSelectable => !IsAlreadyApplied;
 

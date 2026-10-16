@@ -26,7 +26,7 @@ public sealed class DiagnosticsResult
 
 public sealed class SystemDiagnosticInfo
 {
-    public string AppVersion { get; init; } = "0.9.0-beta";
+    public string AppVersion { get; init; } = AppInfo.Version;
     public string OSDescription { get; init; } = RuntimeInformation.OSDescription;
     public string OSVersion { get; init; } = Environment.OSVersion.VersionString;
     public string OSArchitecture { get; init; } = RuntimeInformation.OSArchitecture.ToString();
@@ -136,23 +136,7 @@ public sealed class DiagnosticsCollector
         };
     }
 
-    private static string GetAppVersion()
-    {
-        try
-        {
-            var assembly = Assembly.GetEntryAssembly() ?? Assembly.GetExecutingAssembly();
-            var infoVer = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
-            if (!string.IsNullOrWhiteSpace(infoVer))
-            {
-                return infoVer.Split('+')[0]; // Strip git commit hash if present
-            }
-            return assembly.GetName().Version?.ToString(3) ?? "0.9.0-beta";
-        }
-        catch
-        {
-            return "0.9.0-beta";
-        }
-    }
+    private static string GetAppVersion() => AppInfo.Version;
 
     private static List<JournalSessionSummaryItem> CollectJournalSummaries(string journalDir)
     {

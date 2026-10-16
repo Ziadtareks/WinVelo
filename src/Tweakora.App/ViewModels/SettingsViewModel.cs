@@ -27,7 +27,7 @@ public sealed partial class SettingsViewModel : ObservableObject
     [ObservableProperty]
     private bool _showExperimental;
 
-    public string VersionDisplay => $"v{typeof(SettingsViewModel).Assembly.GetName().Version?.ToString(3) ?? "0.9.0"}-beta";
+    public string VersionDisplay => Tweakora.Core.AppInfo.DisplayVersion;
     public string OsDescription => Environment.OSVersion.VersionString;
 
     public SettingsViewModel(
