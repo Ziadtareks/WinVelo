@@ -7,6 +7,41 @@
 
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisConverter" />
+
+        <Style x:Key="SegmentedRadioBtn" TargetType="RadioButton">
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Padding" Value="10,4" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="4"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource AccentPrimaryBrush}" />
+                                <Setter Property="Foreground" Value="White" />
+                            </Trigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsMouseOver" Value="True" />
+                                    <Condition Property="IsChecked" Value="False" />
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource ControlFillColorSecondaryBrush}" />
+                            </MultiTrigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </UserControl.Resources>
 
     <Grid>
@@ -147,7 +182,7 @@
                 </Grid>
             </Border>
 
-            <!-- ==================== PRESETS SECTION (3 CURATED PRESETS) ==================== -->
+            <!-- ==================== PRESETS SECTION (CURATED PRESETS) ==================== -->
             <DockPanel LastChildFill="False" Margin="2,0,0,12">
                 <StackPanel DockPanel.Dock="Left">
                     <TextBlock Text="Presets" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" />
@@ -158,7 +193,7 @@
             <ItemsControl ItemsSource="{Binding Profiles}" Margin="0,0,0,16">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <UniformGrid Columns="3" Rows="1" />
+                        <UniformGrid Columns="3" />
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
@@ -170,37 +205,52 @@
                                 BorderThickness="1" CornerRadius="10" Padding="18,16" Margin="4">
                             <Grid>
                                 <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto" /> <!-- Header: Icon, Title, Badge -->
-                                    <RowDefinition Height="Auto" /> <!-- Description -->
+                                    <RowDefinition Height="Auto" /> <!-- Header: Icon, Title -->
+                                    <RowDefinition Height="Auto" /> <!-- One-line Description -->
+                                    <RowDefinition Height="Auto" /> <!-- Tiers Subtitle & Selector -->
                                     <RowDefinition Height="*" />    <!-- Included Tweaks Preview -->
                                     <RowDefinition Height="Auto" /> <!-- Action Button & Status -->
                                 </Grid.RowDefinitions>
 
                                 <!-- Card Header -->
-                                <StackPanel Grid.Row="0" Margin="0,0,0,10">
-                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                        <Border Background="{DynamicResource ControlFillColorSecondaryBrush}" CornerRadius="8" Width="36" Height="36" Margin="0,0,10,0">
-                                            <ui:SymbolIcon Symbol="{Binding IconSymbol}" Foreground="{DynamicResource AccentPrimaryBrush}" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                        </Border>
-                                        <StackPanel VerticalAlignment="Center">
-                                            <TextBlock AutomationProperties.AutomationId="{Binding Id, StringFormat='PresetCard_{0}'}"
-                                                       AutomationProperties.Name="{Binding Title}"
-                                                       Text="{Binding Title}" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" />
-                                            <TextBlock Text="{Binding TweakCountText}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" />
-                                        </StackPanel>
-                                    </StackPanel>
+                                <DockPanel Grid.Row="0" LastChildFill="True" Margin="0,0,0,8">
+                                    <Border DockPanel.Dock="Left" Background="{DynamicResource ControlFillColorSecondaryBrush}" CornerRadius="8" Width="36" Height="36" Margin="0,0,10,0" VerticalAlignment="Top">
+                                        <ui:SymbolIcon Symbol="{Binding IconSymbol}" Foreground="{DynamicResource AccentPrimaryBrush}" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    </Border>
+                                    <TextBlock AutomationProperties.AutomationId="{Binding Id, StringFormat='PresetCard_{0}'}"
+                                               AutomationProperties.Name="{Binding Title}"
+                                               Text="{Binding Title}" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"
+                                               TextWrapping="Wrap" LineHeight="18" VerticalAlignment="Center" />
+                                </DockPanel>
 
-                                    <Border HorizontalAlignment="Left" Background="{Binding BadgeBg}" CornerRadius="6" Padding="8,3" Margin="0,8,0,0">
-                                        <TextBlock Text="{Binding BadgeText}" FontSize="10" FontWeight="Bold" Foreground="{Binding BadgeFg}" />
+                                <!-- One-line Description -->
+                                <TextBlock Grid.Row="1" Text="{Binding Description}" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}"
+                                           TextTrimming="CharacterEllipsis" Margin="0,0,0,8" />
+
+                                <!-- Tiers Subtitle & Standard/Full Selector -->
+                                <StackPanel Grid.Row="2" Margin="0,0,0,10">
+                                    <TextBlock Text="{Binding TiersSubtitle}" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" FontWeight="SemiBold" Margin="0,0,0,6" />
+                                    <Border Background="{DynamicResource BgDeepBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
+                                            BorderThickness="1" CornerRadius="6" Padding="2" HorizontalAlignment="Left">
+                                        <StackPanel Orientation="Horizontal">
+                                            <RadioButton Content="Standard"
+                                                         AutomationProperties.AutomationId="{Binding Id, StringFormat='TierStandard_{0}'}"
+                                                         AutomationProperties.Name="{Binding Title, StringFormat='Standard tier for {0}'}"
+                                                         GroupName="{Binding Id, StringFormat='Tier_{0}'}"
+                                                         IsChecked="{Binding IsStandardTier, Mode=TwoWay}"
+                                                         Style="{StaticResource SegmentedRadioBtn}" />
+                                            <RadioButton Content="Full"
+                                                         AutomationProperties.AutomationId="{Binding Id, StringFormat='TierFull_{0}'}"
+                                                         AutomationProperties.Name="{Binding Title, StringFormat='Full tier for {0}'}"
+                                                         GroupName="{Binding Id, StringFormat='Tier_{0}'}"
+                                                         IsChecked="{Binding IsFullTier, Mode=TwoWay}"
+                                                         Style="{StaticResource SegmentedRadioBtn}" />
+                                        </StackPanel>
                                     </Border>
                                 </StackPanel>
 
-                                <!-- Description -->
-                                <TextBlock Grid.Row="1" Text="{Binding Description}" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}"
-                                           TextWrapping="Wrap" Margin="0,0,0,10" MinHeight="36" LineHeight="18" />
-
                                 <!-- Included Tweaks Preview -->
-                                <Border Grid.Row="2" Background="{DynamicResource BgDeepBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
+                                <Border Grid.Row="3" Background="{DynamicResource BgDeepBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
                                         BorderThickness="1" CornerRadius="6" Padding="10,8" Margin="0,0,0,14">
                                     <StackPanel>
                                         <TextBlock Text="Included tweaks:" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,4" />
@@ -210,11 +260,11 @@
                                 </Border>
 
                                 <!-- Button & Status Message -->
-                                <DockPanel Grid.Row="3" LastChildFill="False">
+                                <DockPanel Grid.Row="4" LastChildFill="False">
                                     <ui:Button DockPanel.Dock="Left"
                                                Appearance="Primary"
                                                AutomationProperties.AutomationId="{Binding Id, StringFormat='ProfileBtn_{0}'}"
-                                               AutomationProperties.Name="{Binding Title, StringFormat='Apply {0} Profile'}"
+                                               AutomationProperties.Name="{Binding Title, StringFormat='Review {0}'}"
                                                Content="{Binding ButtonText}"
                                                Command="{Binding ApplyCommand}"
                                                Padding="16,7" FontWeight="SemiBold" />
@@ -254,7 +304,7 @@
                         <Button AutomationProperties.AutomationId="SmartAnalyzeOptimizeButton"
                                 AutomationProperties.Name="Get recommendations"
                                 Content="Get recommendations"
-                                Style="{DynamicResource ModernGhostBtn}"
+                                Style="{DynamicResource ModernSecondaryBtn}"
                                 Command="{Binding GetRecommendationsCommand}"
                                 IsEnabled="{Binding IsNotSmartOptimizing}"
                                 Padding="12,6" FontSize="12" />

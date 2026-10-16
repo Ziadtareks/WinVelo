@@ -234,4 +234,68 @@ public sealed class PresetValidationTests
             Assert.Contains("Recommendations", dvm.ProfilePreviewTitle);
         }
     }
+
+    [Fact]
+    public void DashboardViewModel_PresetCards_StandardFullSelectorTogglesTweaksAndPreview()
+    {
+        var fakeReg = new FakeRegistryService();
+        var fakeSvc = new FakeServicesService();
+        var fakeSched = new FakeTaskSchedulerService();
+        var fakeRestore = new FakeRestoreService();
+        var fakeShell = new FakeShellService();
+        var journal = new RollbackJournalManager(Path.Combine(AppContext.BaseDirectory, "test-journal-dvm-tiers"));
+        var runner = new OperationRunner();
+
+        var tweakService = new TweakService(fakeReg, fakeSvc, fakeSched, fakeRestore, fakeShell, journal);
+        var memOpt = new MemoryOptimizerService();
+        var advisor = new SmartAdvisorService(fakeReg, fakeShell);
+        var dvm = new DashboardViewModel(tweakService, runner, fakeRestore, memOpt, advisor);
+
+        var gamingCard = dvm.Profiles.FirstOrDefault(p => p.Id == "preset.gaming");
+        Assert.NotNull(gamingCard);
+        Assert.Equal("Standard: 4 tweaks · Full: 13 tweaks", gamingCard.TiersSubtitle);
+
+        // Gaming starts in Standard tier
+        Assert.True(gamingCard.IsStandardTier);
+        Assert.False(gamingCard.IsFullTier);
+        Assert.Equal(4, gamingCard.PreviewTweaks.Count);
+        Assert.DoesNotContain("and", gamingCard.PreviewTweakSummary); // 4 tweaks total, no remaining
+
+        // Toggle to Full tier
+        gamingCard.IsFullTier = true;
+        Assert.False(gamingCard.IsStandardTier);
+        Assert.Equal(4, gamingCard.PreviewTweaks.Count); // Preview shows first 4
+        Assert.Contains("and 9 more", gamingCard.PreviewTweakSummary); // 13 - 4 = 9 remaining
+
+        // Toggle back to Standard tier
+        gamingCard.IsStandardTier = true;
+        Assert.True(gamingCard.IsStandardTier);
+        Assert.False(gamingCard.IsFullTier);
+        Assert.DoesNotContain("and", gamingCard.PreviewTweakSummary);
+    }
+
+    [Fact]
+    public void DashboardViewModel_PresetCards_StatusMessageAutoClearsAndClearsOnNav()
+    {
+        var fakeReg = new FakeRegistryService();
+        var fakeSvc = new FakeServicesService();
+        var fakeSched = new FakeTaskSchedulerService();
+        var fakeRestore = new FakeRestoreService();
+        var fakeShell = new FakeShellService();
+        var journal = new RollbackJournalManager(Path.Combine(AppContext.BaseDirectory, "test-journal-dvm-status"));
+        var runner = new OperationRunner();
+
+        var tweakService = new TweakService(fakeReg, fakeSvc, fakeSched, fakeRestore, fakeShell, journal);
+        var memOpt = new MemoryOptimizerService();
+        var advisor = new SmartAdvisorService(fakeReg, fakeShell);
+        var dvm = new DashboardViewModel(tweakService, runner, fakeRestore, memOpt, advisor);
+
+        var gamingCard = dvm.Profiles.First(p => p.Id == "preset.gaming");
+        gamingCard.SetStatusMessage("Profile applied successfully!", "#34D399");
+        Assert.Equal("Profile applied successfully!", gamingCard.StatusMessage);
+
+        // Navigation or manual clear wipes it immediately
+        dvm.ClearProfileStatusMessages();
+        Assert.Empty(gamingCard.StatusMessage);
+    }
 }

@@ -126,15 +126,64 @@ public sealed partial class ProfileCardModel : ObservableObject
     public required string Id { get; init; }
     public required string Title { get; init; }
     public required string Description { get; init; }
-    public required string BadgeText { get; init; }
-    public required string BadgeBg { get; init; }
-    public required string BadgeFg { get; init; }
-    public required string TweakCountText { get; init; }
-    public required string ImpactText { get; init; }
+    public string BadgeText { get; init; } = string.Empty;
+    public string BadgeBg { get; init; } = string.Empty;
+    public string BadgeFg { get; init; } = string.Empty;
+    public string TweakCountText { get; init; } = string.Empty;
+    public string ImpactText { get; init; } = string.Empty;
     public required string ButtonText { get; init; }
     public required string IconSymbol { get; init; }
-    public IReadOnlyList<string> PreviewTweaks { get; init; } = Array.Empty<string>();
-    public string PreviewTweakSummary { get; init; } = string.Empty;
+    public required string TiersSubtitle { get; init; }
+
+    public IReadOnlyList<TweakDefinition> StandardTweaks { get; init; } = Array.Empty<TweakDefinition>();
+    public IReadOnlyList<TweakDefinition> FullTweaks { get; init; } = Array.Empty<TweakDefinition>();
+    public IReadOnlyList<ExcludedPresetTweak> ExcludedTweaks { get; init; } = Array.Empty<ExcludedPresetTweak>();
+
+    [ObservableProperty]
+    private bool _isFullTier;
+
+    public bool IsStandardTier
+    {
+        get => !IsFullTier;
+        set
+        {
+            if (value && IsFullTier)
+            {
+                IsFullTier = false;
+            }
+        }
+    }
+
+    partial void OnIsFullTierChanged(bool value)
+    {
+        OnPropertyChanged(nameof(IsStandardTier));
+        UpdatePreview();
+    }
+
+    public IReadOnlyList<string> PreviewTweaks { get; private set; } = Array.Empty<string>();
+
+    [ObservableProperty]
+    private string _previewTweakSummary = string.Empty;
+
+    public void UpdatePreview()
+    {
+        var activeTweaks = IsFullTier ? FullTweaks : StandardTweaks;
+        var first4 = activeTweaks.Take(4).Select(t => t.Name).ToList();
+        PreviewTweaks = first4;
+        int remainingCount = activeTweaks.Count - first4.Count;
+        if (first4.Count == 0)
+        {
+            PreviewTweakSummary = "No tweaks in standard tier.";
+        }
+        else if (remainingCount > 0)
+        {
+            PreviewTweakSummary = $"{string.Join(", ", first4)}, and {remainingCount} more";
+        }
+        else
+        {
+            PreviewTweakSummary = string.Join(", ", first4);
+        }
+    }
 
     [ObservableProperty]
     private bool _isBusy;
@@ -147,6 +196,33 @@ public sealed partial class ProfileCardModel : ObservableObject
 
     [ObservableProperty]
     private string _statusColor = "#34D399";
+
+    private System.Threading.Timer? _autoClearTimer;
+
+    public void SetStatusMessage(string message, string color = "#34D399", bool hasFailures = false)
+    {
+        _autoClearTimer?.Dispose();
+        StatusMessage = message;
+        StatusColor = color;
+        HasFailures = hasFailures;
+
+        _autoClearTimer = new System.Threading.Timer(_ =>
+        {
+            Application.Current?.Dispatcher?.Invoke(() =>
+            {
+                StatusMessage = string.Empty;
+                HasFailures = false;
+            });
+        }, null, 4000, System.Threading.Timeout.Infinite);
+    }
+
+    public void ClearStatusMessage()
+    {
+        _autoClearTimer?.Dispose();
+        _autoClearTimer = null;
+        StatusMessage = string.Empty;
+        HasFailures = false;
+    }
 
     public Action? OnShowDetails { get; set; }
 
@@ -535,7 +611,8 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
         string confirmText,
         IReadOnlyList<TweakDefinition> tweaks,
         bool isUndo,
-        ProfileCardModel? card)
+        ProfileCardModel? card,
+        IReadOnlyList<ExcludedPresetTweak>? excludedTweaks = null)
     {
         if (_executionDialog != null)
         {
@@ -870,83 +947,78 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
         // No background polling timers
     }
 
+    public void ClearProfileStatusMessages()
+    {
+        foreach (var card in Profiles)
+        {
+            card.ClearStatusMessage();
+        }
+    }
+
     private void InitializeProfiles()
     {
         Profiles.Clear();
 
-        var presets = _tweakService.LoadPresets();
+        var order = new[] { "preset.recommended", "preset.gaming", "preset.privacy", "preset.performance", "preset.clean-ui", "preset.ai" };
+        var presets = _tweakService.LoadPresets()
+            .OrderBy(p =>
+            {
+                int idx = Array.IndexOf(order, p.Id);
+                return idx >= 0 ? idx : 999;
+            })
+            .ToList();
+
         foreach (var preset in presets)
         {
-            var keySet = new HashSet<string>(preset.TweakIds, StringComparer.OrdinalIgnoreCase);
-            var tweaks = _catalog.Where(t => keySet.Contains(t.Id)).ToList();
+            var standardKeySet = new HashSet<string>(preset.Standard, StringComparer.OrdinalIgnoreCase);
+            var fullKeySet = new HashSet<string>(preset.Full, StringComparer.OrdinalIgnoreCase);
 
-            string badgeText = preset.Id switch
-            {
-                "preset.recommended" => "SAFE & RECOMMENDED",
-                "preset.gaming" => "BACKGROUND PACING",
-                "preset.privacy" => "ENHANCED PRIVACY",
-                _ => "CURATED PRESET"
-            };
-
-            string badgeBg = preset.Id switch
-            {
-                "preset.recommended" => "#064E3B",
-                "preset.gaming" => "#78350F",
-                "preset.privacy" => "#1E3A8A",
-                _ => "#1E293B"
-            };
-
-            string badgeFg = preset.Id switch
-            {
-                "preset.recommended" => "#34D399",
-                "preset.gaming" => "#FBBF24",
-                "preset.privacy" => "#60A5FA",
-                _ => "#94A3B8"
-            };
+            var standardTweaks = _catalog.Where(t => standardKeySet.Contains(t.Id)).ToList();
+            var fullTweaks = _catalog.Where(t => fullKeySet.Contains(t.Id)).ToList();
 
             string icon = preset.Id switch
             {
                 "preset.recommended" => "Flash24",
                 "preset.gaming" => "Games24",
                 "preset.privacy" => "ShieldCheckmark24",
+                "preset.performance" => "Rocket24",
+                "preset.clean-ui" => "Desktop24",
                 _ => "Sparkle24"
             };
 
-            var previewList = tweaks.Take(5).Select(t => t.Name).ToList();
-            int remainingCount = tweaks.Count - previewList.Count;
-            string previewSummary = string.Join(", ", previewList) + (remainingCount > 0 ? $", and {remainingCount} more" : "");
+            bool defaultFull = standardTweaks.Count == 0 && fullTweaks.Count > 0;
 
-            Profiles.Add(new ProfileCardModel
+            var card = new ProfileCardModel
             {
                 Id = preset.Id,
                 Title = preset.Name,
                 Description = preset.Description,
-                BadgeText = badgeText,
-                BadgeBg = badgeBg,
-                BadgeFg = badgeFg,
-                TweakCountText = $"{tweaks.Count} Tweaks",
-                ImpactText = "Curated Configuration",
+                TiersSubtitle = $"Standard: {standardTweaks.Count} tweaks · Full: {fullTweaks.Count} tweaks",
                 ButtonText = "Review",
                 IconSymbol = icon,
-                PreviewTweaks = previewList,
-                PreviewTweakSummary = previewSummary,
-                OnApplyAsync = async (card) =>
+                StandardTweaks = standardTweaks,
+                FullTweaks = fullTweaks,
+                ExcludedTweaks = preset.Excluded,
+                IsFullTier = defaultFull,
+                OnApplyAsync = async (c) =>
                 {
+                    var tweaks = c.IsFullTier ? c.FullTweaks : c.StandardTweaks;
+                    string tierName = c.IsFullTier ? "Full" : "Standard";
                     await OpenProfilePreviewAsync(
-                        preset.Name,
+                        $"{preset.Name} ({tierName})",
                         preset.Description,
                         "Already applied tweaks are skipped. You may untick any items before applying.",
                         "Apply Selected Tweaks",
                         tweaks,
                         isUndo: false,
-                        card);
+                        c,
+                        c.ExcludedTweaks);
                 }
-            });
-        }
+            };
 
-        foreach (var p in Profiles)
-        {
-            p.OnShowDetails = ShowDetailsDialog;
+            card.UpdatePreview();
+            card.OnShowDetails = ShowDetailsDialog;
+            Profiles.Add(card);
         }
     }
 
@@ -1233,9 +1305,7 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
 
         if (fail > 0)
         {
-            card.HasFailures = true;
-            card.StatusColor = "#EF4444";
-            card.StatusMessage = $"{actionVerb} {succ} of {total} — {fail} failed (details)";
+            card.SetStatusMessage($"{actionVerb} {succ} of {total} — {fail} failed (details)", "#EF4444", hasFailures: true);
             GlobalStatusMessage = $"{actionVerb} {succ} of {total} — {fail} failed (details)";
             DetailsDialogTitle = $"Execution Details — {card.Title}";
             ExecutionDetailsItems.Clear();
@@ -1247,18 +1317,14 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
         }
         else if (report.SkippedCount > 0)
         {
-            card.HasFailures = false;
-            card.StatusColor = "#60A5FA";
-            card.StatusMessage = $"{actionVerb} {succ} of {total} ({report.SkippedCount} skipped)";
+            card.SetStatusMessage($"{actionVerb} {succ} of {total} ({report.SkippedCount} skipped)", "#60A5FA");
             GlobalStatusMessage = $"{card.Title}: {actionVerb} {succ} of {total} ({report.SkippedCount} skipped).";
             HasFailedDetails = false;
             ExecutionDetailsItems.Clear();
         }
         else
         {
-            card.HasFailures = false;
-            card.StatusColor = "#34D399";
-            card.StatusMessage = isRestore ? "Defaults restored!" : "Profile applied successfully!";
+            card.SetStatusMessage(isRestore ? "Defaults restored!" : "Profile applied successfully!", "#34D399");
             GlobalStatusMessage = isRestore ? "Windows defaults restored successfully." : $"{card.Title} applied successfully.";
             HasFailedDetails = false;
             ExecutionDetailsItems.Clear();

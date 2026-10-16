@@ -254,6 +254,7 @@ public sealed partial class MainViewModel : ObservableObject
     [RelayCommand]
     public void SwitchTab(string tabName)
     {
+        DashboardVM.ClearProfileStatusMessages();
         switch (tabName)
         {
             case "Home" or "Dashboard":
