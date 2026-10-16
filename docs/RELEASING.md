@@ -1,6 +1,6 @@
 # WinVelo Release Guide
 
-This document provides step-by-step instructions for publishing an official release of **WinVelo**, verifying the build provenance attestation, and submitting the package to the official Windows Package Manager (`winget-pkgs`) repository.
+This document provides step-by-step instructions for publishing an official release of **WinVelo**, verifying the build provenance attestation, and (optionally) submitting it to Windows Package Manager.
 
 ---
 
@@ -99,22 +99,11 @@ Loaded 1 attestation from GitHub API
 
 ---
 
-## Step 6: Submit Package to Windows Package Manager (`winget-pkgs`)
+## Step 6 (optional): Publish to Windows Package Manager (`winget`)
 
-WinVelo manifests are pre-generated under `manifests/w/WinVelo/WinVelo/1.0.0/`.
+After the GitHub release is public, create and submit a manifest that points to the release zip:
 
-### Option A: Using `wingetcreate` CLI
 ```powershell
-# Submit the pre-generated manifests directory
-wingetcreate submit manifests\w\WinVelo\WinVelo\1.0.0
+winget install Microsoft.WingetCreate
+wingetcreate new https://github.com/Ziadtareks/WinVelo/releases/download/v1.0.0/WinVelo-v1.0.0-portable.zip
 ```
-*`wingetcreate` will prompt for a GitHub Personal Access Token (PAT) with `public_repo` scope and open a Pull Request against `microsoft/winget-pkgs`.*
-
-### Option B: Manual Fork & Pull Request
-1. Fork [microsoft/winget-pkgs](https://github.com/microsoft/winget-pkgs).
-2. Copy `manifests/w/WinVelo/WinVelo/1.0.0/` into `manifests/w/WinVelo/WinVelo/1.0.0/` in your fork.
-3. Validate locally with winget:
-   ```powershell
-   winget validate --manifest manifests\w\WinVelo\WinVelo\1.0.0
-   ```
-4. Commit and submit a PR to `microsoft/winget-pkgs`.

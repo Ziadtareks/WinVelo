@@ -105,11 +105,11 @@ C:\Dev\Tweakora\
 │   ├── Config\                  # Features, appx, and DNS presets
 │   ├── Presets\                 # Curated system profiles
 │   ├── schema\                  # tweak.schema.json validation schema
-│   ├── Tweaks\                  # 149 verified tweak definitions
+│   ├── Tweaks\                  # 152 tweak definitions
+│   ├── Localization\            # Arabic display text for tweaks and presets (ar.json)
 │   └── overrides.json           # Safety overrides & baseline exclusions
-├── dist\                        # Release packages (Portable & Small zips, SHA256SUMS.txt)
+├── dist\                        # Build output of build\publish.ps1 / release.ps1 (not committed)
 ├── docs\                        # Architecture, Safety, Roadmap, and Guides
-├── installer\                   # Inno Setup compilation script (tweakora.iss)
 ├── src\
 │   ├── Tweakora.App\            # WPF Views, ViewModels, Resources (WinVelo.exe)
 │   ├── Tweakora.Cli\            # Headless command-line tool (winvelo-cli.exe)
