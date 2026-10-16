@@ -11,6 +11,7 @@
     "category",
     "risk",
     "impacts",
+    "tags",
     "windows",
     "detect",
     "apply",
@@ -60,7 +61,11 @@
     },
     "tags": {
       "type": "array",
-      "items": { "type": "string" }
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "enum": ["gaming", "privacy", "ai", "ui", "performance", "network", "updates", "apps"]
+      }
     },
     "presets": {
       "type": "array",

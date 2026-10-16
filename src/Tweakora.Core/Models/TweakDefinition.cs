@@ -116,7 +116,7 @@ public sealed class TweakDefinition
     public List<string> Impacts { get; set; } = new();
 
     [JsonPropertyName("tags")]
-    public List<string>? Tags { get; set; }
+    public List<string> Tags { get; set; } = new();
 
     [JsonPropertyName("presets")]
     public List<string>? Presets { get; set; }

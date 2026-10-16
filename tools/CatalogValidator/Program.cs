@@ -134,6 +134,7 @@ public static class Program
                         ValidateRiskFloors(item, id, ref errorCount);
                         ValidateExplanations(item, id, ref errorCount);
                         ValidateRegistryKeys(item, id, ref errorCount);
+                        ValidateTags(item, id, ref errorCount);
 
                         if (!result.IsValid)
                         {
@@ -190,6 +191,7 @@ public static class Program
                     ValidateRiskFloors(single, id, ref errorCount);
                     ValidateExplanations(single, id, ref errorCount);
                     ValidateRegistryKeys(single, id, ref errorCount);
+                    ValidateTags(single, id, ref errorCount);
 
                     if (!result.IsValid)
                     {
@@ -1031,6 +1033,64 @@ public static class Program
             }
         }
     }
+
+    private static readonly HashSet<string> AllowedTopicTags = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "gaming", "privacy", "ai", "ui", "performance", "network", "updates", "apps"
+    };
+
+    private static void ValidateTags(JsonNode node, string id, ref int errorCount)
+    {
+        var tagsNode = node["tags"];
+        if (tagsNode == null)
+        {
+            errorCount++;
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"  [FAIL] Tweak '{id}' missing required 'tags' array.");
+            Console.ResetColor();
+            return;
+        }
+
+        if (tagsNode is not JsonArray tagsArray || tagsArray.Count == 0)
+        {
+            errorCount++;
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"  [FAIL] Tweak '{id}' has empty or invalid 'tags' array. Must contain at least 1 tag.");
+            Console.ResetColor();
+            return;
+        }
+
+        HashSet<string> seenTags = new(StringComparer.OrdinalIgnoreCase);
+        foreach (var tagItem in tagsArray)
+        {
+            string? tagStr = tagItem?.ToString();
+            if (string.IsNullOrWhiteSpace(tagStr))
+            {
+                errorCount++;
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"  [FAIL] Tweak '{id}' has null or empty tag in 'tags' array.");
+                Console.ResetColor();
+                continue;
+            }
+
+            if (!AllowedTopicTags.Contains(tagStr))
+            {
+                errorCount++;
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"  [FAIL] Tweak '{id}' has unrecognized tag '{tagStr}'. Allowed tags: {string.Join(", ", AllowedTopicTags)}.");
+                Console.ResetColor();
+            }
+
+            if (!seenTags.Add(tagStr))
+            {
+                errorCount++;
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"  [FAIL] Tweak '{id}' has duplicate tag '{tagStr}'.");
+                Console.ResetColor();
+            }
+        }
+    }
 }
+
 
 
