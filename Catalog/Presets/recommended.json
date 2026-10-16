@@ -1,24 +1,12 @@
 {
   "id": "preset.recommended",
   "name": "Recommended Baseline",
-  "description": "Safe, reversible baseline settings that balance privacy, system responsiveness, and clean UI without breaking any features.",
+  "description": "Only Safe tweaks: turns off ads, tips and tracking, shows file extensions, restores the classic right-click menu, and reduces animations and transparency.",
   "standard": [
-    "advanced.display",
-    "advanced.removehomeandgallery",
     "essential.disableexplorerautodiscovery",
-    "gaming.input.disable-mouse-acceleration",
-    "gaming.mode.enable",
     "performance.visual.disable-animations",
     "performance.visual.disable-transparency",
-    "pref.batterypercentage",
-    "pref.darkmode",
-    "pref.hidesettingshome",
-    "pref.newoutlook",
-    "pref.numlock",
-    "pref.scrollbars",
-    "pref.stickykeys",
-    "pref.taskbarsearch",
-    "pref.windowsnapping",
+    "privacy.ads.explorer-sync-notifications",
     "privacy.advertising.advertising-id",
     "privacy.experiences.tailored-experiences",
     "privacy.feedback.feedback-prompts",
@@ -30,34 +18,17 @@
     "ui.explorer.hide-frequent-folders",
     "ui.explorer.hide-gallery",
     "ui.explorer.hide-recent-files",
-    "ui.explorer.open-to-this-pc",
     "ui.explorer.show-file-extensions",
-    "ui.explorer.show-full-path-title",
-    "ui.explorer.show-hidden-files",
     "ui.search.disable-search-highlights",
     "ui.system.disable-tips-suggestions",
     "ui.system.disable-welcome-experience",
-    "ui.taskbar.alignment-left",
-    "ui.taskbar.end-task-right-click",
-    "ui.taskbar.show-seconds-clock"
+    "ui.taskbar.end-task-right-click"
   ],
   "full": [
-    "advanced.display",
-    "advanced.removehomeandgallery",
     "essential.disableexplorerautodiscovery",
-    "gaming.input.disable-mouse-acceleration",
-    "gaming.mode.enable",
     "performance.visual.disable-animations",
     "performance.visual.disable-transparency",
-    "pref.batterypercentage",
-    "pref.darkmode",
-    "pref.hidesettingshome",
-    "pref.newoutlook",
-    "pref.numlock",
-    "pref.scrollbars",
-    "pref.stickykeys",
-    "pref.taskbarsearch",
-    "pref.windowsnapping",
+    "privacy.ads.explorer-sync-notifications",
     "privacy.advertising.advertising-id",
     "privacy.experiences.tailored-experiences",
     "privacy.feedback.feedback-prompts",
@@ -69,16 +40,11 @@
     "ui.explorer.hide-frequent-folders",
     "ui.explorer.hide-gallery",
     "ui.explorer.hide-recent-files",
-    "ui.explorer.open-to-this-pc",
     "ui.explorer.show-file-extensions",
-    "ui.explorer.show-full-path-title",
-    "ui.explorer.show-hidden-files",
     "ui.search.disable-search-highlights",
     "ui.system.disable-tips-suggestions",
     "ui.system.disable-welcome-experience",
-    "ui.taskbar.alignment-left",
-    "ui.taskbar.end-task-right-click",
-    "ui.taskbar.show-seconds-clock"
+    "ui.taskbar.end-task-right-click"
   ],
   "excluded": [
     {
@@ -87,103 +53,107 @@
     },
     {
       "id": "advanced.disablebgapps",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
-    },
-    {
-      "id": "advanced.disablebitlocker",
-      "reason": "High risk — enable individually from Tweaks"
-    },
-    {
-      "id": "advanced.disableipv6",
-      "reason": "High risk — enable individually from Tweaks"
+      "reason": "Recommended Baseline only includes Safe tweaks — find it in the topic presets or Tweaks"
     },
     {
       "id": "advanced.disablenotifications",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+      "reason": "Personal preference — choose it yourself in Tweaks"
     },
     {
       "id": "advanced.disablewarningforunsignedrdp",
       "reason": "High risk — enable individually from Tweaks"
     },
     {
+      "id": "advanced.display",
+      "reason": "Personal preference — choose it yourself in Tweaks"
+    },
+    {
       "id": "advanced.edgedebloat",
       "reason": "High risk — enable individually from Tweaks"
     },
     {
-      "id": "advanced.ipv46",
-      "reason": "High risk — enable individually from Tweaks"
-    },
-    {
       "id": "advanced.logiblock",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+      "reason": "Recommended Baseline only includes Safe tweaks — find it in the topic presets or Tweaks"
     },
     {
       "id": "advanced.razerblock",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+      "reason": "Recommended Baseline only includes Safe tweaks — find it in the topic presets or Tweaks"
     },
     {
       "id": "advanced.removeedge",
       "reason": "High risk — enable individually from Tweaks"
     },
     {
+      "id": "advanced.removehomeandgallery",
+      "reason": "Personal preference — choose it yourself in Tweaks"
+    },
+    {
       "id": "advanced.removeonedrive",
       "reason": "High risk — enable individually from Tweaks"
     },
     {
-      "id": "advanced.reservedstorage",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
-    },
-    {
-      "id": "advanced.teredo",
-      "reason": "High risk — enable individually from Tweaks"
-    },
-    {
       "id": "advanced.utc",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+      "reason": "Fix for a specific problem — apply it only if you have that problem"
     },
     {
       "id": "advanced.windowsai",
       "reason": "High risk — enable individually from Tweaks"
     },
     {
+      "id": "ai.clicktodo.disable",
+      "reason": "Recommended Baseline only includes Safe tweaks — find it in the topic presets or Tweaks"
+    },
+    {
       "id": "ai.copilot.disable-policy",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+      "reason": "Recommended Baseline only includes Safe tweaks — find it in the topic presets or Tweaks"
     },
     {
       "id": "ai.copilot.disable-taskbar-button",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+      "reason": "Recommended Baseline only includes Safe tweaks — find it in the topic presets or Tweaks"
+    },
+    {
+      "id": "ai.notepad.disable-ai-features",
+      "reason": "Recommended Baseline only includes Safe tweaks — find it in the topic presets or Tweaks"
+    },
+    {
+      "id": "ai.paint.disable-ai-features",
+      "reason": "Recommended Baseline only includes Safe tweaks — find it in the topic presets or Tweaks"
+    },
+    {
+      "id": "ai.recall.disable-availability",
+      "reason": "Recommended Baseline only includes Safe tweaks — find it in the topic presets or Tweaks"
     },
     {
       "id": "ai.recall.disable-snapshots",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+      "reason": "Recommended Baseline only includes Safe tweaks — find it in the topic presets or Tweaks"
     },
     {
       "id": "ai.search.disable-bing-web-search",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+      "reason": "Recommended Baseline only includes Safe tweaks — find it in the topic presets or Tweaks"
+    },
+    {
+      "id": "apps.edge.disable-background-mode",
+      "reason": "Recommended Baseline only includes Safe tweaks — find it in the topic presets or Tweaks"
+    },
+    {
+      "id": "apps.edge.disable-sidebar",
+      "reason": "Recommended Baseline only includes Safe tweaks — find it in the topic presets or Tweaks"
+    },
+    {
+      "id": "apps.edge.disable-startup-boost",
+      "reason": "Recommended Baseline only includes Safe tweaks — find it in the topic presets or Tweaks"
     },
     {
       "id": "essential.activity",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+      "reason": "Recommended Baseline only includes Safe tweaks — find it in the topic presets or Tweaks"
     },
     {
       "id": "essential.consumerfeatures",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
-    },
-    {
-      "id": "essential.deletetempfiles",
-      "reason": "High risk — enable individually from Tweaks"
+      "reason": "Recommended Baseline only includes Safe tweaks — find it in the topic presets or Tweaks"
     },
     {
       "id": "essential.disablestoresearch",
       "reason": "High risk — enable individually from Tweaks"
-    },
-    {
-      "id": "essential.diskcleanup",
-      "reason": "High risk — enable individually from Tweaks"
-    },
-    {
-      "id": "essential.hiber",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
     },
     {
       "id": "essential.location",
@@ -191,15 +161,11 @@
     },
     {
       "id": "essential.preventdevicemetadatafromnetwork",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
-    },
-    {
-      "id": "essential.restorepoint",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+      "reason": "Recommended Baseline only includes Safe tweaks — find it in the topic presets or Tweaks"
     },
     {
       "id": "essential.revertstartmenu",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+      "reason": "Personal preference — choose it yourself in Tweaks"
     },
     {
       "id": "essential.services",
@@ -207,7 +173,7 @@
     },
     {
       "id": "essential.telemetry",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+      "reason": "Recommended Baseline only includes Safe tweaks — find it in the topic presets or Tweaks"
     },
     {
       "id": "essential.widget",
@@ -218,27 +184,15 @@
       "reason": "Needs manual review before applying"
     },
     {
-      "id": "gaming.dvr.disable-background-recording",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
-    },
-    {
       "id": "gaming.xbox.disable-game-bar",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+      "reason": "Recommended Baseline only includes Safe tweaks — find it in the topic presets or Tweaks"
     },
     {
       "id": "network.dns.enable-doh",
       "reason": "High risk — enable individually from Tweaks"
     },
     {
-      "id": "network.optimization.limit-peering-lan",
-      "reason": "High risk — enable individually from Tweaks"
-    },
-    {
       "id": "network.probing.disable-active-probing",
-      "reason": "High risk — enable individually from Tweaks"
-    },
-    {
-      "id": "network.teredo.disable-tunneling",
       "reason": "High risk — enable individually from Tweaks"
     },
     {
@@ -250,179 +204,143 @@
       "reason": "High risk — enable individually from Tweaks"
     },
     {
-      "id": "performance.cpu.priority-separation",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
-    },
-    {
-      "id": "performance.cpu.unpark-cores",
-      "reason": "Experimental tweak — requires manual testing"
-    },
-    {
-      "id": "performance.gaming.mmcss-responsiveness",
-      "reason": "Experimental tweak — requires manual testing"
-    },
-    {
       "id": "performance.gpu.disable-mpo",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+      "reason": "Fix for a specific problem — apply it only if you have that problem"
     },
     {
-      "id": "performance.gpu.hags",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
-    },
-    {
-      "id": "performance.input.buffer-queue",
-      "reason": "Experimental tweak — requires manual testing"
-    },
-    {
-      "id": "performance.memory.svchost-split-threshold",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
-    },
-    {
-      "id": "performance.network.delivery-optimization-simple",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
-    },
-    {
-      "id": "performance.network.disable-remote-differential-compression",
-      "reason": "High risk — enable individually from Tweaks"
-    },
-    {
-      "id": "performance.ntfs.disable-8dot3-names",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
-    },
-    {
-      "id": "performance.ntfs.disable-last-access",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
-    },
-    {
-      "id": "performance.power.disable-throttling",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
-    },
-    {
-      "id": "performance.search.prevent-indexing-on-battery",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
-    },
-    {
-      "id": "performance.system.disable-maintenance-wake",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
-    },
-    {
-      "id": "performance.system.storage-sense",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+      "id": "pref.batterypercentage",
+      "reason": "Personal preference — choose it yourself in Tweaks"
     },
     {
       "id": "pref.bingsearch",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+      "reason": "Recommended Baseline only includes Safe tweaks — find it in the topic presets or Tweaks"
+    },
+    {
+      "id": "pref.darkmode",
+      "reason": "Personal preference — choose it yourself in Tweaks"
     },
     {
       "id": "pref.detailedbsod",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+      "reason": "Fix for a specific problem — apply it only if you have that problem"
     },
     {
       "id": "pref.disablelockscreen",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+      "reason": "Personal preference — choose it yourself in Tweaks"
+    },
+    {
+      "id": "pref.hidesettingshome",
+      "reason": "Personal preference — choose it yourself in Tweaks"
     },
     {
       "id": "pref.loginblur",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+      "reason": "Personal preference — choose it yourself in Tweaks"
     },
     {
       "id": "pref.multiplaneoverlay",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+      "reason": "Fix for a specific problem — apply it only if you have that problem"
     },
     {
-      "id": "pref.s3sleep",
-      "reason": "Needs manual review before applying"
+      "id": "pref.newoutlook",
+      "reason": "Personal preference — choose it yourself in Tweaks"
     },
     {
-      "id": "pref.standbyfix",
-      "reason": "Needs manual review before applying"
+      "id": "pref.numlock",
+      "reason": "Personal preference — choose it yourself in Tweaks"
+    },
+    {
+      "id": "pref.scrollbars",
+      "reason": "Personal preference — choose it yourself in Tweaks"
     },
     {
       "id": "pref.startmenurecommendations",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+      "reason": "Personal preference — choose it yourself in Tweaks"
+    },
+    {
+      "id": "pref.taskbarsearch",
+      "reason": "Personal preference — choose it yourself in Tweaks"
     },
     {
       "id": "pref.verboselogon",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+      "reason": "Fix for a specific problem — apply it only if you have that problem"
+    },
+    {
+      "id": "pref.windowsnapping",
+      "reason": "Personal preference — choose it yourself in Tweaks"
     },
     {
       "id": "privacy.activity.activity-history",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+      "reason": "Recommended Baseline only includes Safe tweaks — find it in the topic presets or Tweaks"
     },
     {
       "id": "privacy.ceip.customer-experience-improvement",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+      "reason": "Recommended Baseline only includes Safe tweaks — find it in the topic presets or Tweaks"
     },
     {
       "id": "privacy.clipboard.cloud-clipboard-sync",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+      "reason": "Recommended Baseline only includes Safe tweaks — find it in the topic presets or Tweaks"
     },
     {
       "id": "privacy.consent.deny-account-info",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+      "reason": "Recommended Baseline only includes Safe tweaks — find it in the topic presets or Tweaks"
     },
     {
       "id": "privacy.consent.deny-calendar",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+      "reason": "Recommended Baseline only includes Safe tweaks — find it in the topic presets or Tweaks"
     },
     {
       "id": "privacy.consent.deny-contacts",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+      "reason": "Recommended Baseline only includes Safe tweaks — find it in the topic presets or Tweaks"
     },
     {
       "id": "privacy.consent.deny-diagnostics",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+      "reason": "Recommended Baseline only includes Safe tweaks — find it in the topic presets or Tweaks"
     },
     {
       "id": "privacy.consent.deny-location",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+      "reason": "Recommended Baseline only includes Safe tweaks — find it in the topic presets or Tweaks"
     },
     {
       "id": "privacy.consent.deny-microphone",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+      "reason": "Personal preference — choose it yourself in Tweaks"
     },
     {
       "id": "privacy.consent.deny-notifications",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+      "reason": "Recommended Baseline only includes Safe tweaks — find it in the topic presets or Tweaks"
     },
     {
       "id": "privacy.consent.deny-webcam",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+      "reason": "Personal preference — choose it yourself in Tweaks"
+    },
+    {
+      "id": "privacy.findmydevice.disable",
+      "reason": "Personal preference — choose it yourself in Tweaks"
     },
     {
       "id": "privacy.location.disable-sensor",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+      "reason": "Recommended Baseline only includes Safe tweaks — find it in the topic presets or Tweaks"
     },
     {
       "id": "privacy.reporting.windows-error-reporting",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+      "reason": "Recommended Baseline only includes Safe tweaks — find it in the topic presets or Tweaks"
     },
     {
       "id": "privacy.spotlight.lockscreen-ads",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+      "reason": "Recommended Baseline only includes Safe tweaks — find it in the topic presets or Tweaks"
     },
     {
       "id": "privacy.suggestions.start-menu-promotions",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+      "reason": "Recommended Baseline only includes Safe tweaks — find it in the topic presets or Tweaks"
     },
     {
       "id": "privacy.telemetry.diagnostic-data",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+      "reason": "Recommended Baseline only includes Safe tweaks — find it in the topic presets or Tweaks"
     },
     {
       "id": "system.security.disable-autorun",
       "reason": "High risk — enable individually from Tweaks"
     },
     {
-      "id": "system.security.disable-llmnr",
-      "reason": "High risk — enable individually from Tweaks"
-    },
-    {
       "id": "system.security.disable-lockscreen-camera",
-      "reason": "High risk — enable individually from Tweaks"
-    },
-    {
-      "id": "system.security.disable-rdp-auto-enable",
       "reason": "High risk — enable individually from Tweaks"
     },
     {
@@ -438,48 +356,56 @@
       "reason": "High risk — enable individually from Tweaks"
     },
     {
+      "id": "ui.explorer.hide-onedrive-nav",
+      "reason": "Personal preference — choose it yourself in Tweaks"
+    },
+    {
+      "id": "ui.explorer.open-to-this-pc",
+      "reason": "Personal preference — choose it yourself in Tweaks"
+    },
+    {
+      "id": "ui.explorer.show-full-path-title",
+      "reason": "Personal preference — choose it yourself in Tweaks"
+    },
+    {
+      "id": "ui.explorer.show-hidden-files",
+      "reason": "Personal preference — choose it yourself in Tweaks"
+    },
+    {
       "id": "ui.logon.hide-fast-user-switching",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+      "reason": "Personal preference — choose it yourself in Tweaks"
     },
     {
       "id": "ui.system.enable-long-paths",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+      "reason": "Fix for a specific problem — apply it only if you have that problem"
+    },
+    {
+      "id": "ui.taskbar.alignment-left",
+      "reason": "Personal preference — choose it yourself in Tweaks"
     },
     {
       "id": "ui.taskbar.disable-chat-button",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+      "reason": "Recommended Baseline only includes Safe tweaks — find it in the topic presets or Tweaks"
     },
     {
       "id": "ui.taskbar.disable-task-view-button",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+      "reason": "Recommended Baseline only includes Safe tweaks — find it in the topic presets or Tweaks"
     },
     {
       "id": "ui.taskbar.disable-widgets-button",
-      "reason": "Requires elevated risk confirmation (Medium/Low risk)"
+      "reason": "Recommended Baseline only includes Safe tweaks — find it in the topic presets or Tweaks"
     },
     {
-      "id": "updates.activehours.enable-policy",
-      "reason": "High risk — enable individually from Tweaks"
+      "id": "ui.taskbar.last-active-click",
+      "reason": "Personal preference — choose it yourself in Tweaks"
     },
     {
-      "id": "updates.au.notify-download",
-      "reason": "High risk — enable individually from Tweaks"
+      "id": "ui.taskbar.show-seconds-clock",
+      "reason": "Personal preference — choose it yourself in Tweaks"
     },
     {
-      "id": "updates.drivers.exclude-from-updates",
-      "reason": "High risk — enable individually from Tweaks"
-    },
-    {
-      "id": "updates.peering.metered-connections",
-      "reason": "High risk — enable individually from Tweaks"
-    },
-    {
-      "id": "updates.preview.disable-optional-content",
-      "reason": "High risk — enable individually from Tweaks"
-    },
-    {
-      "id": "updates.reboot.disable-auto-reboot-logged-on",
-      "reason": "High risk — enable individually from Tweaks"
+      "id": "ui.widgets.disable-policy",
+      "reason": "Recommended Baseline only includes Safe tweaks — find it in the topic presets or Tweaks"
     }
   ]
 }

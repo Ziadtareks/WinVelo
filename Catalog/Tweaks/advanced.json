@@ -233,7 +233,8 @@
       "apps",
       "privacy",
       "ai"
-    ]
+    ],
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -308,7 +309,8 @@
     "tags": [
       "network",
       "ui"
-    ]
+    ],
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -624,7 +626,8 @@
       "apps",
       "privacy",
       "ui"
-    ]
+    ],
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -698,7 +701,8 @@
     "needsReview": false,
     "tags": [
       "apps"
-    ]
+    ],
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -770,7 +774,8 @@
     "sourceQuote": "TEM\\CurrentControlSet\\Control\\BitLocker PreventDeviceEncryption REG_DWORD 0x1 For more information about device encryption, see BitLocker devic",
     "tags": [
       "performance"
-    ]
+    ],
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -830,7 +835,8 @@
     "needsReview": false,
     "tags": [
       "ui"
-    ]
+    ],
+    "presetRole": "fix"
   },
   {
     "schemaVersion": "1.0.0",
@@ -906,7 +912,8 @@
       "apps",
       "performance",
       "privacy"
-    ]
+    ],
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1000,7 +1007,8 @@
     ],
     "tags": [
       "ui"
-    ]
+    ],
+    "presetRole": "preference"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1278,7 +1286,8 @@
     "tags": [
       "performance",
       "ui"
-    ]
+    ],
+    "presetRole": "preference"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1351,7 +1360,8 @@
     "tags": [
       "performance",
       "updates"
-    ]
+    ],
+    "presetRole": "advanced"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1437,7 +1447,8 @@
       "ai",
       "privacy",
       "ui"
-    ]
+    ],
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1526,9 +1537,9 @@
     ],
     "needsReview": false,
     "tags": [
-      "apps",
-      "gaming"
-    ]
+      "apps"
+    ],
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1596,9 +1607,9 @@
     ],
     "needsReview": false,
     "tags": [
-      "apps",
-      "gaming"
-    ]
+      "apps"
+    ],
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1676,7 +1687,8 @@
     "tags": [
       "ui",
       "gaming"
-    ]
+    ],
+    "presetRole": "preference"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1747,7 +1759,8 @@
     ],
     "tags": [
       "network"
-    ]
+    ],
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1829,7 +1842,8 @@
     ],
     "tags": [
       "network"
-    ]
+    ],
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1913,7 +1927,8 @@
     ],
     "tags": [
       "network"
-    ]
+    ],
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1975,7 +1990,9 @@
     "tags": [
       "apps",
       "performance",
-      "privacy"
-    ]
+      "privacy",
+      "gaming"
+    ],
+    "presetRole": "optimization"
   }
 ]

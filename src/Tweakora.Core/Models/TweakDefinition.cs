@@ -190,6 +190,14 @@ public sealed class TweakDefinition
 
     [JsonPropertyName("sourceQuote")]
     public string? SourceQuote { get; set; }
+
+    /// <summary>
+    /// How presets may use this tweak: "optimization" (eligible for presets), "preference" (personal taste),
+    /// "fix" (only for a specific problem), "action" (one-time operation) or "advanced" (manual tuning).
+    /// Anything other than "optimization" is never included in a generated preset.
+    /// </summary>
+    [JsonPropertyName("presetRole")]
+    public string PresetRole { get; set; } = "unspecified";
 }
 
 public sealed class SingleOrListStringConverter : JsonConverter<List<string>>

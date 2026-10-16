@@ -25,6 +25,12 @@ Every tweak in WinVelo is data-driven, defined as a JSON document in the `Catalo
 5. **No Dangerous Operations**:
    - Do not delete critical system files, disable Windows Defender, or break core networking dependencies.
 
+6. **Preset Role (`presetRole`)**:
+   - Every tweak declares how presets may use it. Only `optimization` tweaks can be added to a generated preset.
+   - `preference` = personal taste (dark mode, taskbar alignment, seconds in the clock). `fix` = only for a specific problem (MPO flicker, sleep issues, dual-boot clock). `action` = one-time operation (restore point, disk cleanup). `advanced` = manual tuning that should be read before applying.
+   - Presets are built by `tools/PresetGenerator` from topic tags: Safe/Low go into Standard, Medium only into Full, and High, irreversible, Experimental or needsReview tweaks are always excluded with a reason shown to the user.
+   - If two tweaks change the same registry value differently, the generator keeps the first one alphabetically and lists the other as a conflict. After changing tags, risk or `presetRole`, run the generator and commit the updated `Catalog/Presets/*.json`.
+
 ---
 
 ## 2. Risk Rating Rubric

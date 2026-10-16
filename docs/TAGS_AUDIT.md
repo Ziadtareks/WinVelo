@@ -5,12 +5,12 @@ Tags are assigned based on what each tweak actually does (its apply actions and 
 
 Allowed topic tags: `gaming`, `privacy`, `ai`, `ui`, `performance`, `network`, `updates`, `apps`.
 
-Total catalog tweaks audited: **137**.
+Total catalog tweaks audited: **152**.
 
 | Tweak ID | Name | Tags Assigned | Rationale (Actions & whatItDoes) |
 | :--- | :--- | :--- | :--- |
 | `advanced.bravedebloat` | Brave Browser - Debloat | `apps, privacy, ai` | Disables Brave browser background telemetry, wallet, and AI chat features. |
-| `advanced.disablebgapps` | Background Apps - Disable | `apps, performance, privacy` | Prevents Windows Store and UWP applications from running and syncing in the background. |
+| `advanced.disablebgapps` | Background Apps - Disable | `apps, performance, privacy, gaming` | Prevents Windows Store and UWP applications from running and syncing in the background. |
 | `advanced.disablebitlocker` | BitLocker - Disable | `performance` | Disables BitLocker volume encryption to eliminate encryption overhead on disk I/O. |
 | `advanced.disableipv6` | IPv6 - Disable | `network` | Completely disables the IPv6 networking stack on all network adapters. |
 | `advanced.disablenotifications` | System Tray Notifications & Calendar - Disable | `ui, gaming` | Suppresses all system tray toast notifications and Action Center popups to prevent interruptions. |
@@ -18,8 +18,8 @@ Total catalog tweaks audited: **137**.
 | `advanced.display` | Visual Effects - Set to Best Performance | `performance, ui` | Disables window animations and desktop visual effects for maximum shell responsiveness. |
 | `advanced.edgedebloat` | Microsoft Edge - Debloat | `apps, privacy, ui` | Disables promotional telemetry, background shopping tools, and widgets in Edge browser. |
 | `advanced.ipv46` | IPv6 - Set IPv4 as Preferred | `network` | Configures the TCP/IP stack to prioritize IPv4 address resolution over IPv6. |
-| `advanced.logiblock` | Logitech Download Assistant Auto-Install - Disable | `apps, gaming` | Blocks Logitech Download Assistant peripheral auto-installer from launching at startup. |
-| `advanced.razerblock` | Razer Software Auto-Install - Disable | `apps, gaming` | Prevents automatic background installation prompts for Razer peripheral companion software. |
+| `advanced.logiblock` | Logitech Download Assistant Auto-Install - Disable | `apps` | Blocks Logitech Download Assistant peripheral auto-installer from launching at startup. |
+| `advanced.razerblock` | Razer Software Auto-Install - Disable | `apps` | Prevents automatic background installation prompts for Razer peripheral companion software. |
 | `advanced.removeedge` | Microsoft Edge - Remove | `apps` | Removes the Microsoft Edge browser application package and prevents reinstallation. |
 | `advanced.removehomeandgallery` | File Explorer Home and Gallery - Disable | `ui` | Removes Home and Gallery namespace entries from the File Explorer navigation tree. |
 | `advanced.removeonedrive` | Microsoft OneDrive - Remove | `apps, performance, privacy` | Uninstalls OneDrive client to eliminate background synchronization overhead and file telemetry. |
@@ -27,10 +27,17 @@ Total catalog tweaks audited: **137**.
 | `advanced.teredo` | Teredo - Disable | `network` | Disables Teredo tunneling adapter to eliminate obsolete IPv6-over-IPv4 transition traffic. |
 | `advanced.utc` | Date & Time - Set Time to UTC | `ui` | Configures hardware clock to UTC to synchronize system time displays across OSes. |
 | `advanced.windowsai` | Windows AI - Disable And Remove | `ai, privacy, ui` | Disables system-wide generative AI features, Recall snapshots, and Copilot UI integrations. |
+| `ai.clicktodo.disable` | Click to Do - Disable | `ai, privacy` | Turns off Click to Do, the AI overlay that suggests actions for text and images on screen. |
 | `ai.copilot.disable-policy` | Disable Windows Copilot Globally | `ai, privacy, ui` | Disables the Windows Copilot assistant machine-wide via Group Policy. |
 | `ai.copilot.disable-taskbar-button` | Hide Copilot Taskbar Button | `ai, ui` | Hides the Copilot artificial intelligence icon from the Windows taskbar. |
+| `ai.notepad.disable-ai-features` | Notepad AI Features - Disable | `ai, apps` | Turns off Copilot, Rewrite and Summarize features in Notepad. |
+| `ai.paint.disable-ai-features` | Paint AI Features - Disable | `ai, apps` | Turns off Cocreator, Generative Fill and Image Creator in the Paint app. |
+| `ai.recall.disable-availability` | Recall Feature - Make Unavailable | `ai, privacy` | Prevents Recall from being turned on, so Windows does not save snapshots of your screen. |
 | `ai.recall.disable-snapshots` | Disable Windows Recall Snapshots | `ai, privacy` | Disables automated snapshot capture and background OCR indexing in Windows Recall. |
 | `ai.search.disable-bing-web-search` | Disable Bing Web Search in Start Menu | `ai, privacy, ui, network` | Stops sending Start Menu search queries to Bing web services and AI suggestion engines. |
+| `apps.edge.disable-background-mode` | Microsoft Edge Background Apps - Disable | `apps, performance` | Stops Edge from keeping running after you close all its windows. |
+| `apps.edge.disable-sidebar` | Microsoft Edge Sidebar - Disable | `apps, ai, ui` | Removes the Edge sidebar, including the Copilot button and app panel. |
+| `apps.edge.disable-startup-boost` | Microsoft Edge Startup Boost - Disable | `apps, performance` | Stops Edge from preloading in the background when you sign in to Windows. |
 | `essential.activity` | Activity History - Disable | `privacy` | Stops tracking user application activity history and syncing it to the cloud. |
 | `essential.consumerfeatures` | ConsumerFeatures - Disable | `apps, privacy, ui` | Blocks Windows from silently pre-installing sponsored third-party apps and games. |
 | `essential.deletetempfiles` | Temporary Files - Remove | `performance` | Purges user and system temporary folders to reclaim storage space. |
@@ -43,11 +50,11 @@ Total catalog tweaks audited: **137**.
 | `essential.restorepoint` | Restore Point - Create | `performance` | Configures system restore frequency and generates a pre-tweak snapshot checkpoint. |
 | `essential.revertstartmenu` | Start Menu Previous Layout - Enable | `ui` | Restores previous Windows Start Menu layout style. |
 | `essential.services` | Services - Set to Manual | `performance, privacy` | Sets unnecessary telemetry and sync services to manual/disabled to free background CPU and RAM. |
-| `essential.telemetry` | Telemetry - Disable | `privacy, performance` | Restricts diagnostic telemetry data collection, advertising identifiers, and inking tracking. |
+| `essential.telemetry` | Telemetry - Disable | `privacy` | Restricts diagnostic telemetry data collection, advertising identifiers, and inking tracking. |
 | `essential.widget` | Widgets - Remove | `apps, ui, performance` | Uninstalls WebExperience widget host and removes the News & Weather widget from the taskbar. |
 | `essential.wpbt` | Windows Platform Binary Table (WPBT) - Disable | `performance, privacy` | Prevents UEFI firmware from automatically injecting vendor-bundled executables into the OS. |
 | `gaming.dvr.disable-background-recording` | Disable Background Game DVR Recording | `gaming, performance` | Disables rolling background gameplay video recording to eliminate disk and GPU overhead. |
-| `gaming.input.disable-mouse-acceleration` | Disable Mouse Acceleration (Enhance Pointer Precision) | `gaming, ui` | Disables pointer precision enhancement to provide 1:1 raw linear mouse input for gaming. |
+| `gaming.input.disable-mouse-acceleration` | Disable Mouse Acceleration (Enhance Pointer Precision) | `gaming` | Disables pointer precision enhancement to provide 1:1 raw linear mouse input for gaming. |
 | `gaming.mode.enable` | Enable Windows Game Mode | `gaming, performance` | Activates Windows Game Mode to prioritize hardware resources for active gaming processes. |
 | `gaming.xbox.disable-game-bar` | Disable Xbox Game Bar Overlay | `gaming, performance, ui` | Disables the Xbox Game Bar background overlay and capture services. |
 | `network.dns.enable-doh` | Enable DNS over HTTPS (DoH) System Fallback | `network, privacy` | Enables DNS over HTTPS (DoH) encrypted queries with standard fallback. |
@@ -69,6 +76,7 @@ Total catalog tweaks audited: **137**.
 | `performance.ntfs.disable-last-access` | Disable NTFS Last Access Time Updates | `performance` | Disables NTFS last access timestamp updates on files to reduce disk write activity. |
 | `performance.power.disable-throttling` | Disable Windows Power Throttling | `performance, gaming` | Disables Windows Power Throttling to keep background threads operating at full frequency. |
 | `performance.search.prevent-indexing-on-battery` | Prevent Search Indexing While on Battery Power | `performance` | Suspends Windows Search file indexing while operating on battery power. |
+| `performance.startup.remove-startup-delay` | Startup Apps Delay - Remove | `performance` | Starts your startup apps right after sign-in instead of waiting a few seconds. |
 | `performance.system.disable-maintenance-wake` | Disable Automatic Maintenance Wake-Up Timers | `performance` | Prevents scheduled system maintenance tasks from waking the computer from sleep. |
 | `performance.system.storage-sense` | Enable Storage Sense Auto-Cleanup | `performance` | Enables automated Windows Storage Sense background cleanup for temporary files. |
 | `performance.visual.disable-animations` | Disable Window Minimize/Maximize Animations | `performance, ui` | Disables window minimize, maximize, and taskbar animation transitions. |
@@ -78,20 +86,21 @@ Total catalog tweaks audited: **137**.
 | `pref.darkmode` | Dark Theme for Windows | `ui` | Applies dark color palette across Windows shell, taskbar, and modern applications. |
 | `pref.detailedbsod` | BSoD Verbose Mode | `ui` | Replaces standard simplified crash screen with detailed technical stop error codes. |
 | `pref.disablelockscreen` | Lock Screen - Disable | `ui` | Bypasses the initial lock screen image to display the sign-in password prompt directly. |
-| `pref.hidesettingshome` | Settings Home Page | `ui, privacy` | Hides the recommended content and promotional cards page in Windows 11 Settings. |
-| `pref.loginblur` | Logon Screen Acrylic Blur | `ui, performance` | Removes blur rendering on the login screen for faster transition and clear background image. |
+| `pref.hidesettingshome` | Settings Home Page - Show | `ui` | Hides the recommended content and promotional cards page in Windows 11 Settings. |
+| `pref.loginblur` | Logon Screen Acrylic Blur - Enable | `ui, performance` | Removes blur rendering on the login screen for faster transition and clear background image. |
 | `pref.multiplaneoverlay` | Multiplane Overlay Workaround | `gaming, performance, ui` | Workaround for GPU stutter and desktop flickering by disabling Multi-Plane Overlay. |
-| `pref.newoutlook` | Microsoft Outlook New Version | `apps, ui` | Prevents automatic forced migration from classic Outlook to the web-based New Outlook app. |
+| `pref.newoutlook` | Microsoft Outlook - Use New Version | `apps, ui` | Prevents automatic forced migration from classic Outlook to the web-based New Outlook app. |
 | `pref.numlock` | Num Lock on Startup | `ui` | Automatically activates the numeric keypad NumLock key during boot and logon. |
 | `pref.s3sleep` | S3 Sleep | `performance` | Forces traditional S3 sleep state to prevent modern standby overheating and power loss. |
 | `pref.scrollbars` | Scrollbars Always Visible | `ui` | Keeps window scrollbars persistently expanded and visible without requiring hover. |
 | `pref.standbyfix` | S0 Sleep Network Connectivity | `network, performance` | Disables network connectivity during modern standby sleep to prevent battery drain. |
-| `pref.startmenurecommendations` | Start Menu Recommendations | `ui, privacy` | Collapses and hides the Recommended files and recent items section from the Start Menu. |
-| `pref.stickykeys` | Sticky Keys | `gaming, ui` | Prevents the 5x Shift key shortcut from interrupting fullscreen games and apps. |
+| `pref.startmenurecommendations` | Start Menu Recommended Section - Show | `ui, privacy` | Collapses and hides the Recommended files and recent items section from the Start Menu. |
+| `pref.stickykeys` | Sticky Keys Shortcut - Disable | `gaming` | Prevents the 5x Shift key shortcut from interrupting fullscreen games and apps. |
 | `pref.taskbarsearch` | Taskbar Search Icon | `ui` | Customizes the taskbar search element size and appearance. |
 | `pref.verboselogon` | Logon Verbose Mode | `ui` | Displays detailed progress messages during system startup, login, and shutdown. |
-| `pref.windowsnapping` | Window Snapping | `ui` | Enables and configures window edge snapping and layout arrangement behaviors. |
+| `pref.windowsnapping` | Window Snapping - Enable | `ui` | Enables and configures window edge snapping and layout arrangement behaviors. |
 | `privacy.activity.activity-history` | Disable Activity History Publishing | `privacy` | Disables publishing and cloud uploading of user application activity history. |
+| `privacy.ads.explorer-sync-notifications` | File Explorer Sync Provider Ads - Disable | `privacy, ui` | Stops File Explorer from showing OneDrive and Microsoft 365 promotions at the top of the window. |
 | `privacy.advertising.advertising-id` | Disable Advertising ID | `privacy` | Disables unique advertising identifiers used for targeted cross-application tracking. |
 | `privacy.ceip.customer-experience-improvement` | Disable Customer Experience Program (CEIP) | `privacy` | Disables participation in the Customer Experience Improvement Program (CEIP). |
 | `privacy.clipboard.cloud-clipboard-sync` | Disable Cloud Clipboard Sync | `privacy` | Prevents clipboard copy history from synchronizing across multiple Windows devices. |
@@ -105,6 +114,7 @@ Total catalog tweaks audited: **137**.
 | `privacy.consent.deny-webcam` | Deny UWP Apps Access to Webcam by Default | `privacy, apps` | Configures default application permission to deny access to cameras and webcams. |
 | `privacy.experiences.tailored-experiences` | Disable Tailored Experiences | `privacy` | Prevents Microsoft from offering tailored recommendations based on user diagnostic data. |
 | `privacy.feedback.feedback-prompts` | Disable Feedback Frequency Prompts | `privacy, ui` | Sets Windows feedback frequency to 'Never', suppressing survey prompts. |
+| `privacy.findmydevice.disable` | Find My Device - Disable | `privacy` | Turns off Find My Device so this PC does not report its location to your Microsoft account. |
 | `privacy.location.disable-sensor` | Disable System Location Sensor | `privacy` | Disables the system-wide location sensor platform and hardware sensors. |
 | `privacy.reporting.windows-error-reporting` | Disable Windows Error Reporting | `privacy` | Disables automated Windows Error Reporting crash dump generation and upload. |
 | `privacy.search.device-search-history` | Disable Device Search History | `privacy, ui` | Disables recording of local search query history on the device. |
@@ -114,6 +124,7 @@ Total catalog tweaks audited: **137**.
 | `privacy.telemetry.diagnostic-data` | Diagnostic Data Level | `privacy` | Minimizes diagnostic data collection to Security/Basic level. |
 | `privacy.tracking.app-launch-tracking` | Disable App Launch Tracking | `privacy, ui` | Disables tracking of application launch frequency used for Start menu personalization. |
 | `privacy.typing.inking-typing-personalization` | Disable Inking & Typing Data Collection | `privacy` | Disables harvesting of handwritten ink samples and typed keystroke dictionary data. |
+| `system.power.disable-fast-startup` | Fast Startup - Disable | `performance` | Makes Shut Down perform a full shutdown instead of a partial hibernation of the system. |
 | `system.security.disable-autorun` | Disable AutoRun & AutoPlay on All Drives | `ui` | Disables AutoRun and AutoPlay execution across all removable and fixed drives. |
 | `system.security.disable-llmnr` | Disable Link-Local Multicast Name Resolution (LLMNR) | `network` | Disables Link-Local Multicast Name Resolution (LLMNR) to prevent local broadcast poisoning. |
 | `system.security.disable-lockscreen-camera` | Disable Camera Access on Lock Screen | `privacy, ui` | Disables camera capture access directly from the Windows lock screen without unlocking. |
@@ -121,9 +132,11 @@ Total catalog tweaks audited: **137**.
 | `system.security.disable-remote-assistance` | Disable Remote Assistance | `network, privacy` | Disables Windows Remote Assistance to block incoming remote help requests. |
 | `system.security.disable-wsh` | Disable Windows Script Host (VBS/JS Scripts) | `apps` | Disables Windows Script Host (WSH) engine execution for VBScript and JScript files. |
 | `system.security.enforce-smartscreen` | Enforce Windows SmartScreen via Policy | `apps, network` | Enforces Windows Defender SmartScreen file and website reputation checks. |
+| `system.shutdown.auto-end-tasks` | Close Apps Automatically at Shutdown | `performance` | Shut down, restart and sign out close running apps instead of waiting on the 'This app is preventing shutdown' screen. |
 | `ui.explorer.classic-context-menu` | Restore Classic Right-Click Menu | `ui` | Restores classic Windows 10 full right-click context menu in Windows 11 File Explorer. |
 | `ui.explorer.hide-frequent-folders` | Hide Frequently Used Folders in Quick Access | `ui, privacy` | Hides frequently used folders from Quick Access and Home in File Explorer. |
 | `ui.explorer.hide-gallery` | Hide Gallery from File Explorer Navigation Pane | `ui` | Hides the Gallery folder entry from the File Explorer navigation pane. |
+| `ui.explorer.hide-onedrive-nav` | OneDrive in File Explorer Navigation Pane - Hide | `ui, apps` | Removes the OneDrive entry from the left pane of File Explorer for the current user. |
 | `ui.explorer.hide-recent-files` | Hide Recent Files in File Explorer Home | `ui, privacy` | Hides recently opened files from Quick Access and Home in File Explorer. |
 | `ui.explorer.open-to-this-pc` | Open File Explorer to This PC | `ui` | Sets File Explorer to open to 'This PC' by default instead of Home/Quick Access. |
 | `ui.explorer.show-file-extensions` | Always Show Known File Extensions | `ui` | Always displays file extensions for known file types in File Explorer. |
@@ -138,8 +151,10 @@ Total catalog tweaks audited: **137**.
 | `ui.taskbar.disable-chat-button` | Hide Microsoft Teams Chat Icon on Taskbar | `ui` | Hides the Microsoft Teams Chat button from the Windows 11 taskbar. |
 | `ui.taskbar.disable-task-view-button` | Hide Task View Button from Taskbar | `ui` | Hides the Task View desktop switcher button from the Windows 11 taskbar. |
 | `ui.taskbar.disable-widgets-button` | Hide Widgets Weather Icon from Taskbar | `ui, performance` | Hides the Widgets weather icon button from the Windows 11 taskbar. |
-| `ui.taskbar.end-task-right-click` | Enable 'End Task' in Taskbar Context Menu | `ui, performance` | Adds an immediate 'End Task' action to taskbar application right-click menus. |
+| `ui.taskbar.end-task-right-click` | Enable 'End Task' in Taskbar Context Menu | `ui` | Adds an immediate 'End Task' action to taskbar application right-click menus. |
+| `ui.taskbar.last-active-click` | Taskbar Click Opens Last Active Window | `ui` | Clicking a grouped taskbar app switches straight to its last used window instead of showing thumbnails. |
 | `ui.taskbar.show-seconds-clock` | Show Seconds in Taskbar Clock | `ui` | Displays seconds on the taskbar system tray clock. |
+| `ui.widgets.disable-policy` | Widgets Board - Disable by Policy | `ui, privacy` | Turns off the Widgets board and its news feed with a policy, without uninstalling anything. |
 | `updates.activehours.enable-policy` | Enforce Active Hours Policy Against Mid-Day Restarts | `updates` | Enforces configured Active Hours range during which automatic restart will never occur. |
 | `updates.au.notify-download` | Notify Before Downloading Windows Updates | `updates` | Configures Automatic Updates to notify before downloading and installing updates. |
 | `updates.drivers.exclude-from-updates` | Exclude Hardware Drivers from Windows Update | `updates` | Prevents Windows Update from automatically overwriting dedicated hardware drivers. |

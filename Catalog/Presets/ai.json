@@ -1,13 +1,23 @@
 {
   "id": "preset.ai",
   "name": "AI & Copilot Management",
-  "description": "Disables Windows Copilot, Recall automated snapshots, and Bing web suggestions in shell search.",
-  "standard": [],
+  "description": "Turns off Copilot, Recall snapshots, Click to Do, Bing web results in search, and AI features in Paint and Notepad.",
+  "standard": [
+    "ai.clicktodo.disable",
+    "ai.notepad.disable-ai-features",
+    "ai.paint.disable-ai-features",
+    "apps.edge.disable-sidebar"
+  ],
   "full": [
+    "ai.clicktodo.disable",
     "ai.copilot.disable-policy",
     "ai.copilot.disable-taskbar-button",
+    "ai.notepad.disable-ai-features",
+    "ai.paint.disable-ai-features",
+    "ai.recall.disable-availability",
     "ai.recall.disable-snapshots",
-    "ai.search.disable-bing-web-search"
+    "ai.search.disable-bing-web-search",
+    "apps.edge.disable-sidebar"
   ],
   "excluded": [
     {

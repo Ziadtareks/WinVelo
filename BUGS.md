@@ -536,3 +536,20 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
   3. Measured cold start startup latency to interactive Home in simulated test mode: 1013ms – 1570ms, well below the 2-second quality ceiling.
   4. Retook all documentation screenshots cleanly in test mode with `--test-mode --capture-screenshots docs/screenshots`.
   5. Rewrote `README.md` with transparent, neutral descriptions of the 5-tab architecture and zero exaggerated performance claims.
+
+---
+
+## BUG-034: Category Presets Mixed Personal Preferences, Problem-Specific Fixes and Conflicting Tweaks
+- **Component**: `tools/PresetGenerator/Program.cs`, `Catalog/Presets/*.json`, `Catalog/Tweaks/*.json`, `Catalog/schema/tweak.schema.json`
+- **Finding**:
+  1. Topic presets included every tweak with a matching tag, so applying "Gaming" or "Clean UI" also changed personal choices (dark mode, taskbar alignment, seconds in the clock) and applied problem-specific fixes (MPO disable, S3 sleep, verbose logon) on machines without that problem.
+  2. Presets could contain two tweaks that write the same registry value with different data (`EnableActivityFeed`, `OverlayTestMode`, `SearchboxTaskbarMode`, `DODownloadMode`), so the final state depended on apply order.
+  3. Several preference toggles had inverted or misleading names and explanations (for example a "Disable" title on a tweak that enables the setting).
+  4. A previous report claimed the MPO tweaks were excluded as needsReview; they were not (both had `needsReview: false` and were inside presets).
+  5. "Recommended Baseline" described itself as not changing how Windows looks, while it included visual tweaks.
+- **Fix**:
+  1. Added `presetRole` (`optimization`, `preference`, `fix`, `action`, `advanced`) to the schema, model and all catalog tweaks. Only `optimization` tweaks are eligible for presets; the others are listed under "Not included" with a reason.
+  2. The generator now detects registry/service target conflicts deterministically (alphabetical, first wins) and excludes the loser with a "Conflicts with ..." reason.
+  3. Recommended Baseline is Safe-only from the privacy/ui/ai/apps topics, with an accurate description.
+  4. Corrected names, descriptions and explanations of the affected preference toggles and fixed wrong topic tags.
+  5. Added 15 commonly requested tweaks (Edge sidebar/startup boost/background mode policies, Click to Do, Recall availability, Paint and Notepad AI, Widgets policy, File Explorer sync ads, OneDrive navigation entry, last-active taskbar click, Find My Device, Fast Startup, AutoEndTasks, startup app delay). All are marked `verifiedOnBuild: "unverified"` until tested on a real machine.

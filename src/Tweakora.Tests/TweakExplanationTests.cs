@@ -45,7 +45,7 @@ public sealed class TweakExplanationTests
     public void AllTweaks_HaveWhatItDoes_WithSufficientExplanation()
     {
         var tweaks = LoadAllTweaks();
-        Assert.Equal(137, tweaks.Count);
+        Assert.Equal(152, tweaks.Count);
 
         foreach (var t in tweaks)
         {
@@ -60,7 +60,7 @@ public sealed class TweakExplanationTests
     public void AllTweaks_HaveValidSources_WithAtLeastOneHttpUrl()
     {
         var tweaks = LoadAllTweaks();
-        Assert.Equal(137, tweaks.Count);
+        Assert.Equal(152, tweaks.Count);
 
         foreach (var t in tweaks)
         {
@@ -253,7 +253,7 @@ public sealed class TweakExplanationTests
     public void AllTweaks_RegistryValueNamesAndNumbersInExplanations_MatchCatalogActions()
     {
         var tweaks = LoadAllTweaks();
-        Assert.Equal(137, tweaks.Count);
+        Assert.Equal(152, tweaks.Count);
 
         // Gather all registry value names across the entire catalog
         var allValNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -419,7 +419,7 @@ public sealed class TweakExplanationTests
         var documentedTweaks = tweaks.Where(t => string.Equals(t.Evidence, "documented", StringComparison.OrdinalIgnoreCase)).ToList();
 
         Assert.NotEmpty(documentedTweaks);
-        Assert.Equal(15, documentedTweaks.Count);
+        Assert.Equal(20, documentedTweaks.Count);
 
         foreach (var t in documentedTweaks)
         {

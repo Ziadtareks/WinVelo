@@ -63,7 +63,8 @@
       "https://learn.microsoft.com/en-us/windows/client-management/manage-windows-copilot"
     ],
     "needsReview": false,
-    "uiEquivalentLocation": "Settings › Personalization › Taskbar › Taskbar items › Copilot"
+    "uiEquivalentLocation": "Settings › Personalization › Taskbar › Taskbar items › Copilot",
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -132,7 +133,8 @@
     "sources": [
       "https://learn.microsoft.com/en-us/windows/client-management/manage-windows-copilot"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -196,7 +198,8 @@
     "sources": [
       "https://learn.microsoft.com/en-us/windows/client-management/manage-recall"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -266,7 +269,8 @@
     "needsReview": false,
     "relatedTweaks": [
       "pref.bingsearch"
-    ]
+    ],
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -354,7 +358,8 @@
     "aliases": [
       "pref.gamemode",
       "WPFToggleGameMode"
-    ]
+    ],
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -420,7 +425,8 @@
       "https://learn.microsoft.com/en-us/gaming/game-bar/"
     ],
     "needsReview": false,
-    "uiEquivalentLocation": "Settings › Gaming › Game Bar › Open Xbox Game Bar using this button on a controller"
+    "uiEquivalentLocation": "Settings › Gaming › Game Bar › Open Xbox Game Bar using this button on a controller",
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -486,7 +492,8 @@
       "https://learn.microsoft.com/en-us/gaming/game-bar/"
     ],
     "needsReview": false,
-    "uiEquivalentLocation": "Settings › Gaming › Captures › Record in the background while I'm playing a game"
+    "uiEquivalentLocation": "Settings › Gaming › Captures › Record in the background while I'm playing a game",
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -502,8 +509,7 @@
       "ui"
     ],
     "tags": [
-      "gaming",
-      "ui"
+      "gaming"
     ],
     "presets": [
       "gaming"
@@ -590,7 +596,8 @@
     "uiEquivalentLocation": "Settings › Bluetooth & devices › Mouse › Additional mouse settings › Pointer Options › Enhance pointer precision",
     "aliases": [
       "performance.input.raw-mouse"
-    ]
+    ],
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -655,7 +662,8 @@
     "sources": [
       "https://learn.microsoft.com/en-us/windows-hardware/drivers/network/wi-fi-hotspot-offloading"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -718,7 +726,8 @@
     "sources": [
       "https://learn.microsoft.com/en-us/windows-server/networking/ncsi/ncsi-frequently-asked-questions"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -783,7 +792,8 @@
     "sources": [
       "https://learn.microsoft.com/en-us/windows-hardware/drivers/network/wi-fi-hotspot-offloading"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -850,7 +860,8 @@
     "relatedTweaks": [
       "performance.network.delivery-optimization-simple"
     ],
-    "oppositeOf": "performance.network.delivery-optimization-simple"
+    "oppositeOf": "performance.network.delivery-optimization-simple",
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -915,7 +926,8 @@
       "https://learn.microsoft.com/en-us/windows-server/networking/dns/doh-client-support"
     ],
     "needsReview": false,
-    "uiEquivalentLocation": "Settings › Network & internet › Wi-Fi / Ethernet › DNS server assignment › Encrypted only (DNS over HTTPS)"
+    "uiEquivalentLocation": "Settings › Network & internet › Wi-Fi / Ethernet › DNS server assignment › Encrypted only (DNS over HTTPS)",
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -986,7 +998,8 @@
       "advanced.disableipv6",
       "advanced.ipv46",
       "advanced.teredo"
-    ]
+    ],
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1053,7 +1066,8 @@
       "https://learn.microsoft.com/en-us/windows/apps/design/style/acrylic"
     ],
     "needsReview": false,
-    "uiEquivalentLocation": "Settings › Accessibility › Visual effects › Transparency effects"
+    "uiEquivalentLocation": "Settings › Accessibility › Visual effects › Transparency effects",
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1119,7 +1133,8 @@
       "https://learn.microsoft.com/en-us/windows/win32/winmsg/about-windows"
     ],
     "needsReview": false,
-    "uiEquivalentLocation": "Settings › Accessibility › Visual effects › Animation effects"
+    "uiEquivalentLocation": "Settings › Accessibility › Visual effects › Animation effects",
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1186,7 +1201,8 @@
     "uiEquivalentLocation": "Settings › System › Storage › Storage Sense",
     "relatedTweaks": [
       "essential.deletetempfiles"
-    ]
+    ],
+    "presetRole": "preference"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1258,7 +1274,8 @@
     "aliases": [
       "essential.deliveryoptimization",
       "WPFTweaksDeliveryOptimization"
-    ]
+    ],
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1318,7 +1335,8 @@
     "sources": [
       "https://learn.microsoft.com/en-us/troubleshoot/windows-server/performance/svchost-service-grouping"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "presetRole": "advanced"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1381,7 +1399,8 @@
     "sources": [
       "https://learn.microsoft.com/en-us/windows/win32/procthread/automatic-maintenance"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1442,7 +1461,8 @@
     "sources": [
       "https://learn.microsoft.com/en-us/windows/win32/search/-search-indexing-process-overview"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1506,7 +1526,8 @@
     "sources": [
       "https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/fsutil-behavior"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "presetRole": "advanced"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1570,7 +1591,8 @@
     "sources": [
       "https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/fsutil-8dot3name"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "presetRole": "advanced"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1632,7 +1654,8 @@
     "sources": [
       "https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2008-R2-and-2008/cc731518(v=ws.10)"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1706,7 +1729,8 @@
     "sourceQuote": "pply the following MDM policies: System/AllowTelemetry System/LimitDumpCollection System/LimitDiagnosticLogCollection Note The last tw",
     "relatedTweaks": [
       "essential.telemetry"
-    ]
+    ],
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1770,7 +1794,8 @@
       "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services#bkmk-advertising-id"
     ],
     "needsReview": false,
-    "uiEquivalentLocation": "Settings › Privacy & security › General › Let apps show me personalized ads by using my advertising ID"
+    "uiEquivalentLocation": "Settings › Privacy & security › General › Let apps show me personalized ads by using my advertising ID",
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1834,7 +1859,8 @@
       "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services#bkmk-tailored-experiences"
     ],
     "needsReview": false,
-    "uiEquivalentLocation": "Settings › Privacy & security › Diagnostics & feedback › Tailored experiences"
+    "uiEquivalentLocation": "Settings › Privacy & security › Diagnostics & feedback › Tailored experiences",
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1931,7 +1957,8 @@
     "sourceQuote": "eate a REG_DWORD registry setting named PublishUserActivities in HKEY_LOCAL_MACHINE\\Software\\Policies\\Microsoft\\Windows\\System with a value o",
     "relatedTweaks": [
       "essential.activity"
-    ]
+    ],
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1994,7 +2021,8 @@
       "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services#bkmk-speech"
     ],
     "needsReview": false,
-    "sourceQuote": "eate a REG_DWORD registry setting named HasAccepted in HKEY_CURRENT_USER\\Software\\Microsoft\\Speech_OneCore\\Settings\\OnlineSpeechPri"
+    "sourceQuote": "eate a REG_DWORD registry setting named HasAccepted in HKEY_CURRENT_USER\\Software\\Microsoft\\Speech_OneCore\\Settings\\OnlineSpeechPri",
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -2072,7 +2100,8 @@
       "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services#bkmk-inking-typing"
     ],
     "needsReview": false,
-    "sourceQuote": "ization to a value of 1 (one) -and- Set RestrictImplicitInkCollection registry REG_DWORD setting in HKEY_CURRENT_USER\\Software\\Microsoft\\InputPersona"
+    "sourceQuote": "ization to a value of 1 (one) -and- Set RestrictImplicitInkCollection registry REG_DWORD setting in HKEY_CURRENT_USER\\Software\\Microsoft\\InputPersona",
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -2137,7 +2166,8 @@
       "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services#bkmk-app-launch-tracking"
     ],
     "needsReview": false,
-    "sourceQuote": "eate a REG_DWORD registry setting named Start_TrackProgs in HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advance"
+    "sourceQuote": "eate a REG_DWORD registry setting named Start_TrackProgs in HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advance",
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -2201,7 +2231,8 @@
       "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services#bkmk-feedback"
     ],
     "needsReview": false,
-    "sourceQuote": "RENT_USER\\Software\\Microsoft\\Siuf\\Rules\\NumberOfSIUFInPeriod Based on these settings: Setting PeriodInNanoSeconds NumberOfSIUFInPeriod Autom"
+    "sourceQuote": "RENT_USER\\Software\\Microsoft\\Siuf\\Rules\\NumberOfSIUFInPeriod Based on these settings: Setting PeriodInNanoSeconds NumberOfSIUFInPeriod Autom",
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -2262,7 +2293,8 @@
     "sources": [
       "https://learn.microsoft.com/en-us/windows/win32/wer/windows-error-reporting"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -2323,7 +2355,8 @@
     "sources": [
       "https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services#bkmk-ceip"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -2385,7 +2418,8 @@
       "https://support.microsoft.com/en-us/windows/clipboard-in-windows-c436501e-9842-409d-4ef5-63bc18f10e42"
     ],
     "needsReview": false,
-    "uiEquivalentLocation": "Settings › System › Clipboard › Clipboard history across your devices"
+    "uiEquivalentLocation": "Settings › System › Clipboard › Clipboard history across your devices",
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -2450,7 +2484,8 @@
       "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-admx-search"
     ],
     "needsReview": false,
-    "uiEquivalentLocation": "Settings › Privacy & security › Search permissions › History"
+    "uiEquivalentLocation": "Settings › Privacy & security › Search permissions › History",
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -2517,7 +2552,8 @@
       "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-personalization#personalization-nolockscreencamera"
     ],
     "needsReview": false,
-    "uiEquivalentLocation": "Settings › Personalization › Lock screen › Get fun facts, tips, tricks, and more on your lock screen"
+    "uiEquivalentLocation": "Settings › Personalization › Lock screen › Get fun facts, tips, tricks, and more on your lock screen",
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -2585,7 +2621,8 @@
       "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-start#start-hideshareddocuments"
     ],
     "needsReview": false,
-    "uiEquivalentLocation": "Settings › Personalization › Start › Show recommendations for tips, shortcuts, new apps, and more"
+    "uiEquivalentLocation": "Settings › Personalization › Start › Show recommendations for tips, shortcuts, new apps, and more",
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -2652,7 +2689,8 @@
     "uiEquivalentLocation": "Settings › Privacy & security › Location › Location services",
     "relatedTweaks": [
       "essential.location"
-    ]
+    ],
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -2716,7 +2754,8 @@
       "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-privacy#privacy-letappsaccesslocation"
     ],
     "needsReview": false,
-    "uiEquivalentLocation": "Settings › Privacy & security › Location › Let apps access your location"
+    "uiEquivalentLocation": "Settings › Privacy & security › Location › Let apps access your location",
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -2780,7 +2819,8 @@
       "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-privacy#privacy-letappsaccessmicrophone"
     ],
     "needsReview": false,
-    "uiEquivalentLocation": "Settings › Privacy & security › Microphone › Let apps access your microphone"
+    "uiEquivalentLocation": "Settings › Privacy & security › Microphone › Let apps access your microphone",
+    "presetRole": "preference"
   },
   {
     "schemaVersion": "1.0.0",
@@ -2844,7 +2884,8 @@
       "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-privacy#privacy-letappsaccesscamera"
     ],
     "needsReview": false,
-    "uiEquivalentLocation": "Settings › Privacy & security › Camera › Let apps access your camera"
+    "uiEquivalentLocation": "Settings › Privacy & security › Camera › Let apps access your camera",
+    "presetRole": "preference"
   },
   {
     "schemaVersion": "1.0.0",
@@ -2909,7 +2950,8 @@
       "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-privacy#privacy-letappsaccessnotifications"
     ],
     "needsReview": false,
-    "uiEquivalentLocation": "Settings › Privacy & security › Notifications › Let apps access your notifications"
+    "uiEquivalentLocation": "Settings › Privacy & security › Notifications › Let apps access your notifications",
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -2974,7 +3016,8 @@
       "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-privacy#privacy-letappsaccessaccountinfo"
     ],
     "needsReview": false,
-    "uiEquivalentLocation": "Settings › Privacy & security › Account info › Let apps access your account info"
+    "uiEquivalentLocation": "Settings › Privacy & security › Account info › Let apps access your account info",
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -3039,7 +3082,8 @@
       "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-privacy#privacy-letappsaccesscontacts"
     ],
     "needsReview": false,
-    "uiEquivalentLocation": "Settings › Privacy & security › Contacts › Let apps access your contacts"
+    "uiEquivalentLocation": "Settings › Privacy & security › Contacts › Let apps access your contacts",
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -3103,7 +3147,8 @@
       "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-privacy#privacy-letappsaccesscalendar"
     ],
     "needsReview": false,
-    "uiEquivalentLocation": "Settings › Privacy & security › Calendar › Let apps access your calendar"
+    "uiEquivalentLocation": "Settings › Privacy & security › Calendar › Let apps access your calendar",
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -3168,7 +3213,8 @@
       "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-privacy#privacy-letappsaccessdiagnosticsinfo"
     ],
     "needsReview": false,
-    "uiEquivalentLocation": "Settings › Privacy & security › App diagnostics › Let apps access diagnostic info about other apps"
+    "uiEquivalentLocation": "Settings › Privacy & security › App diagnostics › Let apps access diagnostic info about other apps",
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -3233,7 +3279,8 @@
       "https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2008-R2-and-2008/cc753856(v=ws.10)"
     ],
     "needsReview": false,
-    "uiEquivalentLocation": "Control Panel › System › Remote settings › Allow Remote Assistance connections to this computer"
+    "uiEquivalentLocation": "Control Panel › System › Remote settings › Allow Remote Assistance connections to this computer",
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -3296,7 +3343,8 @@
       "https://learn.microsoft.com/en-us/windows/win32/shell/autoplay"
     ],
     "needsReview": false,
-    "uiEquivalentLocation": "Settings › Bluetooth & devices › AutoPlay"
+    "uiEquivalentLocation": "Settings › Bluetooth & devices › AutoPlay",
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -3357,7 +3405,8 @@
     "sources": [
       "https://learn.microsoft.com/en-us/troubleshoot/windows-client/system-management-components/windows-script-host-access-is-disabled"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -3419,7 +3468,8 @@
     "sources": [
       "https://learn.microsoft.com/en-us/windows/security/operating-system-security/virus-and-threat-protection/windows-defender-smartscreen/"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -3479,7 +3529,8 @@
     "sources": [
       "https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2008-R2-and-2008/bb742468(v=msdn.10)"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -3543,7 +3594,8 @@
       "https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/welcome-to-rds"
     ],
     "needsReview": false,
-    "uiEquivalentLocation": "Settings › System › Remote Desktop"
+    "uiEquivalentLocation": "Settings › System › Remote Desktop",
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -3607,7 +3659,8 @@
       "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-personalization#personalization-nolockscreencamera"
     ],
     "needsReview": false,
-    "uiEquivalentLocation": "Settings › Accounts › Sign-in options › Dynamic lock"
+    "uiEquivalentLocation": "Settings › Accounts › Sign-in options › Dynamic lock",
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -3670,7 +3723,8 @@
     "aliases": [
       "advanced.rightclickmenu",
       "WPFTweaksRightClickMenu"
-    ]
+    ],
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -3739,7 +3793,8 @@
     "aliases": [
       "pref.showext",
       "WPFToggleShowExt"
-    ]
+    ],
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -3806,7 +3861,8 @@
     "aliases": [
       "pref.hiddenfiles",
       "WPFToggleHiddenFiles"
-    ]
+    ],
+    "presetRole": "preference"
   },
   {
     "schemaVersion": "1.0.0",
@@ -3873,7 +3929,8 @@
     "uiEquivalentLocation": "File Explorer › Options › General › Open File Explorer to: This PC",
     "relatedTweaks": [
       "advanced.removehomeandgallery"
-    ]
+    ],
+    "presetRole": "preference"
   },
   {
     "schemaVersion": "1.0.0",
@@ -3888,8 +3945,7 @@
       "performance"
     ],
     "tags": [
-      "ui",
-      "performance"
+      "ui"
     ],
     "presets": [
       "recommended",
@@ -3943,7 +3999,8 @@
     "aliases": [
       "essential.endtaskontaskbar",
       "WPFTweaksEndTaskOnTaskbar"
-    ]
+    ],
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -4006,7 +4063,8 @@
       "https://learn.microsoft.com/en-us/windows/win32/shell/taskbar-extensions"
     ],
     "needsReview": false,
-    "uiEquivalentLocation": "Settings › Personalization › Taskbar › Taskbar behaviors › Show seconds in system tray clock"
+    "uiEquivalentLocation": "Settings › Personalization › Taskbar › Taskbar behaviors › Show seconds in system tray clock",
+    "presetRole": "preference"
   },
   {
     "schemaVersion": "1.0.0",
@@ -4074,7 +4132,8 @@
     "aliases": [
       "pref.longpaths",
       "WPFToggleLongPaths"
-    ]
+    ],
+    "presetRole": "fix"
   },
   {
     "schemaVersion": "1.0.0",
@@ -4137,7 +4196,8 @@
       "https://learn.microsoft.com/en-us/windows/win32/shell/taskbar-extensions"
     ],
     "needsReview": false,
-    "uiEquivalentLocation": "Settings › Personalization › Taskbar › Taskbar behaviors › Taskbar alignment"
+    "uiEquivalentLocation": "Settings › Personalization › Taskbar › Taskbar behaviors › Taskbar alignment",
+    "presetRole": "preference"
   },
   {
     "schemaVersion": "1.0.0",
@@ -4201,7 +4261,8 @@
     "needsReview": false,
     "relatedTweaks": [
       "advanced.removehomeandgallery"
-    ]
+    ],
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -4268,7 +4329,8 @@
       "https://learn.microsoft.com/en-us/windows/win32/shell/manage-the-desktop"
     ],
     "needsReview": false,
-    "uiEquivalentLocation": "File Explorer › Options › General › Privacy › Show recently used files"
+    "uiEquivalentLocation": "File Explorer › Options › General › Privacy › Show recently used files",
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -4335,7 +4397,8 @@
       "https://learn.microsoft.com/en-us/windows/win32/shell/manage-the-desktop"
     ],
     "needsReview": false,
-    "uiEquivalentLocation": "File Explorer › Options › General › Privacy › Show frequently used folders"
+    "uiEquivalentLocation": "File Explorer › Options › General › Privacy › Show frequently used folders",
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -4398,7 +4461,8 @@
       "https://learn.microsoft.com/en-us/windows/win32/shell/manage-the-desktop"
     ],
     "needsReview": false,
-    "uiEquivalentLocation": "File Explorer › Options › View › Display the full path in the title bar"
+    "uiEquivalentLocation": "File Explorer › Options › View › Display the full path in the title bar",
+    "presetRole": "preference"
   },
   {
     "schemaVersion": "1.0.0",
@@ -4465,7 +4529,8 @@
       "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-admx-search#search-allowsearchhighlights"
     ],
     "needsReview": false,
-    "uiEquivalentLocation": "Settings › Privacy & security › Search permissions › More settings › Show search highlights"
+    "uiEquivalentLocation": "Settings › Privacy & security › Search permissions › More settings › Show search highlights",
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -4534,7 +4599,8 @@
     "uiEquivalentLocation": "Settings › Personalization › Taskbar › Taskbar items › Widgets",
     "relatedTweaks": [
       "essential.widget"
-    ]
+    ],
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -4598,7 +4664,8 @@
       "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-experience#experience-configurechatontaskbar"
     ],
     "needsReview": false,
-    "uiEquivalentLocation": "Settings › Personalization › Taskbar › Taskbar items › Chat"
+    "uiEquivalentLocation": "Settings › Personalization › Taskbar › Taskbar items › Chat",
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -4661,7 +4728,8 @@
       "https://learn.microsoft.com/en-us/windows/win32/shell/taskbar-extensions"
     ],
     "needsReview": false,
-    "uiEquivalentLocation": "Settings › Personalization › Taskbar › Taskbar items › Task view"
+    "uiEquivalentLocation": "Settings › Personalization › Taskbar › Taskbar items › Task view",
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -4725,7 +4793,8 @@
       "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-experience#experience-allowwindowswelcomeexperience"
     ],
     "needsReview": false,
-    "uiEquivalentLocation": "Settings › System › Notifications › Additional settings › Show the Windows welcome experience after updates"
+    "uiEquivalentLocation": "Settings › System › Notifications › Additional settings › Show the Windows welcome experience after updates",
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -4789,7 +4858,8 @@
       "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-experience#experience-allowsoftwareshareofdiagnosticdata"
     ],
     "needsReview": false,
-    "uiEquivalentLocation": "Settings › System › Notifications › Additional settings › Get tips and suggestions when using Windows"
+    "uiEquivalentLocation": "Settings › System › Notifications › Additional settings › Get tips and suggestions when using Windows",
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -4849,7 +4919,8 @@
     "sources": [
       "https://learn.microsoft.com/en-us/windows/security/identity-protection/fast-user-switching"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "presetRole": "preference"
   },
   {
     "schemaVersion": "1.0.0",
@@ -4911,7 +4982,8 @@
     "sources": [
       "https://learn.microsoft.com/en-us/windows/deployment/update/waas-wu-policies#exclude-drivers-from-windows-updates"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -4972,7 +5044,8 @@
       "https://learn.microsoft.com/en-us/windows/deployment/update/waas-restart#no-auto-restart-with-logged-on-users-for-scheduled-automatic-updates-installations"
     ],
     "needsReview": false,
-    "sourceQuote": "date\\AU , set AuOptions to 4 and enable NoAutoRebootWithLoggedOnUsers . As with group policy, if a user schedules the restart in the update notificat"
+    "sourceQuote": "date\\AU , set AuOptions to 4 and enable NoAutoRebootWithLoggedOnUsers . As with group policy, if a user schedules the restart in the update notificat",
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -5033,7 +5106,8 @@
       "https://learn.microsoft.com/en-us/windows/deployment/update/waas-wu-policies#configure-automatic-updates"
     ],
     "needsReview": false,
-    "sourceQuote": "icrosoft\\Windows\\WindowsUpdate\\AU , set AuOptions to 4 and set the install time with ScheduledInstallTime . Enable AlwaysAutoRebo"
+    "sourceQuote": "icrosoft\\Windows\\WindowsUpdate\\AU , set AuOptions to 4 and set the install time with ScheduledInstallTime . Enable AlwaysAutoRebo",
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -5096,7 +5170,8 @@
       "https://learn.microsoft.com/en-us/windows/deployment/do/waas-delivery-optimization"
     ],
     "needsReview": false,
-    "uiEquivalentLocation": "Settings › Windows Update › Advanced options › Delivery Optimization › Advanced options › Download settings"
+    "uiEquivalentLocation": "Settings › Windows Update › Advanced options › Delivery Optimization › Advanced options › Download settings",
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -5157,7 +5232,8 @@
       "https://learn.microsoft.com/en-us/windows/deployment/update/waas-restart#active-hours"
     ],
     "needsReview": false,
-    "sourceQuote": "ies\\Microsoft\\Windows\\WindowsUpdate use SetActiveHours to enable or disable active hours and ActiveHoursStart and ActiveHoursEnd to sp"
+    "sourceQuote": "ies\\Microsoft\\Windows\\WindowsUpdate use SetActiveHours to enable or disable active hours and ActiveHoursStart and ActiveHoursEnd to sp",
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -5217,6 +5293,987 @@
     "sources": [
       "https://learn.microsoft.com/en-us/windows/deployment/update/waas-wu-policies#allow-optional-content"
     ],
-    "needsReview": false
+    "needsReview": false,
+    "presetRole": "optimization"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "ui.taskbar.last-active-click",
+    "name": "Taskbar Click Opens Last Active Window",
+    "description": "Clicking a grouped taskbar app switches straight to its last used window instead of showing thumbnails.",
+    "category": "ui",
+    "subcategory": "taskbar",
+    "risk": "Safe",
+    "impacts": [
+      "ui"
+    ],
+    "tags": [
+      "ui"
+    ],
+    "windows": {
+      "minBuild": 22000
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": true,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+      "valueName": "LastActiveClick",
+      "matchType": "Equals",
+      "expectedValue": 1
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "operation": "Set",
+        "valueName": "LastActiveClick",
+        "valueKind": "DWord",
+        "data": 1
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "operation": "DeleteValue",
+        "valueName": "LastActiveClick"
+      }
+    ],
+    "source": "https://www.ninjaone.com/blog/enable-or-disable-last-active-click-on-the-taskbar/",
+    "verifiedOnBuild": "unverified",
+    "evidence": "situational",
+    "whatItDoes": "When an app has several windows open, a single click on its taskbar icon brings back the window you used last (LastActiveClick).",
+    "sideEffects": "You no longer see the thumbnail preview list on click; hover still shows previews. File Explorer restarts to apply it.",
+    "sources": [
+      "https://www.ninjaone.com/blog/enable-or-disable-last-active-click-on-the-taskbar/",
+      "https://www.bleepingcomputer.com/news/microsoft/new-windows-11-registry-hacks-to-customize-your-device"
+    ],
+    "needsReview": false,
+    "presetRole": "preference"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "privacy.ads.explorer-sync-notifications",
+    "name": "File Explorer Sync Provider Ads - Disable",
+    "description": "Stops File Explorer from showing OneDrive and Microsoft 365 promotions at the top of the window.",
+    "category": "privacy",
+    "subcategory": "ads",
+    "risk": "Safe",
+    "impacts": [
+      "privacy",
+      "ui"
+    ],
+    "tags": [
+      "privacy",
+      "ui"
+    ],
+    "windows": {
+      "minBuild": 19041
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": true,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+      "valueName": "ShowSyncProviderNotifications",
+      "matchType": "Equals",
+      "expectedValue": 0
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "operation": "Set",
+        "valueName": "ShowSyncProviderNotifications",
+        "valueKind": "DWord",
+        "data": 0
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "operation": "Set",
+        "valueName": "ShowSyncProviderNotifications",
+        "valueKind": "DWord",
+        "data": 1
+      }
+    ],
+    "source": "https://www.ninjaone.com/blog/show-sync-provider-notification-in-file-explorer/",
+    "verifiedOnBuild": "unverified",
+    "evidence": "ui-equivalent",
+    "whatItDoes": "Turns off sync provider notifications in File Explorer (ShowSyncProviderNotifications), which Microsoft uses to show OneDrive and Office subscription banners.",
+    "sideEffects": "Sync provider tips and notices no longer appear in File Explorer. File sync itself keeps working.",
+    "sources": [
+      "https://www.ninjaone.com/blog/show-sync-provider-notification-in-file-explorer/",
+      "https://winaero.com/how-to-disable-ads-in-windows-11/"
+    ],
+    "needsReview": false,
+    "uiEquivalentLocation": "File Explorer › Options › View › Show sync provider notifications",
+    "presetRole": "optimization"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "ui.explorer.hide-onedrive-nav",
+    "name": "OneDrive in File Explorer Navigation Pane - Hide",
+    "description": "Removes the OneDrive entry from the left pane of File Explorer for the current user.",
+    "category": "ui",
+    "subcategory": "explorer",
+    "risk": "Safe",
+    "impacts": [
+      "ui"
+    ],
+    "tags": [
+      "ui",
+      "apps"
+    ],
+    "windows": {
+      "minBuild": 19041
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": true,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Classes\\CLSID\\{018D5C66-4533-4307-9B53-224DE2ED1FE6}",
+      "valueName": "System.IsPinnedToNameSpaceTree",
+      "matchType": "Equals",
+      "expectedValue": 0
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Classes\\CLSID\\{018D5C66-4533-4307-9B53-224DE2ED1FE6}",
+        "operation": "Set",
+        "valueName": "System.IsPinnedToNameSpaceTree",
+        "valueKind": "DWord",
+        "data": 0
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Classes\\CLSID\\{018D5C66-4533-4307-9B53-224DE2ED1FE6}",
+        "operation": "Set",
+        "valueName": "System.IsPinnedToNameSpaceTree",
+        "valueKind": "DWord",
+        "data": 1
+      }
+    ],
+    "source": "https://www.elevenforum.com/t/add-or-remove-onedrive-in-navigation-pane-of-file-explorer-in-windows-11.2478/",
+    "verifiedOnBuild": "unverified",
+    "evidence": "situational",
+    "whatItDoes": "Hides the OneDrive folder from the File Explorer navigation pane (System.IsPinnedToNameSpaceTree). OneDrive is not uninstalled.",
+    "sideEffects": "You reach your OneDrive files through the user folder or the OneDrive tray icon instead. A OneDrive update can add the entry back.",
+    "sources": [
+      "https://www.elevenforum.com/t/add-or-remove-onedrive-in-navigation-pane-of-file-explorer-in-windows-11.2478/",
+      "https://www.winhelponline.com/blog/remove-onedrive-from-explorer/"
+    ],
+    "needsReview": false,
+    "presetRole": "preference"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "ai.paint.disable-ai-features",
+    "name": "Paint AI Features - Disable",
+    "description": "Turns off Cocreator, Generative Fill and Image Creator in the Paint app.",
+    "category": "ai",
+    "subcategory": "paint",
+    "risk": "Low",
+    "impacts": [
+      "privacy"
+    ],
+    "tags": [
+      "ai",
+      "apps"
+    ],
+    "windows": {
+      "minBuild": 22621
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "all": [
+        {
+          "type": "Registry",
+          "hive": "HKLM",
+          "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\Paint",
+          "valueName": "DisableCocreator",
+          "matchType": "Equals",
+          "expectedValue": 1
+        },
+        {
+          "type": "Registry",
+          "hive": "HKLM",
+          "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\Paint",
+          "valueName": "DisableGenerativeFill",
+          "matchType": "Equals",
+          "expectedValue": 1
+        },
+        {
+          "type": "Registry",
+          "hive": "HKLM",
+          "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\Paint",
+          "valueName": "DisableImageCreator",
+          "matchType": "Equals",
+          "expectedValue": 1
+        }
+      ]
+    },
+    "apply": [
+      {
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\Paint",
+        "operation": "Set",
+        "valueName": "DisableCocreator",
+        "valueKind": "DWord",
+        "data": 1
+      },
+      {
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\Paint",
+        "operation": "Set",
+        "valueName": "DisableGenerativeFill",
+        "valueKind": "DWord",
+        "data": 1
+      },
+      {
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\Paint",
+        "operation": "Set",
+        "valueName": "DisableImageCreator",
+        "valueKind": "DWord",
+        "data": 1
+      }
+    ],
+    "undo": [
+      {
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\Paint",
+        "operation": "DeleteValue",
+        "valueName": "DisableCocreator"
+      },
+      {
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\Paint",
+        "operation": "DeleteValue",
+        "valueName": "DisableGenerativeFill"
+      },
+      {
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\Paint",
+        "operation": "DeleteValue",
+        "valueName": "DisableImageCreator"
+      }
+    ],
+    "source": "https://pureinfotech.com/disable-ai-features-paint-windows-11/",
+    "verifiedOnBuild": "unverified",
+    "evidence": "situational",
+    "whatItDoes": "Sets the Paint policies DisableCocreator, DisableGenerativeFill and DisableImageCreator so these AI tools are removed from Paint.",
+    "sideEffects": "The AI buttons disappear from Paint after it is reopened. Regular drawing and editing are unchanged.",
+    "sources": [
+      "https://pureinfotech.com/disable-ai-features-paint-windows-11/",
+      "https://www.thewindowsclub.com/how-to-disable-ai-features-in-the-paint-app-in-windows"
+    ],
+    "needsReview": false,
+    "presetRole": "optimization"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "ai.notepad.disable-ai-features",
+    "name": "Notepad AI Features - Disable",
+    "description": "Turns off Copilot, Rewrite and Summarize features in Notepad.",
+    "category": "ai",
+    "subcategory": "notepad",
+    "risk": "Low",
+    "impacts": [
+      "privacy"
+    ],
+    "tags": [
+      "ai",
+      "apps"
+    ],
+    "windows": {
+      "minBuild": 22621
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SOFTWARE\\Policies\\WindowsNotepad",
+      "valueName": "DisableAIFeatures",
+      "matchType": "Equals",
+      "expectedValue": 1
+    },
+    "apply": [
+      {
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\WindowsNotepad",
+        "operation": "Set",
+        "valueName": "DisableAIFeatures",
+        "valueKind": "DWord",
+        "data": 1
+      }
+    ],
+    "undo": [
+      {
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\WindowsNotepad",
+        "operation": "DeleteValue",
+        "valueName": "DisableAIFeatures"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/client-management/manage-notepad",
+    "verifiedOnBuild": "unverified",
+    "evidence": "situational",
+    "whatItDoes": "Sets the Notepad policy DisableAIFeatures so the AI writing tools are removed from Notepad.",
+    "sideEffects": "Notepad keeps working as a plain text editor without the AI menu. Reopen Notepad to see the change.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows/client-management/manage-notepad",
+      "https://techpress.net/enable-disable-copilot-in-notepad/"
+    ],
+    "needsReview": false,
+    "relatedTweaks": [
+      "advanced.windowsai"
+    ],
+    "presetRole": "optimization"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "ai.clicktodo.disable",
+    "name": "Click to Do - Disable",
+    "description": "Turns off Click to Do, the AI overlay that suggests actions for text and images on screen.",
+    "category": "ai",
+    "subcategory": "clicktodo",
+    "risk": "Low",
+    "impacts": [
+      "privacy"
+    ],
+    "tags": [
+      "ai",
+      "privacy"
+    ],
+    "windows": {
+      "minBuild": 26100
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsAI",
+      "valueName": "DisableClickToDo",
+      "matchType": "Equals",
+      "expectedValue": 1
+    },
+    "apply": [
+      {
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsAI",
+        "operation": "Set",
+        "valueName": "DisableClickToDo",
+        "valueKind": "DWord",
+        "data": 1
+      }
+    ],
+    "undo": [
+      {
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsAI",
+        "operation": "DeleteValue",
+        "valueName": "DisableClickToDo"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-windowsai",
+    "verifiedOnBuild": "unverified",
+    "warnings": "Windows Settings will display 'Some settings are managed by your organization'. This is normal when Group Policy registry keys are set.",
+    "evidence": "documented",
+    "whatItDoes": "Sets the Windows AI policy DisableClickToDo so the Click to Do component and its entry points are unavailable.",
+    "sideEffects": "Click to Do no longer opens from its shortcut or the Snipping Tool. Only affects Copilot+ PCs that have the feature.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-windowsai"
+    ],
+    "needsReview": false,
+    "sourceQuote": "When the policy is enabled, the Click to Do component and entry points won't be available to users.",
+    "presetRole": "optimization"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "ai.recall.disable-availability",
+    "name": "Recall Feature - Make Unavailable",
+    "description": "Prevents Recall from being turned on, so Windows does not save snapshots of your screen.",
+    "category": "ai",
+    "subcategory": "recall",
+    "risk": "Medium",
+    "impacts": [
+      "privacy",
+      "storage"
+    ],
+    "tags": [
+      "ai",
+      "privacy"
+    ],
+    "windows": {
+      "minBuild": 26100
+    },
+    "requiresReboot": true,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsAI",
+      "valueName": "AllowRecallEnablement",
+      "matchType": "Equals",
+      "expectedValue": 0
+    },
+    "apply": [
+      {
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsAI",
+        "operation": "Set",
+        "valueName": "AllowRecallEnablement",
+        "valueKind": "DWord",
+        "data": 0
+      }
+    ],
+    "undo": [
+      {
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsAI",
+        "operation": "DeleteValue",
+        "valueName": "AllowRecallEnablement"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-windowsai",
+    "verifiedOnBuild": "unverified",
+    "warnings": "Windows Settings will display 'Some settings are managed by your organization'. This is normal when Group Policy registry keys are set.",
+    "evidence": "documented",
+    "whatItDoes": "Sets the Windows AI policy AllowRecallEnablement so the Recall optional component cannot be enabled by users on this PC.",
+    "sideEffects": "Recall and its saved snapshots become unavailable after a restart. To use Recall again, undo the tweak and restart.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-windowsai"
+    ],
+    "needsReview": false,
+    "sourceQuote": "This policy setting allows you to determine whether the Recall optional component is available for end users to enable on their device.",
+    "relatedTweaks": [
+      "ai.recall.disable-snapshots"
+    ],
+    "presetRole": "optimization"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "apps.edge.disable-sidebar",
+    "name": "Microsoft Edge Sidebar - Disable",
+    "description": "Removes the Edge sidebar, including the Copilot button and app panel.",
+    "category": "ui",
+    "subcategory": "edge",
+    "risk": "Low",
+    "impacts": [
+      "ui"
+    ],
+    "tags": [
+      "apps",
+      "ai",
+      "ui"
+    ],
+    "windows": {
+      "minBuild": 19041
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SOFTWARE\\Policies\\Microsoft\\Edge",
+      "valueName": "HubsSidebarEnabled",
+      "matchType": "Equals",
+      "expectedValue": 0
+    },
+    "apply": [
+      {
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Edge",
+        "operation": "Set",
+        "valueName": "HubsSidebarEnabled",
+        "valueKind": "DWord",
+        "data": 0
+      }
+    ],
+    "undo": [
+      {
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Edge",
+        "operation": "DeleteValue",
+        "valueName": "HubsSidebarEnabled"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/deployedge/microsoft-edge-browser-policies/hubssidebarenabled",
+    "verifiedOnBuild": "unverified",
+    "warnings": "Edge will show 'Your browser is managed by your organization' in its menu and settings. This is normal when Edge policies are set.",
+    "evidence": "documented",
+    "whatItDoes": "Sets the Edge policy HubsSidebarEnabled so the sidebar is never shown in Microsoft Edge.",
+    "sideEffects": "The sidebar and its Copilot entry disappear from Edge. Edge shows that it is managed by your organization.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/deployedge/microsoft-edge-browser-policies/hubssidebarenabled"
+    ],
+    "needsReview": false,
+    "sourceQuote": "If you disable this policy, the Sidebar is never shown.",
+    "presetRole": "optimization"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "apps.edge.disable-startup-boost",
+    "name": "Microsoft Edge Startup Boost - Disable",
+    "description": "Stops Edge from preloading in the background when you sign in to Windows.",
+    "category": "performance",
+    "subcategory": "edge",
+    "risk": "Low",
+    "impacts": [
+      "performance"
+    ],
+    "tags": [
+      "apps",
+      "performance"
+    ],
+    "windows": {
+      "minBuild": 19041
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SOFTWARE\\Policies\\Microsoft\\Edge",
+      "valueName": "StartupBoostEnabled",
+      "matchType": "Equals",
+      "expectedValue": 0
+    },
+    "apply": [
+      {
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Edge",
+        "operation": "Set",
+        "valueName": "StartupBoostEnabled",
+        "valueKind": "DWord",
+        "data": 0
+      }
+    ],
+    "undo": [
+      {
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Edge",
+        "operation": "DeleteValue",
+        "valueName": "StartupBoostEnabled"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/deployedge/microsoft-edge-browser-policies/startupboostenabled",
+    "verifiedOnBuild": "unverified",
+    "warnings": "Edge will show 'Your browser is managed by your organization' in its menu and settings. This is normal when Edge policies are set.",
+    "evidence": "documented",
+    "whatItDoes": "Sets the Edge policy StartupBoostEnabled so Edge no longer starts its processes early at sign-in.",
+    "sideEffects": "The first Edge window may open a little slower. Edge shows that it is managed by your organization.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/deployedge/microsoft-edge-browser-policies/startupboostenabled"
+    ],
+    "needsReview": false,
+    "sourceQuote": "If you disable this policy, startup boost is turned off.",
+    "presetRole": "optimization"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "apps.edge.disable-background-mode",
+    "name": "Microsoft Edge Background Apps - Disable",
+    "description": "Stops Edge from keeping running after you close all its windows.",
+    "category": "performance",
+    "subcategory": "edge",
+    "risk": "Low",
+    "impacts": [
+      "performance",
+      "battery"
+    ],
+    "tags": [
+      "apps",
+      "performance"
+    ],
+    "windows": {
+      "minBuild": 19041
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SOFTWARE\\Policies\\Microsoft\\Edge",
+      "valueName": "BackgroundModeEnabled",
+      "matchType": "Equals",
+      "expectedValue": 0
+    },
+    "apply": [
+      {
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Edge",
+        "operation": "Set",
+        "valueName": "BackgroundModeEnabled",
+        "valueKind": "DWord",
+        "data": 0
+      }
+    ],
+    "undo": [
+      {
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Edge",
+        "operation": "DeleteValue",
+        "valueName": "BackgroundModeEnabled"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/deployedge/microsoft-edge-browser-policies/backgroundmodeenabled",
+    "verifiedOnBuild": "unverified",
+    "warnings": "Edge will show 'Your browser is managed by your organization' in its menu and settings. This is normal when Edge policies are set.",
+    "evidence": "documented",
+    "whatItDoes": "Sets the Edge policy BackgroundModeEnabled so Edge fully exits when its last window is closed.",
+    "sideEffects": "Edge extensions and web apps stop running while Edge is closed, so their notifications pause. Edge shows that it is managed by your organization.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/deployedge/microsoft-edge-browser-policies/backgroundmodeenabled"
+    ],
+    "needsReview": false,
+    "sourceQuote": "If you disable this policy, background mode is turned off.",
+    "presetRole": "optimization"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "privacy.findmydevice.disable",
+    "name": "Find My Device - Disable",
+    "description": "Turns off Find My Device so this PC does not report its location to your Microsoft account.",
+    "category": "privacy",
+    "subcategory": "location",
+    "risk": "Medium",
+    "impacts": [
+      "privacy",
+      "security"
+    ],
+    "tags": [
+      "privacy"
+    ],
+    "windows": {
+      "minBuild": 19041
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SOFTWARE\\Policies\\Microsoft\\FindMyDevice",
+      "valueName": "AllowFindMyDevice",
+      "matchType": "Equals",
+      "expectedValue": 0
+    },
+    "apply": [
+      {
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\FindMyDevice",
+        "operation": "Set",
+        "valueName": "AllowFindMyDevice",
+        "valueKind": "DWord",
+        "data": 0
+      }
+    ],
+    "undo": [
+      {
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\FindMyDevice",
+        "operation": "DeleteValue",
+        "valueName": "AllowFindMyDevice"
+      }
+    ],
+    "source": "https://www.elevenforum.com/t/enable-or-disable-find-my-device-in-windows-11.3861/",
+    "verifiedOnBuild": "unverified",
+    "warnings": "Windows Settings will display 'Some settings are managed by your organization'. This is normal when Group Policy registry keys are set.",
+    "evidence": "situational",
+    "whatItDoes": "Sets the policy AllowFindMyDevice so Find My Device is off and locked in Settings.",
+    "sideEffects": "You cannot locate or remotely lock this PC from account.microsoft.com if it is lost or stolen.",
+    "sources": [
+      "https://www.elevenforum.com/t/enable-or-disable-find-my-device-in-windows-11.3861/",
+      "https://www.anoopcnair.com/find-my-device-using-intune-security-policy/"
+    ],
+    "needsReview": false,
+    "presetRole": "preference"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "system.power.disable-fast-startup",
+    "name": "Fast Startup - Disable",
+    "description": "Makes Shut Down perform a full shutdown instead of a partial hibernation of the system.",
+    "category": "system",
+    "subcategory": "power",
+    "risk": "Low",
+    "impacts": [
+      "performance",
+      "storage"
+    ],
+    "tags": [
+      "performance"
+    ],
+    "windows": {
+      "minBuild": 19041
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Power",
+      "valueName": "HiberbootEnabled",
+      "matchType": "Equals",
+      "expectedValue": 0
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Power",
+        "operation": "Set",
+        "valueName": "HiberbootEnabled",
+        "valueKind": "DWord",
+        "data": 0
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Power",
+        "operation": "Set",
+        "valueName": "HiberbootEnabled",
+        "valueKind": "DWord",
+        "data": 1
+      }
+    ],
+    "source": "https://www.elevenforum.com/t/turn-on-or-off-fast-startup-in-windows-11.1212/",
+    "verifiedOnBuild": "unverified",
+    "evidence": "ui-equivalent",
+    "whatItDoes": "Turns off Fast Startup (HiberbootEnabled), so every shutdown fully closes the Windows kernel and drivers.",
+    "sideEffects": "Cold boots can take a few seconds longer. Helps with dual-boot setups, driver updates that need a clean start, and machines that misbehave after shutdown.",
+    "sources": [
+      "https://www.elevenforum.com/t/turn-on-or-off-fast-startup-in-windows-11.1212/",
+      "https://www.guidingtech.com/disable-fast-startup-on-windows-11/"
+    ],
+    "needsReview": false,
+    "uiEquivalentLocation": "Control Panel › Power Options › Choose what the power buttons do › Turn on fast startup",
+    "presetRole": "fix"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "ui.widgets.disable-policy",
+    "name": "Widgets Board - Disable by Policy",
+    "description": "Turns off the Widgets board and its news feed with a policy, without uninstalling anything.",
+    "category": "ui",
+    "subcategory": "widgets",
+    "risk": "Medium",
+    "impacts": [
+      "ui",
+      "privacy",
+      "performance"
+    ],
+    "tags": [
+      "ui",
+      "privacy"
+    ],
+    "windows": {
+      "minBuild": 22000
+    },
+    "requiresReboot": true,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SOFTWARE\\Policies\\Microsoft\\Dsh",
+      "valueName": "AllowNewsAndInterests",
+      "matchType": "Equals",
+      "expectedValue": 0
+    },
+    "apply": [
+      {
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Dsh",
+        "operation": "Set",
+        "valueName": "AllowNewsAndInterests",
+        "valueKind": "DWord",
+        "data": 0
+      }
+    ],
+    "undo": [
+      {
+        "type": "Policy",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Policies\\Microsoft\\Dsh",
+        "operation": "DeleteValue",
+        "valueName": "AllowNewsAndInterests"
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-newsandinterests",
+    "verifiedOnBuild": "unverified",
+    "warnings": "Windows Settings will display 'Some settings are managed by your organization'. This is normal when Group Policy registry keys are set.",
+    "evidence": "situational",
+    "whatItDoes": "Sets the policy AllowNewsAndInterests so the Widgets board, its taskbar button and the news feed are turned off.",
+    "sideEffects": "Widgets cannot be opened until the tweak is undone. Takes full effect after a restart.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-newsandinterests",
+      "https://cloudinfra.net/disable-news-and-interests-on-windows-using-intune/"
+    ],
+    "needsReview": false,
+    "relatedTweaks": [
+      "essential.widget",
+      "ui.taskbar.disable-widgets-button"
+    ],
+    "presetRole": "optimization"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "performance.startup.remove-startup-delay",
+    "name": "Startup Apps Delay - Remove",
+    "description": "Starts your startup apps right after sign-in instead of waiting a few seconds.",
+    "category": "Experimental",
+    "subcategory": "startup",
+    "risk": "Low",
+    "impacts": [
+      "performance"
+    ],
+    "tags": [
+      "performance"
+    ],
+    "windows": {
+      "minBuild": 19041
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Serialize",
+      "valueName": "StartupDelayInMSec",
+      "matchType": "Equals",
+      "expectedValue": 0
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Serialize",
+        "operation": "Set",
+        "valueName": "StartupDelayInMSec",
+        "valueKind": "DWord",
+        "data": 0
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Serialize",
+        "operation": "DeleteValue",
+        "valueName": "StartupDelayInMSec"
+      }
+    ],
+    "source": "https://www.elevenforum.com/t/enable-or-disable-delay-of-running-startup-apps-in-windows-11.9144/",
+    "verifiedOnBuild": "unverified",
+    "evidence": "anecdotal",
+    "whatItDoes": "Removes the short delay Windows adds before launching startup apps (StartupDelayInMSec).",
+    "sideEffects": "Startup apps compete with the desktop for disk and CPU right after sign-in, so the desktop can feel slower at first on older drives. Benefit is mostly felt on fast SSDs.",
+    "sources": [
+      "https://www.elevenforum.com/t/enable-or-disable-delay-of-running-startup-apps-in-windows-11.9144/",
+      "https://ninjaone.com/blog/enable-or-disable-delay-of-running-startup-apps-in-windows-11"
+    ],
+    "needsReview": false,
+    "presetRole": "advanced"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "system.shutdown.auto-end-tasks",
+    "name": "Close Apps Automatically at Shutdown",
+    "description": "Shut down, restart and sign out close running apps instead of waiting on the 'This app is preventing shutdown' screen.",
+    "category": "system",
+    "subcategory": "shutdown",
+    "risk": "Medium",
+    "impacts": [
+      "performance"
+    ],
+    "tags": [
+      "performance"
+    ],
+    "windows": {
+      "minBuild": 19041
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Control Panel\\Desktop",
+      "valueName": "AutoEndTasks",
+      "matchType": "Equals",
+      "expectedValue": "1"
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Control Panel\\Desktop",
+        "operation": "Set",
+        "valueName": "AutoEndTasks",
+        "valueKind": "String",
+        "data": "1"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Control Panel\\Desktop",
+        "operation": "DeleteValue",
+        "valueName": "AutoEndTasks"
+      }
+    ],
+    "source": "https://www.elevenforum.com/t/turn-on-or-off-autoendtasks-at-sign-out-restart-shut-down-in-windows-11.8283/",
+    "verifiedOnBuild": "unverified",
+    "evidence": "situational",
+    "whatItDoes": "Tells Windows to end apps that do not close by themselves during shutdown, restart or sign-out (AutoEndTasks).",
+    "sideEffects": "Unsaved work in apps that are still open is lost at shutdown instead of Windows asking you first.",
+    "sources": [
+      "https://www.elevenforum.com/t/turn-on-or-off-autoendtasks-at-sign-out-restart-shut-down-in-windows-11.8283/",
+      "https://www.tomshardware.com/how-to/auto-end-tasks-windows"
+    ],
+    "needsReview": false,
+    "presetRole": "preference"
   }
 ]

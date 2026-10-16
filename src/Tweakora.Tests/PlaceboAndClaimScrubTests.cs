@@ -54,7 +54,7 @@ public sealed class PlaceboAndClaimScrubTests
             }
         }
 
-        Assert.Equal(137, count);
+        Assert.Equal(152, count);
     }
 
     [Fact]

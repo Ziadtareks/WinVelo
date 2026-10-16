@@ -75,7 +75,8 @@
     "needsReview": false,
     "tags": [
       "ui"
-    ]
+    ],
+    "presetRole": "fix"
   },
   {
     "schemaVersion": "1.0.0",
@@ -134,7 +135,8 @@
     "uiEquivalentLocation": "Settings › Personalization › Taskbar › Other system tray icons",
     "tags": [
       "ui"
-    ]
+    ],
+    "presetRole": "preference"
   },
   {
     "schemaVersion": "1.0.0",
@@ -213,7 +215,8 @@
     "uiEquivalentLocation": "Settings › Personalization › Colors › Choose your mode",
     "tags": [
       "ui"
-    ]
+    ],
+    "presetRole": "preference"
   },
   {
     "schemaVersion": "1.0.0",
@@ -273,14 +276,15 @@
     "needsReview": false,
     "tags": [
       "ui"
-    ]
+    ],
+    "presetRole": "fix"
   },
   {
     "schemaVersion": "1.0.0",
     "id": "pref.newoutlook",
     "origin": "WPFToggleNewOutlook",
-    "name": "Microsoft Outlook New Version",
-    "description": "This will ensure the new Outlook application is used.",
+    "name": "Microsoft Outlook - Use New Version",
+    "description": "Switches classic Outlook to the new Outlook and shows the toggle for it. Undo switches back.",
     "category": "ui",
     "subcategory": "Customize Preferences",
     "risk": "Safe",
@@ -377,8 +381,8 @@
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/newoutlook",
     "verifiedOnBuild": "26100",
     "evidence": "ui-equivalent",
-    "whatItDoes": "Prevents Windows from auto-installing or forcing the New Outlook web wrapper.",
-    "sideEffects": "None known.",
+    "whatItDoes": "Turns on the new Outlook for Windows, shows the new Outlook toggle inside classic Outlook, and turns off automatic migration prompts.",
+    "sideEffects": "Classic Outlook opens as the new Outlook, which does not support some classic add-ins and offline features.",
     "sources": [
       "https://learn.microsoft.com/en-us/deployoffice/outlook/new-outlook-for-windows"
     ],
@@ -387,7 +391,8 @@
     "tags": [
       "apps",
       "ui"
-    ]
+    ],
+    "presetRole": "preference"
   },
   {
     "schemaVersion": "1.0.0",
@@ -448,7 +453,8 @@
     "uiEquivalentLocation": "Settings › Accessibility › Visual effects › Always show scrollbars",
     "tags": [
       "ui"
-    ]
+    ],
+    "presetRole": "preference"
   },
   {
     "schemaVersion": "1.0.0",
@@ -528,7 +534,8 @@
       "gaming",
       "performance",
       "ui"
-    ]
+    ],
+    "presetRole": "fix"
   },
   {
     "schemaVersion": "1.0.0",
@@ -607,13 +614,14 @@
     "uiEquivalentLocation": "Control Panel › Ease of Access Center › Make the keyboard easier to use",
     "tags": [
       "ui"
-    ]
+    ],
+    "presetRole": "preference"
   },
   {
     "schemaVersion": "1.0.0",
     "id": "pref.windowsnapping",
     "origin": "WPFToggleWindowSnapping",
-    "name": "Window Snapping",
+    "name": "Window Snapping - Enable",
     "description": "Toggles the window snapping feature when dragging windows.",
     "category": "ui",
     "subcategory": "Customize Preferences",
@@ -659,7 +667,7 @@
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/windowsnapping",
     "verifiedOnBuild": "26100",
     "evidence": "ui-equivalent",
-    "whatItDoes": "Customizes window snapping animations and edge assist behaviors.",
+    "whatItDoes": "Turns on window snapping (the Windows default), so dragging a window to a screen edge resizes it. Use Undo to turn snapping off.",
     "sideEffects": "Alters how application windows snap to screen borders and zones.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/apps/design/basics/window-management"
@@ -668,7 +676,8 @@
     "uiEquivalentLocation": "Settings › System › Multitasking › Snap windows",
     "tags": [
       "ui"
-    ]
+    ],
+    "presetRole": "preference"
   },
   {
     "schemaVersion": "1.0.0",
@@ -729,7 +738,8 @@
     "tags": [
       "network",
       "performance"
-    ]
+    ],
+    "presetRole": "fix"
   },
   {
     "schemaVersion": "1.0.0",
@@ -787,14 +797,15 @@
     "needsReview": true,
     "tags": [
       "performance"
-    ]
+    ],
+    "presetRole": "fix"
   },
   {
     "schemaVersion": "1.0.0",
     "id": "pref.hidesettingshome",
     "origin": "WPFToggleHideSettingsHome",
-    "name": "Settings Home Page",
-    "description": "Toggles the Home Page in the Windows Settings app.",
+    "name": "Settings Home Page - Show",
+    "description": "Shows the Home page in Windows 11 Settings (the Windows default). Undo hides it.",
     "category": "ui",
     "subcategory": "Customize Preferences",
     "risk": "Safe",
@@ -839,16 +850,16 @@
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/hidesettingshome",
     "verifiedOnBuild": "26100",
     "evidence": "situational",
-    "whatItDoes": "Hides the personalized 'Home' recommendations page in Windows 11 Settings.",
-    "sideEffects": "Settings app opens directly to the System page rather than the Home overview cards.",
+    "whatItDoes": "Makes the Home page visible in Windows 11 Settings by setting the page visibility policy to show it. This is the Windows default; use Undo to hide the Home page.",
+    "sideEffects": "None known. Settings opens on the Home page, which shows suggestions and account banners.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-settings#settings-pagelist"
     ],
     "needsReview": false,
     "tags": [
-      "ui",
-      "privacy"
-    ]
+      "ui"
+    ],
+    "presetRole": "preference"
   },
   {
     "schemaVersion": "1.0.0",
@@ -943,14 +954,15 @@
       "ui",
       "privacy",
       "network"
-    ]
+    ],
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
     "id": "pref.loginblur",
     "origin": "WPFToggleLoginBlur",
-    "name": "Logon Screen Acrylic Blur",
-    "description": "Toggles the acrylic blur effect on login screen background.",
+    "name": "Logon Screen Acrylic Blur - Enable",
+    "description": "Keeps the acrylic blur on the sign-in screen background (the Windows default). Undo turns the blur off.",
     "category": "ui",
     "subcategory": "Customize Preferences",
     "risk": "Medium",
@@ -995,8 +1007,8 @@
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/loginblur",
     "verifiedOnBuild": "26100",
     "evidence": "situational",
-    "whatItDoes": "Disables acrylic blur effect on the Windows lock and sign-in screen background.",
-    "sideEffects": "Lock screen sign-in shows a clear background image without acrylic blur distortion.",
+    "whatItDoes": "Allows the acrylic blur effect on the Windows sign-in screen background. This is the Windows default; use Undo to show the background image without blur.",
+    "sideEffects": "None known. The sign-in background stays blurred.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-admx-logon#logon-disableacrylicbackgroundonlogon"
     ],
@@ -1004,7 +1016,8 @@
     "tags": [
       "ui",
       "performance"
-    ]
+    ],
+    "presetRole": "preference"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1063,14 +1076,15 @@
     "uiEquivalentLocation": "Settings › Accounts › Sign-in options",
     "tags": [
       "ui"
-    ]
+    ],
+    "presetRole": "preference"
   },
   {
     "schemaVersion": "1.0.0",
     "id": "pref.startmenurecommendations",
     "origin": "WPFToggleStartMenuRecommendations",
-    "name": "Start Menu Recommendations",
-    "description": "Toggles the recommendations section in the Start Menu. WARNING: This will also disable Windows Spotlight on your Lock Screen as a side effect.",
+    "name": "Start Menu Recommended Section - Show",
+    "description": "Shows the Recommended section in the Windows 11 Start menu (the Windows default) and restarts Explorer. Undo hides it.",
     "category": "ui",
     "subcategory": "Customize Preferences",
     "risk": "Medium",
@@ -1163,8 +1177,8 @@
     "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/startmenurecommendations",
     "verifiedOnBuild": "26100",
     "evidence": "ui-equivalent",
-    "whatItDoes": "Disables recommended files and recently opened items in the Windows 11 Start Menu.",
-    "sideEffects": "The 'Recommended' section of the Start Menu remains empty and will not display recent files.",
+    "whatItDoes": "Removes the policies that hide the Recommended section of the Start menu, so recent files and suggested apps appear again, then restarts Explorer. This is the Windows default; use Undo to hide the section.",
+    "sideEffects": "Explorer restarts, so open File Explorer windows close. The Recommended section shows recent files and app suggestions.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-start#start-hideshareddocuments"
     ],
@@ -1173,14 +1187,15 @@
     "tags": [
       "ui",
       "privacy"
-    ]
+    ],
+    "presetRole": "preference"
   },
   {
     "schemaVersion": "1.0.0",
     "id": "pref.stickykeys",
     "origin": "WPFToggleStickyKeys",
-    "name": "Sticky Keys",
-    "description": "Toggles the Sticky Keys, which activate when clicking shift rapidly.",
+    "name": "Sticky Keys Shortcut - Disable",
+    "description": "Stops Sticky Keys from turning on when Shift is pressed five times, which commonly interrupts games.",
     "category": "ui",
     "subcategory": "Customize Preferences",
     "risk": "Safe",
@@ -1233,9 +1248,9 @@
     "needsReview": false,
     "uiEquivalentLocation": "Settings › Accessibility › Keyboard › Sticky keys",
     "tags": [
-      "gaming",
-      "ui"
-    ]
+      "gaming"
+    ],
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1297,6 +1312,7 @@
     "oppositeOf": "advanced.display",
     "tags": [
       "ui"
-    ]
+    ],
+    "presetRole": "preference"
   }
 ]

@@ -92,7 +92,8 @@
     "oppositeOf": "privacy.activity.activity-history",
     "tags": [
       "privacy"
-    ]
+    ],
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -182,7 +183,8 @@
     "needsReview": false,
     "tags": [
       "performance"
-    ]
+    ],
+    "presetRole": "preference"
   },
   {
     "schemaVersion": "1.0.0",
@@ -273,7 +275,8 @@
       "apps",
       "ui",
       "performance"
-    ]
+    ],
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -331,7 +334,8 @@
     "needsReview": false,
     "tags": [
       "ui"
-    ]
+    ],
+    "presetRole": "preference"
   },
   {
     "schemaVersion": "1.0.0",
@@ -403,7 +407,8 @@
       "apps",
       "ui",
       "privacy"
-    ]
+    ],
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -515,7 +520,8 @@
     ],
     "tags": [
       "privacy"
-    ]
+    ],
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -622,7 +628,8 @@
     "tags": [
       "performance",
       "privacy"
-    ]
+    ],
+    "presetRole": "advanced"
   },
   {
     "schemaVersion": "1.0.0",
@@ -682,7 +689,8 @@
       "apps",
       "privacy",
       "ui"
-    ]
+    ],
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -951,9 +959,9 @@
       "privacy.telemetry.diagnostic-data"
     ],
     "tags": [
-      "privacy",
-      "performance"
-    ]
+      "privacy"
+    ],
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1019,7 +1027,8 @@
     "needsReview": false,
     "tags": [
       "performance"
-    ]
+    ],
+    "presetRole": "action"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1078,7 +1087,8 @@
     "tags": [
       "performance",
       "privacy"
-    ]
+    ],
+    "presetRole": "fix"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1137,7 +1147,8 @@
     "tags": [
       "network",
       "privacy"
-    ]
+    ],
+    "presetRole": "optimization"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1204,7 +1215,8 @@
     "needsReview": false,
     "tags": [
       "performance"
-    ]
+    ],
+    "presetRole": "action"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1274,7 +1286,8 @@
     ],
     "tags": [
       "performance"
-    ]
+    ],
+    "presetRole": "action"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1346,6 +1359,7 @@
       "network",
       "performance",
       "ui"
-    ]
+    ],
+    "presetRole": "optimization"
   }
 ]

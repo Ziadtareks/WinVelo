@@ -253,19 +253,19 @@ public sealed class PresetValidationTests
 
         var gamingCard = dvm.Profiles.FirstOrDefault(p => p.Id == "preset.gaming");
         Assert.NotNull(gamingCard);
-        Assert.Equal("Standard: 4 tweaks · Full: 13 tweaks", gamingCard.TiersSubtitle);
+        Assert.Equal("Standard: 3 tweaks · Full: 6 tweaks", gamingCard.TiersSubtitle);
 
         // Gaming starts in Standard tier
         Assert.True(gamingCard.IsStandardTier);
         Assert.False(gamingCard.IsFullTier);
-        Assert.Equal(4, gamingCard.PreviewTweaks.Count);
-        Assert.DoesNotContain("and", gamingCard.PreviewTweakSummary); // 4 tweaks total, no remaining
+        Assert.Equal(3, gamingCard.PreviewTweaks.Count);
+        Assert.DoesNotContain("and", gamingCard.PreviewTweakSummary); // 3 tweaks total, no remaining
 
         // Toggle to Full tier
         gamingCard.IsFullTier = true;
         Assert.False(gamingCard.IsStandardTier);
         Assert.Equal(4, gamingCard.PreviewTweaks.Count); // Preview shows first 4
-        Assert.Contains("and 9 more", gamingCard.PreviewTweakSummary); // 13 - 4 = 9 remaining
+        Assert.Contains("and 2 more", gamingCard.PreviewTweakSummary); // 6 - 4 = 2 remaining
 
         // Toggle back to Standard tier
         gamingCard.IsStandardTier = true;
