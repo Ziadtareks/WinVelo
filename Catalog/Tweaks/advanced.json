@@ -1410,7 +1410,7 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "$AppxPackage = Get-AppxPackage MicrosoftWindows.Client.CoreAI -ErrorAction SilentlyContinue\n      $Appx = if ($AppxPackage) { $AppxPackage.PackageFullName } else { $null }\n\n      $user = Get-LocalUser $Env:UserName -ErrorAction SilentlyContinue\n      if ($user -and $Appx) {\n          $Sid = $user.Sid.Value\n          New-Item \"HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Appx\\AppxAllUserStore\\EndOfLife\\$Sid\\$Appx\" -Force -ErrorAction SilentlyContinue | Out-Null\n      }\n\n      Get-AppxPackage -AllUsers \"*Copilot*\" -ErrorAction SilentlyContinue | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue\n      winget uninstall -e --name \"Copilot\" --silent --force --accept-source-agreements 2>$null\n      if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 3010 -and $LASTEXITCODE -ne -1978335135 -and $LASTEXITCODE -ne -1978335189 -and $LASTEXITCODE -ne -1978335212) { throw \"winget failed with exit code $LASTEXITCODE\" }\n      Get-AppxPackage -AllUsers Microsoft.MicrosoftOfficeHub -ErrorAction SilentlyContinue | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue\n\n      if ($Appx) {\n          Remove-AppxPackage $Appx -ErrorAction SilentlyContinue\n      }\n\n      if (Get-Service -Name WSAIFabricSvc -ErrorAction SilentlyContinue) {\n          Set-Service -Name WSAIFabricSvc -StartupType Disabled -ErrorAction SilentlyContinue\n      }\n      Disable-WindowsOptionalFeature -FeatureName Recall -Online -NoRestart -ErrorAction SilentlyContinue\n\n      Write-Host \"Windows AI Disabled\"",
+        "script": "$AppxPackage = Get-AppxPackage MicrosoftWindows.Client.CoreAI -ErrorAction SilentlyContinue\n      $Appx = if ($AppxPackage) { $AppxPackage.PackageFullName } else { $null }\n\n      $user = Get-LocalUser $Env:UserName -ErrorAction SilentlyContinue\n      if ($user -and $Appx) {\n          $Sid = $user.Sid.Value\n          New-Item \"HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Appx\\AppxAllUserStore\\EndOfLife\\$Sid\\$Appx\" -Force -ErrorAction SilentlyContinue | Out-Null\n      }\n\n      Get-AppxPackage -AllUsers \"*Copilot*\" -ErrorAction SilentlyContinue | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue\n      if (Get-Command winget -ErrorAction SilentlyContinue) {\n          $ErrorActionPreference = 'Continue'\n          winget uninstall -e --name \"Copilot\" --silent --force --accept-source-agreements | Out-Null\n          $code = $LASTEXITCODE\n          $ErrorActionPreference = 'Stop'\n          if ($code -ne 0 -and $code -ne 3010 -and $code -ne -1978335135 -and $code -ne -1978335189 -and $code -ne -1978335212) { throw \"winget failed with exit code $code\" }\n      }\n      Get-AppxPackage -AllUsers Microsoft.MicrosoftOfficeHub -ErrorAction SilentlyContinue | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue\n\n      if ($Appx) {\n          Remove-AppxPackage $Appx -ErrorAction SilentlyContinue\n      }\n\n      if (Get-Service -Name WSAIFabricSvc -ErrorAction SilentlyContinue) {\n          Set-Service -Name WSAIFabricSvc -StartupType Disabled -ErrorAction SilentlyContinue\n      }\n      Disable-WindowsOptionalFeature -FeatureName Recall -Online -NoRestart -ErrorAction SilentlyContinue\n\n      Write-Host \"Windows AI Disabled\"",
         "timeoutSeconds": 300
       }
     ],
@@ -1497,7 +1497,7 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "$RazerPath = \"$Env:SystemRoot\\Installer\\Razer\"\n\n      if (Test-Path $RazerPath) {\n        Remove-Item $RazerPath\\* -Recurse -Force\n      } else {\n        New-Item -Path $RazerPath -ItemType Directory\n      }\n\n      icacls $RazerPath /deny \"*S-1-1-0:(W)\"",
+        "script": "$RazerPath = \"$Env:SystemRoot\\Installer\\Razer\"\nif (Test-Path $RazerPath) {\n    Remove-Item \"$RazerPath\\*\" -Recurse -Force -ErrorAction SilentlyContinue\n} else {\n    New-Item -Path $RazerPath -ItemType Directory -Force | Out-Null\n}\nicacls $RazerPath /deny \"*S-1-1-0:(W)\" | Out-Null\nif ($LASTEXITCODE -ne 0) { throw \"icacls failed with exit code $LASTEXITCODE\" }",
         "timeoutSeconds": 60
       }
     ],
@@ -1523,7 +1523,7 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "icacls \"$Env:SystemRoot\\Installer\\Razer\" /remove:d *S-1-1-0",
+        "script": "$RazerPath = \"$Env:SystemRoot\\Installer\\Razer\"\nif (Test-Path $RazerPath) {\n    icacls $RazerPath /remove:d \"*S-1-1-0\" | Out-Null\n}",
         "timeoutSeconds": 60
       }
     ],
@@ -1570,7 +1570,7 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "Stop-Process -Name \"logi_download_assistant\" -Force -ErrorAction SilentlyContinue\n\n      $ProgramFiles64 = if ($Env:ProgramW6432) { $Env:ProgramW6432 } else { $Env:ProgramFiles }\n      $LogiPath = \"$ProgramFiles64\\LogiDownloadAssistant\"\n\n      if (Test-Path $LogiPath) {\n        Remove-Item $LogiPath\\* -Recurse -Force -ErrorAction SilentlyContinue\n      } else {\n        New-Item -Path $LogiPath -ItemType Directory -ErrorAction SilentlyContinue\n      }\n\n      icacls $LogiPath /deny \"*S-1-1-0:(W)\" | Out-Null",
+        "script": "Stop-Process -Name \"logi_download_assistant\" -Force -ErrorAction SilentlyContinue\n$ProgramFiles64 = if ($Env:ProgramW6432) { $Env:ProgramW6432 } else { $Env:ProgramFiles }\n$LogiPath = \"$ProgramFiles64\\LogiDownloadAssistant\"\nif (Test-Path $LogiPath) {\n    Remove-Item \"$LogiPath\\*\" -Recurse -Force -ErrorAction SilentlyContinue\n} else {\n    New-Item -Path $LogiPath -ItemType Directory -Force | Out-Null\n}\nicacls $LogiPath /deny \"*S-1-1-0:(W)\" | Out-Null\nif ($LASTEXITCODE -ne 0) { throw \"icacls failed with exit code $LASTEXITCODE\" }",
         "timeoutSeconds": 60
       },
       {

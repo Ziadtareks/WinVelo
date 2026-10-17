@@ -442,6 +442,7 @@ public static class Program
                     }
                 }
 
+                FinishShellChanges(targetTweaks, context);
                 Console.WriteLine($"Restored {restored} of {totalRequested} — {failed} failed");
                 return failed == 0 ? 0 : 1;
             }
@@ -471,6 +472,7 @@ public static class Program
                     }
                 }
 
+                FinishShellChanges(AppliedTweaks(targetTweaks, report), context);
                 int totalFailed = report.FailedCount + missingCount;
                 Console.WriteLine($"Applied {report.AppliedCount} of {totalRequested} — {totalFailed} failed");
                 return totalFailed == 0 ? 0 : 1;
@@ -642,6 +644,7 @@ public static class Program
                         Console.WriteLine($"[Failed] {res.TweakId}: {res.Message ?? "Execution failed."}");
                     }
                 }
+                FinishShellChanges(AppliedTweaks(targetTweaks, report), context);
                 Console.WriteLine($"Applied {report.AppliedCount} of {report.TotalRequested} — {report.FailedCount} failed");
                 return report.FailedCount == 0 ? 0 : 1;
             }
@@ -668,6 +671,35 @@ public static class Program
 
         Console.WriteLine("\n[NOTE] Use --help to view available commands.");
         return 0;
+    }
+
+    private static List<TweakDefinition> AppliedTweaks(IEnumerable<TweakDefinition> tweaks, BatchExecutionReport report)
+    {
+        var applied = new HashSet<string>(report.Results.Where(r => r.Status == TweakExecutionStatus.Applied).Select(r => r.TweakId), StringComparer.OrdinalIgnoreCase);
+        return tweaks.Where(t => applied.Contains(t.Id)).ToList();
+    }
+
+    /// <summary>
+    /// Real mode only: tells Windows that settings changed and restarts Explorer once when a changed
+    /// tweak needs it, so taskbar and File Explorer tweaks show up without signing out (same as the app).
+    /// </summary>
+    private static void FinishShellChanges(IEnumerable<TweakDefinition> changed, Core.Engine.ExecutionContext context)
+    {
+        if (TestModeManager.IsTestMode) return;
+        var list = changed.ToList();
+        if (list.Count == 0) return;
+        try
+        {
+            WindowsSettingNotifier.NotifySettingsChangedForKeysAsync(list.SelectMany(t => t.Apply.Concat(t.Undo)).Select(a => a.Key ?? string.Empty)).GetAwaiter().GetResult();
+        }
+        catch { }
+        bool scriptRestarts = list.Any(t => t.Apply.Concat(t.Undo).Any(a => (a.Script ?? string.Empty).Contains("Stop-Process -Name explorer", StringComparison.OrdinalIgnoreCase)));
+        if (list.Any(t => t.RequiresExplorerRestart) && !scriptRestarts)
+        {
+            Console.WriteLine("[INFO] Restarting Explorer so the taskbar and File Explorer show the changes...");
+            try { context.Shell.RestartExplorer(); }
+            catch (Exception ex) { Console.WriteLine($"[WARN] Could not restart Explorer: {ex.Message}"); }
+        }
     }
 
     private static async Task<int> ExecuteSelfTestAsync(
@@ -1129,6 +1161,7 @@ public static class Program
                     Console.WriteLine($"[Failed] {res.TweakId}: {res.Message ?? "Execution failed."}");
                 }
             }
+            FinishShellChanges(AppliedTweaks(targetTweaks, report), context);
             Console.WriteLine($"Applied {report.AppliedCount} of {report.TotalRequested} — {report.FailedCount} failed");
 
             Console.WriteLine("\n[HEALTH CHECK] Verifying Windows servicing integrity...");

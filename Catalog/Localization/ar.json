@@ -233,9 +233,9 @@
     },
     "essential.diskcleanup": {
       "name": "تنظيف القرص - تشغيل",
-      "description": "يشغّل تنظيف القرص على المحرك C: ويزيل تحديثات Windows القديمة.",
-      "whatItDoes": "يشغّل التنظيف التلقائي عبر Cleanmgr في Windows لاستهداف الملفات المؤقتة وذاكرة التحديثات المؤقتة.",
-      "sideEffects": "يفرّغ سلة المحذوفات ويحذف ملفات إعداد Windows Update التي تم تنزيلها.",
+      "description": "يشغّل تنظيف القرص بصمت ويحذف مكونات تحديثات Windows القديمة.",
+      "whatItDoes": "يضبط StateFlags0001 لمعالجات Temporary Files وRecycle Bin وUpdate Cleanup وDelivery Optimization Files وTemporary Setup Files، ويشغّل تنظيف القرص بصمت باستخدام /sagerun:1، ثم يشغّل DISM /StartComponentCleanup /ResetBase.",
+      "sideEffects": "يفرّغ سلة المحذوفات ويحذف الملفات المؤقتة وملفات التحديثات المنزّلة ومكونات Windows Update القديمة. لا يمكن بعدها إلغاء تثبيت التحديثات المثبتة. قد يستغرق وقتًا طويلًا.",
       "warnings": "يحذف مكونات تحديثات Windows المستبدلة عبر DISM /ResetBase. بعد التنفيذ، لا يمكن التراجع عن التحديثات المستبدلة. التراجع يعيد فقط ضبط علامات CleanMgr في الريجستري.",
       "irreversibleReason": "ينفّذ DISM ResetBase وCleanMgr اللذين يحذفان نهائيًا مكونات تحديثات Windows المستبدلة؛ ولا يمكن استعادة أسس التحديثات المحذوفة."
     },

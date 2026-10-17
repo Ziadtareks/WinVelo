@@ -989,7 +989,7 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "if (-not (Get-ComputerRestorePoint)) {\n          Enable-ComputerRestore -Drive $Env:SystemDrive\n      }\n\n      Checkpoint-Computer -Description \"System Restore Point created by WinUtil\" -RestorePointType MODIFY_SETTINGS\n      Write-Host \"System Restore Point Created Successfully\" -ForegroundColor Green",
+        "script": "Enable-ComputerRestore -Drive \"$Env:SystemDrive\\\" -ErrorAction SilentlyContinue\nCheckpoint-Computer -Description \"WinVelo restore point\" -RestorePointType MODIFY_SETTINGS",
         "timeoutSeconds": 300
       }
     ],
@@ -1143,7 +1143,7 @@
     "id": "essential.diskcleanup",
     "origin": "WPFTweaksDiskCleanup",
     "name": "Disk Cleanup - Run",
-    "description": "Runs Disk Cleanup on Drive C: and removes old Windows Updates.",
+    "description": "Runs Disk Cleanup silently and removes old Windows Update components.",
     "category": "performance",
     "subcategory": "Essential Tweaks",
     "risk": "High",
@@ -1165,12 +1165,6 @@
     },
     "apply": [
       {
-        "type": "PowerShell",
-        "operation": "Execute",
-        "script": "Start-Process -FilePath \"$Env:SystemRoot\\System32\\cleanmgr.exe\" -ArgumentList '/d C: /VERYLOWDISK' -Wait\nDism.exe /online /Cleanup-Image /StartComponentCleanup /ResetBase\nif ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 3010) { throw \"Dism failed with exit code $LASTEXITCODE\" }",
-        "timeoutSeconds": 1800
-      },
-      {
         "type": "Registry",
         "hive": "HKLM",
         "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VolumeCaches\\Temporary Files",
@@ -1178,6 +1172,48 @@
         "valueName": "StateFlags0001",
         "valueKind": "DWord",
         "data": 2
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VolumeCaches\\Recycle Bin",
+        "operation": "Set",
+        "valueName": "StateFlags0001",
+        "valueKind": "DWord",
+        "data": 2
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VolumeCaches\\Update Cleanup",
+        "operation": "Set",
+        "valueName": "StateFlags0001",
+        "valueKind": "DWord",
+        "data": 2
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VolumeCaches\\Delivery Optimization Files",
+        "operation": "Set",
+        "valueName": "StateFlags0001",
+        "valueKind": "DWord",
+        "data": 2
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VolumeCaches\\Temporary Setup Files",
+        "operation": "Set",
+        "valueName": "StateFlags0001",
+        "valueKind": "DWord",
+        "data": 2
+      },
+      {
+        "type": "PowerShell",
+        "operation": "Execute",
+        "script": "Start-Process -FilePath \"$Env:SystemRoot\\System32\\cleanmgr.exe\" -ArgumentList '/sagerun:1' -Wait\nDism.exe /online /Cleanup-Image /StartComponentCleanup /ResetBase\nif ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 3010) { throw \"Dism failed with exit code $LASTEXITCODE\" }",
+        "timeoutSeconds": 1800
       }
     ],
     "undo": [
@@ -1185,6 +1221,34 @@
         "type": "Registry",
         "hive": "HKLM",
         "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VolumeCaches\\Temporary Files",
+        "operation": "DeleteValue",
+        "valueName": "StateFlags0001"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VolumeCaches\\Recycle Bin",
+        "operation": "DeleteValue",
+        "valueName": "StateFlags0001"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VolumeCaches\\Update Cleanup",
+        "operation": "DeleteValue",
+        "valueName": "StateFlags0001"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VolumeCaches\\Delivery Optimization Files",
+        "operation": "DeleteValue",
+        "valueName": "StateFlags0001"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VolumeCaches\\Temporary Setup Files",
         "operation": "DeleteValue",
         "valueName": "StateFlags0001"
       }
@@ -1195,8 +1259,8 @@
     "reversible": false,
     "irreversibleReason": "Executes DISM ResetBase and CleanMgr which permanently purge superseded Windows update components; deleted update baselines cannot be restored.",
     "evidence": "situational",
-    "whatItDoes": "Runs Windows Cleanmgr cleanup automation targeting temporary files and update caches.",
-    "sideEffects": "Empties Recycle Bin and deletes downloaded Windows Update setup caches.",
+    "whatItDoes": "Sets StateFlags0001 for the Temporary Files, Recycle Bin, Update Cleanup, Delivery Optimization Files and Temporary Setup Files handlers, runs Disk Cleanup silently with /sagerun:1, then runs DISM /StartComponentCleanup /ResetBase.",
+    "sideEffects": "Empties the Recycle Bin and deletes temporary files, downloaded update files and old Windows Update components. Installed updates can no longer be uninstalled. Can take a long time.",
     "sources": [
       "https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/cleanmgr"
     ],
