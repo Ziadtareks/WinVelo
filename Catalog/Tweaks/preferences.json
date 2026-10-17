@@ -1086,12 +1086,16 @@
     "requiresReboot": false,
     "requiresExplorerRestart": false,
     "detect": {
-      "type": "Registry",
-      "hive": "HKCU",
-      "key": "Control Panel\\Accessibility\\StickyKeys",
-      "valueName": "Flags",
-      "matchType": "Equals",
-      "expectedValue": "506"
+      "any": [
+        {
+          "type": "Registry",
+          "hive": "HKCU",
+          "key": "Control Panel\\Accessibility\\StickyKeys",
+          "valueName": "Flags",
+          "matchType": "BitsClear",
+          "expectedValue": 5
+        }
+      ]
     },
     "apply": [
       {

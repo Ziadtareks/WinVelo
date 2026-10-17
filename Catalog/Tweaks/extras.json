@@ -865,12 +865,16 @@
     "requiresReboot": true,
     "requiresExplorerRestart": false,
     "detect": {
-      "type": "Registry",
-      "hive": "HKLM",
-      "key": "SYSTEM\\CurrentControlSet\\Services\\TCPIP6\\Parameters",
-      "valueName": "DisabledComponents",
-      "matchType": "Equals",
-      "expectedValue": 8
+      "any": [
+        {
+          "type": "Registry",
+          "hive": "HKLM",
+          "key": "SYSTEM\\CurrentControlSet\\Services\\TCPIP6\\Parameters",
+          "valueName": "DisabledComponents",
+          "matchType": "BitsAnySet",
+          "expectedValue": 9
+        }
+      ]
     },
     "apply": [
       {
@@ -1355,12 +1359,16 @@
     "requiresReboot": true,
     "requiresExplorerRestart": false,
     "detect": {
-      "type": "Registry",
-      "hive": "HKLM",
-      "key": "SYSTEM\\CurrentControlSet\\Control\\FileSystem",
-      "valueName": "NtfsDisableLastAccessUpdate",
-      "matchType": "Equals",
-      "expectedValue": 1
+      "any": [
+        {
+          "type": "Registry",
+          "hive": "HKLM",
+          "key": "SYSTEM\\CurrentControlSet\\Control\\FileSystem",
+          "valueName": "NtfsDisableLastAccessUpdate",
+          "matchType": "BitsAllSet",
+          "expectedValue": 1
+        }
+      ]
     },
     "apply": [
       {

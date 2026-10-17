@@ -224,7 +224,9 @@ public sealed class StateDetector
         if (string.IsNullOrEmpty(action.ServiceName)) return false;
         if (!_services.ServiceExists(action.ServiceName))
         {
-            return false;
+            // A service that is not installed on this edition (e.g. CscService on Home) cannot run,
+            // so it never keeps the tweak from being reported as applied.
+            return true;
         }
 
         string targetStartup = action.StartupType ?? string.Empty;
@@ -390,6 +392,23 @@ public sealed class StateDetector
                 object? actual = _registry.GetValue(hive, key, valName);
                 return CompareJsonElementToData(rule.ExpectedValue, actual);
 
+            case "BitsAllSet":
+            case "BitsAnySet":
+            case "BitsClear":
+                // Bit flag values (e.g. DisabledComponents, NtfsDisableLastAccessUpdate, StickyKeys Flags):
+                // expectedValue is the mask. A missing value never matches.
+                if (!valExists) return false;
+                if (!TryExtractInt64(rule.ExpectedValue, out long mask)) return false;
+                if (!TryExtractInt64(_registry.GetValue(hive, key, valName), out long bits)) return false;
+                mask &= 0xFFFFFFFFL;
+                bits &= 0xFFFFFFFFL;
+                return rule.MatchType switch
+                {
+                    "BitsAllSet" => (bits & mask) == mask,
+                    "BitsAnySet" => (bits & mask) != 0,
+                    _ => (bits & mask) == 0
+                };
+
             case "NotEquals":
                 if (isExpectedRemove)
                 {
@@ -452,7 +471,7 @@ public sealed class StateDetector
 
         if (TryExtractInt64(elem, out long expLong) && TryExtractInt64(actual, out long actLong))
         {
-            return expLong == actLong;
+            return SameRegistryNumber(expLong, actLong);
         }
 
         if (elem.ValueKind == JsonValueKind.True || elem.ValueKind == JsonValueKind.False)
@@ -470,6 +489,15 @@ public sealed class StateDetector
         string? expStr = elem.ValueKind == JsonValueKind.String ? elem.GetString() : elem.GetRawText();
         string actStr = actual.ToString() ?? string.Empty;
         return string.Equals(expStr, actStr, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>A DWORD written as -1 is read back as 4294967295 by some tools (and vice versa).</summary>
+    private static bool SameRegistryNumber(long a, long b)
+    {
+        if (a == b) return true;
+        bool aIs32 = a >= int.MinValue && a <= uint.MaxValue;
+        bool bIs32 = b >= int.MinValue && b <= uint.MaxValue;
+        return aIs32 && bIs32 && unchecked((uint)a) == unchecked((uint)b);
     }
 
     private static bool TryExtractInt64(object? value, out long result)
@@ -589,6 +617,14 @@ public sealed class StateDetector
             {
                 return true;
             }
+
+            // A bit-flag rule on the same value describes the setting's effect, whatever exact number is stored
+            if (!string.IsNullOrEmpty(actVal) &&
+                string.Equals(actVal, ruleVal, StringComparison.OrdinalIgnoreCase) &&
+                (rule.MatchType ?? string.Empty).StartsWith("Bits", StringComparison.Ordinal))
+            {
+                return true;
+            }
         }
 
         return false;
@@ -601,7 +637,7 @@ public sealed class StateDetector
 
         if (TryExtractInt64(actionData.Value, out long aNum) && TryExtractInt64(ruleExpected.Value, out long rNum))
         {
-            return aNum == rNum;
+            return SameRegistryNumber(aNum, rNum);
         }
 
         string? aStr = actionData.Value.ValueKind == JsonValueKind.String ? actionData.Value.GetString() : actionData.Value.GetRawText();

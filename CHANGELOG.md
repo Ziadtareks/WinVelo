@@ -22,6 +22,7 @@ Every tweak was re-checked against Microsoft documentation and what Windows actu
 ### Fixed
 - Several tweaks wrote the wrong value name or type, so Windows ignored them (for example DNS over HTTPS, indexing on battery, search highlights, metered-connection downloads and Sticky Keys).
 - "Activity History - Disable" turned the activity feed on instead of off.
+- Settings you had already turned on outside WinVelo could show as "Not applied" or "Partial": services that are not installed on your edition (for example Offline Files on Home) no longer count as missing, bit-flag values (IPv6/Teredo, NTFS last access, Sticky Keys) are checked by their effect instead of one exact number, and a DWORD of -1 now matches 4294967295.
 - "Multiplane Overlay Workaround" wrote a value that does not disable MPO.
 - Scripts that always failed or never finished: OneDrive removal on 64-bit Windows, Edge removal, Disk Cleanup, and store.db permissions.
 - The Disk Cleanup script could take longer than the 15-minute script limit; long cleanup scripts can now run for up to an hour.

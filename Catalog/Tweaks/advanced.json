@@ -1708,12 +1708,16 @@
     "requiresReboot": true,
     "requiresExplorerRestart": false,
     "detect": {
-      "type": "Registry",
-      "hive": "HKLM",
-      "key": "SYSTEM\\CurrentControlSet\\Services\\Tcpip6\\Parameters",
-      "valueName": "DisabledComponents",
-      "matchType": "Equals",
-      "expectedValue": 32
+      "any": [
+        {
+          "type": "Registry",
+          "hive": "HKLM",
+          "key": "SYSTEM\\CurrentControlSet\\Services\\Tcpip6\\Parameters",
+          "valueName": "DisabledComponents",
+          "matchType": "BitsAllSet",
+          "expectedValue": 32
+        }
+      ]
     },
     "apply": [
       {
@@ -1780,12 +1784,16 @@
     "requiresReboot": true,
     "requiresExplorerRestart": false,
     "detect": {
-      "type": "Registry",
-      "hive": "HKLM",
-      "key": "SYSTEM\\CurrentControlSet\\Services\\Tcpip6\\Parameters",
-      "valueName": "DisabledComponents",
-      "matchType": "Equals",
-      "expectedValue": 1
+      "any": [
+        {
+          "type": "Registry",
+          "hive": "HKLM",
+          "key": "SYSTEM\\CurrentControlSet\\Services\\Tcpip6\\Parameters",
+          "valueName": "DisabledComponents",
+          "matchType": "BitsAllSet",
+          "expectedValue": 1
+        }
+      ]
     },
     "apply": [
       {
@@ -1863,12 +1871,16 @@
     "requiresReboot": true,
     "requiresExplorerRestart": false,
     "detect": {
-      "type": "Registry",
-      "hive": "HKLM",
-      "key": "SYSTEM\\CurrentControlSet\\Services\\Tcpip6\\Parameters",
-      "valueName": "DisabledComponents",
-      "matchType": "Equals",
-      "expectedValue": 255
+      "any": [
+        {
+          "type": "Registry",
+          "hive": "HKLM",
+          "key": "SYSTEM\\CurrentControlSet\\Services\\Tcpip6\\Parameters",
+          "valueName": "DisabledComponents",
+          "matchType": "BitsAllSet",
+          "expectedValue": 255
+        }
+      ]
     },
     "apply": [
       {

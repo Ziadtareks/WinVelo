@@ -420,7 +420,11 @@ public sealed class WinUtilGoldenEngineTests : IDisposable
         };
 
         var report = await _runner.ApplyBatchAsync(new[] { tweak });
-        Assert.Equal(1, report.AppliedCount);
+        // A service that is not installed cannot run, so the tweak counts as already applied
+        // and is skipped instead of failing.
+        Assert.Equal(0, report.FailedCount);
+        Assert.Single(report.Results);
+        Assert.Equal(TweakExecutionStatus.Skipped, report.Results[0].Status);
     }
 
     // =========================================================================

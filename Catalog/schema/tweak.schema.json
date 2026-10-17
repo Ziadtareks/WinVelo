@@ -260,7 +260,7 @@
             "hive": { "type": "string", "enum": ["HKCU", "HKLM", "HKCR", "HKU"] },
             "key": { "type": "string" },
             "valueName": { "type": "string" },
-            "matchType": { "type": "string", "enum": ["Equals", "NotEquals", "Exists", "NotExists"] },
+            "matchType": { "type": "string", "enum": ["Equals", "NotEquals", "Exists", "NotExists", "BitsAllSet", "BitsAnySet", "BitsClear"] },
             "expectedValue": {}
           }
         },
