@@ -52,8 +52,7 @@
     "category": "Social",
     "description": "Official Windows desktop client for WhatsApp messaging and calls.",
     "link": "https://www.whatsapp.com/",
-    "winget": "9NKSQGP7F2NH",
-    "choco": "whatsapp"
+    "winget": "9NKSQGP7F2NH"
   },
   "zoom": {
     "name": "Zoom Workplace",
@@ -228,8 +227,7 @@
     "category": "Gaming",
     "description": "Blizzard entertainment gaming platform for Overwatch, Diablo, and World of Warcraft.",
     "link": "https://battle.net/",
-    "winget": "Blizzard.BattleNet",
-    "choco": "battle.net"
+    "winget": "Blizzard.BattleNet"
   },
   "vscode": {
     "name": "Visual Studio Code",

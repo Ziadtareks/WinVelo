@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Chocolatey ids for WhatsApp (`whatsapp`) and Battle.net (`battle.net`) do not exist on community.chocolatey.org, so both apps are winget-only now. With Chocolatey selected they were skipped with a clear message; nothing was installed wrongly.
+- `SmokeTests.cs` violated two xUnit analyzer rules (xUnit2029), so `dotnet build -p:TreatWarningsAsErrors=true` (the CI setting) failed. Caught by running the CI steps locally.
+- `tools/SourceChecker` reported pages that block automated requests (HTTP 403/429, for example Cloudflare) as failures. They are now warnings that ask for a manual browser check; the five affected elevenforum.com links were verified by hand and are alive.
+
 ## [1.0.2] - 2026-10-19
 
 Safety, security and release-integrity fixes from a full audit (see `docs/AUDIT_v1.0.2.md`). No tweak was added or removed.
@@ -19,7 +24,7 @@ Safety, security and release-integrity fixes from a full audit (see `docs/AUDIT_
 - `WinVelo.exe --test-mode` no longer asks for administrator rights. In normal mode WinVelo asks once at startup; if you say no, it opens read-only.
 - `winvelo-cli --self-test` runs in simulation unless `--real-mode` is given, like every other command.
 - Registry backups (`.reg`) are kept in `%APPDATA%\WinVelo\Backups` instead of `%TEMP%`, which cleaners empty.
-- Releases are built by GitHub Actions and ship `WinVelo-vX.Y.Z-portable.zip.sha256`, `SHA256SUMS.txt` and a build provenance attestation. An optional SignPath signing step is ready but off until a certificate exists.
+- Release assets ship `WinVelo-vX.Y.Z-portable.zip.sha256` and `SHA256SUMS.txt`. The release workflow (GitHub Actions build, build provenance attestation, optional SignPath signing) is ready, but it could not run for v1.0.2: GitHub Actions is disabled for the account, so v1.0.2 was built locally and has **no attestation**. Until Actions is restored, releases are built locally with `build\publish.ps1` and have hash files only.
 - The installed-apps check (`winget list`, which may go online) runs when you open the Apps page, not at startup.
 - Package updates: CommunityToolkit.Mvvm 8.4.2, Microsoft.Extensions 10.0.13, Serilog 4.4.0.
 

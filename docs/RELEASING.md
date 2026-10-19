@@ -51,6 +51,8 @@ git push origin v1.0.0
 
 ## Step 3: Monitor CI Pipeline Execution
 
+> If GitHub Actions is unavailable for the account (the case for v1.0.2), this step and Step 5 do not apply. Run the Step 1 checks locally, build with `.\build\publish.ps1 -Version X.Y.Z`, upload the three files by hand and say in the release notes that the build is local and has no attestation.
+
 1. Navigate to `https://github.com/Ziadtareks/WinVelo/actions`.
 2. Select the **Release** workflow run triggered by your tag `v1.0.0`.
 3. The workflow will:
@@ -78,6 +80,8 @@ git push origin v1.0.0
 ---
 
 ## Step 5: Verify SLSA Build Provenance Attestation
+
+> Locally built releases (v1.0.2, and any release made while Actions is unavailable) have no attestation; verify the `.sha256` file instead (README, *Verify your download*). This step applies only to releases built by the workflow.
 
 After publishing, verify the cryptographic build provenance using the GitHub CLI:
 
