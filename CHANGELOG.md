@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- *Settings → Updates*: a manual **Check for updates** button. It contacts GitHub only when clicked, shows the latest version, and links to the release page. It never downloads or installs an update automatically.
+
 ## [1.0.3] - 2026-10-19
 
 Maintenance release: two apps that could not be installed through Chocolatey, a build error that would have failed CI, a quieter source checker, and corrected release notes. No tweak was added or removed.

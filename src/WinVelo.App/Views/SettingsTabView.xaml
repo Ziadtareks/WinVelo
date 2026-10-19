@@ -176,7 +176,34 @@
                     </StackPanel>
                 </Border>
 
-                <!-- 4. About WinVelo -->
+                <!-- 4. Updates -->
+                <Border Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
+                        BorderThickness="1" CornerRadius="8" Padding="16" Margin="0,0,0,16">
+                    <StackPanel>
+                        <TextBlock Text="{loc:Tr Settings_Updates}" FontSize="{StaticResource FontSizeSubtitle}" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,4" />
+                        <TextBlock Text="{loc:Tr Settings_UpdatesHint}"
+                                   FontSize="{StaticResource FontSizeCaption}" Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap" Margin="0,0,0,10" />
+                        <TextBlock Text="{Binding UpdateStatus}"
+                                   FontSize="{StaticResource FontSizeCaption}" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,0,0,10" />
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="{loc:Tr Settings_CheckForUpdates}"
+                                    Style="{DynamicResource ModernSecondaryBtn}"
+                                    Command="{Binding CheckForUpdatesCommand}"
+                                    AutomationProperties.AutomationId="CheckForUpdatesButton"
+                                    AutomationProperties.Name="Check for updates button"
+                                    Padding="12,6" FontSize="{StaticResource FontSizeCaption}" />
+                            <Button Content="{loc:Tr Settings_OpenReleasePage}"
+                                    Style="{DynamicResource ModernSecondaryBtn}"
+                                    Command="{Binding OpenReleasePageCommand}"
+                                    Visibility="{Binding UpdateAvailable, Converter={StaticResource BoolToVisConverter}}"
+                                    AutomationProperties.AutomationId="OpenReleasePageButton"
+                                    AutomationProperties.Name="Open release page button"
+                                    Padding="12,6" FontSize="{StaticResource FontSizeCaption}" Margin="8,0,0,0" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- 5. About WinVelo -->
                 <Border Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
                         BorderThickness="1" CornerRadius="8" Padding="16" Margin="0,0,0,16">
                     <StackPanel>

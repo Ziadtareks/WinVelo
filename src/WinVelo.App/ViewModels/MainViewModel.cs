@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
@@ -15,6 +16,7 @@ using WinVelo.Core.Interfaces;
 using WinVelo.Core.Models;
 using WinVelo.Core.Operations;
 using WinVelo.Core.Safety;
+using WinVelo.Core.Updates;
 using WinVelo.Modules.Tweaks;
 using WinVelo.Platform;
 using Wpf.Ui.Appearance;
@@ -157,7 +159,9 @@ public sealed partial class MainViewModel : ObservableObject
         ISystemRestoreService? restoreService = null,
         FirstRunWizardViewModel? wizardVM = null,
         UnifiedExecutionDialogViewModel? executionDialogVM = null,
-        SettingsViewModel? settingsVM = null)
+        SettingsViewModel? settingsVM = null,
+        IUpdateChecker? updateChecker = null,
+        IShellService? shell = null)
     {
         DashboardVM = dashboardVM;
         InstallVM = installVM;
@@ -177,7 +181,11 @@ public sealed partial class MainViewModel : ObservableObject
         WizardVM = wizardVM ?? new FirstRunWizardViewModel(resSvc, _appSettings);
         WizardVM.WizardCompleted += OnWizardCompleted;
 
-        SettingsVM = settingsVM ?? new SettingsViewModel(_appSettings, tweaksVM);
+        SettingsVM = settingsVM ?? new SettingsViewModel(
+            _appSettings,
+            tweaksVM,
+            updateChecker ?? new GitHubUpdateChecker(new HttpClient { Timeout = TimeSpan.FromSeconds(15) }),
+            shell);
         SettingsVM.RequestOpenWizard = OpenFirstRunWizard;
 
         var userSettings = _appSettings.GetSettings();

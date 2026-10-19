@@ -34,9 +34,12 @@ Below is an exhaustive list of every feature that can initiate an outbound netwo
 - **Destinations**: Public resolver IP addresses selected by the user (Cloudflare `1.1.1.1`, Google `8.8.8.8`, Quad9 `9.9.9.9`, AdGuard `94.140.14.14`).
 - **Trigger**: Occurs **only** when the user navigates to the DNS tool and clicks "Run Benchmark".
 
-### C. Updates
-- WinVelo does **not** check for updates and does not contact GitHub or any other server on its own.
-- New versions are published on the [Releases page](https://github.com/Ziadtareks/WinVelo/releases); download them manually when you want to update.
+### C. Update Checks
+- **Trigger**: Occurs **only** when you click **Check for updates** in *Settings → Updates*.
+- **Mechanism**: One HTTPS request to `https://api.github.com/repos/Ziadtareks/WinVelo/releases/latest`. GitHub receives standard request data such as your IP address and the user agent `WinVelo/<version>`. No identifier, telemetry, or usage data is sent.
+- **No automatic download**: WinVelo only compares the latest version number and shows a link. It never downloads or installs an update by itself.
+- Opening the release page uses your default browser.
+- New versions are also published on the [Releases page](https://github.com/Ziadtareks/WinVelo/releases); you can download them manually at any time.
 
 ---
 

@@ -8,6 +8,7 @@ using CommunityToolkit.Mvvm.Input;
 using WinVelo.App.Services;
 using WinVelo.Core.Interfaces;
 using WinVelo.Core.Models;
+using WinVelo.Core.Updates;
 using WinVelo.Modules.Tweaks;
 using Wpf.Ui.Appearance;
 
@@ -17,6 +18,9 @@ public sealed partial class SettingsViewModel : ObservableObject
 {
     private readonly IAppSettingsService _appSettings;
     private readonly TweaksViewModel _tweaksVM;
+    private readonly IUpdateChecker _updateChecker;
+    private readonly IShellService? _shell;
+    private string? _releaseUrl;
     public Action? RequestOpenWizard { get; set; }
 
     [ObservableProperty]
@@ -32,6 +36,12 @@ public sealed partial class SettingsViewModel : ObservableObject
     private bool _showExperimental;
 
     public string VersionDisplay => WinVelo.Core.AppInfo.DisplayVersion;
+
+    [ObservableProperty]
+    private string _updateStatus = string.Empty;
+
+    [ObservableProperty]
+    private bool _updateAvailable;
 
     public IReadOnlyList<LanguageOption> Languages => LocalizationManager.SupportedLanguages;
 
@@ -49,10 +59,14 @@ public sealed partial class SettingsViewModel : ObservableObject
 
     public SettingsViewModel(
         IAppSettingsService appSettings,
-        TweaksViewModel tweaksVM)
+        TweaksViewModel tweaksVM,
+        IUpdateChecker updateChecker,
+        IShellService? shell = null)
     {
         _appSettings = appSettings;
         _tweaksVM = tweaksVM;
+        _updateChecker = updateChecker;
+        _shell = shell;
 
         var s = _appSettings.GetSettings();
         _appMode = s.AppMode;
@@ -129,6 +143,49 @@ public sealed partial class SettingsViewModel : ObservableObject
     public void OpenWizard()
     {
         RequestOpenWizard?.Invoke();
+    }
+
+    [RelayCommand]
+    private async Task CheckForUpdatesAsync()
+    {
+        UpdateAvailable = false;
+        _releaseUrl = null;
+        UpdateStatus = LocalizationManager.T("Checking for updates...");
+
+        try
+        {
+            UpdateCheckResult result = await _updateChecker.CheckAsync(WinVelo.Core.AppInfo.Version);
+            switch (result.Status)
+            {
+                case UpdateCheckStatus.UpdateAvailable:
+                    _releaseUrl = result.ReleaseUrl;
+                    UpdateAvailable = true;
+                    UpdateStatus = LocalizationManager.T("{0} is available.", result.LatestVersion ?? string.Empty);
+                    break;
+
+                case UpdateCheckStatus.UpToDate:
+                    UpdateStatus = LocalizationManager.T("You are running the latest version ({0}).", WinVelo.Core.AppInfo.DisplayVersion);
+                    break;
+
+                default:
+                    UpdateStatus = LocalizationManager.T("Could not check for updates. Check your connection and try again.");
+                    break;
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "Update check failed");
+            UpdateStatus = LocalizationManager.T("Could not check for updates. Check your connection and try again.");
+        }
+    }
+
+    [RelayCommand]
+    private void OpenReleasePage()
+    {
+        if (_shell != null && !string.IsNullOrWhiteSpace(_releaseUrl))
+        {
+            _shell.OpenUrl(_releaseUrl);
+        }
     }
 
     private void Save()

@@ -95,7 +95,7 @@ Never turn off your antivirus to run WinVelo. Code signing is planned ([docs/REL
 ### What it doesn't do
 
 - No "FPS boost", "RAM cleaner" or other placebo tweaks.
-- No telemetry, analytics, ads or update checks. WinVelo only uses the network when you install an app or run the DNS benchmark. See [PRIVACY.md](PRIVACY.md).
+- No telemetry, analytics, ads or automatic update checks. WinVelo only uses the network when you install an app, run the DNS benchmark, or click **Check for updates** in Settings. See [PRIVACY.md](PRIVACY.md).
 - Nothing is applied without you choosing it and confirming it.
 
 ---
