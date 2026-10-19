@@ -5,16 +5,22 @@
 <h1 align="center">WinVelo</h1>
 
 <p align="center">
-  A transparent, open-source tweak tool for Windows 10 and 11.<br/>
-  See exactly what every setting changes, apply it, and undo it.
+  <b>Tweak Windows 10 and 11 without guessing: see every change before it happens, and undo it later.</b><br/>
+  Open source, no telemetry, no placebo tweaks.
 </p>
 
 <p align="center">
   <a href="https://github.com/Ziadtareks/WinVelo/actions/workflows/build-and-test.yml"><img src="https://github.com/Ziadtareks/WinVelo/actions/workflows/build-and-test.yml/badge.svg" alt="CI"></a>
-  <a href="https://github.com/Ziadtareks/WinVelo/releases/latest"><img src="https://img.shields.io/badge/release-v1.0.1-2563EB.svg" alt="Release v1.0.1"></a>
+  <a href="https://github.com/Ziadtareks/WinVelo/releases/latest"><img src="https://img.shields.io/github/v/release/Ziadtareks/WinVelo?color=2563EB&label=release" alt="Latest release"></a>
   <img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10 | 11">
   <img src="https://img.shields.io/badge/tweaks-140-10B981.svg" alt="140 tweaks">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green.svg" alt="MIT License"></a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/Ziadtareks/WinVelo/releases/latest"><b>⬇ Download the latest release</b></a>
+  &nbsp;·&nbsp; <a href="#verify-your-download">Verify your download</a>
+  &nbsp;·&nbsp; <a href="#بالعربية">العربية</a>
 </p>
 
 ![WinVelo](docs/screenshots/home.png)
@@ -139,10 +145,23 @@ Never turn off your antivirus to run WinVelo. Code signing is planned ([docs/SIG
 WinVelo أداة مفتوحة المصدر لضبط Windows 10 و 11. تعرض لك كل تعديل بالتفصيل قبل تطبيقه، وتتيح لك التراجع عنه في أي وقت.
 
 1. نزّل **`WinVelo-v<version>-portable.zip`** من [صفحة الإصدارات](https://github.com/Ziadtareks/WinVelo/releases/latest).
-2. فك الضغط في أي مكان، وشغّل **`WinVelo.exe`**. لا يحتاج إلى تثبيت ولا إلى تنزيل .NET.
+2. فك الضغط في أي مكان، وشغّل **`WinVelo.exe`** ووافق على طلب صلاحيات المسؤول. لا يحتاج إلى تثبيت ولا إلى تنزيل .NET، وقائمة التعديلات مدمجة في البرنامج.
 3. لتحويل الواجهة إلى العربية: **Settings › Language › العربية**، ثم أعد تشغيل البرنامج.
 
-إذا ظهر تحذير SmartScreen، اضغط **More info** ثم **Run anyway**، لأن البرنامج غير موقّع رقميًا بعد. ننصح بإنشاء نقطة استعادة قبل أول تعديل، والبدء بالوضع البسيط.
+**ما يقدّمه:** يعرض كل قيمة في السجل وكل خدمة ومهمة مجدولة قبل تغييرها، مع مستوى الخطورة والآثار الجانبية والمصدر. يحفظ القيمة الأصلية قبل كل تغيير في سجل التراجع (`%APPDATA%\WinVelo`) لتتراجع عن تعديل واحد أو جلسة أو كل شيء. لا يعطّل أبدًا Windows Update ولا BITS ولا متجر Microsoft ولا أمان Windows، وهذا مفروض في الكود نفسه. لا قياس عن بُعد ولا إعلانات ولا تعديلات وهمية من نوع «تسريع الألعاب» أو «تنظيف الذاكرة».
+
+**تحقّق من الملف قبل تشغيله:** نزّل الملف `WinVelo-v<version>-portable.zip.sha256` بجانب الملف المضغوط، ثم شغّل في PowerShell داخل نفس المجلد:
+
+```powershell
+$zip = "WinVelo-v<version>-portable.zip"
+(Get-FileHash $zip -Algorithm SHA256).Hash -eq (Get-Content "$zip.sha256" -Raw).Split(' ')[0]
+```
+
+إذا ظهرت `True` فالملف سليم ومطابق لما بناه GitHub Actions. التفاصيل في قسم [Verify your download](#verify-your-download).
+
+**تحذير SmartScreen أو برنامج الحماية:** البرنامج غير موقّع رقميًا بعد، لذلك قد يظهر *Windows protected your PC*؛ تحقّق من الملف أولًا ثم اضغط **More info** ثم **Run anyway**. قد تصنّف بعض برامج الحماية أدوات الضبط كـ«برامج غير مرغوبة» لأنها تغيّر السجل والخدمات؛ لا تعطّل برنامج الحماية، بل تحقّق من الـ hash وأبلغ الشركة عن إنذار خاطئ.
+
+**جرّبه بأمان:** `WinVelo.exe --test-mode` يعرض الواجهة كاملة دون أي تغيير في جهازك ودون طلب صلاحيات المسؤول. ننصح بإنشاء نقطة استعادة قبل أول تعديل، والبدء بالوضع البسيط أو بالمستوى *Standard* من الإعدادات المسبقة.
 
 ---
 
