@@ -43,7 +43,7 @@ There is nothing to install and you don't need to download .NET, because the run
 
 ### Verify your download
 
-From v1.0.2 on, releases are built by GitHub Actions from the tagged source ([release workflow](.github/workflows/release.yml)), not on a developer PC. Each release has three files:
+Releases are normally built by GitHub Actions from the tagged source ([release workflow](.github/workflows/release.yml)), not on a developer PC. Exception: **v1.0.2 was built locally** because GitHub Actions was unavailable for the account, so it has no build attestation. Each release has three files:
 
 | File | What it is |
 |---|---|
@@ -62,7 +62,7 @@ From v1.0.2 on, releases are built by GitHub Actions from the tagged source ([re
    ```
 
    `-eq` ignores upper/lower case, so it works with the lowercase hash in the file.
-3. Optional, stronger check (v1.0.2 and later): the zip carries a [build provenance attestation](https://docs.github.com/actions/security-for-github-actions/using-artifact-attestations) that proves it was built by this repository's workflow. With the [GitHub CLI](https://cli.github.com/):
+3. Optional, stronger check (only for releases built by GitHub Actions, when the release notes say so): the zip carries a [build provenance attestation](https://docs.github.com/actions/security-for-github-actions/using-artifact-attestations) that proves it was built by this repository's workflow. With the [GitHub CLI](https://cli.github.com/):
 
    ```powershell
    gh attestation verify WinVelo-v<version>-portable.zip --repo Ziadtareks/WinVelo
@@ -76,7 +76,7 @@ Some antivirus products flag Windows tweak tools, including WinVelo, as "potenti
 
 What you can do:
 
-- Check the hash and the attestation as shown above. If they match, the file is exactly what GitHub Actions built from the public source.
+- Check the hash (and the attestation, when the release has one) as shown above. If they match, the file is exactly what the release notes say: an official build from the public source.
 - Read the source of what you are about to run. Every tweak is plain JSON in [`Catalog/Tweaks`](Catalog/Tweaks), and the app shows every registry value, service and task before it changes anything.
 - Try it without touching your PC first: `WinVelo.exe --test-mode`.
 - If your antivirus still flags a release whose hash matches, please report it to the antivirus vendor as a false positive and [tell us](https://github.com/Ziadtareks/WinVelo/issues).

@@ -209,7 +209,7 @@ public sealed class SmokeTests : IDisposable
         var en = JsonSerializer.Deserialize<Dictionary<string, string>>(File.ReadAllText(Path.Combine(loc, "Lang-en.json")))!;
         var ar = JsonSerializer.Deserialize<Dictionary<string, string>>(File.ReadAllText(Path.Combine(loc, "Lang-ar.json")))!;
 
-        Assert.Empty(en.Keys.Where(k => !ar.ContainsKey(k)));
-        Assert.Empty(ar.Keys.Where(k => System.Text.RegularExpressions.Regex.IsMatch(k, @"^[A-Za-z]+_[A-Za-z0-9_]+$") && !en.ContainsKey(k)));
+        Assert.DoesNotContain(en.Keys, k => !ar.ContainsKey(k));
+        Assert.DoesNotContain(ar.Keys, k => System.Text.RegularExpressions.Regex.IsMatch(k, @"^[A-Za-z]+_[A-Za-z0-9_]+$") && !en.ContainsKey(k));
     }
 }

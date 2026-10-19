@@ -51,6 +51,7 @@ public class Program
 
         int totalChecked = 0;
         int failedCount = 0;
+        int warnedCount = 0;
         var failureReports = new List<(string Id, string Url, int StatusCode, string Reason)>();
 
         foreach (var file in jsonFiles)
@@ -172,6 +173,7 @@ public class Program
                 }
 
                 bool anyUrlOk = false;
+                bool blockedOnly = false;
                 string lastFailReason = "";
                 int lastStatusCode = 0;
                 string checkedUrl = urls[0];
@@ -199,7 +201,9 @@ public class Program
 
                         if (!resp.IsSuccessStatusCode)
                         {
-                            lastFailReason = $"HTTP status {(int)resp.StatusCode} ({resp.ReasonPhrase})";
+                            lastStatusCode = (int)resp.StatusCode;
+                            lastFailReason = $"HTTP status {lastStatusCode} ({resp.ReasonPhrase})";
+                            blockedOnly = lastStatusCode is 403 or 429;
                             continue;
                         }
 
@@ -219,6 +223,7 @@ public class Program
 
                         if (!keywordMatched)
                         {
+                            blockedOnly = false;
                             lastFailReason = $"HTTP 200 OK, but page does not mention target identifiers: [{string.Join(", ", keywords)}]";
                             continue;
                         }
@@ -229,6 +234,7 @@ public class Program
                     catch (Exception ex)
                     {
                         lastStatusCode = 0;
+                        blockedOnly = false;
                         lastFailReason = $"Request exception: {ex.Message}";
                     }
                 }
@@ -236,6 +242,11 @@ public class Program
                 if (anyUrlOk)
                 {
                     Console.WriteLine($"  [PASS] {id} -> 200 OK");
+                }
+                else if (blockedOnly)
+                {
+                    Console.WriteLine($"  [WARN] {id} -> {lastFailReason} (the site blocks automated checks; verify in a browser) ({checkedUrl})");
+                    warnedCount++;
                 }
                 else
                 {
@@ -247,7 +258,7 @@ public class Program
         }
 
         Console.WriteLine("\n----------------------------------------");
-        Console.WriteLine($"Summary: {totalChecked} tweak(s) checked. {failedCount} failure(s).");
+        Console.WriteLine($"Summary: {totalChecked} tweak(s) checked. {warnedCount} warning(s), {failedCount} failure(s).");
         Console.WriteLine("----------------------------------------\n");
 
         if (failureReports.Count > 0)
