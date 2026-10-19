@@ -48,6 +48,7 @@ public sealed class LocalizationManager : INotifyPropertyChanged
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(IsRightToLeft));
                 OnPropertyChanged(nameof(FlowDirection));
+                OnPropertyChanged(nameof(DirectionalIconScaleX));
                 OnPropertyChanged("Item[]");
             }
         }
@@ -56,6 +57,10 @@ public sealed class LocalizationManager : INotifyPropertyChanged
     public bool IsRightToLeft => _currentLanguage == "ar";
 
     public FlowDirection FlowDirection => IsRightToLeft ? FlowDirection.RightToLeft : FlowDirection.LeftToRight;
+
+    /// <summary>-1 in right-to-left languages. Font icons that point a direction (arrows) are not mirrored by WPF,
+    /// so they use this as a ScaleX to point the right way.</summary>
+    public double DirectionalIconScaleX => IsRightToLeft ? -1 : 1;
 
     /// <summary>Text for a XAML key; falls back to English, then to the key itself.</summary>
     public string this[string key]

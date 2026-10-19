@@ -64,9 +64,12 @@ public sealed class LocalizationTests
     public void ViewModelTexts_AllHaveArabicTranslation()
     {
         var ar = LoadDict(Path.Combine(LocDir, "Lang-ar.json"));
-        string vmDir = Path.Combine(RepoRoot(), "src", "WinVelo.App", "ViewModels");
+        // Every C# file of the app (view models, App.xaml.cs, services), not only ViewModels/.
+        string appDir = Path.Combine(RepoRoot(), "src", "WinVelo.App");
         var missing = new List<string>();
-        foreach (var file in Directory.GetFiles(vmDir, "*.cs"))
+        foreach (var file in Directory.GetFiles(appDir, "*.cs", SearchOption.AllDirectories)
+                                      .Where(f => !f.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}") &&
+                                                  !f.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}")))
         {
             foreach (Match m in Regex.Matches(File.ReadAllText(file), "LocalizationManager\\.T\\(\"((?:[^\"\\\\]|\\\\.)*)\""))
             {
@@ -80,6 +83,19 @@ public sealed class LocalizationTests
             }
         }
         Assert.True(missing.Count == 0, "Missing Arabic for: " + string.Join(" | ", missing.Distinct()));
+    }
+
+    [Fact]
+    public void EnglishAndArabicDictionaries_HaveTheSameKeyedEntries()
+    {
+        var en = LoadDict(Path.Combine(LocDir, "Lang-en.json"));
+        var ar = LoadDict(Path.Combine(LocDir, "Lang-ar.json"));
+
+        // Lang-en.json holds the short XAML keys; Lang-ar.json holds those plus English sentences used by T().
+        // Every short key must exist in both, and no Arabic entry may be empty.
+        var keyed = ar.Keys.Where(k => Regex.IsMatch(k, @"^[A-Za-z]+_[A-Za-z0-9_]+$")).ToList();
+        Assert.True(keyed.All(en.ContainsKey), "Arabic XAML keys missing in English: " + string.Join(", ", keyed.Where(k => !en.ContainsKey(k))));
+        Assert.True(ar.All(kv => !string.IsNullOrWhiteSpace(kv.Value)), "Empty Arabic texts: " + string.Join(", ", ar.Where(kv => string.IsNullOrWhiteSpace(kv.Value)).Select(kv => kv.Key)));
     }
 
     [Fact]

@@ -519,7 +519,12 @@
                                                 <TextBlock Text="{Binding Subtitle}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" />
                                             </StackPanel>
                                         </StackPanel>
-                                        <ui:SymbolIcon DockPanel.Dock="Right" Symbol="ArrowRight24" FontSize="14" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" />
+                                        <ui:SymbolIcon DockPanel.Dock="Right" Symbol="ArrowRight24" FontSize="14" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"
+                                                       RenderTransformOrigin="0.5,0.5">
+                                            <ui:SymbolIcon.RenderTransform>
+                                                <ScaleTransform ScaleX="{Binding DirectionalIconScaleX, Source={x:Static loc:LocalizationManager.Instance}}" />
+                                            </ui:SymbolIcon.RenderTransform>
+                                        </ui:SymbolIcon>
                                     </DockPanel>
                                 </Border>
                             </DataTemplate>
