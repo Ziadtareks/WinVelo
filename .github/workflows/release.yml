@@ -66,6 +66,9 @@ jobs:
       - name: Validate catalog
         run: dotnet run --project tools/CatalogValidator/CatalogValidator.csproj --configuration Release --no-build
 
+      - name: Check README tweak count
+        run: dotnet run --project tools/CatalogStats/CatalogStats.csproj --configuration Release --no-build
+
       - name: Unit tests
         run: dotnet test src/WinVelo.Tests/WinVelo.Tests.csproj --configuration Release --no-build
 

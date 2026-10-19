@@ -43,6 +43,8 @@ Run "dotnet build" { dotnet build WinVelo.sln -c Release --nologo -v minimal }
 
 Step "2/6 Catalog and presets"
 Run "Catalog validator" { dotnet run --project tools/CatalogValidator/CatalogValidator.csproj -c Release --no-build }
+Run "README tweak count" { dotnet run --project tools/CatalogStats/CatalogStats.csproj -c Release --no-build }
+$tweakCount = (dotnet run --project tools/CatalogStats/CatalogStats.csproj -c Release --no-build -- --count | Select-Object -Last 1).Trim()
 Run "Preset generator" { dotnet run --project tools/PresetGenerator/PresetGenerator.csproj -c Release --no-build }
 $presetDiff = git status --porcelain -- Catalog/Presets
 if ($presetDiff) {
@@ -113,7 +115,7 @@ A transparent, open-source tweak tool for Windows 10 and 11. See exactly what ev
 SHA-256: ``$zipHash``
 
 ### Highlights
-- 140 tweaks, each showing its exact registry/service changes, risk, side effects and source
+- $tweakCount tweaks, each showing its exact registry/service changes, risk, side effects and source
 - Presets (Recommended, Privacy, AI & Copilot, Clean UI, Performance, Gaming) with a preview before applying
 - Rollback journal with undo for single tweaks, sessions or everything
 - App installer (winget), startup, services, cleaner, DNS, fixes, updates, optional features, restore points

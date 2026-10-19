@@ -108,6 +108,12 @@ Before submitting a Pull Request, verify that your changes pass all checks:
    ```
    *Must exit with `0 error(s)`.*
 
+   If you added or removed a tweak, update the counts in the README and docs:
+   ```powershell
+   dotnet run --project tools/CatalogStats/CatalogStats.csproj -- --update
+   ```
+   *CI fails when the README count and the catalog differ.*
+
 2. **Run All Unit Tests**:
    ```powershell
    dotnet test src/WinVelo.Tests/WinVelo.Tests.csproj -c Debug
