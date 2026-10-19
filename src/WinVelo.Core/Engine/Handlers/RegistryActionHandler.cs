@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using WinVelo.Core.Models;
@@ -25,7 +26,8 @@ public sealed class RegistryActionHandler : IActionHandler
 
         // Read current state before touching
         bool keyExisted = context.Registry.KeyExists(normHive, normKey);
-        bool valueExisted = !string.IsNullOrEmpty(valName) && context.Registry.ValueExists(normHive, normKey, valName);
+        // An empty value name is the key's default value ("@"); it is tracked like any other value.
+        bool valueExisted = keyExisted && context.Registry.ValueExists(normHive, normKey, valName);
         object? previousData = valueExisted ? context.Registry.GetValue(normHive, normKey, valName) : null;
         string? previousKind = valueExisted ? context.Registry.GetValueKind(normHive, normKey, valName) : null;
 
@@ -77,7 +79,7 @@ public sealed class RegistryActionHandler : IActionHandler
                         object dataToSet = ParseData(action.Data, action.ValueKind ?? "DWord");
                         if (dataToSet is string s && string.Equals(s, "<RemoveEntry>", StringComparison.OrdinalIgnoreCase))
                         {
-                            if (keyExisted && valueExisted && !string.IsNullOrEmpty(valName))
+                            if (keyExisted && valueExisted)
                             {
                                 context.Registry.DeleteValue(normHive, normKey, valName);
                             }
@@ -90,7 +92,7 @@ public sealed class RegistryActionHandler : IActionHandler
                         break;
 
                     case "DeleteValue":
-                        if (keyExisted && valueExisted && !string.IsNullOrEmpty(valName))
+                        if (keyExisted && valueExisted)
                         {
                             context.Registry.DeleteValue(normHive, normKey, valName);
                         }
@@ -109,10 +111,12 @@ public sealed class RegistryActionHandler : IActionHandler
             }
             catch (Exception ex) when (ex is UnauthorizedAccessException or System.Security.SecurityException)
             {
+                // Reporting this as applied would be false: nothing was written. The runner rolls back the earlier
+                // steps of this tweak and shows it as failed.
                 return Task.FromResult(new ActionResult
                 {
-                    Success = true, // We do not fail the batch on Windows protected keys
-                    Message = $"[WARN] Protected by Windows Tamper Protection or TrustedInstaller ({normHive}\\{normKey}): {ex.Message}"
+                    Success = false,
+                    Message = $"Windows blocked the change to {normHive}\\{normKey} (Tamper Protection or TrustedInstaller permissions): {ex.Message}"
                 });
             }
             catch (Exception ex)
@@ -152,13 +156,16 @@ public sealed class RegistryActionHandler : IActionHandler
             if (!record.ExistedBefore || string.Equals(record.PreviousData, "<RemoveEntry>", StringComparison.OrdinalIgnoreCase))
             {
                 // Value did not exist originally -> delete it
-                if (!string.IsNullOrEmpty(valueName) && context.Registry.ValueExists(hive, key, valueName))
+                if (context.Registry.KeyExists(hive, key) && context.Registry.ValueExists(hive, key, valueName))
                 {
                     context.Registry.DeleteValue(hive, key, valueName);
                 }
 
-                // If the whole key was created by us and is now empty -> delete key
-                if (record.KeyCreated && context.Registry.KeyExists(hive, key))
+                // Remove the key only if WinVelo created it AND nothing else lives in it now. DeleteKey removes the
+                // whole tree, so a key that meanwhile holds values of other tweaks, policies or programs must stay.
+                if (record.KeyCreated && context.Registry.KeyExists(hive, key) &&
+                    !context.Registry.GetValueNames(hive, key).Any() &&
+                    !context.Registry.GetSubKeyNames(hive, key).Any())
                 {
                     context.Registry.DeleteKey(hive, key);
                 }
@@ -177,10 +184,11 @@ public sealed class RegistryActionHandler : IActionHandler
         }
         catch (Exception ex) when (ex is UnauthorizedAccessException or System.Security.SecurityException)
         {
+            // Not restored: say so, and keep the journal record so the undo can be retried.
             return Task.FromResult(new ActionResult
             {
-                Success = true,
-                Message = $"[WARN] Could not undo protected registry key ({hive}\\{key}): {ex.Message}"
+                Success = false,
+                Message = $"Windows blocked restoring {hive}\\{key} (Tamper Protection or TrustedInstaller permissions): {ex.Message}"
             });
         }
         catch (Exception ex)
@@ -197,7 +205,7 @@ public sealed class RegistryActionHandler : IActionHandler
         string valName = action.ValueName ?? string.Empty;
         string targetId = $"{hive}\\{key}\\{(string.IsNullOrEmpty(valName) ? "@" : valName)}";
 
-        bool valueExisted = !string.IsNullOrEmpty(valName) && context.Registry.ValueExists(hive, key, valName);
+        bool valueExisted = context.Registry.ValueExists(hive, key, valName);
         object? current = valueExisted ? context.Registry.GetValue(hive, key, valName) : null;
 
         return new ActionPreview
@@ -214,6 +222,8 @@ public sealed class RegistryActionHandler : IActionHandler
     {
         if (data == null) return null;
         if (data is byte[] bytes) return Convert.ToBase64String(bytes);
+        // REG_MULTI_SZ: ToString() would store "System.String[]" and lose the original value.
+        if (data is string[] lines) return JsonSerializer.Serialize(lines);
         return data.ToString();
     }
 
@@ -245,8 +255,25 @@ public sealed class RegistryActionHandler : IActionHandler
         {
             "DWord" => RegistryPathHelper.ParseDWord(data),
             "QWord" => RegistryPathHelper.ParseQWord(data),
-            "Binary" => !string.IsNullOrEmpty(data) ? Convert.FromBase64String(data) : Array.Empty<byte>(),
+            "Binary" or "None" => !string.IsNullOrEmpty(data) ? Convert.FromBase64String(data) : Array.Empty<byte>(),
+            "MultiString" => DeserializeMultiString(data),
             _ => data
         };
+    }
+
+    private static string[] DeserializeMultiString(string data)
+    {
+        if (data.StartsWith('['))
+        {
+            try
+            {
+                return JsonSerializer.Deserialize<string[]>(data) ?? Array.Empty<string>();
+            }
+            catch (JsonException)
+            {
+                // fall through: an older journal stored the text as is
+            }
+        }
+        return new[] { data };
     }
 }

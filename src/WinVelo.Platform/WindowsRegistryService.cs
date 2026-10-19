@@ -108,6 +108,7 @@ public sealed class WindowsRegistryService : IRegistryService
                 RegistryValueKind.ExpandString => "ExpandString",
                 RegistryValueKind.MultiString => "MultiString",
                 RegistryValueKind.Binary => "Binary",
+                RegistryValueKind.None => "None",
                 _ => "Unknown"
             };
         }
@@ -135,11 +136,14 @@ public sealed class WindowsRegistryService : IRegistryService
                 "ExpandString" => RegistryValueKind.ExpandString,
                 "MultiString" => RegistryValueKind.MultiString,
                 "Binary" => RegistryValueKind.Binary,
+                "None" => RegistryValueKind.None,
                 _ => RegistryValueKind.DWord
             };
 
             object realData = kind switch
             {
+                RegistryValueKind.MultiString => data is string[] lines ? lines : new[] { data?.ToString() ?? string.Empty },
+                RegistryValueKind.None => data is byte[] raw ? raw : Array.Empty<byte>(),
                 RegistryValueKind.DWord => RegistryPathHelper.ParseDWord(data),
                 RegistryValueKind.QWord => RegistryPathHelper.ParseQWord(data),
                 RegistryValueKind.Binary => data is byte[] b ? b : (data is string s ? (s.Length > 0 ? Convert.FromBase64String(s) : Array.Empty<byte>()) : Array.Empty<byte>()),

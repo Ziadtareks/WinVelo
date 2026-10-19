@@ -113,8 +113,13 @@ public sealed class FakeRegistryService : IRegistryService
 
     public void DeleteKey(string hive, string key)
     {
+        // Same as the real registry (DeleteSubKeyTree): the key and everything below it.
         string fullKey = GetFullKey(hive, key);
-        Keys.Remove(fullKey);
+        string prefix = fullKey + "\\";
+        foreach (string k in Keys.Keys.Where(k => string.Equals(k, fullKey, StringComparison.OrdinalIgnoreCase) || k.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)).ToList())
+        {
+            Keys.Remove(k);
+        }
     }
 
     public void CreateKey(string hive, string key)
