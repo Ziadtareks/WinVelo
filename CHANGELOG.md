@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Maintenance release: two apps that could not be installed through Chocolatey, a build error that would have failed CI, a quieter source checker, and corrected release notes. No tweak was added or removed.
 
+### Changed
+- Repository cleanup: removed internal audit and working documents, the unused `Catalog/Apps/apps.winget.json`, the VM test scripts, and screenshot variants that the README does not use. The screenshot capture now writes only the seven screenshots shown in the README, in English and Arabic.
+
 ### Fixed
 - Chocolatey ids for WhatsApp (`whatsapp`) and Battle.net (`battle.net`) do not exist on community.chocolatey.org, so both apps are winget-only now. With Chocolatey selected they were skipped with a clear message; nothing was installed wrongly.
 - `SmokeTests.cs` violated two xUnit analyzer rules (xUnit2029), so `dotnet build -p:TreatWarningsAsErrors=true` (the CI setting) failed. Caught by running the CI steps locally.
@@ -168,7 +171,7 @@ This is the first honest public beta release of WinVelo. This release completely
   - Read-only tool collecting app version, OS build, journal summary, tweak states, and sanitized logs.
   - Automatic privacy scrubbing: strips usernames, machine names, and user paths outside `%APPDATA%\WinVelo`.
 - **Comprehensive Host Manual Test Plan**:
-  - Published `docs/MANUAL_TEST_PLAN.md` with structured checklists, exact Settings paths, and explicit STOP line boundaries for safe physical host testing.
+  - Manual host testing used structured checklists, exact Settings paths, and explicit STOP line boundaries for safe physical host testing.
 
 [Unreleased]: https://github.com/Ziadtareks/WinVelo/compare/v1.0.3...HEAD
 [1.0.3]: https://github.com/Ziadtareks/WinVelo/compare/v1.0.2...v1.0.3
