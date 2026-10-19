@@ -3,18 +3,17 @@ updates:
   - package-ecosystem: "nuget"
     directory: "/"
     schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 5
+      interval: "monthly"
+    open-pull-requests-limit: 3
     groups:
-      microsoft-extensions:
-        patterns: ["Microsoft.Extensions.*"]
-      test-tools:
-        patterns: ["xunit*", "Microsoft.NET.Test.Sdk", "coverlet.*", "FlaUI.*"]
+      nuget:
+        patterns: ["*"]
 
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
+    open-pull-requests-limit: 3
     groups:
       actions:
         patterns: ["*"]

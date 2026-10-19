@@ -1,0 +1,23 @@
+{
+  "sessionId": "20261016_101500_a1b2c3d4",
+  "startedAtUtc": "2026-10-16T10:15:00Z",
+  "isCompleted": false,
+  "mode": "real",
+  "appVersion": "1.0.1",
+  "records": [
+    {
+      "tweakId": "ui.explorer.show-file-extensions",
+      "actionIndex": 0,
+      "actionType": "Registry",
+      "targetIdentifier": "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced\\HideFileExt",
+      "existedBefore": true,
+      "previousValueKind": "DWord",
+      "previousData": "1",
+      "keyCreated": false,
+      "isBaseline": true,
+      "isReverted": false,
+      "revertedAtUtc": null,
+      "appliedAtUtc": "2026-10-16T10:15:01Z"
+    }
+  ]
+}

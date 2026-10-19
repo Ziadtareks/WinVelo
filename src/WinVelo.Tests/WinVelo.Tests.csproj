@@ -31,4 +31,9 @@
     <ProjectReference Include="..\..\tools\CatalogValidator\CatalogValidator.csproj" />
   </ItemGroup>
 
+  <!-- Journal files written by WinVelo 1.0.1 and by Tweakora (no "mode" field), used by SmokeTests. -->
+  <ItemGroup>
+    <None Include="Fixtures\*.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>
