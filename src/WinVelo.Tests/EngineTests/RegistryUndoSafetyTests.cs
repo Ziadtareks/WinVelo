@@ -173,6 +173,49 @@ public sealed class RegistryUndoSafetyTests : IDisposable
         Assert.Equal(1, _registry.GetValue("HKLM", key, "Enabled")); // back to the true original
     }
 
+    [Theory]
+    [InlineData(true)]   // undo the tweak that really changed the value first
+    [InlineData(false)]  // undo the tweak that was already active first
+    public async Task TweakSkippedAsAlreadyActive_IsJournaled_AndUndoNeverSwitchesOffTheOtherTweak(bool changerFirst)
+    {
+        // "Telemetry - Disable" sets Enabled=0 (and more); "Disable Advertising ID" only Enabled=0, so it is
+        // already active when applied afterwards. Its catalog undo deletes the value.
+        const string key = @"SOFTWARE\WinVeloTest\Adopted";
+        _registry.SetValue("HKLM", key, "Enabled", 1, "DWord");
+        var runner = Runner(_registry);
+        var telemetry = SetTweak("test.telemetry", key, "Enabled", 0);
+        telemetry.Apply.Add(new ActionItem { Type = "Registry", Hive = "HKLM", Key = key, ValueName = "Other", ValueKind = "DWord", Operation = "Set", Data = JsonDocument.Parse("0").RootElement });
+        var advertising = SetTweak("test.advertising", key, "Enabled", 0);
+
+        await runner.ApplyBatchAsync(new[] { telemetry });
+        await Task.Delay(5);
+        var report = await runner.ApplyBatchAsync(new[] { advertising });
+        Assert.Equal(TweakExecutionStatus.Skipped, Assert.Single(report.Results).Status);
+
+        var first = changerFirst ? telemetry : advertising;
+        var second = changerFirst ? advertising : telemetry;
+
+        Assert.True((await runner.UndoTweakAsync(first)).Success);
+        Assert.Equal(0, _registry.GetValue("HKLM", key, "Enabled")); // the other tweak still needs it
+
+        Assert.True((await runner.UndoTweakAsync(second)).Success);
+        Assert.Equal(1, _registry.GetValue("HKLM", key, "Enabled")); // the true original
+    }
+
+    [Fact]
+    public async Task SettingTheUserMadeThemselves_IsLeftAloneByUndo()
+    {
+        const string key = @"SOFTWARE\WinVeloTest\UserSet";
+        _registry.SetValue("HKLM", key, "Enabled", 0, "DWord"); // set by the user in Windows Settings
+        var runner = Runner(_registry);
+        var tweak = SetTweak("test.user", key, "Enabled", 0);
+
+        await runner.ApplyBatchAsync(new[] { tweak });   // already active: nothing changes
+        await runner.UndoTweakAsync(tweak);               // nothing WinVelo changed, so nothing to undo
+
+        Assert.Equal(0, _registry.GetValue("HKLM", key, "Enabled"));
+    }
+
     [Fact]
     public async Task TwoTweaksCreatingTheSameValue_UndoOlderFirst_DeletesItAtTheEnd()
     {

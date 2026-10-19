@@ -8,8 +8,32 @@ using WinVelo.Core.Utilities;
 
 namespace WinVelo.Core.Engine.Handlers;
 
-public sealed class RegistryActionHandler : IActionHandler
+public sealed class RegistryActionHandler : IActionHandler, IStateCaptureHandler
 {
+    public JournalActionRecord? CaptureCurrentState(ActionItem action, string tweakId, int actionIndex, ExecutionContext context)
+    {
+        if (string.IsNullOrWhiteSpace(action.Hive) || string.IsNullOrWhiteSpace(action.Key)) return null;
+
+        var (normHive, normKey) = RegistryPathHelper.Normalize(action.Hive, action.Key);
+        string valName = action.ValueName ?? string.Empty;
+        bool keyExisted = context.Registry.KeyExists(normHive, normKey);
+        bool valueExisted = keyExisted && context.Registry.ValueExists(normHive, normKey, valName);
+
+        return new JournalActionRecord
+        {
+            TweakId = tweakId,
+            ActionIndex = actionIndex,
+            ActionType = action.Type,
+            TargetIdentifier = $"{normHive}\\{normKey}\\{(string.IsNullOrEmpty(valName) ? "@" : valName)}",
+            ExistedBefore = valueExisted,
+            PreviousValueKind = valueExisted ? context.Registry.GetValueKind(normHive, normKey, valName) : null,
+            PreviousData = valueExisted ? SerializeData(context.Registry.GetValue(normHive, normKey, valName)) : null,
+            KeyCreated = false,
+            IsBaseline = true,
+            AppliedAtUtc = DateTime.UtcNow
+        };
+    }
+
     public bool CanHandle(string actionType) =>
         actionType.Equals("Registry", StringComparison.OrdinalIgnoreCase) ||
         actionType.Equals("Policy", StringComparison.OrdinalIgnoreCase);

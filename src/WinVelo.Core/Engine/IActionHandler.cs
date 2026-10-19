@@ -36,6 +36,16 @@ public sealed class ActionPreview
     public string? ProposedState { get; init; }
 }
 
+/// <summary>
+/// A handler that can record the current state of an action's target without changing it. Used for tweaks that
+/// are already active when applied, so their undo puts back exactly what was there instead of running the
+/// catalog undo (which could switch off the same setting of another tweak).
+/// </summary>
+public interface IStateCaptureHandler
+{
+    JournalActionRecord? CaptureCurrentState(ActionItem action, string tweakId, int actionIndex, ExecutionContext context);
+}
+
 public interface IActionHandler
 {
     bool CanHandle(string actionType);

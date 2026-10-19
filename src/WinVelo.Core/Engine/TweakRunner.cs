@@ -138,6 +138,14 @@ public sealed class TweakRunner
             bool isAlreadyActive = await _detector.IsTweakActiveAsync(tweak, useCache: false);
             if (isAlreadyActive)
             {
+                // Nothing is changed, but the current state is journaled. Undo then puts back exactly this state
+                // (often a value another tweak set) instead of running the catalog undo, which could switch off
+                // that other tweak's setting.
+                if (!_context.IsDryRun)
+                {
+                    RecordAdoptedState(tweak);
+                }
+
                 progress?.Report($"Skipping {tweak.Id}: already active.");
                 report.Results.Add(new TweakExecutionResult
                 {
@@ -547,6 +555,28 @@ public sealed class TweakRunner
         if (string.IsNullOrWhiteSpace(type)) return false;
         return string.Equals(type, "PowerShell", StringComparison.OrdinalIgnoreCase) ||
                string.Equals(type, "Script", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private void RecordAdoptedState(TweakDefinition tweak)
+    {
+        for (int i = 0; i < tweak.Apply.Count; i++)
+        {
+            ActionItem action = tweak.Apply[i];
+            if (_handlers.FirstOrDefault(h => h.CanHandle(action.Type)) is not IStateCaptureHandler capture) continue;
+
+            JournalActionRecord? record = capture.CaptureCurrentState(action, tweak.Id, i, _context);
+            if (record == null) continue;
+
+            // A tweak that already has an active record for this target keeps its original baseline.
+            bool alreadyJournaled = _context.Journal.GetAllSessions()
+                .SelectMany(s => s.Records)
+                .Any(r => !r.IsReverted && r.TweakId == tweak.Id &&
+                          string.Equals(r.TargetIdentifier, record.TargetIdentifier, StringComparison.OrdinalIgnoreCase));
+            if (!alreadyJournaled)
+            {
+                _context.Journal.RecordActionWriteAhead(record);
+            }
+        }
     }
 
     /// <summary>

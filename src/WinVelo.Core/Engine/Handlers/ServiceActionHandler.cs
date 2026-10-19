@@ -5,8 +5,26 @@ using WinVelo.Core.Safety;
 
 namespace WinVelo.Core.Engine.Handlers;
 
-public sealed class ServiceActionHandler : IActionHandler
+public sealed class ServiceActionHandler : IActionHandler, IStateCaptureHandler
 {
+    public JournalActionRecord? CaptureCurrentState(ActionItem action, string tweakId, int actionIndex, ExecutionContext context)
+    {
+        if (string.IsNullOrWhiteSpace(action.ServiceName) || !context.Services.ServiceExists(action.ServiceName)) return null;
+
+        return new JournalActionRecord
+        {
+            TweakId = tweakId,
+            ActionIndex = actionIndex,
+            ActionType = "Service",
+            TargetIdentifier = action.ServiceName,
+            ExistedBefore = true,
+            PreviousValueKind = "ServiceConfig",
+            PreviousData = $"{context.Services.GetStartupType(action.ServiceName)}|{context.Services.GetState(action.ServiceName)}",
+            IsBaseline = true,
+            AppliedAtUtc = DateTime.UtcNow
+        };
+    }
+
     public bool CanHandle(string actionType) =>
         actionType.Equals("Service", StringComparison.OrdinalIgnoreCase);
 
