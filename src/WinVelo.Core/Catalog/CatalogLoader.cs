@@ -1,5 +1,6 @@
 using System.Text.Json;
 using WinVelo.Core.Models;
+using WinVelo.Core.Safety;
 
 namespace WinVelo.Core.Catalog;
 
@@ -13,7 +14,8 @@ public sealed class CatalogLoadResult<T>
 /// <summary>
 /// Loads tweaks and presets from a <see cref="CatalogSource"/>.
 /// A file that is not valid JSON is skipped. Inside a valid file, a tweak that cannot be read
-/// (or is rejected by <see cref="TweakValidators"/>) is skipped on its own; the other tweaks still load.
+/// (or is rejected by <see cref="ServicingGuard"/> or <see cref="TweakValidators"/>) is skipped on its own;
+/// the other tweaks still load.
 /// </summary>
 public static class CatalogLoader
 {
@@ -84,7 +86,9 @@ public static class CatalogLoader
                         continue;
                     }
 
-                    var problems = TweakValidators.SelectMany(v => v(tweak)).ToList();
+                    // Protected Windows components are checked here as well as in each handler, so a tweak that
+                    // would turn off Windows Update, the Store or Windows Security never even appears in the app.
+                    var problems = ServicingGuard.CheckTweak(tweak).Concat(TweakValidators.SelectMany(v => v(tweak))).ToList();
                     if (problems.Count > 0)
                     {
                         seen.Remove(tweak.Id);

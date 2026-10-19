@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using WinVelo.Core.Models;
+using WinVelo.Core.Safety;
 
 namespace WinVelo.Core.Engine.Handlers;
 
@@ -11,6 +12,12 @@ public sealed class ServiceActionHandler : IActionHandler
 
     public Task<ActionResult> ExecuteAsync(ActionItem action, string tweakId, int actionIndex, ExecutionContext context)
     {
+        string? blockedByServicingGuard = ServicingGuard.CheckAction(action);
+        if (blockedByServicingGuard != null)
+        {
+            return Task.FromResult(new ActionResult { Success = false, Message = "Blocked: " + blockedByServicingGuard });
+        }
+
         if (string.IsNullOrWhiteSpace(action.ServiceName))
         {
             return Task.FromResult(new ActionResult { Success = false, Message = "Missing ServiceName." });

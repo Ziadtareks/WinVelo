@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using WinVelo.Core.Models;
+using WinVelo.Core.Safety;
 using WinVelo.Core.Utilities;
 
 namespace WinVelo.Core.Engine.Handlers;
@@ -15,6 +16,12 @@ public sealed class RegistryActionHandler : IActionHandler
 
     public Task<ActionResult> ExecuteAsync(ActionItem action, string tweakId, int actionIndex, ExecutionContext context)
     {
+        string? blockedByServicingGuard = ServicingGuard.CheckAction(action);
+        if (blockedByServicingGuard != null)
+        {
+            return Task.FromResult(new ActionResult { Success = false, Message = "Blocked: " + blockedByServicingGuard });
+        }
+
         if (string.IsNullOrWhiteSpace(action.Hive) || string.IsNullOrWhiteSpace(action.Key))
         {
             return Task.FromResult(new ActionResult { Success = false, Message = "Missing Hive or Key." });

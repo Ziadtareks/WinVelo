@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using WinVelo.Core.Models;
+using WinVelo.Core.Safety;
 
 namespace WinVelo.Core.Engine.Handlers;
 
@@ -16,6 +17,13 @@ public sealed class PowerShellActionHandler : IActionHandler
         {
             return new ActionResult { Success = false, Message = "Missing script content." };
         }
+
+        string? blockedByServicingGuard = ServicingGuard.CheckAction(action);
+        if (blockedByServicingGuard != null)
+        {
+            return new ActionResult { Success = false, Message = "Blocked: " + blockedByServicingGuard };
+        }
+
 
         string targetId = $"powershell://{tweakId}/{actionIndex}";
 
