@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.NetworkInformation;
 using System.Threading;
 using System.Threading.Tasks;
+using WinVelo.Core.Utilities;
 using WinVelo.Core.Interfaces;
 
 namespace WinVelo.Modules.Network;
@@ -146,13 +147,13 @@ public sealed class NetworkOptimizerService : INetworkOptimizerService
     public async Task<bool> ApplyDnsAsync(string primaryDns, string secondaryDns, CancellationToken cancellationToken = default)
     {
         string script;
-        if (string.IsNullOrWhiteSpace(secondaryDns))
+        try
         {
-            script = $"Get-NetAdapter | Where-Object Status -eq 'Up' | Set-DnsClientServerAddress -ServerAddresses '{primaryDns}'";
+            script = SafeCommands.SetDnsServers(primaryDns, secondaryDns);
         }
-        else
+        catch (ArgumentException)
         {
-            script = $"Get-NetAdapter | Where-Object Status -eq 'Up' | Set-DnsClientServerAddress -ServerAddresses '{primaryDns}', '{secondaryDns}'";
+            return false;
         }
 
         var res = await _shell.ExecutePowerShellAsync(script, 30);

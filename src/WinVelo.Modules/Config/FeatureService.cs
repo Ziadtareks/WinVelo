@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using WinVelo.Core.Safety;
+using WinVelo.Core.Utilities;
 using WinVelo.Core.Catalog;
 using WinVelo.Core.Interfaces;
 using WinVelo.Core.Operations;
@@ -104,7 +106,15 @@ public sealed class FeatureService : IFeatureService
             {
                 foreach (string fn in feature.FeatureNames)
                 {
-                    string script = $"Enable-WindowsOptionalFeature -Online -FeatureName '{fn}' -All -NoRestart";
+                    string script;
+                    try
+                    {
+                        script = SafeCommands.OptionalFeature(true, fn);
+                    }
+                    catch (ArgumentException ex)
+                    {
+                        return new OperationItemResult { Id = feature.Key, Name = feature.Name, Status = OperationItemStatus.Failed, Reason = ex.Message };
+                    }
                     var res = await _shell.ExecutePowerShellAsync(script, 180);
                     if (!res.Success)
                     {
@@ -120,6 +130,12 @@ public sealed class FeatureService : IFeatureService
 
                 foreach (string sc in feature.InvokeScripts)
                 {
+                    string? blocked = ServicingGuard.CheckScript(sc);
+                    if (blocked != null)
+                    {
+                        return new OperationItemResult { Id = feature.Key, Name = feature.Name, Status = OperationItemStatus.Failed, Reason = "Blocked: " + blocked };
+                    }
+
                     var res = await _shell.ExecutePowerShellAsync(sc, 180);
                     if (!res.Success)
                     {
@@ -157,7 +173,15 @@ public sealed class FeatureService : IFeatureService
             {
                 foreach (string fn in feature.FeatureNames)
                 {
-                    string script = $"Disable-WindowsOptionalFeature -Online -FeatureName '{fn}' -NoRestart";
+                    string script;
+                    try
+                    {
+                        script = SafeCommands.OptionalFeature(false, fn);
+                    }
+                    catch (ArgumentException ex)
+                    {
+                        return new OperationItemResult { Id = feature.Key, Name = feature.Name, Status = OperationItemStatus.Failed, Reason = ex.Message };
+                    }
                     var res = await _shell.ExecutePowerShellAsync(script, 180);
                     if (!res.Success)
                     {

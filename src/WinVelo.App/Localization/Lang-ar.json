@@ -820,5 +820,7 @@
   "{0} (Auto-Selected)": "{0} (تم اختياره تلقائيًا)",
   "{0} rollback journal file(s) could not be read. WinVelo did not delete them, but it cannot undo the changes they describe.\n\nThe files are in:\n{1}\n\nPlease keep them and report this on GitHub.": "تعذّرت قراءة {0} من ملفات سجل التراجع. لم يحذفها WinVelo، لكنه لا يستطيع التراجع عن التغييرات المسجلة فيها.\n\nالملفات موجودة في:\n{1}\n\nيرجى الاحتفاظ بها والإبلاغ عن المشكلة على GitHub.",
   "Rollback journal problem": "مشكلة في سجل التراجع",
-  "Automatic updates off (Caution)": "التحديثات التلقائية متوقفة (تحذير)"
+  "Automatic updates off (Caution)": "التحديثات التلقائية متوقفة (تحذير)",
+  "WinVelo is using tweak files from this folder instead of its built-in catalog:\n{0}\n\nThese files can change your system as administrator. Only keep this folder if you created it or trust where it came from. Delete it to go back to the built-in catalog.": "يستخدم WinVelo ملفات التعديلات من هذا المجلد بدلًا من الكتالوج المدمج فيه:\n{0}\n\nيمكن لهذه الملفات تغيير نظامك بصلاحيات المسؤول. احتفظ بهذا المجلد فقط إذا كنت أنشأته بنفسك أو تثق بمصدره. احذفه للعودة إلى الكتالوج المدمج.",
+  "Custom catalog in use": "يتم استخدام كتالوج مخصص"
 }

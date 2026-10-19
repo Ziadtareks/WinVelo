@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using WinVelo.Core.Utilities;
 using WinVelo.Core;
 using WinVelo.Core.Catalog;
 using WinVelo.Core.Engine;
@@ -382,17 +383,13 @@ public sealed class TweakService : ITweakService
     public async Task<bool> SetDnsAsync(string primary, string secondary)
     {
         string script;
-        if (string.Equals(primary, "DHCP", StringComparison.OrdinalIgnoreCase) || string.Equals(primary, "Automatic", StringComparison.OrdinalIgnoreCase))
+        try
         {
-            script = "Get-NetAdapter | Where-Object Status -eq 'Up' | Set-DnsClientServerAddress -ResetServerAddresses";
+            script = SafeCommands.SetDnsServers(primary, secondary);
         }
-        else if (string.IsNullOrWhiteSpace(secondary))
+        catch (ArgumentException)
         {
-            script = $"Get-NetAdapter | Where-Object Status -eq 'Up' | Set-DnsClientServerAddress -ServerAddresses '{primary}'";
-        }
-        else
-        {
-            script = $"Get-NetAdapter | Where-Object Status -eq 'Up' | Set-DnsClientServerAddress -ServerAddresses '{primary}', '{secondary}'";
+            return false;
         }
 
         var res = await _shell.ExecutePowerShellAsync(script, 30);

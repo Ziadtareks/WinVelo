@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.NetworkInformation;
 using System.Threading;
 using System.Threading.Tasks;
+using WinVelo.Core.Utilities;
 using WinVelo.Core.Interfaces;
 
 namespace WinVelo.Modules.Network;
@@ -113,17 +114,13 @@ public sealed class DnsService : IDnsService
     public async Task<bool> ApplyDnsAsync(DnsProviderDefinition provider, CancellationToken cancellationToken = default)
     {
         string script;
-        if (string.Equals(provider.PrimaryDns, "DHCP", StringComparison.OrdinalIgnoreCase))
+        try
         {
-            script = "Get-NetAdapter | Where-Object Status -eq 'Up' | Set-DnsClientServerAddress -ResetServerAddresses";
+            script = SafeCommands.SetDnsServers(provider.PrimaryDns, provider.SecondaryDns);
         }
-        else if (string.IsNullOrWhiteSpace(provider.SecondaryDns) || provider.SecondaryDns == "DHCP")
+        catch (ArgumentException)
         {
-            script = $"Get-NetAdapter | Where-Object Status -eq 'Up' | Set-DnsClientServerAddress -ServerAddresses '{provider.PrimaryDns}'";
-        }
-        else
-        {
-            script = $"Get-NetAdapter | Where-Object Status -eq 'Up' | Set-DnsClientServerAddress -ServerAddresses '{provider.PrimaryDns}', '{provider.SecondaryDns}'";
+            return false;
         }
 
         var res = await _shell.ExecutePowerShellAsync(script, 30);
