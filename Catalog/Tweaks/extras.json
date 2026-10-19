@@ -1128,9 +1128,80 @@
     "needsReview": false,
     "uiEquivalentLocation": "Settings › System › Storage › Storage Sense",
     "relatedTweaks": [
+      "essential.deletetempfiles",
+      "performance.system.storage-sense-disable"
+    ],
+    "oppositeOf": "performance.system.storage-sense-disable",
+    "presetRole": "preference"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "performance.system.storage-sense-disable",
+    "origin": "WPFTweaksStorage",
+    "name": "Disable Storage Sense Auto-Cleanup",
+    "description": "Stops Windows Storage Sense from deleting temporary files and emptying the Recycle Bin automatically.",
+    "category": "performance",
+    "subcategory": "storage",
+    "risk": "Medium",
+    "impacts": [
+      "performance",
+      "storage"
+    ],
+    "tags": [
+      "performance"
+    ],
+    "windows": {
+      "minBuild": 19041
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\StorageSense\\Parameters\\StoragePolicy",
+      "valueName": "01",
+      "matchType": "Equals",
+      "expectedValue": 0
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\StorageSense\\Parameters\\StoragePolicy",
+        "operation": "Set",
+        "valueName": "01",
+        "valueKind": "DWord",
+        "data": 0
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\StorageSense\\Parameters\\StoragePolicy",
+        "operation": "Set",
+        "valueName": "01",
+        "valueKind": "DWord",
+        "data": 1
+      }
+    ],
+    "source": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-storage#allowstoragesenseglobal",
+    "verifiedOnBuild": "22631.4317",
+    "evidence": "ui-equivalent",
+    "whatItDoes": "Disables the global Storage Sense switch by setting its StoragePolicy value to 0.",
+    "sideEffects": "Windows stops deleting temporary app files and old Recycle Bin items automatically. Manual cleanup still works, but disk space may fill if you do not clean up yourself.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows/client-management/mdm/storage-csp"
+    ],
+    "needsReview": false,
+    "uiEquivalentLocation": "Settings › System › Storage › Storage Sense",
+    "relatedTweaks": [
+      "performance.system.storage-sense",
       "essential.deletetempfiles"
     ],
-    "presetRole": "preference"
+    "oppositeOf": "performance.system.storage-sense",
+    "presetRole": "preference",
+    "effectNote": "Only changes the global Storage Sense switch. Per-folder cleanup schedules and manual cleanup remain unchanged."
   },
   {
     "schemaVersion": "1.0.0",

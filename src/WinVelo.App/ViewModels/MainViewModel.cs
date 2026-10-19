@@ -176,7 +176,7 @@ public sealed partial class MainViewModel : ObservableObject
         _appSettings = appSettings ?? new AppSettingsService();
         var resSvc = restoreService ?? new NullRestoreService();
         ExecutionDialogVM = executionDialogVM ?? new UnifiedExecutionDialogViewModel(tweakService, null, activityTracker);
-        ToolsVM = toolsVM ?? new ToolsViewModel(startupVM, updatesVM, configVM, toolboxVM, resSvc);
+        ToolsVM = toolsVM ?? new ToolsViewModel(startupVM, updatesVM, configVM, toolboxVM, resSvc, tweakService, shell);
         HistoryVM = historyVM ?? new HistoryViewModel(tweakService, resSvc, null, ExecutionDialogVM);
         WizardVM = wizardVM ?? new FirstRunWizardViewModel(resSvc, _appSettings);
         WizardVM.WizardCompleted += OnWizardCompleted;

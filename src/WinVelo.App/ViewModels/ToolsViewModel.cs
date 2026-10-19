@@ -5,12 +5,17 @@ using CommunityToolkit.Mvvm.Input;
 using WinVelo.App.Services;
 using WinVelo.Core.Interfaces;
 using WinVelo.App.Localization;
+using WinVelo.Modules.Tweaks;
 
 namespace WinVelo.App.ViewModels;
 
 public sealed partial class ToolsViewModel : ObservableObject
 {
+    private const string OosuUrl = "https://www.oo-software.com/en/shutup10";
+
     private readonly ISystemRestoreService? _restoreService;
+    private readonly ITweakService? _tweakService;
+    private readonly IShellService? _shell;
 
     public StartupViewModel StartupVM { get; }
     public UpdatesViewModel UpdatesVM { get; }
@@ -40,18 +45,25 @@ public sealed partial class ToolsViewModel : ObservableObject
     [ObservableProperty]
     private bool _isCreatingRestorePoint;
 
+    [ObservableProperty]
+    private string _powerPlanStatusText = LocalizationManager.T("Choose a power plan. Balanced is the Windows default.");
+
     public ToolsViewModel(
         StartupViewModel startupVM,
         UpdatesViewModel updatesVM,
         ConfigViewModel configVM,
         ToolboxViewModel toolboxVM,
-        ISystemRestoreService? restoreService = null)
+        ISystemRestoreService? restoreService = null,
+        ITweakService? tweakService = null,
+        IShellService? shell = null)
     {
         StartupVM = startupVM;
         UpdatesVM = updatesVM;
         ConfigVM = configVM;
         ToolboxVM = toolboxVM;
         _restoreService = restoreService;
+        _tweakService = tweakService;
+        _shell = shell;
 
         RefreshRestoreInfo();
     }
@@ -75,6 +87,7 @@ public sealed partial class ToolsViewModel : ObservableObject
             "Updates" or "WindowsUpdates" or "UpdateMode" => "Updates",
             "Features" or "OptionalFeatures" => "Features",
             "RestorePoints" or "Restore" or "SystemRestore" => "RestorePoints",
+            "PowerPlan" or "Power" or "Performance" => "PowerPlan",
             _ => toolName
         };
 
@@ -161,5 +174,41 @@ public sealed partial class ToolsViewModel : ObservableObject
         {
             IsCreatingRestorePoint = false;
         }
+    }
+
+    [RelayCommand]
+    public async Task ApplyPowerPlanAsync(string? plan)
+    {
+        if (string.IsNullOrWhiteSpace(plan))
+        {
+            return;
+        }
+
+        if (_tweakService == null)
+        {
+            PowerPlanStatusText = LocalizationManager.T("Power plan controls are not available.");
+            return;
+        }
+
+        string selectedPlan = plan.Trim();
+        PowerPlanStatusText = LocalizationManager.T("Changing the Windows power plan...");
+
+        try
+        {
+            bool success = await _tweakService.SetPerformancePlanAsync(selectedPlan);
+            PowerPlanStatusText = success
+                ? LocalizationManager.T("Power plan changed to {0}.", selectedPlan)
+                : LocalizationManager.T("Could not change the power plan. Windows may require administrator rights.");
+        }
+        catch (Exception ex)
+        {
+            PowerPlanStatusText = LocalizationManager.T("Power plan change failed: {0}", ex.Message);
+        }
+    }
+
+    [RelayCommand]
+    public void OpenOosu()
+    {
+        _shell?.OpenUrl(OosuUrl);
     }
 }

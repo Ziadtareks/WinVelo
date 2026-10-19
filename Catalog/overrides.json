@@ -5,20 +5,24 @@
       "reason": "Licensing bypass and third-party Terms of Service violation. Modifies hosts file with hundreds of domain overrides.",
       "documentation": "docs/UPSTREAM.md"
     },
+    "WPFToggleHideSettingsHome": {
+      "reason": "Upstream writes an invalid SettingsPageVisibility value (show:home). Windows only accepts showonly: and hide: prefixes, so the tweak has no defined effect.",
+      "documentation": "docs/UPSTREAM.md"
+    },
     "WPFOOSUbutton": {
-      "reason": "Handled as dedicated UI button opening official O&O download web page; automatic third-party binary downloading is disabled for security.",
+      "reason": "Handled as a native button in the Tools tab that opens the official O&O download page. WinVelo never downloads or runs third-party binaries automatically.",
       "documentation": "docs/UPSTREAM.md"
     },
     "WPFchangedns": {
-      "reason": "Handled as first-class native DNS Provider dropdown control in Tweaks and Toolbox tabs.",
+      "reason": "Handled as a native DNS provider tool in the Tools tab.",
       "documentation": "docs/UPSTREAM.md"
     },
     "WPFAddUltPerf": {
-      "reason": "Handled as first-class native Performance Power Plan dropdown control.",
+      "reason": "Handled as a native Power Plan tool in the Tools tab that applies the Ultimate Performance scheme.",
       "documentation": "docs/UPSTREAM.md"
     },
     "WPFRemoveUltPerf": {
-      "reason": "Handled as first-class native Performance Power Plan dropdown control.",
+      "reason": "Handled as a native Power Plan tool in the Tools tab; switching back to Balanced restores the default plan. WinVelo does not delete power schemes.",
       "documentation": "docs/UPSTREAM.md"
     }
   },

@@ -21,8 +21,8 @@
                     <TextBlock Text="{loc:Tr Tools_IntegratedWindowsMaintenanceServiceContr}"
                                FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,20" />
 
-                    <!-- Grid of 8 Tool Tiles -->
-                    <UniformGrid Columns="3" Margin="0,0,0,24">
+                    <!-- Grid of 9 Tool Tiles -->
+                    <UniformGrid Columns="3" Margin="0,0,0,16">
                         <!-- 1. Startup Apps -->
                         <Border Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
                                 BorderThickness="1" CornerRadius="8" Padding="16" Margin="6">
@@ -198,7 +198,51 @@
                                         Command="{Binding SelectToolCommand}" CommandParameter="RestorePoints" HorizontalAlignment="Left" Padding="12,5" />
                             </Grid>
                         </Border>
+
+                        <!-- 9. Power Plan -->
+                        <Border Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
+                                BorderThickness="1" CornerRadius="8" Padding="16" Margin="6">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Border Grid.Row="0" Width="38" Height="38" CornerRadius="8" Background="{DynamicResource AccentSubtleBrush}" HorizontalAlignment="Left" Margin="0,0,0,10">
+                                    <ui:SymbolIcon Symbol="Flash24" Foreground="{DynamicResource AccentBrush}" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Border>
+                                <TextBlock Grid.Row="1" Text="{loc:Tr Tools_PowerPlan}" FontSize="15" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,4" />
+                                <TextBlock Grid.Row="2" Text="{loc:Tr Tools_PowerPlanDesc}"
+                                           FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,0,0,14" />
+                                <Button Grid.Row="3" AutomationProperties.AutomationId="Tool_PowerPlan" AutomationProperties.Name="Power Plan"
+                                        Content="{loc:Tr Tools_OpenTool}" Style="{DynamicResource ModernSecondaryBtn}"
+                                        Command="{Binding SelectToolCommand}" CommandParameter="PowerPlan" HorizontalAlignment="Left" Padding="12,5" />
+                            </Grid>
+                        </Border>
                     </UniformGrid>
+
+                    <!-- Third-party security tools -->
+                    <Border Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
+                            BorderThickness="1" CornerRadius="8" Padding="16" Margin="6,0,6,0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Border Grid.Column="0" Width="38" Height="38" CornerRadius="8" Background="{DynamicResource AccentSubtleBrush}" VerticalAlignment="Center" Margin="0,0,12,0">
+                                <ui:SymbolIcon Symbol="ShieldCheckmark24" Foreground="{DynamicResource AccentBrush}" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock Text="{loc:Tr Tools_OosuShutUp10}" FontSize="15" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" />
+                                <TextBlock Text="{loc:Tr Tools_OosuShutUp10Desc}" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,2,12,0" />
+                            </StackPanel>
+                            <Button Grid.Column="2" AutomationProperties.AutomationId="Tool_OOSU" AutomationProperties.Name="Open O&amp;O ShutUp10++ official page"
+                                    Content="{loc:Tr Tools_OpenOfficialPage}" Style="{DynamicResource ModernSecondaryBtn}"
+                                    Command="{Binding OpenOosuCommand}" VerticalAlignment="Center" Padding="12,5" />
+                        </Grid>
+                    </Border>
                 </StackPanel>
             </Border>
 
@@ -236,8 +280,11 @@
                                     Content="{loc:Tr Tools_Features}" Style="{DynamicResource ModernGhostBtn}" Margin="0,0,4,0"
                                     Command="{Binding SelectToolCommand}" CommandParameter="Features" />
                             <Button AutomationProperties.Name="Restore Points"
-                                    Content="{loc:Tr Tools_RestorePoints}" Style="{DynamicResource ModernGhostBtn}"
+                                    Content="{loc:Tr Tools_RestorePoints}" Style="{DynamicResource ModernGhostBtn}" Margin="0,0,4,0"
                                     Command="{Binding SelectToolCommand}" CommandParameter="RestorePoints" />
+                            <Button AutomationProperties.Name="Power Plan"
+                                    Content="{loc:Tr Tools_PowerPlan}" Style="{DynamicResource ModernGhostBtn}"
+                                    Command="{Binding SelectToolCommand}" CommandParameter="PowerPlan" />
                         </WrapPanel>
                     </DockPanel>
                 </Border>
@@ -732,6 +779,59 @@
                             </DockPanel>
                         </StackPanel>
                     </Border>
+                </StackPanel>
+            </Border>
+
+            <!-- ==================== 9. POWER PLAN ==================== -->
+            <Border>
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ActiveTool}" Value="PowerPlan">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <StackPanel>
+                    <Border Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
+                            BorderThickness="1" CornerRadius="8" Padding="16" Margin="0,0,0,12">
+                        <StackPanel>
+                            <TextBlock Text="{loc:Tr Tools_PowerPlan}" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" />
+                            <TextBlock Text="{loc:Tr Tools_PowerPlanDesc}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,2,0,0" TextWrapping="Wrap" />
+                        </StackPanel>
+                    </Border>
+
+                    <UniformGrid Columns="2" Margin="0,0,0,12">
+                        <Border Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
+                                BorderThickness="1" CornerRadius="8" Padding="16" Margin="0,0,6,0">
+                            <StackPanel>
+                                <TextBlock Text="{loc:Tr Tools_BalancedPowerPlan}" FontSize="15" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" />
+                                <TextBlock Text="{loc:Tr Tools_BalancedPowerPlanDesc}" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,4,0,14" />
+                                <Button Content="{loc:Tr Tools_SwitchToBalanced}" AutomationProperties.Name="Switch to Balanced power plan"
+                                        Style="{DynamicResource ModernSecondaryBtn}" HorizontalAlignment="Left" Padding="12,5"
+                                        Command="{Binding ApplyPowerPlanCommand}" CommandParameter="Balanced" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource AccentPrimaryBrush}"
+                                BorderThickness="1" CornerRadius="8" Padding="16" Margin="6,0,0,0">
+                            <StackPanel>
+                                <TextBlock Text="{loc:Tr Tools_UltimatePerformance}" FontSize="15" FontWeight="SemiBold" Foreground="{DynamicResource AccentPrimaryBrush}" />
+                                <TextBlock Text="{loc:Tr Tools_UltimatePerformanceDesc}" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,4,0,14" />
+                                <Button Content="{loc:Tr Tools_EnableUltimatePerformance}" AutomationProperties.Name="Enable Ultimate Performance power plan"
+                                        Style="{DynamicResource ModernPrimaryBtn}" HorizontalAlignment="Left" Padding="12,5"
+                                        Command="{Binding ApplyPowerPlanCommand}" CommandParameter="Ultimate Performance" />
+                            </StackPanel>
+                        </Border>
+                    </UniformGrid>
+
+                    <Border Background="{DynamicResource BgDeepBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
+                            BorderThickness="1" CornerRadius="6" Padding="12,10" Margin="0,0,0,8">
+                        <TextBlock Text="{Binding PowerPlanStatusText}" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" />
+                    </Border>
+                    <TextBlock Text="{loc:Tr Tools_PowerPlanNote}" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap" />
                 </StackPanel>
             </Border>
         </StackPanel>

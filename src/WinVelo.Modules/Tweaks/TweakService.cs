@@ -368,13 +368,23 @@ public sealed class TweakService : ITweakService
     {
         if (string.Equals(planName, "Ultimate Performance", StringComparison.OrdinalIgnoreCase))
         {
-            string script = "powercfg -duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61; powercfg /setactive e9a42b02-d5df-448d-aa00-03f14749eb61";
+            string script =
+                "$guid = 'e9a42b02-d5df-448d-aa00-03f14749eb61'; " +
+                "$list = powercfg /list; " +
+                "if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; " +
+                "if (-not ($list -match [regex]::Escape($guid))) { " +
+                "$created = powercfg -duplicatescheme $guid; " +
+                "if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; " +
+                "$match = [regex]::Match(($created -join \"`n\"), '[0-9a-fA-F-]{36}'); " +
+                "if ($match.Success) { $guid = $match.Value } }; " +
+                "powercfg /setactive $guid; " +
+                "exit $LASTEXITCODE";
             var res = await _shell.ExecutePowerShellAsync(script, 30);
             return res.Success;
         }
         else
         {
-            string script = "powercfg /setactive 381b4222-f694-41f0-9685-ff5bb260df2e";
+            string script = "powercfg /setactive 381b4222-f694-41f0-9685-ff5bb260df2e; exit $LASTEXITCODE";
             var res = await _shell.ExecutePowerShellAsync(script, 30);
             return res.Success;
         }

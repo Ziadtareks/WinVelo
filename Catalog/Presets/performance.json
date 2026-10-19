@@ -104,6 +104,10 @@
       "reason": "Personal preference — choose it yourself in Tweaks"
     },
     {
+      "id": "performance.system.storage-sense-disable",
+      "reason": "Personal preference — choose it yourself in Tweaks"
+    },
+    {
       "id": "pref.loginblur",
       "reason": "Personal preference — choose it yourself in Tweaks"
     },
