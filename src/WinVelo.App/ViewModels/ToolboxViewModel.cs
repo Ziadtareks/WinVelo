@@ -1,6 +1,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -36,7 +37,19 @@ public sealed partial class ToolboxViewModel : ObservableObject
     private bool _isScanningCleaner;
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(CancelCleanCommand))]
     private bool _isCleaning;
+
+    private CancellationTokenSource? _cleanCts;
+
+    private bool CanCancelClean() => IsCleaning;
+
+    [RelayCommand(CanExecute = nameof(CanCancelClean))]
+    private void CancelClean()
+    {
+        _cleanCts?.Cancel();
+        CleanerStatusText = LocalizationManager.T("Stopping cleanup…");
+    }
 
     [ObservableProperty]
     private bool _isNagleDisabled;
@@ -139,10 +152,18 @@ public sealed partial class ToolboxViewModel : ObservableObject
         CleanerStatusText = LocalizationManager.T("Cleaning selected safe cache locations...");
         await Task.Yield();
 
+        _cleanCts?.Dispose();
+        _cleanCts = new CancellationTokenSource();
+        var token = _cleanCts.Token;
         try
         {
-            var result = await Task.Run(async () => await _cleanerService.CleanCategoriesAsync(selected));
+            var result = await Task.Run(async () => await _cleanerService.CleanCategoriesAsync(selected, token));
             CleanerStatusText = LocalizationManager.T("Cleanup completed! {0}.", result.FormattedSummary);
+            await ScanCleanerAsync();
+        }
+        catch (OperationCanceledException)
+        {
+            CleanerStatusText = LocalizationManager.T("Cleanup stopped. Files that were already deleted stay deleted.");
             await ScanCleanerAsync();
         }
         catch (Exception ex)

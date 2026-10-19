@@ -301,5 +301,6 @@
   "Wizard_TransparentEvidenceBasedSettings": "Transparent, Evidence-Based Settings",
   "Wizard_TurnOnSystemRestoreDrive": "Turn On System Restore (Drive C:\\)",
   "Wizard_WinveloIsBuiltOnTransparency": "WinVelo is built on transparency, safety, and strict verification.",
-  "Apps_Cancel": "Cancel"
+  "Apps_Cancel": "Cancel",
+  "Tools_StopCleanup": "Stop"
 }

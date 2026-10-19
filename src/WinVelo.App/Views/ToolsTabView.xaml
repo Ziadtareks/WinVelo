@@ -382,6 +382,9 @@
                                         Command="{Binding ToolboxVM.ScanCleanerCommand}" Margin="0,0,8,0" />
                                 <Button Content="{loc:Tr Tools_CleanSelected}" AutomationProperties.Name="Clean Selected Items" Style="{DynamicResource ModernPrimaryBtn}"
                                         Command="{Binding ToolboxVM.CleanNowCommand}" />
+                                <Button Content="{loc:Tr Tools_StopCleanup}" AutomationProperties.Name="Stop Cleanup" Style="{DynamicResource ModernSecondaryBtn}"
+                                        Command="{Binding ToolboxVM.CancelCleanCommand}" Margin="8,0,0,0"
+                                        Visibility="{Binding ToolboxVM.IsCleaning, Converter={StaticResource BoolToVisConverter}}" />
                             </StackPanel>
                         </DockPanel>
                     </Border>
