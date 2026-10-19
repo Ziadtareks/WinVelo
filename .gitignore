@@ -41,3 +41,7 @@ dist/*
 upstream/
 
 Claude outputs/
+
+## Reports written by winvelo-cli --detect-all / --dry-run / --self-test in a source checkout
+/verify/
+self-test-results.md

@@ -247,39 +247,58 @@ public sealed class DiagnosticsCollector
         return logs;
     }
 
+    /// <summary>
+    /// Removes personal data from log text before it goes into a diagnostics bundle: user profile paths (of any
+    /// user), the user, machine and domain names, Windows SIDs, IP and MAC addresses, e-mail addresses and
+    /// serial numbers. Names are replaced only as whole words, so "Al" does not turn "Already" into "&lt;USER&gt;ready".
+    /// </summary>
     public static string SanitizeContent(string input)
+    {
+        return SanitizeContent(input, Environment.UserName, Environment.MachineName,
+            Environment.GetEnvironmentVariable("USERDOMAIN"), Environment.GetEnvironmentVariable("USERDNSDOMAIN"));
+    }
+
+    public static string SanitizeContent(string input, string? userName, string? machineName, string? domain = null, string? dnsDomain = null)
     {
         if (string.IsNullOrEmpty(input))
         {
             return string.Empty;
         }
 
-        string sanitized = input;
+        string s = input;
 
-        // 1. Sanitize User Profile path (e.g. C:\Users\Username)
-        string userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-        if (!string.IsNullOrEmpty(userProfile))
-        {
-            string sanitizedProfile = Path.Combine(Path.GetDirectoryName(userProfile) ?? "C:\\Users", "<USER>");
-            sanitized = sanitized.Replace(userProfile, sanitizedProfile, StringComparison.OrdinalIgnoreCase);
-        }
+        // Profile folders of any user: C:\Users\Name, \\server\Users\Name, C:/Users/Name, Documents and Settings.
+        s = Regex.Replace(s, @"(?i)(\\|/)(Users|Documents and Settings)(\\|/)(?!<USER>)[^\\/:*?""<>|\r\n]+", "$1$2$3<USER>");
 
-        // 2. Sanitize User Name
-        string userName = Environment.UserName;
-        if (!string.IsNullOrEmpty(userName) && userName.Length > 1)
-        {
-            sanitized = Regex.Replace(sanitized, Regex.Escape(userName), "<USER>", RegexOptions.IgnoreCase);
-        }
+        // Windows security identifiers (user and machine accounts).
+        s = Regex.Replace(s, @"\bS-1-5-21(-\d+){3,4}\b", "<SID>");
+        s = Regex.Replace(s, @"\bS-1-12-1(-\d+){4,}\b", "<SID>");
 
-        // 3. Sanitize Machine Name (if distinct from username)
-        string machineName = Environment.MachineName;
-        if (!string.IsNullOrEmpty(machineName) && machineName.Length > 1 &&
-            !string.Equals(machineName, userName, StringComparison.OrdinalIgnoreCase))
-        {
-            sanitized = sanitized.Replace(machineName, "<MACHINE>", StringComparison.OrdinalIgnoreCase);
-        }
+        // E-mail addresses (Microsoft account names often appear in paths and messages).
+        s = Regex.Replace(s, @"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b", "<EMAIL>");
 
-        return sanitized;
+        // MAC addresses, then IPv4 and IPv6 addresses.
+        s = Regex.Replace(s, @"(?i)\b([0-9a-f]{2}[:-]){5}[0-9a-f]{2}\b", "<MAC>");
+        s = Regex.Replace(s, @"(?<![\d.])(25[0-5]|2[0-4]\d|1?\d?\d)(\.(25[0-5]|2[0-4]\d|1?\d?\d)){3}(?![\d.])", "<IP>");
+        s = Regex.Replace(s, @"(?i)(?<![0-9a-f:])([0-9a-f]{1,4}:){7}[0-9a-f]{1,4}(?![0-9a-f:])", "<IP>");
+        s = Regex.Replace(s, @"(?i)(?<![0-9a-z:])([0-9a-f]{1,4}:){1,6}:[0-9a-f]{1,4}(:[0-9a-f]{1,4}){0,5}(%\w+)?(?![0-9a-z:])", "<IP>");
+
+        // "SerialNumber: ABC123", "Serial=..." and similar.
+        s = Regex.Replace(s, @"(?i)\b(serial\s*(number|no\.?)?\s*[:=]\s*)[^\s,;""']+", "$1<SERIAL>");
+
+        // Names last, as whole words only.
+        s = ReplaceWord(s, userName, "<USER>");
+        if (!string.Equals(machineName, userName, StringComparison.OrdinalIgnoreCase)) s = ReplaceWord(s, machineName, "<MACHINE>");
+        if (!string.Equals(domain, machineName, StringComparison.OrdinalIgnoreCase)) s = ReplaceWord(s, domain, "<DOMAIN>");
+        s = ReplaceWord(s, dnsDomain, "<DOMAIN>");
+
+        return s;
+    }
+
+    private static string ReplaceWord(string text, string? word, string replacement)
+    {
+        if (string.IsNullOrWhiteSpace(word) || word.Length < 2) return text;
+        return Regex.Replace(text, @"(?<![\p{L}\p{N}_])" + Regex.Escape(word) + @"(?![\p{L}\p{N}_])", replacement, RegexOptions.IgnoreCase);
     }
 
     private static void WriteArchiveEntry(ZipArchive archive, string entryName, string content)

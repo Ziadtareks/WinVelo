@@ -142,6 +142,38 @@ public sealed class DiagnosticsCollectorTests : IDisposable
     }
 
     [Fact]
+    public void SanitizeContent_RemovesEveryKindOfPersonalData()
+    {
+        string log = string.Join("\n",
+            @"Loaded C:\Users\Alice\AppData\Roaming\WinVelo\Journal",
+            @"Other profile: D:\Users\Bob Smith\Desktop\file.txt and C:/Users/carol/Downloads",
+            @"Share \\RIG-999\Users\Alice\Documents",
+            "Owner SID S-1-5-21-3623811015-3361044348-30300820-1013 and AAD S-1-12-1-1111111111-2222222222-3333333333-4444444444",
+            "Signed in as alice.smith@contoso.com on RIG-999 in domain CONTOSO",
+            "IPv4 192.168.1.23, IPv6 fe80::1c2b:3d4e:5f60:7a8b%12 and 2001:0db8:85a3:0000:0000:8a2e:0370:7334",
+            "MAC 00-1A-2B-3C-4D-5E / 00:1a:2b:3c:4d:5e",
+            "Disk SerialNumber: WD-WCC4N1234567, BIOS Serial=ABC123",
+            "Alice already started at 08:35:52.094 on Windows 10.0.22631 with WinVelo 1.0.2",
+            "Tweak HKCU\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\\InprocServer32");
+
+        string s = DiagnosticsCollector.SanitizeContent(log, userName: "Alice", machineName: "RIG-999", domain: "CONTOSO", dnsDomain: "contoso.local");
+
+        foreach (string secret in new[] { "Alice", "Bob Smith", "carol", "RIG-999", "CONTOSO", "S-1-5-21-3623811015", "S-1-12-1-1111111111",
+                                          "alice.smith@contoso.com", "192.168.1.23", "fe80::1c2b", "2001:0db8", "00-1A-2B", "00:1a:2b",
+                                          "WCC4N1234567", "ABC123" })
+        {
+            Assert.DoesNotContain(secret, s, StringComparison.OrdinalIgnoreCase);
+        }
+
+        // Useful, non-personal text stays readable.
+        Assert.Contains(@"C:\Users\<USER>\AppData\Roaming\WinVelo\Journal", s);
+        Assert.Contains("already started at 08:35:52.094", s);
+        Assert.Contains("10.0.22631", s);
+        Assert.Contains("1.0.2", s);
+        Assert.Contains("{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}", s);
+    }
+
+    [Fact]
     public async Task Cli_Diagnostics_CommandRunsInTestMode()
     {
         string outZip = Path.Combine(_tempDir, "cli_diag.zip");

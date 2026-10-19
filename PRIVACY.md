@@ -44,5 +44,5 @@ Below is an exhaustive list of every feature that can initiate an outbound netwo
 
 When you run `winvelo-cli --diagnostics <out.zip>` to prepare a diagnostic archive for bug reporting, WinVelo:
 - Gathers system OS build, tweak states, and recent log files.
-- **Automatically sanitizes personal data**: Strips Windows user accounts, computer hostnames, and user directory paths (e.g. `C:\Users\YourName` is rewritten to `C:\Users\<USER>`).
+- **Automatically sanitizes personal data** in the logs it includes: user profile paths of any account (`C:\Users\YourName` becomes `C:\Users\<USER>`), your user, computer and domain names, Windows account SIDs, e-mail addresses, IP and MAC addresses, and serial numbers.
 - Saves the `.zip` archive **locally on your machine**. It is **never automatically uploaded**. You have full discretion to inspect the archive before deciding whether to share it with developers.
