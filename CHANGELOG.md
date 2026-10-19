@@ -8,10 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.3] - 2026-10-19
+
+Maintenance release: two apps that could not be installed through Chocolatey, a build error that would have failed CI, a quieter source checker, and corrected release notes. No tweak was added or removed.
+
 ### Fixed
 - Chocolatey ids for WhatsApp (`whatsapp`) and Battle.net (`battle.net`) do not exist on community.chocolatey.org, so both apps are winget-only now. With Chocolatey selected they were skipped with a clear message; nothing was installed wrongly.
 - `SmokeTests.cs` violated two xUnit analyzer rules (xUnit2029), so `dotnet build -p:TreatWarningsAsErrors=true` (the CI setting) failed. Caught by running the CI steps locally.
 - `tools/SourceChecker` reported pages that block automated requests (HTTP 403/429, for example Cloudflare) as failures. They are now warnings that ask for a manual browser check; the five affected elevenforum.com links were verified by hand and are alive.
+- README, CHANGELOG and `docs/RELEASING.md` no longer claim that v1.0.2 ships a build provenance attestation. It does not: GitHub Actions is disabled for the account, so v1.0.2 was built locally, and this release is built locally for the same reason.
 
 ## [1.0.2] - 2026-10-19
 
@@ -165,7 +170,8 @@ This is the first honest public beta release of WinVelo. This release completely
 - **Comprehensive Host Manual Test Plan**:
   - Published `docs/MANUAL_TEST_PLAN.md` with structured checklists, exact Settings paths, and explicit STOP line boundaries for safe physical host testing.
 
-[Unreleased]: https://github.com/Ziadtareks/WinVelo/compare/v1.0.2...HEAD
+[Unreleased]: https://github.com/Ziadtareks/WinVelo/compare/v1.0.3...HEAD
+[1.0.3]: https://github.com/Ziadtareks/WinVelo/compare/v1.0.2...v1.0.3
 [1.0.2]: https://github.com/Ziadtareks/WinVelo/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/Ziadtareks/WinVelo/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/Ziadtareks/WinVelo/releases/tag/v1.0.0
