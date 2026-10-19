@@ -51,7 +51,6 @@ public partial class App : Application
         // 1. Detect Test Mode from command line arguments or environment variable
         string[] args = Environment.GetCommandLineArgs();
         bool isTestMode = args.Any(a => string.Equals(a, "--test-mode", StringComparison.OrdinalIgnoreCase)) ||
-                          string.Equals(Environment.GetEnvironmentVariable("WINVELO_TEST_MODE"), "1", StringComparison.OrdinalIgnoreCase) ||
                           string.Equals(Environment.GetEnvironmentVariable("WINVELO_TEST_MODE"), "1", StringComparison.OrdinalIgnoreCase);
 
         if (isTestMode)
@@ -209,6 +208,8 @@ public partial class App : Application
 
             Log.Information("WinVelo main window shown successfully.");
 
+            _ = Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, new Action(() => ReportCatalogProblems(window)));
+
             // Item 0b Startup instrumentation: measure time to first Home render
             await Dispatcher.InvokeAsync(() =>
             {
@@ -263,13 +264,59 @@ public partial class App : Application
         {
             Log.Fatal(ex, "Critical failure during application startup");
             MessageBox.Show(
-                $"WinVelo failed to start:\n\n{ex.Message}\n\nStack Trace:\n{ex.StackTrace}\n\nPlease check the logs in %LOCALAPPDATA%\\WinVelo\\Logs for details.",
-                "WinVelo Startup Error",
+                LocalizationManager.T("WinVelo could not start: {0}\n\nNothing on your PC was changed. Details are in the log folder:\n{1}", ex.Message, WinVeloStoragePaths.GetLogsDirectory(TestModeManager.IsTestMode)),
+                LocalizationManager.T("WinVelo Startup Error"),
                 MessageBoxButton.OK,
                 MessageBoxImage.Error
             );
 
             Shutdown(1);
+        }
+    }
+
+    /// <summary>
+    /// Tells the user, once, when parts of the catalog could not be read. Broken files or tweaks are skipped,
+    /// so the app keeps working with everything else.
+    /// </summary>
+    private void ReportCatalogProblems(Window owner)
+    {
+        try
+        {
+            var tweakService = _host.Services.GetRequiredService<ITweakService>();
+            int count = tweakService.LoadCatalog().Count;
+            var issues = tweakService.CatalogIssues;
+            var source = WinVelo.Core.Catalog.CatalogSource.Default;
+            if (source.UsesExternalFolder)
+            {
+                Log.Information("Using the Catalog folder at {Path}; its files replace the built-in catalog.", source.ExternalPath);
+            }
+            foreach (var issue in issues)
+            {
+                Log.Warning("Catalog problem: {Issue}", issue.ToString());
+            }
+
+            if (count == 0)
+            {
+                MessageBox.Show(owner,
+                    LocalizationManager.T("WinVelo could not load any tweaks.\n\nIf you put a Catalog folder next to WinVelo.exe, it may contain broken files: delete or fix that folder and start WinVelo again. Without that folder, WinVelo uses its built-in tweak list.\n\nDetails are in the log folder:\n{0}", WinVeloStoragePaths.GetLogsDirectory(TestModeManager.IsTestMode)),
+                    LocalizationManager.T("Tweak list not available"),
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+            else if (issues.Count > 0)
+            {
+                string list = string.Join("\n", issues.Take(8).Select(i => "• " + i.ToString()));
+                if (issues.Count > 8) list += "\n…";
+                MessageBox.Show(owner,
+                    LocalizationManager.T("Some catalog entries could not be read and were skipped. Everything else works normally.\n\n{0}\n\nDetails are in the log folder:\n{1}", list, WinVeloStoragePaths.GetLogsDirectory(TestModeManager.IsTestMode)),
+                    LocalizationManager.T("Some tweaks were skipped"),
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "Could not check the catalog for problems.");
         }
     }
 
@@ -602,8 +649,8 @@ public partial class App : Application
             try
             {
                 MessageBox.Show(
-                    $"An unexpected error occurred in the UI:\n\n{e.Exception.Message}\n\nCheck logs for more details.",
-                    "WinVelo Error",
+                    LocalizationManager.T("Something went wrong: {0}\n\nWinVelo is still running. Details are in the log folder:\n{1}", e.Exception.Message, WinVeloStoragePaths.GetLogsDirectory(TestModeManager.IsTestMode)),
+                    LocalizationManager.T("WinVelo Error"),
                     MessageBoxButton.OK,
                     MessageBoxImage.Error
                 );
@@ -629,8 +676,8 @@ public partial class App : Application
                 try
                 {
                     MessageBox.Show(
-                        $"A critical system error occurred:\n\n{ex.Message}",
-                        "WinVelo Fatal Error",
+                        LocalizationManager.T("WinVelo has to close because of an unexpected error: {0}\n\nDetails are in the log folder:\n{1}", ex.Message, WinVeloStoragePaths.GetLogsDirectory(TestModeManager.IsTestMode)),
+                        LocalizationManager.T("WinVelo Fatal Error"),
                         MessageBoxButton.OK,
                         MessageBoxImage.Error
                     );

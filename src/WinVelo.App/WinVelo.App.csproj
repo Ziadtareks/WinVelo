@@ -43,8 +43,5 @@
     <Resource Include="Assets\winvelo-64.png" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Include="..\..\Catalog\**\*" Link="Catalog\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
-  </ItemGroup>
 
 </Project>

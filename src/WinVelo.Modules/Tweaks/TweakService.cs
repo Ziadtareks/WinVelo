@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using WinVelo.Core;
+using WinVelo.Core.Catalog;
 using WinVelo.Core.Engine;
 using WinVelo.Core.Engine.Handlers;
 using WinVelo.Core.Engine.Runners;
@@ -20,6 +21,8 @@ namespace WinVelo.Modules.Tweaks;
 public interface ITweakService
 {
     IReadOnlyList<TweakDefinition> LoadCatalog();
+    /// <summary>Problems found the last time the catalog was loaded (broken files or tweaks that were skipped).</summary>
+    IReadOnlyList<CatalogIssue> CatalogIssues => Array.Empty<CatalogIssue>();
     IReadOnlyList<PresetDefinition> LoadPresets() => Array.Empty<PresetDefinition>();
     IReadOnlyList<TweakDefinition> GetActiveJournalTweaks() => Array.Empty<TweakDefinition>();
     bool IsRebootPending() => false;
@@ -63,6 +66,9 @@ public sealed class TweakService : ITweakService
     private readonly TweakRunner _runner;
     private readonly DryRunEngine _dryRun;
     private readonly BackupManager _backupManager;
+    private readonly object _issuesLock = new();
+    private readonly List<CatalogIssue> _catalogIssues = new();
+    private readonly Dictionary<string, List<CatalogIssue>> _catalogIssuesByArea = new();
 
     public BackupManager BackupManager => _backupManager;
 
@@ -108,46 +114,24 @@ public sealed class TweakService : ITweakService
         _dryRun = new DryRunEngine(_handlers, context);
     }
 
+    public IReadOnlyList<CatalogIssue> CatalogIssues
+    {
+        get
+        {
+            lock (_issuesLock)
+            {
+                return _catalogIssues.ToList();
+            }
+        }
+    }
+
     public IReadOnlyList<TweakDefinition> LoadCatalog()
     {
-        string rootDir = AppContext.BaseDirectory;
-        string tweaksDir = Path.Combine(rootDir, "Catalog", "Tweaks");
-
-        if (!Directory.Exists(tweaksDir))
-        {
-            string? parent = Directory.GetParent(rootDir)?.FullName;
-            while (parent != null)
-            {
-                string candidate = Path.Combine(parent, "Catalog", "Tweaks");
-                if (Directory.Exists(candidate))
-                {
-                    tweaksDir = candidate;
-                    break;
-                }
-                parent = Directory.GetParent(parent)?.FullName;
-            }
-        }
-
-        List<TweakDefinition> list = new();
-        if (Directory.Exists(tweaksDir))
-        {
-            foreach (string file in Directory.GetFiles(tweaksDir, "*.json", SearchOption.AllDirectories))
-            {
-                try
-                {
-                    string json = File.ReadAllText(file);
-                    var items = JsonSerializer.Deserialize<List<TweakDefinition>>(json, new JsonSerializerOptions
-                    {
-                        PropertyNameCaseInsensitive = true
-                    });
-                    if (items != null) list.AddRange(items);
-                }
-                catch { }
-            }
-            CatalogTranslations.Apply(list, Path.GetDirectoryName(tweaksDir) ?? string.Empty);
-        }
-
-        return list;
+        var source = CatalogSource.Default;
+        var result = CatalogLoader.LoadTweaks(source);
+        CatalogTranslations.Apply(result.Items, source);
+        RecordIssues("Tweaks", result.Issues);
+        return result.Items;
     }
 
     public Task<ServicingHealthReport> CheckServicingHealthAsync()
@@ -162,44 +146,24 @@ public sealed class TweakService : ITweakService
 
     public IReadOnlyList<PresetDefinition> LoadPresets()
     {
-        string rootDir = AppContext.BaseDirectory;
-        string presetsDir = Path.Combine(rootDir, "Catalog", "Presets");
+        var source = CatalogSource.Default;
+        var result = CatalogLoader.LoadPresets(source);
+        CatalogTranslations.Apply(result.Items, source);
+        RecordIssues("Presets", result.Issues);
+        return result.Items;
+    }
 
-        if (!Directory.Exists(presetsDir))
+    private void RecordIssues(string area, List<CatalogIssue> issues)
+    {
+        lock (_issuesLock)
         {
-            string? parent = Directory.GetParent(rootDir)?.FullName;
-            while (parent != null)
+            _catalogIssuesByArea[area] = issues;
+            _catalogIssues.Clear();
+            foreach (var list in _catalogIssuesByArea.Values)
             {
-                string candidate = Path.Combine(parent, "Catalog", "Presets");
-                if (Directory.Exists(candidate))
-                {
-                    presetsDir = candidate;
-                    break;
-                }
-                parent = Directory.GetParent(parent)?.FullName;
+                _catalogIssues.AddRange(list);
             }
         }
-
-        List<PresetDefinition> list = new();
-        if (Directory.Exists(presetsDir))
-        {
-            foreach (string file in Directory.GetFiles(presetsDir, "*.json", SearchOption.AllDirectories).OrderBy(f => f))
-            {
-                try
-                {
-                    string json = File.ReadAllText(file);
-                    var item = JsonSerializer.Deserialize<PresetDefinition>(json, new JsonSerializerOptions
-                    {
-                        PropertyNameCaseInsensitive = true
-                    });
-                    if (item != null) list.Add(item);
-                }
-                catch { }
-            }
-            CatalogTranslations.Apply(list, Path.GetDirectoryName(presetsDir) ?? string.Empty);
-        }
-
-        return list;
     }
 
     public IReadOnlyList<TweakDefinition> GetActiveJournalTweaks()

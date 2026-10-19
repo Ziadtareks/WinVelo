@@ -11,4 +11,12 @@
     <PackageReference Include="JsonSchema.Net" Version="7.3.3" />
   </ItemGroup>
 
+  <!-- The catalog is built into the assembly so the app works without a Catalog folder.
+       A Catalog folder next to the exe still overrides single files (see Catalog/CatalogSource.cs). -->
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\Catalog\**\*.json" Exclude="..\..\Catalog\schema\**;..\..\Catalog\*.json">
+      <LogicalName>Catalog/$([System.String]::Copy('%(RecursiveDir)').Replace('\','/'))%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+
 </Project>

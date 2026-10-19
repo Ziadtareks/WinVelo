@@ -26,7 +26,9 @@
 2. Unzip it anywhere: your Desktop, a tools folder, or a USB stick.
 3. Run **`WinVelo.exe`** and accept the administrator prompt.
 
-There is nothing to install and you don't need to download .NET, because the runtime is built into the exe. Keep the `Catalog` folder next to `WinVelo.exe`, since it holds the tweak definitions.
+There is nothing to install and you don't need to download .NET, because the runtime is built into the exe. The tweak catalog is built in too, so `WinVelo.exe` works on its own.
+
+> **Advanced:** to try your own tweak definitions, create a `Catalog` folder next to `WinVelo.exe` with the same layout as [`Catalog`](Catalog) in this repository (for example `Catalog\Tweaks\extras.json`). Each file you put there replaces the built-in file with the same path. A broken file or tweak is skipped and reported; the rest keeps working.
 
 > **Windows SmartScreen:** WinVelo isn't code-signed yet, so Windows may show *"Windows protected your PC"*. Click **More info**, then **Run anyway**. You can check the download against the SHA-256 hash on the release page.
 

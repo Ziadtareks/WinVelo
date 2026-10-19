@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using WinVelo.Core.Catalog;
 using WinVelo.Core.Engine;
 using WinVelo.Core.Engine.Handlers;
 using WinVelo.Core.Interfaces;
@@ -78,24 +79,7 @@ public static class Program
             Console.WriteLine("[MODE] TEST/SIMULATION ACTIVE — Using safe in-memory fakes.");
         }
 
-        string rootDir = AppContext.BaseDirectory;
-        string tweaksDir = Path.Combine(rootDir, "Catalog", "Tweaks");
-        if (!Directory.Exists(tweaksDir))
-        {
-            string? parent = Directory.GetParent(rootDir)?.FullName;
-            while (parent != null)
-            {
-                string candidate = Path.Combine(parent, "Catalog", "Tweaks");
-                if (Directory.Exists(candidate))
-                {
-                    tweaksDir = candidate;
-                    break;
-                }
-                parent = Directory.GetParent(parent)?.FullName;
-            }
-        }
-
-        List<TweakDefinition> catalog = LoadCatalog(tweaksDir);
+        List<TweakDefinition> catalog = LoadCatalog(CatalogSource.Default);
         Console.WriteLine($"[INFO] Loaded {catalog.Count} tweak(s) from catalog.");
 
         if (args.Contains("--list"))
@@ -373,7 +357,7 @@ public static class Program
         if (presetIdx >= 0 && presetIdx < args.Length - 1)
         {
             string presetName = args[presetIdx + 1];
-            return await ExecutePresetAsync(presetName, catalog, dryRun, isDryRun, isRun, handlers, context, runner, tweaksDir, args);
+            return await ExecutePresetAsync(presetName, catalog, dryRun, isDryRun, isRun, handlers, context, runner, CatalogSource.Default, args);
         }
 
         // 1. Tweak execution: --tweak <id1,id2> / --tweaks <id1,id2> [--apply | --undo]
@@ -1079,51 +1063,18 @@ public static class Program
         IEnumerable<IActionHandler> handlers,
         Core.Engine.ExecutionContext context,
         TweakRunner runner,
-        string catalogDir,
+        CatalogSource catalogSource,
         string[] args)
     {
-        string presetsDir = Path.Combine(catalogDir, "..", "Presets");
-        if (!Directory.Exists(presetsDir))
-        {
-            string? p = Directory.GetParent(catalogDir)?.FullName;
-            if (p != null)
-            {
-                presetsDir = Path.Combine(p, "Presets");
-            }
-        }
-
-        List<PresetDefinition> loadedPresets = new();
-        if (Directory.Exists(presetsDir))
-        {
-            foreach (var pFile in Directory.GetFiles(presetsDir, "*.json"))
-            {
-                try
-                {
-                    string pJson = File.ReadAllText(pFile);
-                    var def = JsonSerializer.Deserialize<PresetDefinition>(pJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                    if (def != null) loadedPresets.Add(def);
-                }
-                catch { }
-            }
-        }
+        var presetLoad = CatalogLoader.LoadPresets(catalogSource);
+        PrintCatalogIssues(presetLoad.Issues);
+        List<PresetDefinition> loadedPresets = presetLoad.Items;
 
         PresetDefinition? matchedPreset = loadedPresets.FirstOrDefault(p =>
             string.Equals(p.Id, presetName, StringComparison.OrdinalIgnoreCase) ||
             string.Equals(p.Id, $"preset.{presetName}", StringComparison.OrdinalIgnoreCase) ||
             string.Equals(p.Name, presetName, StringComparison.OrdinalIgnoreCase));
 
-        if (matchedPreset == null && Directory.Exists(presetsDir))
-        {
-            string namedFile = Path.Combine(presetsDir, $"{presetName}.json");
-            if (File.Exists(namedFile))
-            {
-                try
-                {
-                    matchedPreset = JsonSerializer.Deserialize<PresetDefinition>(File.ReadAllText(namedFile), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                }
-                catch { }
-            }
-        }
 
         if (matchedPreset == null)
         {
@@ -1234,22 +1185,27 @@ public static class Program
         return 0;
     }
 
-    private static List<TweakDefinition> LoadCatalog(string tweaksDir)
+    private static List<TweakDefinition> LoadCatalog(CatalogSource source)
     {
-        List<TweakDefinition> tweaks = new();
-        if (!Directory.Exists(tweaksDir)) return tweaks;
-
-        foreach (string file in Directory.GetFiles(tweaksDir, "*.json", SearchOption.AllDirectories))
+        if (source.UsesExternalFolder)
         {
-            try
-            {
-                string json = File.ReadAllText(file);
-                List<TweakDefinition>? items = JsonSerializer.Deserialize<List<TweakDefinition>>(json);
-                if (items != null) tweaks.AddRange(items);
-            }
-            catch { }
+            Console.WriteLine($"[INFO] Using the Catalog folder at {source.ExternalPath} (files there replace the built-in catalog).");
         }
-        return tweaks;
+
+        var result = CatalogLoader.LoadTweaks(source);
+        PrintCatalogIssues(result.Issues);
+        return result.Items;
+    }
+
+    private static void PrintCatalogIssues(IReadOnlyList<CatalogIssue> issues)
+    {
+        if (issues.Count == 0) return;
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        foreach (var issue in issues)
+        {
+            Console.WriteLine($"[WARN] Catalog: {issue}");
+        }
+        Console.ResetColor();
     }
 
     private static bool CheckIrreversibleTweaksGate(IEnumerable<TweakDefinition> tweaks, string[] args)

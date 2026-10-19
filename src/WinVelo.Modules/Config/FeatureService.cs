@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using WinVelo.Core.Catalog;
 using WinVelo.Core.Interfaces;
 using WinVelo.Core.Operations;
 
@@ -47,68 +48,45 @@ public sealed class FeatureService : IFeatureService
 
     public IReadOnlyList<FeatureDefinition> LoadFeatures()
     {
-        string rootDir = AppContext.BaseDirectory;
-        string configPath = Path.Combine(rootDir, "Catalog", "Config", "feature.json");
-
-        if (!File.Exists(configPath))
-        {
-            string? parent = Directory.GetParent(rootDir)?.FullName;
-            while (parent != null)
-            {
-                string candidate = Path.Combine(parent, "Catalog", "Config", "feature.json");
-                if (File.Exists(candidate))
-                {
-                    configPath = candidate;
-                    break;
-                }
-                parent = Directory.GetParent(parent)?.FullName;
-            }
-        }
-
         var list = new List<FeatureDefinition>();
-        if (File.Exists(configPath))
+        using var doc = CatalogLoader.LoadDocument(CatalogSource.Default, "Config/feature.json");
+        if (doc != null && doc.RootElement.ValueKind == JsonValueKind.Object)
         {
-            try
+            foreach (var prop in doc.RootElement.EnumerateObject())
             {
-                string json = File.ReadAllText(configPath);
-                using var doc = JsonDocument.Parse(json);
+                var elem = prop.Value;
+                if (elem.ValueKind != JsonValueKind.Object) continue;
+                string cat = elem.TryGetProperty("category", out var cP) ? cP.GetString() ?? "" : "";
+                string type = elem.TryGetProperty("Type", out var tP) ? tP.GetString() ?? "" : "";
 
-                foreach (var prop in doc.RootElement.EnumerateObject())
+                if (cat == "Features" && type != "Button")
                 {
-                    var elem = prop.Value;
-                    string cat = elem.TryGetProperty("category", out var cP) ? cP.GetString() ?? "" : "";
-                    string type = elem.TryGetProperty("Type", out var tP) ? tP.GetString() ?? "" : "";
+                    string name = elem.TryGetProperty("Content", out var nP) ? nP.GetString() ?? prop.Name : prop.Name;
+                    string desc = elem.TryGetProperty("Description", out var dP) ? dP.GetString() ?? name : name;
 
-                    if (cat == "Features" && type != "Button")
+                    var feats = new List<string>();
+                    if (elem.TryGetProperty("feature", out var fP) && fP.ValueKind == JsonValueKind.Array)
                     {
-                        string name = elem.TryGetProperty("Content", out var nP) ? nP.GetString() ?? prop.Name : prop.Name;
-                        string desc = elem.TryGetProperty("Description", out var dP) ? dP.GetString() ?? name : name;
-
-                        var feats = new List<string>();
-                        if (elem.TryGetProperty("feature", out var fP) && fP.ValueKind == JsonValueKind.Array)
-                        {
-                            feats.AddRange(fP.EnumerateArray().Select(x => x.GetString() ?? "").Where(s => !string.IsNullOrEmpty(s)));
-                        }
-
-                        var scripts = new List<string>();
-                        if (elem.TryGetProperty("InvokeScript", out var sP) && sP.ValueKind == JsonValueKind.Array)
-                        {
-                            scripts.AddRange(sP.EnumerateArray().Select(x => x.GetString() ?? "").Where(s => !string.IsNullOrEmpty(s)));
-                        }
-
-                        list.Add(new FeatureDefinition
-                        {
-                            Key = prop.Name,
-                            Name = name,
-                            Description = desc,
-                            Category = cat,
-                            FeatureNames = feats,
-                            InvokeScripts = scripts
-                        });
+                        feats.AddRange(fP.EnumerateArray().Select(x => x.GetString() ?? "").Where(s => !string.IsNullOrEmpty(s)));
                     }
+
+                    var scripts = new List<string>();
+                    if (elem.TryGetProperty("InvokeScript", out var sP) && sP.ValueKind == JsonValueKind.Array)
+                    {
+                        scripts.AddRange(sP.EnumerateArray().Select(x => x.GetString() ?? "").Where(s => !string.IsNullOrEmpty(s)));
+                    }
+
+                    list.Add(new FeatureDefinition
+                    {
+                        Key = prop.Name,
+                        Name = name,
+                        Description = desc,
+                        Category = cat,
+                        FeatureNames = feats,
+                        InvokeScripts = scripts
+                    });
                 }
             }
-            catch { }
         }
 
         return list;

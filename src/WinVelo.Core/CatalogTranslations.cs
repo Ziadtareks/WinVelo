@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using WinVelo.Core.Catalog;
 using WinVelo.Core.Models;
 
 namespace WinVelo.Core;
@@ -15,13 +16,14 @@ public static class CatalogTranslations
     private static readonly object _lock = new();
     private static TranslationFile? _cached;
     private static string? _cachedPath;
+    private static CatalogSource? _cachedSource;
 
     /// <summary>Language code set by the app at startup ("en" or "ar").</summary>
     public static string Language { get; set; } = "en";
 
-    public static void Apply(IList<TweakDefinition> tweaks, string catalogRoot)
+    public static void Apply(IList<TweakDefinition> tweaks, CatalogSource catalog)
     {
-        var file = Load(catalogRoot);
+        var file = Load(catalog);
         if (file?.Tweaks == null) return;
 
         foreach (var t in tweaks)
@@ -37,9 +39,9 @@ public static class CatalogTranslations
         }
     }
 
-    public static void Apply(IList<PresetDefinition> presets, string catalogRoot)
+    public static void Apply(IList<PresetDefinition> presets, CatalogSource catalog)
     {
-        var file = Load(catalogRoot);
+        var file = Load(catalog);
         if (file == null) return;
 
         foreach (var p in presets)
@@ -73,27 +75,30 @@ public static class CatalogTranslations
         return reason;
     }
 
-    private static TranslationFile? Load(string catalogRoot)
+    private static TranslationFile? Load(CatalogSource catalog)
     {
         string lang = (Language ?? "en").Trim().ToLowerInvariant();
-        if (lang == "en" || string.IsNullOrWhiteSpace(catalogRoot)) return null;
+        if (lang == "en") return null;
 
-        string path = Path.Combine(catalogRoot, "Localization", lang + ".json");
+        string relativePath = "Localization/" + lang + ".json";
         lock (_lock)
         {
-            if (_cachedPath == path) return _cached;
-            _cachedPath = path;
+            if (ReferenceEquals(_cachedSource, catalog) && _cachedPath == relativePath) return _cached;
+            _cachedSource = catalog;
+            _cachedPath = relativePath;
             _cached = null;
             try
             {
-                if (File.Exists(path))
+                string? text = catalog.ReadText(relativePath);
+                if (text != null)
                 {
-                    _cached = JsonSerializer.Deserialize<TranslationFile>(File.ReadAllText(path),
+                    _cached = JsonSerializer.Deserialize<TranslationFile>(text,
                         new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
                 }
             }
-            catch
+            catch (Exception ex) when (ex is JsonException or IOException or UnauthorizedAccessException)
             {
+                // A broken translation file only means the catalog stays in English.
                 _cached = null;
             }
             return _cached;

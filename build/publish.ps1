@@ -5,7 +5,6 @@
     Produces dist/WinVelo-v<Version>-portable/ containing:
       WinVelo.exe          - the app (self-contained single file, .NET runtime included)
       winvelo-cli.exe      - the command-line tool (self-contained single file)
-      Catalog/             - tweak and preset definitions (plain JSON, readable and editable)
       LICENSE, README.md, THIRD-PARTY-NOTICES.md
     Then zips it to dist/WinVelo-v<Version>-portable.zip and writes dist/SHA256SUMS.txt.
 .EXAMPLE
@@ -75,20 +74,19 @@ foreach ($doc in @("LICENSE", "README.md", "THIRD-PARTY-NOTICES.md")) {
 }
 
 Write-Host "`n[4/5] Checking the package..." -ForegroundColor Yellow
-$required = @("WinVelo.exe", "winvelo-cli.exe", "LICENSE", "README.md", "THIRD-PARTY-NOTICES.md", "Catalog\Tweaks", "Catalog\Presets")
+$required = @("WinVelo.exe", "winvelo-cli.exe", "LICENSE", "README.md", "THIRD-PARTY-NOTICES.md")
 foreach ($r in $required) {
     if (-not (Test-Path (Join-Path $outDir $r))) { throw "Package check failed: '$r' is missing." }
 }
-if (Test-Path (Join-Path $outDir "Catalog\Catalog")) { throw "Package check failed: nested Catalog\Catalog folder." }
 
-$allowedRoot = @("WinVelo.exe", "winvelo-cli.exe", "LICENSE", "README.md", "THIRD-PARTY-NOTICES.md", "Catalog")
+$allowedRoot = @("WinVelo.exe", "winvelo-cli.exe", "LICENSE", "README.md", "THIRD-PARTY-NOTICES.md")
 $extra = Get-ChildItem $outDir | Where-Object { $allowedRoot -notcontains $_.Name }
 if ($extra) {
-    throw "Package check failed: unexpected files in the package root: $(($extra.Name) -join ', '). Only the exe files, Catalog and the license/readme files are allowed."
+    throw "Package check failed: unexpected files in the package root: $(($extra.Name) -join ', '). Only the exe files and the license/readme files are allowed. The catalog is built into the exe files."
 }
 $stray = Get-ChildItem $outDir -Recurse -File -Include *.dll, *.pdb, *.deps.json, *.runtimeconfig.json
 if ($stray) { throw "Package check failed: found $(($stray.Name) -join ', ')." }
-Write-Host "  [OK] Package contains only the two exe files, Catalog and the license/readme files." -ForegroundColor Green
+Write-Host "  [OK] Package contains only the two exe files and the license/readme files." -ForegroundColor Green
 
 Write-Host "`n[5/5] Zipping and computing SHA-256..." -ForegroundColor Yellow
 Compress-Archive -Path $outDir -DestinationPath $zipPath -Force

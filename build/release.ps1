@@ -106,7 +106,7 @@ $notes = @"
 A transparent, open-source tweak tool for Windows 10 and 11. See exactly what every setting changes, apply it, and undo it.
 
 ### Download
-**$zipName**: unzip it and run ``WinVelo.exe``. You don't need to install anything or download .NET. Keep the ``Catalog`` folder next to the exe.
+**$zipName**: unzip it and run ``WinVelo.exe``. You don't need to install anything or download .NET.
 
 > WinVelo isn't code-signed yet, so Windows SmartScreen may warn you. Click **More info**, then **Run anyway**.
 

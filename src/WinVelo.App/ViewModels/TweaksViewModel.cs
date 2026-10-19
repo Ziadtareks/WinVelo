@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using WinVelo.Core.Catalog;
 using WinVelo.App.Services;
 using WinVelo.Core.Engine.Runners;
 using WinVelo.Core.Models;
@@ -517,45 +518,19 @@ public sealed partial class TweaksViewModel : ObservableObject
 
     private void LoadPresets()
     {
-        string rootDir = AppDomain.CurrentDomain.BaseDirectory;
-        string presetPath = Path.Combine(rootDir, "Catalog", "Config", "preset.json");
+        using var doc = CatalogLoader.LoadDocument(CatalogSource.Default, "Config/preset.json");
+        if (doc == null || doc.RootElement.ValueKind != JsonValueKind.Object) return;
 
-        if (!File.Exists(presetPath))
+        foreach (var prop in doc.RootElement.EnumerateObject())
         {
-            string? parent = Directory.GetParent(rootDir)?.FullName;
-            while (parent != null)
+            if (prop.Value.ValueKind != JsonValueKind.Array) continue;
+            var list = new List<string>();
+            foreach (var item in prop.Value.EnumerateArray())
             {
-                string candidate = Path.Combine(parent, "Catalog", "Config", "preset.json");
-                if (File.Exists(candidate))
-                {
-                    presetPath = candidate;
-                    break;
-                }
-                parent = Directory.GetParent(parent)?.FullName;
+                string? s = item.ValueKind == JsonValueKind.String ? item.GetString() : null;
+                if (!string.IsNullOrEmpty(s)) list.Add(s);
             }
-        }
-
-        if (File.Exists(presetPath))
-        {
-            try
-            {
-                string json = File.ReadAllText(presetPath);
-                using var doc = JsonDocument.Parse(json);
-                foreach (var prop in doc.RootElement.EnumerateObject())
-                {
-                    var list = new List<string>();
-                    foreach (var item in prop.Value.EnumerateArray())
-                    {
-                        string? s = item.GetString();
-                        if (!string.IsNullOrEmpty(s)) list.Add(s);
-                    }
-                    _presets[prop.Name] = list;
-                }
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Failed to load presets: {ex.Message}");
-            }
+            _presets[prop.Name] = list;
         }
     }
 

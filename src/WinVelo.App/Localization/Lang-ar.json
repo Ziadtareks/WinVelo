@@ -799,5 +799,15 @@
   "Main_SwitchLanguage": "تغيير اللغة (سيُعاد تشغيل WinVelo)",
   "Not available on this PC: needs Windows build {0} or newer (this PC has {1}).": "غير متاح على هذا الجهاز: يحتاج Windows إصدار {0} أو أحدث (هذا الجهاز إصداره {1}).",
   "Not available on this PC: only works up to Windows build {0} (this PC has {1}).": "غير متاح على هذا الجهاز: يعمل فقط حتى Windows إصدار {0} (هذا الجهاز إصداره {1}).",
-  "Not available on this PC: not supported on Windows {0} (needs {1}).": "غير متاح على هذا الجهاز: غير مدعوم في Windows {0} (يحتاج {1})."
+  "Not available on this PC: not supported on Windows {0} (needs {1}).": "غير متاح على هذا الجهاز: غير مدعوم في Windows {0} (يحتاج {1}).",
+  "WinVelo could not start: {0}\n\nNothing on your PC was changed. Details are in the log folder:\n{1}": "تعذّر تشغيل WinVelo: {0}\n\nلم يتغيّر أي شيء في جهازك. التفاصيل في مجلد السجلات:\n{1}",
+  "WinVelo Startup Error": "خطأ في تشغيل WinVelo",
+  "Something went wrong: {0}\n\nWinVelo is still running. Details are in the log folder:\n{1}": "حدث خطأ: {0}\n\nما زال WinVelo يعمل. التفاصيل في مجلد السجلات:\n{1}",
+  "WinVelo Error": "خطأ في WinVelo",
+  "WinVelo has to close because of an unexpected error: {0}\n\nDetails are in the log folder:\n{1}": "يجب إغلاق WinVelo بسبب خطأ غير متوقع: {0}\n\nالتفاصيل في مجلد السجلات:\n{1}",
+  "WinVelo Fatal Error": "خطأ فادح في WinVelo",
+  "WinVelo could not load any tweaks.\n\nIf you put a Catalog folder next to WinVelo.exe, it may contain broken files: delete or fix that folder and start WinVelo again. Without that folder, WinVelo uses its built-in tweak list.\n\nDetails are in the log folder:\n{0}": "تعذّر على WinVelo تحميل أي تعديل.\n\nإذا وضعت مجلد Catalog بجانب WinVelo.exe فقد يحتوي على ملفات تالفة: احذف هذا المجلد أو أصلحه ثم شغّل WinVelo من جديد. بدون هذا المجلد يستخدم WinVelo قائمة التعديلات المدمجة فيه.\n\nالتفاصيل في مجلد السجلات:\n{0}",
+  "Tweak list not available": "قائمة التعديلات غير متاحة",
+  "Some catalog entries could not be read and were skipped. Everything else works normally.\n\n{0}\n\nDetails are in the log folder:\n{1}": "تعذّرت قراءة بعض عناصر الكتالوج فتم تخطيها. كل ما عداها يعمل بشكل طبيعي.\n\n{0}\n\nالتفاصيل في مجلد السجلات:\n{1}",
+  "Some tweaks were skipped": "تم تخطي بعض التعديلات"
 }

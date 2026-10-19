@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
+using WinVelo.Core.Catalog;
 using WinVelo.Core.Interfaces;
 using WinVelo.Core.Models;
 using WinVelo.Core.Operations;
@@ -205,61 +206,39 @@ public sealed class AppInstallService : IAppInstallService
 
     public IReadOnlyList<ApplicationItem> LoadApplications()
     {
-        string rootDir = AppContext.BaseDirectory;
-        string appJsonPath = Path.Combine(rootDir, "Catalog", "Apps", "applications.json");
-
-        if (!File.Exists(appJsonPath))
-        {
-            string? parent = Directory.GetParent(rootDir)?.FullName;
-            while (parent != null)
-            {
-                string candidate = Path.Combine(parent, "Catalog", "Apps", "applications.json");
-                if (File.Exists(candidate))
-                {
-                    appJsonPath = candidate;
-                    break;
-                }
-                parent = Directory.GetParent(parent)?.FullName;
-            }
-        }
-
         List<ApplicationItem> list = new();
-        if (File.Exists(appJsonPath))
+        using var doc = CatalogLoader.LoadDocument(CatalogSource.Default, "Apps/applications.json");
+        if (doc != null && doc.RootElement.ValueKind == JsonValueKind.Object)
         {
-            try
+            foreach (var prop in doc.RootElement.EnumerateObject())
             {
-                string json = File.ReadAllText(appJsonPath);
-                using var doc = JsonDocument.Parse(json);
-                foreach (var prop in doc.RootElement.EnumerateObject())
+                var elem = prop.Value;
+                if (elem.ValueKind != JsonValueKind.Object) continue;
+                string name = elem.TryGetProperty("name", out var nP) ? nP.GetString() ?? prop.Name : prop.Name;
+                string cat = elem.TryGetProperty("category", out var cP) ? cP.GetString() ?? "Utilities" : "Utilities";
+                string desc = elem.TryGetProperty("description", out var dP) ? dP.GetString() ?? "" : "";
+                string link = elem.TryGetProperty("link", out var lP) ? lP.GetString() ?? "" : "";
+                string winget = elem.TryGetProperty("winget", out var wP) ? wP.GetString() ?? "" : "";
+                string choco = elem.TryGetProperty("choco", out var chP) ? chP.GetString() ?? "" : "";
+
+                var (color, icon, code) = GetBrandMeta(prop.Name, cat);
+                string? svg = GetBrandSvg(prop.Name);
+
+                list.Add(new ApplicationItem
                 {
-                    var elem = prop.Value;
-                    string name = elem.TryGetProperty("name", out var nP) ? nP.GetString() ?? prop.Name : prop.Name;
-                    string cat = elem.TryGetProperty("category", out var cP) ? cP.GetString() ?? "Utilities" : "Utilities";
-                    string desc = elem.TryGetProperty("description", out var dP) ? dP.GetString() ?? "" : "";
-                    string link = elem.TryGetProperty("link", out var lP) ? lP.GetString() ?? "" : "";
-                    string winget = elem.TryGetProperty("winget", out var wP) ? wP.GetString() ?? "" : "";
-                    string choco = elem.TryGetProperty("choco", out var chP) ? chP.GetString() ?? "" : "";
-
-                    var (color, icon, code) = GetBrandMeta(prop.Name, cat);
-                    string? svg = GetBrandSvg(prop.Name);
-
-                    list.Add(new ApplicationItem
-                    {
-                        Key = prop.Name,
-                        Name = name,
-                        Category = cat,
-                        Description = desc,
-                        Link = link,
-                        WingetId = winget,
-                        ChocoId = choco,
-                        BrandColor = color,
-                        IconSymbol = icon,
-                        ShortCode = code,
-                        SvgIconPath = svg
-                    });
-                }
+                    Key = prop.Name,
+                    Name = name,
+                    Category = cat,
+                    Description = desc,
+                    Link = link,
+                    WingetId = winget,
+                    ChocoId = choco,
+                    BrandColor = color,
+                    IconSymbol = icon,
+                    ShortCode = code,
+                    SvgIconPath = svg
+                });
             }
-            catch { }
         }
 
         return list;
