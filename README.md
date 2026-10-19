@@ -5,15 +5,22 @@
 <h1 align="center">WinVelo</h1>
 
 <p align="center">
-  A transparent, open-source tweak tool for Windows 10 and 11.<br/>
-  See exactly what every setting changes, apply it, and undo it.
+  <b>Tweak Windows 10 and 11 without guessing: see every change before it happens, and undo it later.</b><br/>
+  Open source, no telemetry, no placebo tweaks.
 </p>
 
 <p align="center">
-  <a href="https://github.com/Ziadtareks/WinVelo/releases/latest"><img src="https://img.shields.io/badge/release-v1.0.1-2563EB.svg" alt="Release v1.0.1"></a>
+  <a href="https://github.com/Ziadtareks/WinVelo/actions/workflows/build-and-test.yml"><img src="https://github.com/Ziadtareks/WinVelo/actions/workflows/build-and-test.yml/badge.svg" alt="CI"></a>
+  <a href="https://github.com/Ziadtareks/WinVelo/releases/latest"><img src="https://img.shields.io/github/v/release/Ziadtareks/WinVelo?color=2563EB&label=release" alt="Latest release"></a>
   <img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10 | 11">
   <img src="https://img.shields.io/badge/tweaks-140-10B981.svg" alt="140 tweaks">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green.svg" alt="MIT License"></a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/Ziadtareks/WinVelo/releases/latest"><b>⬇ Download the latest release</b></a>
+  &nbsp;·&nbsp; <a href="#verify-your-download">Verify your download</a>
+  &nbsp;·&nbsp; <a href="#بالعربية">العربية</a>
 </p>
 
 ![WinVelo](docs/screenshots/home.png)
@@ -26,11 +33,55 @@
 2. Unzip it anywhere: your Desktop, a tools folder, or a USB stick.
 3. Run **`WinVelo.exe`** and accept the administrator prompt.
 
-There is nothing to install and you don't need to download .NET, because the runtime is built into the exe. Keep the `Catalog` folder next to `WinVelo.exe`, since it holds the tweak definitions.
+There is nothing to install and you don't need to download .NET, because the runtime is built into the exe. The tweak catalog is built in too, so `WinVelo.exe` works on its own.
 
-> **Windows SmartScreen:** WinVelo isn't code-signed yet, so Windows may show *"Windows protected your PC"*. Click **More info**, then **Run anyway**. You can check the download against the SHA-256 hash on the release page.
+> **Advanced:** to try your own tweak definitions, make a folder with the same layout as [`Catalog`](Catalog) in this repository (for example `MyCatalog\Tweaks\extras.json`) and start `WinVelo.exe --catalog MyCatalog` (or `winvelo-cli --catalog MyCatalog ...`). Each file there replaces the built-in file with the same path. Because catalog files can run PowerShell as administrator, WinVelo asks you to confirm the folder first, and never uses a folder you did not name. A broken file or tweak is skipped and reported.
+
+> **Windows SmartScreen:** WinVelo isn't code-signed yet, so Windows may show *"Windows protected your PC"*. Check your download first (see below), then click **More info** and **Run anyway**.
 
 **Requirements:** Windows 10 version 2004 (build 19041) or newer, or Windows 11, 64-bit.
+
+### Verify your download
+
+From v1.0.2 on, releases are built by GitHub Actions from the tagged source ([release workflow](.github/workflows/release.yml)), not on a developer PC. Each release has three files:
+
+| File | What it is |
+|---|---|
+| `WinVelo-v<version>-portable.zip` | The app and the CLI |
+| `WinVelo-v<version>-portable.zip.sha256` | The SHA-256 hash of the zip |
+| `SHA256SUMS.txt` | Hashes of the zip, `WinVelo.exe` and `winvelo-cli.exe` |
+
+1. Download the zip and its `.sha256` file into the same folder.
+2. In PowerShell, in that folder, run (replace `<version>`):
+
+   ```powershell
+   $zip      = "WinVelo-v<version>-portable.zip"
+   $expected = (Get-Content "$zip.sha256" -Raw).Split(' ')[0]
+   $actual   = (Get-FileHash $zip -Algorithm SHA256).Hash
+   if ($actual -eq $expected) { "OK: the hash matches" } else { "STOP: the hash does NOT match" }
+   ```
+
+   `-eq` ignores upper/lower case, so it works with the lowercase hash in the file.
+3. Optional, stronger check (v1.0.2 and later): the zip carries a [build provenance attestation](https://docs.github.com/actions/security-for-github-actions/using-artifact-attestations) that proves it was built by this repository's workflow. With the [GitHub CLI](https://cli.github.com/):
+
+   ```powershell
+   gh attestation verify WinVelo-v<version>-portable.zip --repo Ziadtareks/WinVelo
+   ```
+
+If a hash does not match, do not run the file. Download it again from the [releases page](https://github.com/Ziadtareks/WinVelo/releases) and [open an issue](https://github.com/Ziadtareks/WinVelo/issues) if it still fails.
+
+### Antivirus false positives
+
+Some antivirus products flag Windows tweak tools, including WinVelo, as "potentially unwanted" or with a generic heuristic name. This happens because a tweak tool does what malware also does: it asks for administrator rights, changes registry policies, stops services and scheduled tasks, and runs PowerShell. A new, unsigned exe that few people have downloaded yet also has no reputation, which makes a heuristic warning more likely.
+
+What you can do:
+
+- Check the hash and the attestation as shown above. If they match, the file is exactly what GitHub Actions built from the public source.
+- Read the source of what you are about to run. Every tweak is plain JSON in [`Catalog/Tweaks`](Catalog/Tweaks), and the app shows every registry value, service and task before it changes anything.
+- Try it without touching your PC first: `WinVelo.exe --test-mode`.
+- If your antivirus still flags a release whose hash matches, please report it to the antivirus vendor as a false positive and [tell us](https://github.com/Ziadtareks/WinVelo/issues).
+
+Never turn off your antivirus to run WinVelo. Code signing is planned ([docs/RELEASING.md](docs/RELEASING.md#code-signing-off-until-a-certificate-exists)) and will reduce these warnings.
 
 ---
 
@@ -39,7 +90,7 @@ There is nothing to install and you don't need to download .NET, because the run
 - **Shows every change before it happens.** Each tweak lists the exact registry values, services or scheduled tasks it touches, its risk level, its side effects and where the information comes from.
 - **Lets you undo anything reversible.** Before a change is written, the original value is saved to a rollback journal (`%APPDATA%\WinVelo`). You can undo a single tweak, a whole session, or every change WinVelo has made.
 - **Is honest about evidence.** Each tweak is labelled as *documented* (Microsoft documentation, with a quote), *UI-equivalent* (the same switch exists in Windows Settings, and the path is shown), *situational* (it fixes a specific problem), or *anecdotal*. Anecdotal tweaks stay hidden under **Experimental**.
-- **Keeps Windows working.** Windows Update, the Microsoft Store, BITS and Windows Security are protected and are never disabled.
+- **Keeps Windows working.** Windows Update, the Microsoft Store, BITS and Windows Security are protected and are never disabled or stopped. This is enforced in the code, so even an edited catalog cannot do it. The *Turn off automatic updates* mode only sets the `NoAutoUpdate` policy; you can still update from Settings.
 
 ### What it doesn't do
 
@@ -94,10 +145,23 @@ There is nothing to install and you don't need to download .NET, because the run
 WinVelo أداة مفتوحة المصدر لضبط Windows 10 و 11. تعرض لك كل تعديل بالتفصيل قبل تطبيقه، وتتيح لك التراجع عنه في أي وقت.
 
 1. نزّل **`WinVelo-v<version>-portable.zip`** من [صفحة الإصدارات](https://github.com/Ziadtareks/WinVelo/releases/latest).
-2. فك الضغط في أي مكان، وشغّل **`WinVelo.exe`**. لا يحتاج إلى تثبيت ولا إلى تنزيل .NET.
+2. فك الضغط في أي مكان، وشغّل **`WinVelo.exe`** ووافق على طلب صلاحيات المسؤول. لا يحتاج إلى تثبيت ولا إلى تنزيل .NET، وقائمة التعديلات مدمجة في البرنامج.
 3. لتحويل الواجهة إلى العربية: **Settings › Language › العربية**، ثم أعد تشغيل البرنامج.
 
-إذا ظهر تحذير SmartScreen، اضغط **More info** ثم **Run anyway**، لأن البرنامج غير موقّع رقميًا بعد. ننصح بإنشاء نقطة استعادة قبل أول تعديل، والبدء بالوضع البسيط.
+**ما يقدّمه:** يعرض كل قيمة في السجل وكل خدمة ومهمة مجدولة قبل تغييرها، مع مستوى الخطورة والآثار الجانبية والمصدر. يحفظ القيمة الأصلية قبل كل تغيير في سجل التراجع (`%APPDATA%\WinVelo`) لتتراجع عن تعديل واحد أو جلسة أو كل شيء. لا يعطّل أبدًا Windows Update ولا BITS ولا متجر Microsoft ولا أمان Windows، وهذا مفروض في الكود نفسه. لا قياس عن بُعد ولا إعلانات ولا تعديلات وهمية من نوع «تسريع الألعاب» أو «تنظيف الذاكرة».
+
+**تحقّق من الملف قبل تشغيله:** نزّل الملف `WinVelo-v<version>-portable.zip.sha256` بجانب الملف المضغوط، ثم شغّل في PowerShell داخل نفس المجلد:
+
+```powershell
+$zip = "WinVelo-v<version>-portable.zip"
+(Get-FileHash $zip -Algorithm SHA256).Hash -eq (Get-Content "$zip.sha256" -Raw).Split(' ')[0]
+```
+
+إذا ظهرت `True` فالملف سليم ومطابق لما بناه GitHub Actions. التفاصيل في قسم [Verify your download](#verify-your-download).
+
+**تحذير SmartScreen أو برنامج الحماية:** البرنامج غير موقّع رقميًا بعد، لذلك قد يظهر *Windows protected your PC*؛ تحقّق من الملف أولًا ثم اضغط **More info** ثم **Run anyway**. قد تصنّف بعض برامج الحماية أدوات الضبط كـ«برامج غير مرغوبة» لأنها تغيّر السجل والخدمات؛ لا تعطّل برنامج الحماية، بل تحقّق من الـ hash وأبلغ الشركة عن إنذار خاطئ.
+
+**جرّبه بأمان:** `WinVelo.exe --test-mode` يعرض الواجهة كاملة دون أي تغيير في جهازك ودون طلب صلاحيات المسؤول. ننصح بإنشاء نقطة استعادة قبل أول تعديل، والبدء بالوضع البسيط أو بالمستوى *Standard* من الإعدادات المسبقة.
 
 ---
 
@@ -108,7 +172,7 @@ WinVelo أداة مفتوحة المصدر لضبط Windows 10 و 11. تعرض �
 - **High**-risk tweaks and irreversible actions (for example removing Edge or OneDrive) are never part of a preset and ask for extra confirmation.
 - Some tweaks need a restart or an Explorer restart. The preview tells you which ones.
 - Tweaks that only work on a certain Windows build or edition are skipped on other PCs, and the tweak card says why.
-- You can try the whole interface without touching your system: `WinVelo.exe --test-mode`.
+- You can try the whole interface without touching your system: `WinVelo.exe --test-mode`. Test mode does not ask for administrator rights.
 
 ---
 
@@ -138,18 +202,16 @@ You need Windows 10/11 and the [.NET 10 SDK](https://dotnet.microsoft.com/downlo
 git clone https://github.com/Ziadtareks/WinVelo.git
 cd WinVelo
 
-dotnet build Tweakora.sln -c Release
-dotnet test src/Tweakora.Tests/Tweakora.Tests.csproj
+dotnet build WinVelo.sln -c Release
+dotnet test src/WinVelo.Tests/WinVelo.Tests.csproj
 dotnet run --project tools/CatalogValidator/CatalogValidator.csproj
 
 # run the app without touching your system
-dotnet run --project src/Tweakora.App/Tweakora.App.csproj -- --test-mode
+dotnet run --project src/WinVelo.App/WinVelo.App.csproj -- --test-mode
 
 # build the portable package into dist\
 .\build\publish.ps1
 ```
-
-The source folders still use the project's former name, *Tweakora*.
 
 ### Adding a tweak
 

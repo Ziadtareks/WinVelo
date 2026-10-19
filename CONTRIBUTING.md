@@ -108,19 +108,25 @@ Before submitting a Pull Request, verify that your changes pass all checks:
    ```
    *Must exit with `0 error(s)`.*
 
+   If you added or removed a tweak, update the counts in the README and docs:
+   ```powershell
+   dotnet run --project tools/CatalogStats/CatalogStats.csproj -- --update
+   ```
+   *CI fails when the README count and the catalog differ.*
+
 2. **Run All Unit Tests**:
    ```powershell
-   dotnet test src/Tweakora.Tests/Tweakora.Tests.csproj -c Debug
+   dotnet test src/WinVelo.Tests/WinVelo.Tests.csproj -c Debug
    ```
-   *All tests must pass.*
+   *All tests must pass. CI runs the same tests on every push and pull request, with `WINVELO_TEST_MODE=1`.*
 
 3. **Run UI Tests in Test Mode**:
    ```powershell
-   dotnet test src/Tweakora.UiTests/Tweakora.UiTests.csproj -c Debug
+   dotnet test src/WinVelo.UiTests/WinVelo.UiTests.csproj -c Debug
    ```
    *All UI automation tests must pass in `--test-mode`.*
 
 4. **Code Quality**:
-   - 0 compiler warnings.
+   - 0 compiler warnings (CI builds with `-p:TreatWarningsAsErrors=true`).
    - Follow standard C# code conventions.
    - Do not include personal paths or temporary debugging files in commits.

@@ -34,7 +34,7 @@ Every tweak in WinVelo is data-driven, defined as a JSON document in the `Catalo
 7. **Arabic Text**:
    - Every tweak and preset needs an Arabic `name` (and ideally `description`, `whatItDoes`, `sideEffects`) in `Catalog/Localization/ar.json`. `LocalizationTests` fails if one is missing.
    - Keep registry value names, product names and numbers in Latin script.
-   - New UI text: XAML uses `{loc:Tr Key}` with the English text in `src/Tweakora.App/Localization/Lang-en.json`; view models use `LocalizationManager.T("English text")`. Add the Arabic text to `Lang-ar.json`.
+   - New UI text: XAML uses `{loc:Tr Key}` with the English text in `src/WinVelo.App/Localization/Lang-en.json`; view models use `LocalizationManager.T("English text")`. Add the Arabic text to `Lang-ar.json`.
 
 ---
 
@@ -129,5 +129,5 @@ dotnet run --project tools/CatalogValidator/CatalogValidator.csproj -- Catalog/
 Then run the full automated test suite:
 
 ```powershell
-dotnet test Tweakora.sln
+dotnet test WinVelo.sln
 ```

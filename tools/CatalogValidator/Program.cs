@@ -2,7 +2,8 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using Json.Schema;
-using Tweakora.Core.Safety;
+using WinVelo.Core.Safety;
+using WinVelo.Core.Utilities;
 
 namespace CatalogValidator;
 
@@ -11,22 +12,18 @@ public static class Program
     public static int Main(string[] args)
     {
         Console.WriteLine("========================================");
-        Console.WriteLine("  Tweakora Catalog Validator (CI Tool) ");
+        Console.WriteLine("  WinVelo Catalog Validator (CI Tool) ");
         Console.WriteLine("========================================");
 
-        string rootDir = @"C:\Dev\Tweakora";
+        string rootDir = Directory.GetCurrentDirectory();
         string? candidateRoot = AppContext.BaseDirectory;
-        while (candidateRoot != null && !File.Exists(Path.Combine(candidateRoot, "Tweakora.sln")))
+        while (candidateRoot != null && !File.Exists(Path.Combine(candidateRoot, "WinVelo.sln")))
         {
             candidateRoot = Directory.GetParent(candidateRoot)?.FullName;
         }
-        if (candidateRoot != null && File.Exists(Path.Combine(candidateRoot, "Tweakora.sln")))
+        if (candidateRoot != null && File.Exists(Path.Combine(candidateRoot, "WinVelo.sln")))
         {
             rootDir = candidateRoot;
-        }
-        else if (!Directory.Exists(rootDir))
-        {
-            rootDir = Directory.GetCurrentDirectory();
         }
 
         string schemaPath = Path.Combine(rootDir, "Catalog", "schema", "tweak.schema.json");
@@ -135,6 +132,7 @@ public static class Program
                         ValidateExplanations(item, id, ref errorCount);
                         ValidateRegistryKeys(item, id, ref errorCount);
                         ValidateTags(item, id, ref errorCount);
+                        ValidateEvidenceRules(item, id, ref errorCount);
 
                         if (!result.IsValid)
                         {
@@ -192,6 +190,7 @@ public static class Program
                     ValidateExplanations(single, id, ref errorCount);
                     ValidateRegistryKeys(single, id, ref errorCount);
                     ValidateTags(single, id, ref errorCount);
+                    ValidateEvidenceRules(single, id, ref errorCount);
 
                     if (!result.IsValid)
                     {
@@ -509,12 +508,93 @@ public static class Program
         ValidateNoExactDuplicates(tweakMap, ref errorCount);
         ValidateAliasesLock(tweakMap, tweaksDir, ref errorCount);
         ValidateNoConflictingRegistryData(tweakMap, ref errorCount);
+        ValidateApplications(Path.Combine(rootDir, "Catalog", "Apps", "applications.json"), ref errorCount);
 
         Console.WriteLine("\n----------------------------------------");
         Console.WriteLine($"Summary: {totalTweaks} tweak(s) and {totalPresets} preset(s) validated. {errorCount} error(s).");
         Console.WriteLine("----------------------------------------");
 
         return errorCount == 0 ? 0 : 1;
+    }
+
+    /// <summary>
+    /// Every app in the installer list needs a well-formed winget id (or none), a well-formed Chocolatey id (or none),
+    /// at least one of the two, an http(s) website and a unique key and winget id. Ids are passed to winget/choco as
+    /// separate arguments, and this check keeps anything that is not a plain id out of the catalog.
+    /// </summary>
+    public static void ValidateApplications(string applicationsPath, ref int errorCount)
+    {
+        Console.WriteLine("\n[CHECKING APPS] Validating Catalog/Apps/applications.json...");
+        int before = errorCount;
+        JsonObject? apps;
+        try
+        {
+            apps = JsonNode.Parse(File.ReadAllText(applicationsPath)) as JsonObject;
+        }
+        catch (Exception ex) when (ex is IOException or JsonException or UnauthorizedAccessException)
+        {
+            Console.WriteLine($"  [FAIL] Could not read {applicationsPath}: {ex.Message}");
+            errorCount++;
+            return;
+        }
+
+        if (apps == null)
+        {
+            Console.WriteLine("  [FAIL] applications.json must be a JSON object of apps.");
+            errorCount++;
+            return;
+        }
+
+        var wingetIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var (key, node) in apps)
+        {
+            if (node is not JsonObject app)
+            {
+                Console.WriteLine($"  [FAIL] App '{key}' is not an object.");
+                errorCount++;
+                continue;
+            }
+
+            string winget = app["winget"]?.ToString() ?? string.Empty;
+            string choco = app["choco"]?.ToString() ?? string.Empty;
+            string link = app["link"]?.ToString() ?? string.Empty;
+
+            if (string.IsNullOrWhiteSpace(app["name"]?.ToString()))
+            {
+                Console.WriteLine($"  [FAIL] App '{key}' has no name.");
+                errorCount++;
+            }
+            if (winget.Length == 0 && choco.Length == 0)
+            {
+                Console.WriteLine($"  [FAIL] App '{key}' has neither a winget nor a Chocolatey id.");
+                errorCount++;
+            }
+            if (winget.Length > 0 && !PackageIds.IsValidWingetId(winget))
+            {
+                Console.WriteLine($"  [FAIL] App '{key}' has an invalid winget id '{winget}' (expected Publisher.Package or a 12-character Store id).");
+                errorCount++;
+            }
+            if (winget.Length > 0 && !wingetIds.Add(winget))
+            {
+                Console.WriteLine($"  [FAIL] App '{key}' reuses winget id '{winget}'.");
+                errorCount++;
+            }
+            if (choco.Length > 0 && !PackageIds.IsValidChocolateyId(choco))
+            {
+                Console.WriteLine($"  [FAIL] App '{key}' has an invalid Chocolatey id '{choco}'.");
+                errorCount++;
+            }
+            if (link.Length > 0 && !SafeUrl.IsWebUrl(link))
+            {
+                Console.WriteLine($"  [FAIL] App '{key}' has a link that is not an http(s) URL: '{link}'.");
+                errorCount++;
+            }
+        }
+
+        if (errorCount == before)
+        {
+            Console.WriteLine($"  [PASS] {apps.Count} app(s) have well-formed package ids and links.");
+        }
     }
 
     private static bool TouchesServicing(JsonNode item, out string servicingReason)
@@ -635,6 +715,45 @@ public static class Program
                 Console.WriteLine($"  [FAIL] Tweak '{id}' has evidence='ui-equivalent' but missing or empty 'uiEquivalentLocation' (e.g. 'Settings › Personalization › Colors').");
                 Console.ResetColor();
             }
+        }
+    }
+
+    /// <summary>
+    /// - "anecdotal" evidence is only allowed in the Experimental category (hidden by default in the app);
+    /// - "documented" needs at least one https source;
+    /// - every entry in "source"/"sources" must be an absolute http(s) URL.
+    /// </summary>
+    public static void ValidateEvidenceRules(JsonNode item, string id, ref int errorCount)
+    {
+        string evidence = item["evidence"]?.ToString() ?? string.Empty;
+        string category = item["category"]?.ToString() ?? string.Empty;
+
+        if (evidence.Equals("anecdotal", StringComparison.OrdinalIgnoreCase) &&
+            !category.Equals("Experimental", StringComparison.OrdinalIgnoreCase))
+        {
+            errorCount++;
+            Console.WriteLine($"  [FAIL] Tweak '{id}' has anecdotal evidence but category '{category}'. Anecdotal tweaks must be in the Experimental category.");
+        }
+
+        var urls = new List<string>();
+        if (item["source"] is JsonValue sv && sv.TryGetValue(out string? single) && !string.IsNullOrWhiteSpace(single)) urls.Add(single);
+        if (item["source"] is JsonArray sa) urls.AddRange(sa.Select(n => n?.ToString() ?? string.Empty));
+        if (item["sources"] is JsonArray arr) urls.AddRange(arr.Select(n => n?.ToString() ?? string.Empty));
+
+        foreach (string url in urls)
+        {
+            if (!SafeUrl.IsWebUrl(url))
+            {
+                errorCount++;
+                Console.WriteLine($"  [FAIL] Tweak '{id}' has a source that is not an http(s) URL: '{url}'.");
+            }
+        }
+
+        if (evidence.Equals("documented", StringComparison.OrdinalIgnoreCase) &&
+            !urls.Any(u => u.StartsWith("https://", StringComparison.OrdinalIgnoreCase)))
+        {
+            errorCount++;
+            Console.WriteLine($"  [FAIL] Tweak '{id}' has evidence='documented' but no https source link.");
         }
     }
 

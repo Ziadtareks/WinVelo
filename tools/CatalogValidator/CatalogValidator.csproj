@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Tweakora.Core\Tweakora.Core.csproj" />
+    <ProjectReference Include="..\..\src\WinVelo.Core\WinVelo.Core.csproj" />
   </ItemGroup>
 
 </Project>

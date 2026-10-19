@@ -1,0 +1,69 @@
+name: Bug report
+description: Something in WinVelo does not work as described.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. Please do **not** report security problems here; see [SECURITY.md](https://github.com/Ziadtareks/WinVelo/blob/main/SECURITY.md).
+  - type: input
+    id: version
+    attributes:
+      label: WinVelo version
+      description: Shown in Settings, or run `winvelo-cli --help`.
+      placeholder: v1.0.2
+    validations:
+      required: true
+  - type: input
+    id: windows
+    attributes:
+      label: Windows version and edition
+      description: Press Win+R, type `winver`. For example "Windows 11 Pro 24H2, build 26100".
+    validations:
+      required: true
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Mode
+      options:
+        - Normal (real changes)
+        - Test mode (--test-mode)
+        - Command line (winvelo-cli)
+    validations:
+      required: true
+  - type: input
+    id: tweak
+    attributes:
+      label: Tweak or preset id (if any)
+      placeholder: ui.explorer.show-file-extensions
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open Tweaks
+        2. Apply ...
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected and what happened instead
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Diagnostics
+      description: |
+        Optional but very helpful: run `winvelo-cli --diagnostics WinVelo-Diagnostics.zip` and attach the zip.
+        It is anonymised (no user, computer or domain names, SIDs, IP/MAC addresses or e-mail addresses). Look inside before you upload it.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I searched the existing issues.
+          required: true
+        - label: I am using the latest release.

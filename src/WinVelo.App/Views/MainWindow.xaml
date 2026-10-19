@@ -1,0 +1,660 @@
+<ui:FluentWindow x:Class="WinVelo.App.Views.MainWindow"
+                   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                   xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+                   xmlns:vm="clr-namespace:WinVelo.App.ViewModels"
+                   xmlns:views="clr-namespace:WinVelo.App.Views"
+                   xmlns:loc="clr-namespace:WinVelo.App.Localization"
+                   Title="{loc:Tr Main_WinveloWindowsVelocityPerformanceUtility}"
+                   Height="860" Width="1360"
+                   MinHeight="640" MinWidth="960"
+                   Icon="pack://application:,,,/WinVelo;component/Assets/winvelo.ico"
+                   FlowDirection="{Binding FlowDirection, Source={x:Static loc:LocalizationManager.Instance}}"
+                   WindowStartupLocation="CenterScreen"
+                   ExtendsContentIntoTitleBar="True"
+                   AutomationProperties.AutomationId="WinVeloMainWindow">
+
+    <Window.InputBindings>
+        <KeyBinding Modifiers="Control" Key="K" Command="{Binding ToggleCommandPaletteCommand}" />
+    </Window.InputBindings>
+
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisConverter" />
+
+        <DataTemplate DataType="{x:Type vm:DashboardViewModel}">
+            <views:DashboardTabView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:TweaksViewModel}">
+            <views:TweaksTabView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:InstallViewModel}">
+            <views:InstallTabView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ToolsViewModel}">
+            <views:ToolsTabView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:HistoryViewModel}">
+            <views:HistoryTabView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ConfigViewModel}">
+            <views:ConfigTabView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:UpdatesViewModel}">
+            <views:UpdatesTabView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:StartupViewModel}">
+            <views:StartupTabView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
+            <views:SettingsTabView />
+        </DataTemplate>
+    </Window.Resources>
+
+    <Grid Background="{DynamicResource BgDeepBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" /> <!-- TitleBar (Row 0) -->
+            <RowDefinition Height="Auto" /> <!-- Test Mode Warning Banner (Row 1) -->
+            <RowDefinition Height="Auto" /> <!-- Admin Privilege Warning Banner (Row 2) -->
+            <RowDefinition Height="*" />    <!-- Main Work Area with Sidebar & Workspace (Row 3) -->
+        </Grid.RowDefinitions>
+
+        <!-- TITLEBAR -->
+        <ui:TitleBar Grid.Row="0"
+                     x:Name="AppTitleBar"
+                     Title="WinVelo"
+                     ShowMaximize="True"
+                     ShowMinimize="True"
+                     ShowClose="True">
+            <ui:TitleBar.Icon>
+                <ui:ImageIcon FlowDirection="LeftToRight" Source="pack://application:,,,/WinVelo;component/Assets/winvelo-64.png" Width="18" Height="18" />
+            </ui:TitleBar.Icon>
+            <ui:TitleBar.TrailingContent>
+                <StackPanel Orientation="Horizontal" Margin="0,0,8,0">
+                    <!-- Command Palette Shortcut Button (Ctrl+K) -->
+                    <ui:Button AutomationProperties.AutomationId="OpenCommandPaletteButton"
+                               AutomationProperties.Name="Command Palette"
+                               Icon="{ui:SymbolIcon Search24}"
+                               ToolTip="{loc:Tr Main_CommandPaletteCtrlK}"
+                               Command="{Binding ToggleCommandPaletteCommand}"
+                               Appearance="Transparent" Margin="0,0,4,0" />
+
+                    <!-- Theme Toggle Button -->
+                    <ui:Button AutomationProperties.AutomationId="ToggleThemeButton"
+                               AutomationProperties.Name="Toggle Theme"
+                               Icon="{ui:SymbolIcon DarkTheme24}"
+                               ToolTip="{loc:Tr Main_ToggleDarkLightTheme}"
+                               Command="{Binding ToggleThemeCommand}"
+                               Appearance="Transparent" Margin="0,0,4,0" />
+
+                    <!-- Language Switch (English / Arabic) -->
+                    <ui:Button AutomationProperties.AutomationId="SwitchLanguageButton"
+                               AutomationProperties.Name="Switch language"
+                               Icon="{ui:SymbolIcon Globe24}"
+                               Content="{Binding OtherLanguageName}"
+                               ToolTip="{loc:Tr Main_SwitchLanguage}"
+                               Command="{Binding SwitchLanguageCommand}"
+                               Appearance="Transparent" Margin="0,0,4,0" />
+
+                    <!-- Config / Settings Menu Button -->
+                    <ui:Button AutomationProperties.AutomationId="ConfigMenuButton"
+                               AutomationProperties.Name="Options and Settings"
+                               Icon="{ui:SymbolIcon Settings24}"
+                               ToolTip="{loc:Tr Main_OptionsAbout}"
+                               Appearance="Transparent" Margin="0,0,4,0">
+                        <ui:Button.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="{loc:Tr Main_ExportConfigJson}" Command="{Binding ExportConfigCommand}" />
+                                <Separator />
+                                <MenuItem Header="{loc:Tr Main_AboutWinvelo}" Command="{Binding OpenAboutDialogCommand}" />
+                            </ContextMenu>
+                        </ui:Button.ContextMenu>
+                    </ui:Button>
+
+                    <TextBlock AutomationProperties.AutomationId="CurrentThemeText"
+                               Text="{Binding CurrentThemeName}"
+                               Width="0" Height="0" Opacity="0" />
+                </StackPanel>
+            </ui:TitleBar.TrailingContent>
+        </ui:TitleBar>
+
+        <!-- TEST MODE WARNING BANNER -->
+        <Border Grid.Row="1" AutomationProperties.AutomationId="TestModeBanner" AutomationProperties.Name="TEST MODE ACTIVE — Simulated Platform Engine. Real Windows host system is untouched." Background="#78350F" BorderBrush="#D97706" BorderThickness="0,0,0,1" Padding="14,8"
+                Visibility="{Binding IsTestModeActive, Converter={StaticResource BoolToVisConverter}}">
+            <DockPanel>
+                <ui:SymbolIcon Symbol="Warning24" Foreground="#FBBF24" FontSize="18" Margin="0,0,10,0" VerticalAlignment="Center" />
+                <TextBlock AutomationProperties.AutomationId="TestModeBannerText"
+                           AutomationProperties.Name="TEST MODE ACTIVE — Simulated Platform Engine. Real Windows host system is untouched."
+                           Text="{loc:Tr Main_TestModeActiveSimulatedPlatform}"
+                           FontWeight="Bold" Foreground="#FBBF24" FontSize="12" VerticalAlignment="Center" />
+            </DockPanel>
+        </Border>
+
+        <!-- ADMIN PRIVILEGE WARNING BANNER -->
+        <Border Grid.Row="2" Background="#7F1D1D" BorderBrush="#DC2626" BorderThickness="0,0,0,1" Padding="14,8"
+                Visibility="{Binding IsMissingAdministratorPrivileges, Converter={StaticResource BoolToVisConverter}}">
+            <DockPanel LastChildFill="False">
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" VerticalAlignment="Center">
+                    <ui:SymbolIcon Symbol="ShieldError24" Foreground="#F87171" FontSize="18" Margin="0,0,10,0" VerticalAlignment="Center" />
+                    <TextBlock AutomationProperties.AutomationId="AdminWarningBanner"
+                               Text="{loc:Tr Main_LimitedAccessWinveloIsRunning}"
+                               FontWeight="Bold" Foreground="#F87171" FontSize="12" VerticalAlignment="Center" />
+                </StackPanel>
+                <Button DockPanel.Dock="Right" Content="{loc:Tr Main_RestartAsAdministrator}"
+                        AutomationProperties.AutomationId="RestartAsAdminButton"
+                        AutomationProperties.Name="Restart as Administrator"
+                        Style="{DynamicResource ModernPrimaryBtn}" Command="{Binding RestartAsAdminCommand}"
+                        Padding="12,5" FontSize="12" />
+            </DockPanel>
+        </Border>
+
+        <!-- MAIN LAYOUT: LEFT SIDEBAR + WORKSPACE -->
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="240" /> <!-- Left Sidebar Navigation -->
+                <ColumnDefinition Width="*" />   <!-- Center & Bottom Workspace -->
+            </Grid.ColumnDefinitions>
+
+            <!-- ==================== LEFT SIDEBAR ==================== -->
+            <Border Grid.Column="0" Background="{DynamicResource BgSidebarBrush}"
+                    BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="0,0,1,0">
+                <Grid Margin="12,14">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" /> <!-- Brand Logo & Title -->
+                        <RowDefinition Height="*" />    <!-- Navigation Items -->
+                        <RowDefinition Height="Auto" /> <!-- Sidebar Footer (Backups, System Info, Mode Switch) -->
+                    </Grid.RowDefinitions>
+
+                    <!-- App Brand Header -->
+                    <DockPanel Grid.Row="0" Margin="4,0,4,16" LastChildFill="False">
+                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" VerticalAlignment="Center">
+                            <Image FlowDirection="LeftToRight" Source="pack://application:,,,/WinVelo;component/Assets/winvelo-64.png" Width="28" Height="28" Margin="0,0,8,0" RenderOptions.BitmapScalingMode="HighQuality" />
+                            <TextBlock Text="WINVELO" FontSize="16" FontWeight="ExtraBold"
+                                       Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" />
+                        </StackPanel>
+                        <Border DockPanel.Dock="Right" Background="{DynamicResource StatusDefaultBgBrush}" CornerRadius="4" Padding="6,2" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding AppVersion}" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextSecondaryBrush}" />
+                        </Border>
+                    </DockPanel>
+
+                    <!-- Scrollable Navigation Items (5 Core Tabs) -->
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                        <StackPanel>
+                            <!-- MAIN NAVIGATION -->
+                            <TextBlock Text="{loc:Tr Main_Navigation}" FontSize="11" FontWeight="Bold"
+                                       Foreground="{DynamicResource TextMutedBrush}" Margin="8,4,0,8" />
+
+                            <!-- 1. Home -->
+                            <Button AutomationProperties.AutomationId="Tab_Dashboard"
+                                    AutomationProperties.Name="Home"
+                                    Command="{Binding SwitchTabCommand}" CommandParameter="Home" Margin="0,0,0,6">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource SidebarNavBtn}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsHomeActive}" Value="True">
+                                                <Setter Property="Background" Value="{DynamicResource BgCardHoverBrush}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                                <DockPanel LastChildFill="False">
+                                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                                        <ui:SymbolIcon Symbol="Home24" FontSize="16" Margin="0,0,10,0" VerticalAlignment="Center">
+                                            <ui:SymbolIcon.Style>
+                                                <Style TargetType="ui:SymbolIcon">
+                                                    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsHomeActive}" Value="True">
+                                                            <Setter Property="Foreground" Value="{DynamicResource AccentPrimaryBrush}" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </ui:SymbolIcon.Style>
+                                        </ui:SymbolIcon>
+                                        <TextBlock Text="{loc:Tr Main_Home}" FontSize="13" VerticalAlignment="Center">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+                                                    <Setter Property="FontWeight" Value="SemiBold" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsHomeActive}" Value="True">
+                                                            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+                                                            <Setter Property="FontWeight" Value="Bold" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </StackPanel>
+                                </DockPanel>
+                            </Button>
+
+                            <!-- 2. Tweaks -->
+                            <Button AutomationProperties.AutomationId="Tab_Tweaks"
+                                    AutomationProperties.Name="Tweaks"
+                                    Command="{Binding SwitchTabCommand}" CommandParameter="Tweaks" Margin="0,0,0,6">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource SidebarNavBtn}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsTweaksActive}" Value="True">
+                                                <Setter Property="Background" Value="{DynamicResource BgCardHoverBrush}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                                <DockPanel LastChildFill="False">
+                                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                                        <ui:SymbolIcon Symbol="Apps24" FontSize="16" Margin="0,0,10,0" VerticalAlignment="Center">
+                                            <ui:SymbolIcon.Style>
+                                                <Style TargetType="ui:SymbolIcon">
+                                                    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsTweaksActive}" Value="True">
+                                                            <Setter Property="Foreground" Value="{DynamicResource AccentPrimaryBrush}" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </ui:SymbolIcon.Style>
+                                        </ui:SymbolIcon>
+                                        <TextBlock Text="{loc:Tr Main_Tweaks}" FontSize="13" VerticalAlignment="Center">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+                                                    <Setter Property="FontWeight" Value="SemiBold" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsTweaksActive}" Value="True">
+                                                            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+                                                            <Setter Property="FontWeight" Value="Bold" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </StackPanel>
+                                    <Border DockPanel.Dock="Right" Background="{DynamicResource StatusDefaultBgBrush}" CornerRadius="8" Padding="6,1" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding TweaksVM.AllCount}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" />
+                                    </Border>
+                                </DockPanel>
+                            </Button>
+
+                            <!-- 3. Apps -->
+                            <Button AutomationProperties.AutomationId="Tab_Install"
+                                    AutomationProperties.Name="Apps"
+                                    Command="{Binding SwitchTabCommand}" CommandParameter="Apps" Margin="0,0,0,6">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource SidebarNavBtn}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsAppsActive}" Value="True">
+                                                <Setter Property="Background" Value="{DynamicResource BgCardHoverBrush}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                                <DockPanel LastChildFill="False">
+                                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                                        <ui:SymbolIcon Symbol="ArrowDownload24" FontSize="16" Margin="0,0,10,0" VerticalAlignment="Center">
+                                            <ui:SymbolIcon.Style>
+                                                <Style TargetType="ui:SymbolIcon">
+                                                    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsAppsActive}" Value="True">
+                                                            <Setter Property="Foreground" Value="{DynamicResource AccentPrimaryBrush}" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </ui:SymbolIcon.Style>
+                                        </ui:SymbolIcon>
+                                        <TextBlock Text="{loc:Tr Main_Apps}" FontSize="13" VerticalAlignment="Center">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+                                                    <Setter Property="FontWeight" Value="SemiBold" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsAppsActive}" Value="True">
+                                                            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+                                                            <Setter Property="FontWeight" Value="Bold" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </StackPanel>
+                                </DockPanel>
+                            </Button>
+
+                            <!-- 4. Tools -->
+                            <Button AutomationProperties.AutomationId="Tab_Toolbox"
+                                    AutomationProperties.Name="Tools"
+                                    Command="{Binding SwitchTabCommand}" CommandParameter="Tools" Margin="0,0,0,6">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource SidebarNavBtn}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsToolsActive}" Value="True">
+                                                <Setter Property="Background" Value="{DynamicResource BgCardHoverBrush}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                                <DockPanel LastChildFill="False">
+                                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                                        <ui:SymbolIcon Symbol="Toolbox24" FontSize="16" Margin="0,0,10,0" VerticalAlignment="Center">
+                                            <ui:SymbolIcon.Style>
+                                                <Style TargetType="ui:SymbolIcon">
+                                                    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsToolsActive}" Value="True">
+                                                            <Setter Property="Foreground" Value="{DynamicResource AccentPrimaryBrush}" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </ui:SymbolIcon.Style>
+                                        </ui:SymbolIcon>
+                                        <TextBlock Text="{loc:Tr Main_Tools}" FontSize="13" VerticalAlignment="Center">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+                                                    <Setter Property="FontWeight" Value="SemiBold" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsToolsActive}" Value="True">
+                                                            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+                                                            <Setter Property="FontWeight" Value="Bold" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </StackPanel>
+                                </DockPanel>
+                            </Button>
+
+                            <!-- 5. History -->
+                            <Button AutomationProperties.AutomationId="Tab_Backups"
+                                    AutomationProperties.Name="History"
+                                    Command="{Binding SwitchTabCommand}" CommandParameter="History" Margin="0,0,0,6">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource SidebarNavBtn}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsHistoryActive}" Value="True">
+                                                <Setter Property="Background" Value="{DynamicResource BgCardHoverBrush}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                                <DockPanel LastChildFill="False">
+                                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                                        <ui:SymbolIcon Symbol="Clock24" FontSize="16" Margin="0,0,10,0" VerticalAlignment="Center">
+                                            <ui:SymbolIcon.Style>
+                                                <Style TargetType="ui:SymbolIcon">
+                                                    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsHistoryActive}" Value="True">
+                                                            <Setter Property="Foreground" Value="{DynamicResource AccentPrimaryBrush}" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </ui:SymbolIcon.Style>
+                                        </ui:SymbolIcon>
+                                        <TextBlock Text="{loc:Tr Main_History}" FontSize="13" VerticalAlignment="Center">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+                                                    <Setter Property="FontWeight" Value="SemiBold" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsHistoryActive}" Value="True">
+                                                            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+                                                            <Setter Property="FontWeight" Value="Bold" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </StackPanel>
+                                    <Border DockPanel.Dock="Right" Background="{DynamicResource StatusDefaultBgBrush}" CornerRadius="8" Padding="6,1" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding HistoryVM.Sessions.Count}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" />
+                                    </Border>
+                                </DockPanel>
+                            </Button>
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <!-- Sidebar Footer: Pinned Settings -->
+                    <Border Grid.Row="2" BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="0,1,0,0" Padding="0,10,0,0">
+                        <Button AutomationProperties.AutomationId="Tab_Settings"
+                                AutomationProperties.Name="Settings"
+                                Command="{Binding SwitchTabCommand}" CommandParameter="Settings">
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource SidebarNavBtn}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsSettingsActive}" Value="True">
+                                            <Setter Property="Background" Value="{DynamicResource BgCardHoverBrush}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                            <DockPanel LastChildFill="False">
+                                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                                    <ui:SymbolIcon Symbol="Settings24" FontSize="16" Margin="0,0,10,0" VerticalAlignment="Center">
+                                        <ui:SymbolIcon.Style>
+                                            <Style TargetType="ui:SymbolIcon">
+                                                <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsSettingsActive}" Value="True">
+                                                        <Setter Property="Foreground" Value="{DynamicResource AccentPrimaryBrush}" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </ui:SymbolIcon.Style>
+                                    </ui:SymbolIcon>
+                                    <TextBlock Text="{loc:Tr Main_Settings}" FontSize="13" VerticalAlignment="Center">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+                                                <Setter Property="FontWeight" Value="SemiBold" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsSettingsActive}" Value="True">
+                                                        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+                                                        <Setter Property="FontWeight" Value="Bold" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </StackPanel>
+                            </DockPanel>
+                        </Button>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <!-- ==================== CENTER WORKSPACE ==================== -->
+            <Grid Grid.Column="1">
+                <ContentControl Content="{Binding CurrentPage}" />
+            </Grid>
+        </Grid>
+
+        <!-- COMMAND PALETTE (Ctrl+K) OVERLAY -->
+        <Grid Grid.Row="0" Grid.RowSpan="4" Background="#80000000"
+              Visibility="{Binding IsCommandPaletteOpen, Converter={StaticResource BoolToVisConverter}}">
+            <Border Background="{DynamicResource BgCardBrush}"
+                    BorderBrush="{DynamicResource BorderSubtleBrush}"
+                    BorderThickness="1" CornerRadius="8"
+                    Width="600" MaxHeight="450" VerticalAlignment="Top" Margin="0,60,0,0">
+                <Grid Margin="16">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <DockPanel Grid.Row="0" Margin="0,0,0,12">
+                        <ui:Button DockPanel.Dock="Right" Icon="{ui:SymbolIcon Dismiss16}" Appearance="Transparent"
+                                   AutomationProperties.Name="Close Command Palette"
+                                   Command="{Binding ToggleCommandPaletteCommand}" Margin="8,0,0,0" />
+                        <ui:TextBox AutomationProperties.AutomationId="CommandPaletteSearchBox"
+                                    AutomationProperties.Name="Command Palette Search Input"
+                                    PlaceholderText="{loc:Tr Main_SearchTweaksToolsAppsAnd}"
+                                    Text="{Binding PaletteQuery, UpdateSourceTrigger=PropertyChanged}"
+                                    Icon="{ui:SymbolIcon Search24}">
+                            <ui:TextBox.InputBindings>
+                                <KeyBinding Key="Enter" Command="{Binding ExecuteFirstPaletteItemCommand}" />
+                            </ui:TextBox.InputBindings>
+                        </ui:TextBox>
+                    </DockPanel>
+
+                    <ListBox Grid.Row="1" ItemsSource="{Binding PaletteResults}"
+                             Background="Transparent" BorderThickness="0" MaxHeight="350">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate DataType="{x:Type vm:PaletteItem}">
+                                <Border Background="{DynamicResource BgDeepBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
+                                        BorderThickness="1" CornerRadius="6" Padding="10,8" Margin="0,0,0,4">
+                                    <Border.InputBindings>
+                                        <MouseBinding MouseAction="LeftClick"
+                                                      Command="{Binding DataContext.ExecutePaletteItemCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                      CommandParameter="{Binding}" />
+                                    </Border.InputBindings>
+                                    <DockPanel LastChildFill="False">
+                                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                                            <Border Background="{DynamicResource StatusDefaultBgBrush}" CornerRadius="4" Padding="6,2" Margin="0,0,10,0">
+                                                <TextBlock Text="{Binding Category, Converter={StaticResource Tr}}" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}" />
+                                            </Border>
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="13" Foreground="{DynamicResource TextPrimaryBrush}" />
+                                                <TextBlock Text="{Binding Subtitle}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" />
+                                            </StackPanel>
+                                        </StackPanel>
+                                        <ui:SymbolIcon DockPanel.Dock="Right" Symbol="ArrowRight24" FontSize="14" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"
+                                                       RenderTransformOrigin="0.5,0.5">
+                                            <ui:SymbolIcon.RenderTransform>
+                                                <ScaleTransform ScaleX="{Binding DirectionalIconScaleX, Source={x:Static loc:LocalizationManager.Instance}}" />
+                                            </ui:SymbolIcon.RenderTransform>
+                                        </ui:SymbolIcon>
+                                    </DockPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- DIFF PREVIEW DIALOG OVERLAY -->
+        <Grid Grid.Row="0" Grid.RowSpan="4" Background="#80000000"
+              Visibility="{Binding TweaksVM.IsPreviewDialogOpen, Converter={StaticResource BoolToVisConverter}}">
+            <Border Background="{DynamicResource BgCardBrush}"
+                    BorderBrush="{DynamicResource BorderSubtleBrush}"
+                    BorderThickness="1" CornerRadius="8"
+                    Width="750" Height="500" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Grid Margin="20">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <DockPanel Grid.Row="0" Margin="0,0,0,12">
+                        <TextBlock Text="{loc:Tr Main_DryRunDiffPreview}" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" />
+                        <Button DockPanel.Dock="Right" Content="{loc:Tr Config_Cancel}" Style="{DynamicResource ModernGhostBtn}"
+                                AutomationProperties.Name="Cancel Diff Preview"
+                                Command="{Binding TweaksVM.CloseDiffPreviewCommand}" />
+                    </DockPanel>
+                    <TextBox Grid.Row="1" Text="{Binding TweaksVM.PreviewReportText}"
+                             AutomationProperties.Name="Diff Preview Report Text"
+                             IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"
+                             Background="{DynamicResource BgDeepBrush}" Foreground="{DynamicResource TextPrimaryBrush}"
+                             BorderBrush="{DynamicResource BorderSubtleBrush}" FlowDirection="LeftToRight" FontFamily="Consolas, Cascadia Code, Courier New" FontSize="12" Padding="10" />
+                    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+                        <Button Content="{loc:Tr Config_Close}" Style="{DynamicResource ModernSecondaryBtn}"
+                                AutomationProperties.Name="Close Diff Preview"
+                                Command="{Binding TweaksVM.CloseDiffPreviewCommand}" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- CRASH RECOVERY DIALOG OVERLAY -->
+        <Grid Grid.Row="0" Grid.RowSpan="4" Background="#80000000"
+              Visibility="{Binding IsRecoveryDialogOpen, Converter={StaticResource BoolToVisConverter}}">
+            <Border Background="{DynamicResource BgCardBrush}"
+                    BorderBrush="{DynamicResource BorderSubtleBrush}"
+                    BorderThickness="1" CornerRadius="8"
+                    Width="600" VerticalAlignment="Center" HorizontalAlignment="Center" Padding="24">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <!-- Title -->
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,12">
+                        <TextBlock Text="⚠" FontSize="20" Foreground="#F59E0B" Margin="0,0,10,0" VerticalAlignment="Center" />
+                        <TextBlock Text="{loc:Tr Main_IncompleteSessionDetected}" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" />
+                    </StackPanel>
+
+                    <!-- Message -->
+                    <TextBlock Grid.Row="1" Text="{Binding RecoveryDialogMessage}"
+                               FontSize="14" Foreground="{DynamicResource TextPrimaryBrush}" TextWrapping="Wrap" Margin="0,0,0,12" />
+
+                    <TextBlock Grid.Row="2" Text="{loc:Tr Main_WinveloDetectedChangesFromA}"
+                               FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,0,0,20" />
+
+                    <!-- Buttons -->
+                    <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">
+                        <ui:Button Content="{loc:Tr Main_KeepAndMarkComplete}"
+                                   AutomationProperties.Name="Keep Recovery Changes"
+                                   Appearance="Secondary" Margin="0,0,12,0"
+                                   Command="{Binding KeepRecoveryCommand}" />
+                        <ui:Button Content="{loc:Tr Main_RollBackTheseChanges}"
+                                   AutomationProperties.Name="Roll Back Recovery Changes"
+                                   Appearance="Danger"
+                                   Command="{Binding RollbackRecoveryCommand}" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- SLEEK FLOATING LIVE ACTIVITY HUD PILL -->
+        <Border Grid.Row="0" Grid.RowSpan="4"
+                HorizontalAlignment="Center" VerticalAlignment="Top"
+                Margin="0,52,0,0"
+                Background="#1E2433"
+                BorderBrush="#3B82F6"
+                BorderThickness="1"
+                CornerRadius="20"
+                Padding="16,8"
+                Panel.ZIndex="1000"
+                IsHitTestVisible="False"
+                Visibility="{Binding IsActivityVisible, Converter={StaticResource BoolToVisConverter}}">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="20" ShadowDepth="4" Direction="270" Color="#000000" Opacity="0.6" />
+            </Border.Effect>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <!-- Running Animated Progress Ring -->
+                <ui:ProgressRing Width="16" Height="16" IsIndeterminate="True"
+                                 Margin="0,0,10,0" VerticalAlignment="Center"
+                                 Visibility="{Binding IsActivityRunning, Converter={StaticResource BoolToVisConverter}}" />
+
+                <!-- Emerald Green Success Icon -->
+                <TextBlock Text="✓" FontSize="14" FontWeight="ExtraBold" Foreground="#10B981"
+                           Margin="0,0,8,0" VerticalAlignment="Center"
+                           Visibility="{Binding IsActivitySuccess, Converter={StaticResource BoolToVisConverter}}" />
+
+                <!-- Dynamic Status / Action Text -->
+                <TextBlock Text="{Binding ActivityText}"
+                           FontSize="12" FontWeight="SemiBold"
+                           Foreground="{DynamicResource TextPrimaryBrush}"
+                           VerticalAlignment="Center" />
+            </StackPanel>
+        </Border>
+
+        <!-- FIRST-RUN WIZARD MODAL OVERLAY -->
+        <Grid Grid.Row="0" Grid.RowSpan="4"
+              Background="#99000000"
+              Panel.ZIndex="2000"
+              Visibility="{Binding IsWizardOpen, Converter={StaticResource BoolToVisConverter}}">
+            <views:FirstRunWizardView DataContext="{Binding WizardVM}" />
+        </Grid>
+
+        <!-- UNIFIED EXECUTION DIALOG OVERLAY (SHARED PREVIEW & RESULT) -->
+        <views:UnifiedExecutionDialogView Grid.Row="0" Grid.RowSpan="4"
+                                          DataContext="{Binding ExecutionDialogVM}"
+                                          Panel.ZIndex="3000" />
+    </Grid>
+</ui:FluentWindow>

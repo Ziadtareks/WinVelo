@@ -34,12 +34,12 @@ The following 3 items from WinUtil were intentionally excluded based on safety, 
 ### 2. `WPFWinUtilInstallPSProfile` ("CTT PowerShell Profile - Install")
 - **Source**: `config/feature.json`
 - **Upstream Action**: Downloads and executes a custom PowerShell 7+ profile containing personal alias definitions, third-party module imports, and Chris Titus Tech branding.
-- **Reason Not Ported**: Vendor-specific branding and personalized shell customization; not appropriate for Tweakora core system toolbox.
+- **Reason Not Ported**: Vendor-specific branding and personalized shell customization; not appropriate for WinVelo core system toolbox.
 
 ### 3. `WPFWinUtilUninstallPSProfile` ("CTT PowerShell Profile - Remove")
 - **Source**: `config/feature.json`
 - **Upstream Action**: Deletes the CTT PowerShell profile.
-- **Reason Not Ported**: Paired with the install script above; not applicable to Tweakora.
+- **Reason Not Ported**: Paired with the install script above; not applicable to WinVelo.
 
 ### 5. `WPFToggleHideSettingsHome` ("Settings Home Page")
 - **Source**: `config/tweaks.json`
@@ -49,7 +49,7 @@ The following 3 items from WinUtil were intentionally excluded based on safety, 
 ### 4. Dedicated WinUtil UI Button Controls (`WPFchangedns`, `WPFAddUltPerf`, `WPFRemoveUltPerf`)
 - **Source**: `config/tweaks.json`
 - **Upstream Action**: Upstream uses button handlers in PowerShell (`WPFchangedns` for setting network adapter DNS, `WPFAddUltPerf` for duplicating the Ultimate Performance GUID, `WPFRemoveUltPerf` for deleting it).
-- **Tweakora Implementation**: Handled directly via dedicated first-class UI controls:
+- **WinVelo Implementation**: Handled directly via dedicated first-class UI controls:
   - `WPFchangedns` -> Native **DNS Provider Dropdown** in the Tweaks tab and DnsSwitcher in Toolbox.
   - `WPFAddUltPerf` / `WPFRemoveUltPerf` -> Native **Performance Power Plan Dropdown** in the Tweaks tab.
 
@@ -59,15 +59,15 @@ The following 3 items from WinUtil were intentionally excluded based on safety, 
 
 1. **`WPFTweaksDisableBitLocker` ("BitLocker - Disable")**:
    - **Upstream**: Listed under `Essential Tweaks`.
-   - **Tweakora**: Moved to `Advanced Tweaks - CAUTION`. Risk level set to **High**. Red warning text added: *"Removes disk encryption and exposes data to unauthorized physical access."* Excluded from all presets.
+   - **WinVelo**: Moved to `Advanced Tweaks - CAUTION`. Risk level set to **High**. Red warning text added: *"Removes disk encryption and exposes data to unauthorized physical access."* Excluded from all presets.
 2. **`WPFOOSUbutton` ("O&O ShutUp10++ - Run")**:
    - **Upstream**: Downloads third-party executable and executes it automatically.
-   - **Tweakora**: Changed to a button that opens the official O&O Software download page in the default web browser. No automatic binary downloading.
+   - **WinVelo**: Changed to a button that opens the official O&O Software download page in the default web browser. No automatic binary downloading.
 3. **`WPFTweaksServices` ("Services - Set to Manual")**:
    - Explicitly breaks down all target services (`CscService`, `DiagTrack`, `MapsBroker`, `StorSvc`, `SharedAccess`).
    - Explains why `CscService`, `DiagTrack`, and `SharedAccess` are set to `Disabled`.
 4. **High Risk Guarding**:
    - `WPFTweaksRemoveEdge`, `WPFTweaksRemoveOneDrive`, `WPFTweaksWindowsAI`, `WPFTweaksDisableIPv6`:
    - Risk set to **High**, with explicit warning dialogs and comprehensive simulated undo testing.
-5. **Tweakora Extras**:
-   - Verified tweaks developed in Tweakora that are not present in WinUtil are preserved in a dedicated "Tweakora Extras" section.
+5. **WinVelo Extras**:
+   - Verified tweaks developed in WinVelo that are not present in WinUtil are preserved in a dedicated "WinVelo Extras" section.

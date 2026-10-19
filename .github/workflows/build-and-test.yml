@@ -1,33 +1,201 @@
-name: Build and Test
+name: CI
 
 on:
   push:
-    branches: [ "main" ]
   pull_request:
-    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+  # Defence in depth: the real Windows services refuse to start while test mode is on,
+  # so no test can ever change the runner's registry, services or tasks.
+  WINVELO_TEST_MODE: '1'
 
 jobs:
   build:
-    name: Build & Test on Windows
+    name: Build, test and validate (Windows)
     runs-on: windows-latest
 
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    - name: Setup .NET 10
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: '10.0.x'
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
 
-    - name: Restore Dependencies
-      run: dotnet restore Tweakora.sln
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.NUGET_PACKAGES }}
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', 'Directory.Build.props') }}
+          restore-keys: nuget-${{ runner.os }}-
 
-    - name: Validate Catalog JSON
-      run: dotnet run --project tools/CatalogValidator/CatalogValidator.csproj
+      - name: Restore
+        run: dotnet restore WinVelo.sln
 
-    - name: Build Solution
-      run: dotnet build Tweakora.sln --configuration Release --no-restore
+      # The solution builds with 0 warnings; keep it that way.
+      - name: Build (warnings are errors)
+        run: dotnet build WinVelo.sln --configuration Release --no-restore -p:TreatWarningsAsErrors=true
 
-    - name: Run Tests
-      run: dotnet test Tweakora.sln --configuration Release --no-build --verbosity normal
+      - name: Validate catalog
+        run: dotnet run --project tools/CatalogValidator/CatalogValidator.csproj --configuration Release --no-build
+
+      - name: Check README tweak count
+        run: dotnet run --project tools/CatalogStats/CatalogStats.csproj --configuration Release --no-build
+
+      - name: Unit tests
+        run: dotnet test src/WinVelo.Tests/WinVelo.Tests.csproj --configuration Release --no-build --logger "trx;LogFileName=unit-tests.trx" --results-directory TestResults
+
+      - name: Check for vulnerable NuGet packages
+        shell: pwsh
+        run: |
+          $out = dotnet list WinVelo.sln package --vulnerable --include-transitive 2>&1 | Out-String
+          Write-Host $out
+          if ($out -match 'has the following vulnerable packages') { throw "Vulnerable NuGet packages found." }
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: TestResults
+          if-no-files-found: ignore
+
+  smoke:
+    # Replaces manual VM testing for releases. Builds the real portable package and checks it on Windows.
+    # Everything runs in test/simulation mode: no step touches the runner's registry, services or tasks.
+    name: Windows smoke tests (portable package, simulation only)
+    runs-on: windows-latest
+    needs: build
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.NUGET_PACKAGES }}
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', 'Directory.Build.props') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      - name: Build the portable package
+        shell: pwsh
+        run: .\build\publish.ps1 -SkipZip
+
+      - name: Package has no Catalog folder and does not require administrator rights
+        shell: pwsh
+        run: |
+          $pkg = (Get-ChildItem dist -Directory -Filter 'WinVelo-v*-portable' | Select-Object -First 1).FullName
+          "PKG=$pkg" >> $env:GITHUB_ENV
+          if (Test-Path (Join-Path $pkg 'Catalog')) { throw 'The package contains a Catalog folder; the catalog must be embedded.' }
+          $bytes = [System.IO.File]::ReadAllBytes((Join-Path $pkg 'WinVelo.exe'))
+          $text = [System.Text.Encoding]::UTF8.GetString($bytes)
+          if ($text -notmatch 'requestedExecutionLevel\s+level="asInvoker"') { throw 'WinVelo.exe manifest is not asInvoker.' }
+          if ($text -match 'level="requireAdministrator"') { throw 'WinVelo.exe still requires administrator rights.' }
+          Write-Host 'OK: no Catalog folder, manifest asInvoker.'
+
+      - name: WinVelo.exe --test-mode starts and closes cleanly
+        shell: pwsh
+        run: |
+          $p = Start-Process -FilePath (Join-Path $env:PKG 'WinVelo.exe') -ArgumentList '--test-mode' -PassThru
+          $deadline = (Get-Date).AddSeconds(60)
+          while ((Get-Date) -lt $deadline -and -not $p.HasExited) {
+            $p.Refresh()
+            if ($p.MainWindowHandle -ne [IntPtr]::Zero) { break }
+            Start-Sleep -Milliseconds 500
+          }
+          if ($p.HasExited) { throw "WinVelo.exe exited during startup with code $($p.ExitCode)." }
+          if ($p.MainWindowHandle -eq [IntPtr]::Zero) { Stop-Process -Id $p.Id -Force; throw 'No main window within 60 seconds (startup dialog or hang).' }
+          Write-Host "Main window shown: '$($p.MainWindowTitle)'"
+          Start-Sleep -Seconds 5
+          [void]$p.CloseMainWindow()
+          if (-not $p.WaitForExit(30000)) { Stop-Process -Id $p.Id -Force; throw 'WinVelo.exe did not close within 30 seconds.' }
+          if ($p.ExitCode -ne 0) { throw "WinVelo.exe exited with code $($p.ExitCode)." }
+          Write-Host 'OK: started without an administrator prompt, showed the window and exited with code 0.'
+
+      - name: winvelo-cli works without a Catalog folder (simulation)
+        shell: pwsh
+        run: |
+          $cli = Join-Path $env:PKG 'winvelo-cli.exe'
+          function Run([string[]]$cliArgs, [string]$expect) {
+            $out = & $cli @cliArgs 2>&1 | Out-String
+            Write-Host $out
+            if ($LASTEXITCODE -ne 0) { throw "winvelo-cli $($cliArgs -join ' ') exited with $LASTEXITCODE" }
+            if ($out -notmatch [regex]::Escape('TEST/SIMULATION ACTIVE')) { throw 'The CLI did not run in simulation mode.' }
+            if ($expect -and $out -notmatch [regex]::Escape($expect)) { throw "Expected '$expect' in the output of: $($cliArgs -join ' ')" }
+          }
+          Run @('--list') 'Loaded 140 tweak(s)'
+          Run @('--info', 'ui.explorer.show-file-extensions') 'TWEAK INFORMATION'
+          Run @('--detect-all', '--test-mode') 'Scanning host machine state for all 140 tweaks'
+          Run @('--preset', 'privacy', '--dry-run') 'DRY RUN PREVIEW'
+          Run @('--tweak', 'ui.explorer.show-file-extensions', '--apply', '--yes') 'Applied 1 of 1'
+          Run @('--tweak', 'ui.explorer.show-file-extensions', '--undo', '--yes') 'Restored 1 of 1'
+
+          # A custom catalog is only used when named with --catalog, and the CLI warns about it.
+          $custom = Join-Path $env:RUNNER_TEMP 'custom-catalog\Tweaks'
+          New-Item -ItemType Directory -Force $custom | Out-Null
+          Copy-Item Catalog\Tweaks\preferences.json $custom
+          Run @('--catalog', (Split-Path $custom), '--list') 'Custom catalog requested'
+
+      - name: Smoke tests (apply/undo, old journals, protected services, update mode, dictionaries)
+        run: dotnet test src/WinVelo.Tests/WinVelo.Tests.csproj --configuration Release --filter Category=Smoke
+
+      - name: Collect test-mode logs
+        if: failure()
+        shell: pwsh
+        run: |
+          $logs = Join-Path $env:TEMP 'WinVelo-TestMode\Logs'
+          if (Test-Path $logs) { Copy-Item $logs (Join-Path $env:RUNNER_TEMP 'smoke-logs') -Recurse }
+
+      - name: Upload test-mode logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-logs
+          path: ${{ runner.temp }}/smoke-logs
+          if-no-files-found: ignore
+
+  ui-tests:
+    # FlaUI drives the real WPF window in --test-mode (no system changes). GitHub's hosted runners have
+    # a desktop session, but UI automation there can be timing-sensitive, so this job reports without
+    # blocking merges. Make it required once it has been green for a while.
+    name: UI tests (test mode, non-blocking)
+    runs-on: windows-latest
+    needs: build
+    continue-on-error: true
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.NUGET_PACKAGES }}
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', 'Directory.Build.props') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      - name: UI tests
+        run: dotnet test src/WinVelo.UiTests/WinVelo.UiTests.csproj --configuration Debug

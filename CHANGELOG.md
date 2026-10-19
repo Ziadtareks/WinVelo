@@ -6,6 +6,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased]
+
+## [1.0.2] - 2026-10-19
+
+Safety, security and release-integrity fixes from a full audit (see `docs/AUDIT_v1.0.2.md`). No tweak was added or removed.
+
+### Changed
+- The project is now called WinVelo everywhere: solution, folders, namespaces and test projects (formerly *Tweakora*). Data from `%APPDATA%\Tweakora` is still migrated, and older rollback journals still load.
+- The tweak catalog is built into `WinVelo.exe` and `winvelo-cli.exe`; the portable zip no longer needs a `Catalog` folder. A custom catalog folder is used only with `--catalog <folder>` and after you confirm an administrator warning; a folder next to the exe is ignored.
+- "Turn off automatic updates" (formerly "Disable All Updates", `--update-mode DisableAll`) only sets the `NoAutoUpdate` policy. It no longer disables the Windows Update, BITS and Update Orchestrator services, and choosing it re-enables them if an older version disabled them.
+- `WinVelo.exe --test-mode` no longer asks for administrator rights. In normal mode WinVelo asks once at startup; if you say no, it opens read-only.
+- `winvelo-cli --self-test` runs in simulation unless `--real-mode` is given, like every other command.
+- Registry backups (`.reg`) are kept in `%APPDATA%\WinVelo\Backups` instead of `%TEMP%`, which cleaners empty.
+- Releases are built by GitHub Actions and ship `WinVelo-vX.Y.Z-portable.zip.sha256`, `SHA256SUMS.txt` and a build provenance attestation. An optional SignPath signing step is ready but off until a certificate exists.
+- The installed-apps check (`winget list`, which may go online) runs when you open the Apps page, not at startup.
+- Package updates: CommunityToolkit.Mvvm 8.4.2, Microsoft.Extensions 10.0.13, Serilog 4.4.0.
+
+### Fixed
+- **Undo could remove more than WinVelo added.** Undoing a tweak that had created a registry key deleted the whole key, including values of other tweaks, policies or programs. The key is now removed only when empty.
+- **Undo order mattered** for the 21 registry values that more than one tweak sets (for example *Telemetry - Disable* and *Disable Advertising ID*): undoing them in the "wrong" order left the setting changed. Any order now restores the original.
+- **The rollback journal could be lost in a crash** while it was being saved. Saves are now atomic, keep a backup copy, and are protected against two WinVelo processes writing at once; unreadable journal files are reported and never deleted.
+- The registry default value (`@`) was not saved before a change, so undo deleted a default value that existed before. Multi-string values were saved as `System.String[]`.
+- "Access denied" (Tamper Protection, TrustedInstaller) was reported as applied. It is now reported as failed.
+- Windows Update, BITS, the Microsoft Store and Windows Security services are now protected in the code itself (not only by the catalog validator): a catalog entry, script or the Services tool cannot disable or stop them.
+- App installer: package ids were inserted into a PowerShell command (a crafted catalog entry could run commands as administrator). winget and Chocolatey are now started directly with separate arguments, ids are checked, results come from exit codes, missing winget/Chocolatey, timeouts and "package not found" give clear messages, installs can be cancelled, and the Apps page shows the result.
+- Three winget ids did not exist: paint.net (`dotPDN.PaintDotNet`), AnyDesk (`AnyDesk.AnyDesk`) and WhatsApp (Microsoft Store id `9NKSQGP7F2NH`).
+- "Git" showed as installed when only GitHub Desktop was. Chocolatey was sometimes given a winget id.
+- DNS addresses and optional-feature names are validated before they reach PowerShell. Links from the catalog only open http(s) URLs.
+- A broken catalog file or tweak is skipped and reported instead of silently emptying the list.
+- The diagnostics bundle now also removes other users' profile paths, domain names, SIDs, e-mail, IP and MAC addresses and serial numbers.
+- Restore points: names with an apostrophe failed, slow disks timed out after 30 seconds, and the 24-hour limit is now explained.
+- Startup and crash dialogs no longer show stack traces; they are translated and point to the log folder.
+- Missing Arabic translations (app status badges, new dialogs); the typed "I understand" confirmation also accepts the Arabic word; the command-palette arrow points the right way in Arabic.
+- The cleanup in Tools can be stopped.
+- A service change that Windows refuses is now reported as failed (it used to show as applied with a warning).
+- Undoing a tweak that was already active when you applied it (for example because another tweak set the same value) no longer switches off the other tweak's setting.
+
+### Added
+- CI on every push and pull request (Windows, .NET 10, warnings as errors, tests, catalog validator, README tweak count, vulnerable-package check) and a CI badge, plus a Windows smoke job that tests the portable package in test mode.
+- `tools/CatalogStats`: counts tweaks/apps/presets and keeps the README numbers correct.
+- CatalogValidator checks app package ids and links, anecdotal ⇒ Experimental, and https sources for documented tweaks.
+- README: *Verify your download* and *Antivirus false positives*; the Arabic section covers the same points.
+- Issue templates, a pull request template and Dependabot (monthly).
+
 ## [1.0.1] - 2026-10-16
 
 Every tweak was re-checked against Microsoft documentation and what Windows actually reads. Tweaks that change nothing were removed, and the ones that were wired wrong were fixed.
@@ -115,3 +159,8 @@ This is the first honest public beta release of WinVelo. This release completely
   - Automatic privacy scrubbing: strips usernames, machine names, and user paths outside `%APPDATA%\WinVelo`.
 - **Comprehensive Host Manual Test Plan**:
   - Published `docs/MANUAL_TEST_PLAN.md` with structured checklists, exact Settings paths, and explicit STOP line boundaries for safe physical host testing.
+
+[Unreleased]: https://github.com/Ziadtareks/WinVelo/compare/v1.0.2...HEAD
+[1.0.2]: https://github.com/Ziadtareks/WinVelo/compare/v1.0.1...v1.0.2
+[1.0.1]: https://github.com/Ziadtareks/WinVelo/compare/v1.0.0...v1.0.1
+[1.0.0]: https://github.com/Ziadtareks/WinVelo/releases/tag/v1.0.0

@@ -61,7 +61,7 @@ flowchart TD
 
 To protect the host development workstation:
 1. **Host PC Protection**:
-   - During local development, all engine tests and UI demo modes use in-memory mock services (`Tweakora.Simulation`).
+   - During local development, all engine tests and UI demo modes use in-memory mock services (`WinVelo.Simulation`).
    - The host PC's registry, services, and filesystem are never modified by the test suite or dev runs.
 2. **Virtual Machine Testing**:
    - Verification of real Windows changes takes place in dedicated Hyper-V, VMware, or VirtualBox virtual machines.

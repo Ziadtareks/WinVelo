@@ -6,7 +6,7 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Json.Schema;
-using Tweakora.Core.Models;
+using WinVelo.Core.Models;
 
 namespace UpstreamImporter;
 
@@ -46,13 +46,13 @@ public static class Program
         Console.WriteLine("   WinUtil Upstream Importer with Overrides   ");
         Console.WriteLine("==============================================");
 
-        string rootDir = @"C:\Dev\Tweakora";
+        string rootDir = @"C:\Dev\WinVelo";
         string? candidate = AppContext.BaseDirectory;
-        while (candidate != null && !File.Exists(Path.Combine(candidate, "Tweakora.sln")))
+        while (candidate != null && !File.Exists(Path.Combine(candidate, "WinVelo.sln")))
         {
             candidate = Directory.GetParent(candidate)?.FullName;
         }
-        if (candidate != null && File.Exists(Path.Combine(candidate, "Tweakora.sln")))
+        if (candidate != null && File.Exists(Path.Combine(candidate, "WinVelo.sln")))
         {
             rootDir = candidate;
         }
@@ -278,8 +278,8 @@ public static class Program
         File.WriteAllText(Path.Combine(catalogDir, "Tweaks", "advanced.json"), JsonSerializer.Serialize(advancedTweaks, JsonOptions));
         File.WriteAllText(Path.Combine(catalogDir, "Tweaks", "preferences.json"), JsonSerializer.Serialize(preferencesTweaks, JsonOptions));
 
-        // 5. Preserve existing unique Tweakora extras in extras.json
-        BuildTweakoraExtras(catalogDir, essentialTweaks.Concat(advancedTweaks).Concat(preferencesTweaks).ToList());
+        // 5. Preserve existing unique WinVelo extras in extras.json
+        BuildWinVeloExtras(catalogDir, essentialTweaks.Concat(advancedTweaks).Concat(preferencesTweaks).ToList());
 
         // 6. Validate all newly generated catalog files against schema
         Console.WriteLine("\n[VALIDATING CATALOG AGAINST SCHEMA...]");
@@ -562,7 +562,7 @@ public static class Program
         return (hive, key);
     }
 
-    private static void BuildTweakoraExtras(string catalogDir, List<TweakDefinition> portedTweaks)
+    private static void BuildWinVeloExtras(string catalogDir, List<TweakDefinition> portedTweaks)
     {
         var portedIds = new HashSet<string>(portedTweaks.Select(t => t.Id), StringComparer.OrdinalIgnoreCase);
         var portedOrigins = new HashSet<string>(portedTweaks.Where(t => t.Origin != null).Select(t => t.Origin!), StringComparer.OrdinalIgnoreCase);
@@ -587,7 +587,7 @@ public static class Program
             }
         }
 
-        Console.WriteLine($"[INFO] Compiled {extras.Count} unique Tweakora Extras in extras.json");
+        Console.WriteLine($"[INFO] Compiled {extras.Count} unique WinVelo Extras in extras.json");
         File.WriteAllText(extrasPath, JsonSerializer.Serialize(extras, JsonOptions));
     }
 }

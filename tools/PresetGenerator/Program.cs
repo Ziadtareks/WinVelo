@@ -1,6 +1,6 @@
 using System.Text.Encodings.Web;
 using System.Text.Json;
-using Tweakora.Core.Models;
+using WinVelo.Core.Models;
 
 namespace PresetGenerator;
 
@@ -72,14 +72,14 @@ public static class Program
     public static int Main(string[] args)
     {
         string rootDir = Directory.GetCurrentDirectory();
-        while (rootDir != null && !File.Exists(Path.Combine(rootDir, "Tweakora.sln")))
+        while (rootDir != null && !File.Exists(Path.Combine(rootDir, "WinVelo.sln")))
         {
             rootDir = Directory.GetParent(rootDir)?.FullName!;
         }
 
         if (rootDir == null)
         {
-            Console.WriteLine("[ERROR] Could not find repository root containing Tweakora.sln");
+            Console.WriteLine("[ERROR] Could not find repository root containing WinVelo.sln");
             return 1;
         }
 

@@ -1,21 +1,25 @@
 # ==============================================================================
-# Tweakora Host-Side VirtualBox VM Test Orchestrator
+# WinVelo Host-Side VirtualBox VM Test Orchestrator
 # Runs on the host machine to control the VirtualBox test VM and execute real-mode tests
 # ==============================================================================
 
 param(
-    [string]$VmName = "Tweakora-Test-VM",
+    [string]$VmName = "WinVelo-Test-VM",
     [string]$SnapshotName = "clean",
-    [string]$GuestUser = "tweakora-admin",
-    [string]$GuestPassword = "Password123!",
+    [string]$GuestUser = "winvelo-admin",
+    # No default: pass the password of your own test VM (or set WINVELO_VM_PASSWORD).
+    [string]$GuestPassword = $env:WINVELO_VM_PASSWORD,
     [string]$VBoxManagePath = "C:\Program Files\Oracle\VirtualBox\VBoxManage.exe",
     [switch]$Headless
 )
 
 $ErrorActionPreference = "Stop"
+if ([string]::IsNullOrWhiteSpace($GuestPassword)) {
+    throw "Pass -GuestPassword <password of the test VM> or set WINVELO_VM_PASSWORD."
+}
 
 Write-Host "==========================================================" -ForegroundColor Cyan
-Write-Host "   Tweakora Host VirtualBox Test Orchestrator (Phase C)   " -ForegroundColor Cyan
+Write-Host "   WinVelo Host VirtualBox Test Orchestrator (Phase C)   " -ForegroundColor Cyan
 Write-Host "==========================================================" -ForegroundColor Cyan
 Write-Host "VM Name:       $VmName"
 Write-Host "Snapshot:      $SnapshotName"
@@ -43,8 +47,8 @@ $guestStagingDir = Join-Path $repoRoot "tests\vm\staging"
 if (Test-Path $guestStagingDir) { Remove-Item $guestStagingDir -Recurse -Force }
 New-Item -ItemType Directory -Path $guestStagingDir -Force | Out-Null
 
-Write-Host "[1/7] Building and staging Tweakora CLI for guest..." -ForegroundColor Cyan
-$publishCmd = "dotnet publish `"$repoRoot\src\Tweakora.Cli\Tweakora.Cli.csproj`" -c Release -o `"$guestStagingDir`""
+Write-Host "[1/7] Building and staging WinVelo CLI for guest..." -ForegroundColor Cyan
+$publishCmd = "dotnet publish `"$repoRoot\src\WinVelo.Cli\WinVelo.Cli.csproj`" -c Release -o `"$guestStagingDir`""
 Invoke-Expression $publishCmd
 
 # Copy Catalog & test runner into staging
@@ -99,15 +103,15 @@ if (-not $guestReady) {
 }
 Write-Host "[PASS] Guest Windows 11 OS is responsive." -ForegroundColor Green
 
-# 7. Copy staging directory into guest C:\TweakoraTest
-Write-Host "`n[5/7] Deploying Tweakora package into guest at C:\TweakoraTest..." -ForegroundColor Cyan
-& "$VBoxManagePath" guestcontrol "$VmName" --username "$GuestUser" --password "$GuestPassword" createdir "C:\TweakoraTest" 2>&1 | Out-Null
-& "$VBoxManagePath" guestcontrol "$VmName" --username "$GuestUser" --password "$GuestPassword" copyto --target-directory "C:\TweakoraTest" --recursive "$guestStagingDir\*" 2>&1 | Out-Null
+# 7. Copy staging directory into guest C:\WinVeloTest
+Write-Host "`n[5/7] Deploying WinVelo package into guest at C:\WinVeloTest..." -ForegroundColor Cyan
+& "$VBoxManagePath" guestcontrol "$VmName" --username "$GuestUser" --password "$GuestPassword" createdir "C:\WinVeloTest" 2>&1 | Out-Null
+& "$VBoxManagePath" guestcontrol "$VmName" --username "$GuestUser" --password "$GuestPassword" copyto --target-directory "C:\WinVeloTest" --recursive "$guestStagingDir\*" 2>&1 | Out-Null
 Write-Host "[PASS] Package deployed to guest." -ForegroundColor Green
 
 # 8. Run integration test script inside guest
 Write-Host "`n[6/7] Running tests/vm/run-integration.ps1 inside guest as administrator..." -ForegroundColor Cyan
-$testOut = & "$VBoxManagePath" guestcontrol "$VmName" --username "$GuestUser" --password "$GuestPassword" run --exe "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -- -NoProfile -ExecutionPolicy Bypass -File "C:\TweakoraTest\run-integration.ps1" 2>&1
+$testOut = & "$VBoxManagePath" guestcontrol "$VmName" --username "$GuestUser" --password "$GuestPassword" run --exe "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -- -NoProfile -ExecutionPolicy Bypass -File "C:\WinVeloTest\run-integration.ps1" 2>&1
 Write-Host $testOut
 
 # 9. Copy back integration-results.json to host
@@ -115,7 +119,7 @@ $resultsDir = Join-Path $repoRoot "tests\vm\results"
 if (-not (Test-Path $resultsDir)) { New-Item -ItemType Directory -Path $resultsDir -Force | Out-Null }
 $hostResultJson = Join-Path $resultsDir "integration-results.json"
 
-& "$VBoxManagePath" guestcontrol "$VmName" --username "$GuestUser" --password "$GuestPassword" copyfrom "C:\TweakoraTest\integration-results.json" --target-directory "$resultsDir" 2>&1 | Out-Null
+& "$VBoxManagePath" guestcontrol "$VmName" --username "$GuestUser" --password "$GuestPassword" copyfrom "C:\WinVeloTest\integration-results.json" --target-directory "$resultsDir" 2>&1 | Out-Null
 
 # 10. Power off and restore clean snapshot
 Write-Host "`n[7/7] Powering off and reverting VM to clean snapshot..." -ForegroundColor Cyan

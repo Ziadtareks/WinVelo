@@ -1,0 +1,20 @@
+{
+  "sessionId": "20261001_090000_0badc0de",
+  "startedAtUtc": "2026-10-01T09:00:00Z",
+  "isCompleted": true,
+  "records": [
+    {
+      "tweakId": "privacy.advertising.advertising-id",
+      "actionIndex": 0,
+      "actionType": "Registry",
+      "targetIdentifier": "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\AdvertisingInfo\\Enabled",
+      "existedBefore": false,
+      "previousValueKind": null,
+      "previousData": null,
+      "keyCreated": false,
+      "isBaseline": true,
+      "isReverted": false,
+      "appliedAtUtc": "2026-10-01T09:00:01Z"
+    }
+  ]
+}

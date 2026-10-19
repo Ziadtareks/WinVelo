@@ -39,10 +39,12 @@ $running = Get-Process -Name "WinVelo", "winvelo-cli" -ErrorAction SilentlyConti
 if ($running) { throw "Close WinVelo / winvelo-cli first (PID $(($running.Id) -join ', '))." }
 
 Step "1/6 Build"
-Run "dotnet build" { dotnet build Tweakora.sln -c Release --nologo -v minimal }
+Run "dotnet build" { dotnet build WinVelo.sln -c Release --nologo -v minimal }
 
 Step "2/6 Catalog and presets"
 Run "Catalog validator" { dotnet run --project tools/CatalogValidator/CatalogValidator.csproj -c Release --no-build }
+Run "README tweak count" { dotnet run --project tools/CatalogStats/CatalogStats.csproj -c Release --no-build }
+$tweakCount = (dotnet run --project tools/CatalogStats/CatalogStats.csproj -c Release --no-build -- --count | Select-Object -Last 1).Trim()
 Run "Preset generator" { dotnet run --project tools/PresetGenerator/PresetGenerator.csproj -c Release --no-build }
 $presetDiff = git status --porcelain -- Catalog/Presets
 if ($presetDiff) {
@@ -52,14 +54,14 @@ Write-Host "[OK] Presets match the generator." -ForegroundColor Green
 
 if (-not $SkipTests) {
     Step "3/6 Unit tests"
-    Run "Unit tests" { dotnet test src/Tweakora.Tests/Tweakora.Tests.csproj -c Release --no-build --nologo }
+    Run "Unit tests" { dotnet test src/WinVelo.Tests/WinVelo.Tests.csproj -c Release --no-build --nologo }
 } else {
     Write-Host "`n(Skipping tests)" -ForegroundColor Yellow
 }
 
 if (-not $SkipScreenshots) {
     Step "4/6 Screenshots (test mode, no system changes)"
-    $appExe = Join-Path $repoRoot "src\Tweakora.App\bin\Release\net10.0-windows\WinVelo.exe"
+    $appExe = Join-Path $repoRoot "src\WinVelo.App\bin\Release\net10.0-windows\WinVelo.exe"
     if (-not (Test-Path $appExe)) { throw "Built app not found at $appExe" }
     $shotDir = Join-Path $repoRoot "docs\screenshots"
     $p = Start-Process -FilePath $appExe -ArgumentList @("--test-mode", "--capture-screenshots", "`"$shotDir`"") -PassThru -Wait
@@ -106,14 +108,14 @@ $notes = @"
 A transparent, open-source tweak tool for Windows 10 and 11. See exactly what every setting changes, apply it, and undo it.
 
 ### Download
-**$zipName**: unzip it and run ``WinVelo.exe``. You don't need to install anything or download .NET. Keep the ``Catalog`` folder next to the exe.
+**$zipName**: unzip it and run ``WinVelo.exe``. You don't need to install anything or download .NET.
 
 > WinVelo isn't code-signed yet, so Windows SmartScreen may warn you. Click **More info**, then **Run anyway**.
 
 SHA-256: ``$zipHash``
 
 ### Highlights
-- 140 tweaks, each showing its exact registry/service changes, risk, side effects and source
+- $tweakCount tweaks, each showing its exact registry/service changes, risk, side effects and source
 - Presets (Recommended, Privacy, AI & Copilot, Clean UI, Performance, Gaming) with a preview before applying
 - Rollback journal with undo for single tweaks, sessions or everything
 - App installer (winget), startup, services, cleaner, DNS, fixes, updates, optional features, restore points
