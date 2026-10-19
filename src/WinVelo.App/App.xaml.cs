@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -18,6 +19,7 @@ using WinVelo.Core.Engine;
 using WinVelo.Core.Interfaces;
 using WinVelo.Core.Operations;
 using WinVelo.Core.Safety;
+using WinVelo.Core.Updates;
 using WinVelo.Modules.Advisor;
 using WinVelo.Modules.Apps;
 using WinVelo.Modules.Cleaner;
@@ -140,6 +142,8 @@ public partial class App : Application
                 services.AddSingleton<IMemoryOptimizerService, MemoryOptimizerService>();
                 services.AddSingleton<INetworkOptimizerService, NetworkOptimizerService>();
                 services.AddSingleton<ISmartAdvisorService, SmartAdvisorService>();
+                services.AddSingleton(new HttpClient { Timeout = TimeSpan.FromSeconds(15) });
+                services.AddSingleton<IUpdateChecker, GitHubUpdateChecker>();
 
                 // ViewModels
                 services.AddSingleton<DashboardViewModel>();
