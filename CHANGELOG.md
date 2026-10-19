@@ -10,11 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.2] - 2026-10-19
 
-Safety, security and release-integrity fixes from a full audit (see `AUDIT_REPORT.md`). No tweak was added or removed.
+Safety, security and release-integrity fixes from a full audit (see `docs/AUDIT_v1.0.2.md`). No tweak was added or removed.
 
 ### Changed
 - The project is now called WinVelo everywhere: solution, folders, namespaces and test projects (formerly *Tweakora*). Data from `%APPDATA%\Tweakora` is still migrated, and older rollback journals still load.
-- The tweak catalog is built into `WinVelo.exe` and `winvelo-cli.exe`; the portable zip no longer needs a `Catalog` folder. A `Catalog` folder next to the exe still replaces single files, and WinVelo says so at startup.
+- The tweak catalog is built into `WinVelo.exe` and `winvelo-cli.exe`; the portable zip no longer needs a `Catalog` folder. A custom catalog folder is used only with `--catalog <folder>` and after you confirm an administrator warning; a folder next to the exe is ignored.
 - "Turn off automatic updates" (formerly "Disable All Updates", `--update-mode DisableAll`) only sets the `NoAutoUpdate` policy. It no longer disables the Windows Update, BITS and Update Orchestrator services, and choosing it re-enables them if an older version disabled them.
 - `WinVelo.exe --test-mode` no longer asks for administrator rights. In normal mode WinVelo asks once at startup; if you say no, it opens read-only.
 - `winvelo-cli --self-test` runs in simulation unless `--real-mode` is given, like every other command.
@@ -40,13 +40,15 @@ Safety, security and release-integrity fixes from a full audit (see `AUDIT_REPOR
 - Startup and crash dialogs no longer show stack traces; they are translated and point to the log folder.
 - Missing Arabic translations (app status badges, new dialogs); the typed "I understand" confirmation also accepts the Arabic word; the command-palette arrow points the right way in Arabic.
 - The cleanup in Tools can be stopped.
+- A service change that Windows refuses is now reported as failed (it used to show as applied with a warning).
+- Undoing a tweak that was already active when you applied it (for example because another tweak set the same value) no longer switches off the other tweak's setting.
 
 ### Added
-- CI on every push and pull request (Windows, .NET 10, warnings as errors, tests, catalog validator, README tweak count, vulnerable-package check) and a CI badge.
+- CI on every push and pull request (Windows, .NET 10, warnings as errors, tests, catalog validator, README tweak count, vulnerable-package check) and a CI badge, plus a Windows smoke job that tests the portable package in test mode.
 - `tools/CatalogStats`: counts tweaks/apps/presets and keeps the README numbers correct.
 - CatalogValidator checks app package ids and links, anecdotal ⇒ Experimental, and https sources for documented tweaks.
 - README: *Verify your download* and *Antivirus false positives*; the Arabic section covers the same points.
-- Issue templates, a pull request template and Dependabot.
+- Issue templates, a pull request template and Dependabot (monthly).
 
 ## [1.0.1] - 2026-10-16
 

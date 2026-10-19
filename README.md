@@ -81,7 +81,7 @@ What you can do:
 - Try it without touching your PC first: `WinVelo.exe --test-mode`.
 - If your antivirus still flags a release whose hash matches, please report it to the antivirus vendor as a false positive and [tell us](https://github.com/Ziadtareks/WinVelo/issues).
 
-Never turn off your antivirus to run WinVelo. Code signing is planned ([docs/SIGNING.md](docs/SIGNING.md)) and will reduce these warnings.
+Never turn off your antivirus to run WinVelo. Code signing is planned ([docs/RELEASING.md](docs/RELEASING.md#code-signing-off-until-a-certificate-exists)) and will reduce these warnings.
 
 ---
 

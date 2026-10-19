@@ -80,7 +80,7 @@ jobs:
       # Code signing (OFF by default). WinVelo has no certificate yet, so nothing is signed and
       # nothing pretends to be. To turn signing on:
       #   1. Get a certificate. SignPath Foundation signs open-source projects for free:
-      #      https://signpath.org  (see docs/SIGNING.md).
+      #      https://signpath.org  (see docs/RELEASING.md, "Code signing").
       #   2. Add the secrets SIGNPATH_API_TOKEN and SIGNPATH_ORGANIZATION_ID, and the repository
       #      variables SIGNPATH_PROJECT_SLUG and SIGNPATH_SIGNING_POLICY_SLUG
       #      (Settings > Secrets and variables > Actions).

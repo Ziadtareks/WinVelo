@@ -57,7 +57,7 @@ git push origin v1.0.0
    - Check that the tag matches `<Version>` in `Directory.Build.props`.
    - Restore, build, validate the catalog and the README tweak count, and run the unit tests.
    - Build the portable folder (`build\publish.ps1 -SkipZip`).
-   - Sign the exe files, only when signing is turned on (see [SIGNING.md](SIGNING.md)).
+   - Sign the exe files, only when signing is turned on (see [Code signing](#code-signing-off-until-a-certificate-exists)).
    - Zip the folder and write `WinVelo-v1.0.0-portable.zip.sha256` and `SHA256SUMS.txt` (`build\publish.ps1 -PackageOnly`).
    - Attest build provenance (`actions/attest-build-provenance`).
    - Create a **Draft** GitHub Release with the zip and both hash files.
@@ -106,3 +106,20 @@ After the GitHub release is public, create and submit a manifest that points to 
 winget install Microsoft.WingetCreate
 wingetcreate new https://github.com/Ziadtareks/WinVelo/releases/download/v1.0.0/WinVelo-v1.0.0-portable.zip
 ```
+
+---
+
+## Code signing (off until a certificate exists)
+
+Releases are **not code-signed** yet, and nothing in the build pretends otherwise: the release notes say whether a release is signed. Users can check a download with the `.sha256` file and the build attestation (README, *Verify your download*).
+
+The release workflow already has a signing step between `build\publish.ps1 -SkipZip` and `-PackageOnly`, so the hashes and the attestation always describe the signed files. It stays off until the repository variable `WINVELO_SIGNING` is `signpath`.
+
+To turn it on with [SignPath Foundation](https://signpath.org) (free code signing for open-source projects that build in CI):
+
+1. Apply at <https://signpath.org> and create the project in SignPath (an artifact configuration that signs `WinVelo.exe` and `winvelo-cli.exe`, and a signing policy).
+2. In GitHub, **Settings › Secrets and variables › Actions**, add the secrets `SIGNPATH_API_TOKEN` and `SIGNPATH_ORGANIZATION_ID`, and the variables `SIGNPATH_PROJECT_SLUG` and `SIGNPATH_SIGNING_POLICY_SLUG`.
+3. Set the variable `WINVELO_SIGNING` to `signpath`.
+4. Before the first signed release, check the [SignPath GitHub action](https://github.com/SignPath/github-action-submit-signing-request) README; its version and inputs may have changed.
+
+To sign a local build instead: `.\build\publish.ps1 -SkipZip`, sign the two exe files in `dist\WinVelo-v<version>-portable\`, then `.\build\publish.ps1 -PackageOnly`. A self-signed certificate only helps for your own tests; SmartScreen still warns on other PCs.

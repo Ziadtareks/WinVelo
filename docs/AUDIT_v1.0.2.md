@@ -1,10 +1,10 @@
 # WinVelo audit report (v1.0.2)
 
-Branch: `claude/quirky-einstein-l1yxvx` (22 commits on top of `f32c400`, tag v1.0.1). Audit date: 2026-10-19.
+Audit of v1.0.1 (`f32c400`), fixes released as v1.0.2. Audit date: 2026-10-19.
 
 ## 1. Summary
 
-WinVelo's design is sound (write-ahead journal, simulation fakes, evidence labels), but the audit found real problems in the parts users trust most. Undo could delete more than WinVelo added, leave settings changed when two tweaks shared a value, or lose the whole journal in a crash. The app installer and the DNS/feature tools put catalog values into PowerShell, so a crafted catalog entry could run commands as administrator. The "Windows Update is never disabled" promise was enforced only at build time and was broken by the app's own update mode. All of these are fixed and covered by new tests (from 247 to 353 tests). The catalog itself is in good shape, but 3 of the 36 winget ids did not exist.
+WinVelo's design is sound (write-ahead journal, simulation fakes, evidence labels), but the audit found real problems in the parts users trust most. Undo could delete more than WinVelo added, leave settings changed when two tweaks shared a value, or lose the whole journal in a crash. The app installer and the DNS/feature tools put catalog values into PowerShell, so a crafted catalog entry could run commands as administrator. The "Windows Update is never disabled" promise was enforced only at build time and was broken by the app's own update mode. All of these are fixed and covered by new tests (from 247 to 385 tests). The catalog itself is in good shape, but 3 of the 36 winget ids did not exist.
 
 ## 2. Issues found
 
@@ -35,11 +35,11 @@ Severity: Critical / High / Medium / Low. Status: Fixed / Not fixed / Needs huma
 | A-21 | Medium | Restore points | `Platform/WindowsRestoreService.cs` | Fixed | Unescaped description (apostrophe broke it), 30 s timeout (`ExitCode` of a running process threw), possible pipe deadlock, unclear 24-hour message. |
 | A-22 | Medium | Backups | `TweakService.cs`, `WinVeloStoragePaths.cs` | Fixed | `.reg` backups went to `%TEMP%`, which WinVelo's own cleaner empties. |
 | A-23 | Medium | Release | `.github/workflows/release.yml` | Fixed | The signing step signed a path that did not exist yet (before `publish.ps1` ran), so a configured certificate would have had no effect. |
-| A-24 | Medium | CI | GitHub repository settings | Needs human decision | No workflow has ever run (also not after this branch's pushes): GitHub Actions appears to be disabled for the repository. |
-| A-25 | Medium | Safety / undo | `TweakRunner.cs` | Not fixed | A tweak that is already active when applied (because another tweak set the same values) is skipped without a journal record; undoing it later falls back to the catalog undo actions, which can switch off the other tweak's value. Needs a design for shared targets. |
+| A-24 | High | CI | GitHub account settings | Needs owner action | No workflow has ever run. Triggering one through the GitHub API returns "Actions has been disabled for this user", so CI, the smoke job and the release workflow cannot run until the owner re-enables Actions. |
+| A-25 | Medium | Safety / undo | `TweakRunner.cs`, handlers | Fixed | A tweak that was already active when applied got no journal record, so its undo ran the catalog undo and could switch off another tweak's value (or the user's own setting). The current state is now journaled (`IStateCaptureHandler`); every undo order restores the original. |
 | A-26 | Medium | Elevation | Platform | Not fixed | If a standard user elevates with a different administrator account, HKCU tweaks go to the administrator's profile. WinVelo does not detect this. Suggest a warning (compare the token user with the Explorer user). |
-| A-27 | Medium | Honesty | `Core/Engine/Handlers/ServiceActionHandler.cs` | Needs human decision | Service failures (access denied, service missing) are reported as success with a `[WARN]` text, following WinUtil policy. Registry handling was changed to report failures; services were left as designed. |
-| A-28 | Medium | Catalog trust | `CatalogSource.cs`, `App.xaml.cs` | Needs human decision | A `Catalog` folder next to the exe can run PowerShell as administrator (the same as replacing the exe, which is equally writable). WinVelo now tells the user at startup; you may want an explicit opt-in flag instead. |
+| A-27 | Medium | Honesty | `Core/Engine/Handlers/ServiceActionHandler.cs` | Fixed | Refused service changes (access denied, cannot start/stop) were reported as success with a `[WARN]` text. They are now failures (EN/AR messages); a service that is not installed on the edition is still a skip. |
+| A-28 | Medium | Catalog trust | `CatalogSource.cs`, `App.xaml.cs`, `Cli/Program.cs` | Fixed | A `Catalog` folder next to the exe was used automatically and its PowerShell runs as administrator. Now the built-in catalog is always the default; a custom folder needs `--catalog <folder>` plus confirmation after an administrator warning (app) or confirmation/`--yes` in real mode (CLI). |
 | A-29 | Low | Rename | whole repo | Fixed | Folders, solution, namespaces and tests still used "Tweakora". Only `AppDataMigrator.LegacyProductName` (migration) and the CHANGELOG mention it now. |
 | A-30 | Low | Release | `build/publish.ps1` | Fixed | No per-artifact `.sha256` file; SHA256SUMS lacked the CLI. |
 | A-31 | Low | CI | `.github/workflows/build-and-test.yml` | Fixed | Ran only for `main`, no NuGet cache, warnings allowed, CI included UI tests that need a desktop. |
@@ -61,7 +61,7 @@ Catalog checks that passed (no change needed): unique ids; every documented twea
 **Phase 1**
 - Rename Tweakora → WinVelo (`git mv`), with `%APPDATA%\Tweakora` migration kept and a test that a 1.0.1 journal still loads.
 - Catalog embedded in WinVelo.Core (`CatalogSource`, `CatalogLoader`); optional override folder; per-file and per-tweak error handling; EN/AR messages; 11 loader tests.
-- `publish.ps1`: `-SkipZip` / `-PackageOnly` stages, `.sha256` per zip and `SHA256SUMS.txt`. Release workflow: version check, CI build, attestation, opt-in SignPath step. README *Verify your download* and *Antivirus false positives*; SIGNING.md and RELEASING.md rewritten.
+- `publish.ps1`: `-SkipZip` / `-PackageOnly` stages, `.sha256` per zip and `SHA256SUMS.txt`. Release workflow: version check, CI build, attestation, opt-in SignPath step. README *Verify your download* and *Antivirus false positives*; signing steps in docs/RELEASING.md.
 - CI on every push/PR: .NET 10 on windows-latest, NuGet cache, warnings as errors, unit tests with `WINVELO_TEST_MODE=1`, catalog validator, README counts, vulnerable-package check; UI tests in a non-blocking job; CI badge.
 - `tools/CatalogStats` keeps the README/docs counts correct (CI fails on drift).
 - App installer rewrite (A-01, A-15 to A-18, A-33), validator rule and 26 tests for ids, links and installer behaviour.
@@ -73,29 +73,30 @@ Catalog checks that passed (no change needed): unique ids; every documented twea
 - CLI self-test needs `--real-mode`; diagnostics sanitiser; DNS/feature command validation; external catalog warning; `asInvoker` manifest; restore points; backups folder; reg.exe arguments.
 - Validator: anecdotal ⇒ Experimental, https source for documented, http(s) sources only.
 - Localization: missing Arabic, test covers every `T()` in the app and empty entries, RTL arrow, Arabic confirmation word. New XAML resource test (undefined `StaticResource` keys).
-- Cleaner cancel; issue/PR templates; Dependabot; no default VM password; package updates (Mvvm 8.4.2, Microsoft.Extensions 10.0.13, Serilog 4.4.0); CHANGELOG 1.0.2; README top and Arabic section.
+- Service failures reported as failures; custom catalog opt-in with confirmation; already-active tweaks journaled (A-25, A-27, A-28).
+- Windows smoke job in CI (portable package, `--test-mode` start/exit, CLI without a Catalog folder, apply/undo of a tweak and a preset compared with the starting state, 1.0.1/Tweakora journal fixtures, protected services, update mode, dictionaries).
+- Cleaner cancel; issue/PR templates; Dependabot (monthly, grouped, at most 3 PRs); no default VM password; package updates (Mvvm 8.4.2, Microsoft.Extensions 10.0.13, Serilog 4.4.0); CHANGELOG 1.0.2; README top and Arabic section.
 
 ## 4. Not verified here, and what you need to do
 
-1. **Turn on GitHub Actions** (Settings › Actions › General › Allow all actions). Nothing has ever run in CI, so the Windows-only tests below have not been seen passing on Windows. Then check the first CI run.
-2. **Windows-only tests.** This audit ran on Linux with the WPF runtime borrowed from NuGet. 325 of 353 tests pass; the other 28 need Windows (24 construct WPF view models that call native code, 1 needs `powershell.exe`, 1 is a reflection load of WPF types, 2 compare files with Windows line endings). None of them failed because of these changes (they failed identically before the first commit). Run `dotnet test src/WinVelo.Tests/WinVelo.Tests.csproj` on Windows, and the UI tests (`src/WinVelo.UiTests`).
-3. **Manual checks on a Windows VM** (not possible here): the startup elevation flow (accept and decline UAC), `--test-mode` without a prompt, Apps page status/cancel, Tools cleanup Stop button, restore-point creation, and the Arabic layout of the new dialogs.
-4. **WhatsApp Store id `9NKSQGP7F2NH`**: format checked, not confirmed against the Store (no access). Run `winget show --id 9NKSQGP7F2NH --source msstore`.
-5. **Chocolatey package names** (all 36) have a valid format but could not be checked: community.chocolatey.org was unreachable. Run `choco search <id> --exact` for each, or check the website.
+1. **GitHub Actions is disabled for the owner account.** The GitHub API answers "Actions has been disabled for this user" when a workflow is triggered, and no run has ever happened. Until it is re-enabled, CI (build, tests, CatalogValidator, CatalogStats, smoke job) has **not** run on Windows, and the release workflow cannot build v1.0.2. Re-enable it under GitHub › Settings (account) › Actions, or check github.com/settings/billing; if the account is restricted, only GitHub Support can lift that.
+2. **What was verified here (Linux):** Release build with warnings as errors: 0 warnings. CatalogValidator: 140 tweaks, 6 presets, 0 errors. CatalogStats: README matches. Unit tests: 357 of 385 pass; the other 28 need Windows (24 construct WPF view models that call native code, 1 needs `powershell.exe`, 1 loads WPF types by reflection, 2 compare files with Windows line endings) and failed identically before the audit. All 18 smoke tests pass. The CLI checks of the smoke job pass against the Linux build. The `WinVelo.exe --test-mode` start/exit check and the package checks can only run on Windows.
+3. **Not checked by the smoke job** (cannot be done safely on a CI runner): the real UAC prompt in normal mode, real registry/service changes, restore points, and the Arabic layout. These run only on a real PC.
+4. **WhatsApp Store id `9NKSQGP7F2NH`**: format checked, not confirmed against the Store. Run `winget show --id 9NKSQGP7F2NH --source msstore`.
+5. **Chocolatey package names** (all 36): valid format, not checked (community.chocolatey.org was unreachable). Run `choco search <id> --exact`.
 6. **Tweak source links**: learn.microsoft.com was unreachable, so links were checked for format only. Run `dotnet run --project tools/SourceChecker/SourceChecker.csproj`.
-7. **winget exit codes** used in `PackageCommands` (`0x8A150014`, `0x8A15002B`, `0x8A150061`) are taken from winget's documented return codes from memory; confirm them against the current [returnCodes.md](https://github.com/microsoft/winget-cli/blob/master/doc/windows/package-manager/winget/returnCodes.md).
-8. **Code signing**: apply to [SignPath Foundation](https://signpath.org), add the secrets and variables listed in `docs/SIGNING.md`, set `WINVELO_SIGNING=signpath`, and check the SignPath action's current inputs before the first signed release.
-9. **Decisions**: A-24, A-27, A-28, A-38 above.
-10. **Release**: after merging, tag `v1.0.2`; the workflow refuses a tag that does not match `Directory.Build.props`.
+7. **winget exit codes** in `PackageCommands` (`0x8A150014`, `0x8A15002B`, `0x8A150061`) are from winget's documented return codes, written from memory; confirm them against [returnCodes.md](https://github.com/microsoft/winget-cli/blob/master/doc/windows/package-manager/winget/returnCodes.md).
+8. **Code signing**: see docs/RELEASING.md, *Code signing*.
+9. **Decision left to you:** A-38 (personal path in an old commit).
 
 ## 5. Suggestions for the next version
 
-1. Shared-target model for tweaks (A-25): reference-count registry values and services that several tweaks touch, so "already active" tweaks get journal records and every undo is exact.
+1. Show "also changed by …" in the preview when tweaks share a registry value or service.
 2. Detect over-the-shoulder elevation (A-26) and warn before applying HKCU tweaks.
-3. Make the external Catalog folder opt-in (`--catalog <path>`) and show its origin on each tweak card.
+3. Show the origin (built-in or custom catalog) on each tweak card.
 4. Run the UI tests and a VM integration run (`tests/vm`) in CI on a self-hosted Windows runner.
 5. Code signing through SignPath Foundation.
-6. Report service failures honestly (A-27) with a distinct "Not available on this edition" status instead of success.
+6. A distinct "Not available on this edition" status for services that are not installed.
 7. Merge the 21 overlapping tweaks into one owner per value, or show "also changed by …" in the preview.
 8. Make the DNS benchmark cancellable and run all Tools operations through `OperationRunner` with progress.
 9. Remove dead code (`ScriptRunner.RunCmdAsync`, `apps.winget.json`) and the duplicated CatalogValidator/test logic.
