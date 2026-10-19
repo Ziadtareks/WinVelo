@@ -1,0 +1,52 @@
+name: Tweak request
+description: Suggest a new tweak or a change to an existing one.
+labels: ["tweak-request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        WinVelo only accepts tweaks that really change something and can be shown to do so. Please read the
+        [tweak authoring guide](https://github.com/Ziadtareks/WinVelo/blob/main/docs/TWEAK_GUIDE.md) first.
+        No "FPS boost", "RAM cleaner" or similar placebo tweaks.
+  - type: input
+    id: name
+    attributes:
+      label: Tweak name
+      placeholder: Disable Bing results in Start search
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What it changes
+      description: Exact registry values, services, scheduled tasks or commands, and what undo restores.
+      placeholder: |
+        HKCU\Software\Policies\Microsoft\Windows\Explorer
+        DisableSearchBoxSuggestions = 1 (DWORD)
+    validations:
+      required: true
+  - type: dropdown
+    id: evidence
+    attributes:
+      label: Evidence
+      options:
+        - documented (Microsoft documentation that names the setting)
+        - ui-equivalent (the same switch exists in Settings or Control Panel)
+        - situational (fixes a specific, described problem)
+        - anecdotal (only in Experimental)
+    validations:
+      required: true
+  - type: textarea
+    id: sources
+    attributes:
+      label: Sources
+      description: Links, and for "documented" a short quote that names the setting.
+    validations:
+      required: true
+  - type: textarea
+    id: side-effects
+    attributes:
+      label: Side effects and risk
+      description: What can break, which Windows versions/editions it applies to, and whether it needs a restart.
+    validations:
+      required: true

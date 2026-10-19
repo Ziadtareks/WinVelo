@@ -7,12 +7,16 @@ param(
     [string]$VmName = "WinVelo-Test-VM",
     [string]$SnapshotName = "clean",
     [string]$GuestUser = "winvelo-admin",
-    [string]$GuestPassword = "Password123!",
+    # No default: pass the password of your own test VM (or set WINVELO_VM_PASSWORD).
+    [string]$GuestPassword = $env:WINVELO_VM_PASSWORD,
     [string]$VBoxManagePath = "C:\Program Files\Oracle\VirtualBox\VBoxManage.exe",
     [switch]$Headless
 )
 
 $ErrorActionPreference = "Stop"
+if ([string]::IsNullOrWhiteSpace($GuestPassword)) {
+    throw "Pass -GuestPassword <password of the test VM> or set WINVELO_VM_PASSWORD."
+}
 
 Write-Host "==========================================================" -ForegroundColor Cyan
 Write-Host "   WinVelo Host VirtualBox Test Orchestrator (Phase C)   " -ForegroundColor Cyan
