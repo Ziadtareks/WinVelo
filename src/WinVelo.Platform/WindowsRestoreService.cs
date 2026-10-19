@@ -118,24 +118,59 @@ public sealed class WindowsRestoreService : ISystemRestoreService
         try
         {
             int beforeCount = GetRestorePointCount();
-            using var process = Process.Start(new ProcessStartInfo
+
+            // The description is a PowerShell single-quoted literal: '' is the only escape it needs.
+            string safeDescription = (description ?? "WinVelo").Replace("'", "''").Replace("\r", " ").Replace("\n", " ");
+            var startInfo = new ProcessStartInfo
             {
                 FileName = "powershell.exe",
-                Arguments = $"-NoProfile -NonInteractive -Command \"Checkpoint-Computer -Description '{description}' -RestorePointType 'MODIFY_SETTINGS'\"",
                 CreateNoWindow = true,
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true
-            });
-            process?.WaitForExit(30000);
-            int afterCount = GetRestorePointCount();
+            };
+            startInfo.ArgumentList.Add("-NoProfile");
+            startInfo.ArgumentList.Add("-NonInteractive");
+            startInfo.ArgumentList.Add("-Command");
+            startInfo.ArgumentList.Add($"Checkpoint-Computer -Description '{safeDescription}' -RestorePointType 'MODIFY_SETTINGS'");
 
+            using var process = Process.Start(startInfo);
+            if (process == null)
+            {
+                return new RestorePointResult { Success = false, ErrorMessage = "PowerShell could not be started.", SequenceNumber = beforeCount };
+            }
+
+            // Read both streams while waiting, so a full output pipe can never block the process.
+            var stdout = process.StandardOutput.ReadToEndAsync();
+            var stderr = process.StandardError.ReadToEndAsync();
+
+            // Creating a restore point can take a few minutes on a busy disk.
+            if (!process.WaitForExit(TimeSpan.FromMinutes(5)))
+            {
+                try { process.Kill(entireProcessTree: true); } catch (InvalidOperationException) { }
+                return new RestorePointResult
+                {
+                    Success = false,
+                    ErrorMessage = "Windows did not finish creating the restore point within 5 minutes.",
+                    SequenceNumber = beforeCount
+                };
+            }
+
+            string error = stderr.GetAwaiter().GetResult().Trim();
+            _ = stdout.GetAwaiter().GetResult();
+            int afterCount = GetRestorePointCount();
             bool reallyCreated = afterCount > beforeCount;
+
+            // Exit code 0 without a new point: Windows skipped it because one was created in the last 24 hours
+            // (SystemRestorePointCreationFrequency). That is not an error; the newest point still protects the PC.
+            bool throttled = !reallyCreated && process.ExitCode == 0;
             return new RestorePointResult
             {
                 Success = reallyCreated,
-                WasThrottledOrSkipped = !reallyCreated && process?.ExitCode == 0,
-                ErrorMessage = reallyCreated ? null : (process?.StandardError.ReadToEnd() ?? "Restore point not created (throttled by Windows 24h limit)"),
+                WasThrottledOrSkipped = throttled,
+                ErrorMessage = reallyCreated ? null
+                    : throttled ? "Windows creates at most one restore point every 24 hours; the most recent one is kept."
+                    : (string.IsNullOrWhiteSpace(error) ? $"Restore point not created (exit code {process.ExitCode})." : error),
                 SequenceNumber = afterCount
             };
         }

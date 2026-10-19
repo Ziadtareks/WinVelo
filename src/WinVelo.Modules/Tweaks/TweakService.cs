@@ -107,7 +107,7 @@ public sealed class TweakService : ITweakService
             Shell = _shell,
             Journal = _journal,
             IsDryRun = false,
-            BackupDirectory = Path.Combine(Path.GetTempPath(), "WinVelo_Backups")
+            BackupDirectory = WinVeloStoragePaths.GetRegistryBackupDirectory(TestModeManager.IsTestMode)
         };
 
         _detector = new StateDetector(_registry, _services, _tasks);

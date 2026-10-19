@@ -26,6 +26,15 @@ public static class WinVeloStoragePaths
         return Path.Combine(GetStorageRoot(isTestMode), "Journal");
     }
 
+    /// <summary>
+    /// Folder for the .reg exports made before registry changes. Not under %TEMP%, which Windows Disk Cleanup
+    /// and WinVelo's own cleaner empty.
+    /// </summary>
+    public static string GetRegistryBackupDirectory(bool isTestMode)
+    {
+        return Path.Combine(GetStorageRoot(isTestMode), "Backups");
+    }
+
     public static string GetSettingsPath(bool isTestMode)
     {
         if (isTestMode)

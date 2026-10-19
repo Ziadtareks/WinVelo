@@ -212,13 +212,18 @@ public sealed class WindowsRegistryService : IRegistryService
         string safeName = $"{normHive}_{normKey}".Replace('\\', '_').Replace('/', '_').Replace(':', '_');
         string backupFile = Path.Combine(backupFolder, $"{safeName}_{DateTime.UtcNow:yyyyMMddHHmmss}.reg");
 
-        using var process = Process.Start(new ProcessStartInfo
+        var startInfo = new ProcessStartInfo
         {
             FileName = "reg.exe",
-            Arguments = $"export \"{normHive}\\{normKey}\" \"{backupFile}\" /y",
             CreateNoWindow = true,
             UseShellExecute = false
-        });
+        };
+        // Separate arguments: a key name from the catalog can never add its own reg.exe switches.
+        startInfo.ArgumentList.Add("export");
+        startInfo.ArgumentList.Add($"{normHive}\\{normKey}");
+        startInfo.ArgumentList.Add(backupFile);
+        startInfo.ArgumentList.Add("/y");
+        using var process = Process.Start(startInfo);
         process?.WaitForExit(5000);
 
         return backupFile;
