@@ -806,7 +806,6 @@
   "WinVelo Error": "خطأ في WinVelo",
   "WinVelo has to close because of an unexpected error: {0}\n\nDetails are in the log folder:\n{1}": "يجب إغلاق WinVelo بسبب خطأ غير متوقع: {0}\n\nالتفاصيل في مجلد السجلات:\n{1}",
   "WinVelo Fatal Error": "خطأ فادح في WinVelo",
-  "WinVelo could not load any tweaks.\n\nIf you put a Catalog folder next to WinVelo.exe, it may contain broken files: delete or fix that folder and start WinVelo again. Without that folder, WinVelo uses its built-in tweak list.\n\nDetails are in the log folder:\n{0}": "تعذّر على WinVelo تحميل أي تعديل.\n\nإذا وضعت مجلد Catalog بجانب WinVelo.exe فقد يحتوي على ملفات تالفة: احذف هذا المجلد أو أصلحه ثم شغّل WinVelo من جديد. بدون هذا المجلد يستخدم WinVelo قائمة التعديلات المدمجة فيه.\n\nالتفاصيل في مجلد السجلات:\n{0}",
   "Tweak list not available": "قائمة التعديلات غير متاحة",
   "Some catalog entries could not be read and were skipped. Everything else works normally.\n\n{0}\n\nDetails are in the log folder:\n{1}": "تعذّرت قراءة بعض عناصر الكتالوج فتم تخطيها. كل ما عداها يعمل بشكل طبيعي.\n\n{0}\n\nالتفاصيل في مجلد السجلات:\n{1}",
   "Some tweaks were skipped": "تم تخطي بعض التعديلات",
@@ -821,8 +820,6 @@
   "{0} rollback journal file(s) could not be read. WinVelo did not delete them, but it cannot undo the changes they describe.\n\nThe files are in:\n{1}\n\nPlease keep them and report this on GitHub.": "تعذّرت قراءة {0} من ملفات سجل التراجع. لم يحذفها WinVelo، لكنه لا يستطيع التراجع عن التغييرات المسجلة فيها.\n\nالملفات موجودة في:\n{1}\n\nيرجى الاحتفاظ بها والإبلاغ عن المشكلة على GitHub.",
   "Rollback journal problem": "مشكلة في سجل التراجع",
   "Automatic updates off (Caution)": "التحديثات التلقائية متوقفة (تحذير)",
-  "WinVelo is using tweak files from this folder instead of its built-in catalog:\n{0}\n\nThese files can change your system as administrator. Only keep this folder if you created it or trust where it came from. Delete it to go back to the built-in catalog.": "يستخدم WinVelo ملفات التعديلات من هذا المجلد بدلًا من الكتالوج المدمج فيه:\n{0}\n\nيمكن لهذه الملفات تغيير نظامك بصلاحيات المسؤول. احتفظ بهذا المجلد فقط إذا كنت أنشأته بنفسك أو تثق بمصدره. احذفه للعودة إلى الكتالوج المدمج.",
-  "Custom catalog in use": "يتم استخدام كتالوج مخصص",
   "Administrator rights are needed for this change.\n\nClick 'Restart as Administrator' in the banner at the top, or start WinVelo again and accept the Windows prompt.": "يحتاج هذا التغيير إلى صلاحيات المسؤول.\n\nاضغط «إعادة التشغيل كمسؤول» في الشريط أعلى النافذة، أو شغّل WinVelo من جديد ووافق على نافذة Windows.",
   "Administrator rights required": "صلاحيات المسؤول مطلوبة",
   "Applied successfully.": "تم التطبيق بنجاح.",
@@ -851,5 +848,8 @@
   "Could not start service '{0}': {1}": "تعذّر تشغيل الخدمة '{0}': {1}",
   "Could not stop service '{0}': {1}": "تعذّر إيقاف الخدمة '{0}': {1}",
   "Could not restore the startup type of service '{0}': {1}": "تعذّرت استعادة نوع بدء تشغيل الخدمة '{0}': {1}",
-  "Could not restore the running state of service '{0}': {1}": "تعذّرت استعادة حالة تشغيل الخدمة '{0}': {1}"
+  "Could not restore the running state of service '{0}': {1}": "تعذّرت استعادة حالة تشغيل الخدمة '{0}': {1}",
+  "WinVelo was started with a custom tweak catalog:\n{0}\n\nWARNING: files in this folder replace the built-in tweaks and can run PowerShell scripts with administrator rights. Use it only if you wrote these files yourself or fully trust where they came from.\n\nUse this custom catalog?\nYes: use it.  No: use the built-in catalog.": "تم تشغيل WinVelo مع كتالوج تعديلات مخصص:\n{0}\n\nتحذير: ملفات هذا المجلد تحل محل التعديلات المدمجة ويمكنها تشغيل سكربتات PowerShell بصلاحيات المسؤول. استخدمه فقط إذا كتبت هذه الملفات بنفسك أو كنت تثق بمصدرها تمامًا.\n\nهل تريد استخدام هذا الكتالوج المخصص؟\nنعم: استخدمه.  لا: استخدم الكتالوج المدمج.",
+  "Custom catalog: administrator warning": "كتالوج مخصص: تحذير صلاحيات المسؤول",
+  "WinVelo could not load any tweaks.\n\nIf you started it with --catalog, that folder may contain broken files: fix it, or start WinVelo without --catalog to use its built-in tweak list.\n\nDetails are in the log folder:\n{0}": "تعذّر على WinVelo تحميل أي تعديل.\n\nإذا شغّلته مع ‎--catalog فقد يحتوي ذلك المجلد على ملفات تالفة: أصلحها، أو شغّل WinVelo بدون ‎--catalog لاستخدام قائمة التعديلات المدمجة.\n\nالتفاصيل في مجلد السجلات:\n{0}"
 }

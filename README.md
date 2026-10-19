@@ -35,7 +35,7 @@
 
 There is nothing to install and you don't need to download .NET, because the runtime is built into the exe. The tweak catalog is built in too, so `WinVelo.exe` works on its own.
 
-> **Advanced:** to try your own tweak definitions, create a `Catalog` folder next to `WinVelo.exe` with the same layout as [`Catalog`](Catalog) in this repository (for example `Catalog\Tweaks\extras.json`). Each file you put there replaces the built-in file with the same path. A broken file or tweak is skipped and reported; the rest keeps working.
+> **Advanced:** to try your own tweak definitions, make a folder with the same layout as [`Catalog`](Catalog) in this repository (for example `MyCatalog\Tweaks\extras.json`) and start `WinVelo.exe --catalog MyCatalog` (or `winvelo-cli --catalog MyCatalog ...`). Each file there replaces the built-in file with the same path. Because catalog files can run PowerShell as administrator, WinVelo asks you to confirm the folder first, and never uses a folder you did not name. A broken file or tweak is skipped and reported.
 
 > **Windows SmartScreen:** WinVelo isn't code-signed yet, so Windows may show *"Windows protected your PC"*. Check your download first (see below), then click **More info** and **Run anyway**.
 

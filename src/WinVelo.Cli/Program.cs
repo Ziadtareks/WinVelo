@@ -81,6 +81,24 @@ public static class Program
             Console.WriteLine("[MODE] TEST/SIMULATION ACTIVE — Using safe in-memory fakes.");
         }
 
+        // A custom catalog is used only when asked for with --catalog <folder>. Its scripts run as administrator,
+        // so in real mode it must be confirmed (interactively or with --yes); a folder next to the exe is ignored.
+        string? customCatalog = CatalogSource.RequestedFolder(args);
+        if (!string.IsNullOrWhiteSpace(customCatalog))
+        {
+            string full = Path.GetFullPath(customCatalog);
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine($"[WARNING] Custom catalog requested: {full}");
+            Console.WriteLine("          Its files replace the built-in tweaks and can run PowerShell scripts as administrator.");
+            Console.WriteLine("          Use it only if you wrote these files yourself or fully trust where they came from.");
+            Console.ResetColor();
+            if (isRealMode && !CheckConfirmationGate(args, $"use the custom catalog at {full}"))
+            {
+                return 1;
+            }
+            CatalogSource.SetDefault(CatalogSource.FromOverrideFolder(full));
+        }
+
         List<TweakDefinition> catalog = LoadCatalog(CatalogSource.Default);
         Console.WriteLine($"[INFO] Loaded {catalog.Count} tweak(s) from catalog.");
 
@@ -1453,6 +1471,7 @@ public static class Program
         Console.WriteLine("  winvelo-cli --diagnostics <out.zip>      Export read-only diagnostic bundle for bug reports");
         Console.WriteLine("  winvelo-cli --yes / -y                   Bypass interactive confirmation for modifying commands");
         Console.WriteLine("  winvelo-cli --real-mode                  Use real Windows drivers (default is simulation)");
+        Console.WriteLine("  winvelo-cli --catalog <folder>           Use a custom catalog folder (needs confirmation in real mode)");
     }
 }
 

@@ -206,6 +206,7 @@ public partial class App : Application
             await _host.StartAsync();
 
             ApplyLanguage(e.Args);
+            ConfirmCustomCatalog(e.Args);
 
             MainWindow window = _host.Services.GetRequiredService<MainWindow>();
             MainWindow = window;
@@ -280,6 +281,44 @@ public partial class App : Application
     }
 
     /// <summary>
+    /// A custom catalog folder (--catalog <folder>) can contain PowerShell that runs as administrator. It is used
+    /// only when the user confirms it here; otherwise WinVelo keeps its built-in catalog.
+    /// </summary>
+    private static void ConfirmCustomCatalog(string[] args)
+    {
+        string? folder = WinVelo.Core.Catalog.CatalogSource.RequestedFolder(args);
+        if (string.IsNullOrWhiteSpace(folder)) return;
+
+        string full;
+        try
+        {
+            full = Path.GetFullPath(folder);
+        }
+        catch (Exception ex) when (ex is ArgumentException or NotSupportedException or PathTooLongException)
+        {
+            Log.Warning(ex, "Ignoring invalid --catalog path {Folder}", folder);
+            return;
+        }
+
+        var answer = MessageBox.Show(
+            LocalizationManager.T("WinVelo was started with a custom tweak catalog:\n{0}\n\nWARNING: files in this folder replace the built-in tweaks and can run PowerShell scripts with administrator rights. Use it only if you wrote these files yourself or fully trust where they came from.\n\nUse this custom catalog?\nYes: use it.  No: use the built-in catalog.", full),
+            LocalizationManager.T("Custom catalog: administrator warning"),
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Warning,
+            MessageBoxResult.No);
+
+        if (answer == MessageBoxResult.Yes)
+        {
+            WinVelo.Core.Catalog.CatalogSource.SetDefault(WinVelo.Core.Catalog.CatalogSource.FromOverrideFolder(full));
+            Log.Warning("The user confirmed the custom catalog at {Path}.", full);
+        }
+        else
+        {
+            Log.Information("The user declined the custom catalog at {Path}; using the built-in catalog.", full);
+        }
+    }
+
+    /// <summary>
     /// Tells the user, once, when parts of the catalog could not be read. Broken files or tweaks are skipped,
     /// so the app keeps working with everything else.
     /// </summary>
@@ -293,13 +332,7 @@ public partial class App : Application
             var source = WinVelo.Core.Catalog.CatalogSource.Default;
             if (source.UsesExternalFolder)
             {
-                Log.Warning("Using the Catalog folder at {Path}; its files replace the built-in catalog.", source.ExternalPath);
-                // Catalog files can contain PowerShell that runs as administrator, so never use them silently.
-                MessageBox.Show(owner,
-                    LocalizationManager.T("WinVelo is using tweak files from this folder instead of its built-in catalog:\n{0}\n\nThese files can change your system as administrator. Only keep this folder if you created it or trust where it came from. Delete it to go back to the built-in catalog.", source.ExternalPath ?? string.Empty),
-                    LocalizationManager.T("Custom catalog in use"),
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Information);
+                Log.Warning("Using the confirmed custom catalog at {Path}; its files replace the built-in catalog.", source.ExternalPath);
             }
             foreach (var issue in issues)
             {
@@ -309,7 +342,7 @@ public partial class App : Application
             if (count == 0)
             {
                 MessageBox.Show(owner,
-                    LocalizationManager.T("WinVelo could not load any tweaks.\n\nIf you put a Catalog folder next to WinVelo.exe, it may contain broken files: delete or fix that folder and start WinVelo again. Without that folder, WinVelo uses its built-in tweak list.\n\nDetails are in the log folder:\n{0}", WinVeloStoragePaths.GetLogsDirectory(TestModeManager.IsTestMode)),
+                    LocalizationManager.T("WinVelo could not load any tweaks.\n\nIf you started it with --catalog, that folder may contain broken files: fix it, or start WinVelo without --catalog to use its built-in tweak list.\n\nDetails are in the log folder:\n{0}", WinVeloStoragePaths.GetLogsDirectory(TestModeManager.IsTestMode)),
                     LocalizationManager.T("Tweak list not available"),
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);

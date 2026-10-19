@@ -129,6 +129,35 @@ public sealed class CatalogLoaderTests : IDisposable
         Assert.Single(issues);
     }
 
+    [Fact]
+    public void DefaultCatalog_IsBuiltIn_UntilACustomFolderIsConfirmed()
+    {
+        // Default never picks up a Catalog folder by itself (scripts in it would run as administrator).
+        Assert.False(CatalogSource.EmbeddedOnly().UsesExternalFolder);
+
+        string tweaks = Path.Combine(_root, "Custom", "Tweaks");
+        Directory.CreateDirectory(tweaks);
+        File.WriteAllText(Path.Combine(tweaks, "mine.json"), "[" + ValidTweak + "]");
+
+        var custom = CatalogSource.FromOverrideFolder(Path.Combine(_root, "Custom"));
+        Assert.True(custom.UsesExternalFolder);
+        Assert.Contains(CatalogLoader.LoadTweaks(custom).Items, t => t.Id == "test.valid.one");
+
+        var missing = CatalogSource.FromOverrideFolder(Path.Combine(_root, "does-not-exist"));
+        Assert.False(missing.UsesExternalFolder);
+        Assert.NotEmpty(missing.SourceIssues);
+    }
+
+    [Theory]
+    [InlineData(new[] { "--list" }, null)]
+    [InlineData(new[] { "--catalog", "D:\\mine", "--list" }, "D:\\mine")]
+    [InlineData(new[] { "--catalog=D:\\mine" }, "D:\\mine")]
+    [InlineData(new[] { "--list", "--catalog" }, null)]
+    public void CatalogFlag_IsRead(string[] args, string? expected)
+    {
+        Assert.Equal(expected, CatalogSource.RequestedFolder(args));
+    }
+
     [Theory]
     [InlineData("../secret.json")]
     [InlineData("Tweaks/../../secret.json")]

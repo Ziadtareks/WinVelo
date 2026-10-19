@@ -59,16 +59,55 @@ public sealed class CatalogSource
         }
     }
 
-    /// <summary>The catalog used by the app and the CLI: the folder next to the exe (if any) over the built-in files.</summary>
+    /// <summary>
+    /// The catalog used by the app and the CLI: the built-in files. A custom folder is used only after the user
+    /// asked for it explicitly (<c>--catalog &lt;folder&gt;</c>) and confirmed it; a Catalog folder that simply lies
+    /// next to the exe is ignored, because its scripts would run as administrator.
+    /// </summary>
     public static CatalogSource Default
     {
         get
         {
             lock (_defaultLock)
             {
-                return _default ??= Create(AppContext.BaseDirectory);
+                return _default ??= EmbeddedOnly();
             }
         }
+    }
+
+    /// <summary>The folder given with <c>--catalog &lt;folder&gt;</c> (or "--catalog=&lt;folder&gt;"), or null.</summary>
+    public static string? RequestedFolder(IReadOnlyList<string> args)
+    {
+        for (int i = 0; i < args.Count; i++)
+        {
+            if (args[i].StartsWith("--catalog=", StringComparison.OrdinalIgnoreCase)) return args[i].Substring("--catalog=".Length);
+            if (string.Equals(args[i], "--catalog", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Count) return args[i + 1];
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// Files in <paramref name="catalogFolder"/> replace the built-in files with the same relative path.
+    /// Only call this after the user confirmed that they trust the folder.
+    /// </summary>
+    public static CatalogSource FromOverrideFolder(string catalogFolder)
+    {
+        string full = Path.GetFullPath(catalogFolder);
+        var source = new CatalogSource(Directory.Exists(full) ? full : null, typeof(CatalogSource).Assembly);
+        if (!Directory.Exists(full))
+        {
+            source._sourceIssues.Add(new CatalogIssue(catalogFolder, null, "The catalog folder does not exist. The built-in catalog is used instead."));
+        }
+        else
+        {
+            string tweaks = Path.Combine(full, "Tweaks");
+            if (Directory.Exists(tweaks) && !SafeHasJson(tweaks))
+            {
+                source._sourceIssues.Add(new CatalogIssue("Catalog/Tweaks", null,
+                    "The Tweaks folder has no .json files. The built-in tweaks are used instead."));
+            }
+        }
+        return source;
     }
 
     /// <summary>Replaces <see cref="Default"/>. Used by tests; pass null to go back to the normal lookup.</summary>
