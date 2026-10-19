@@ -138,18 +138,16 @@ You need Windows 10/11 and the [.NET 10 SDK](https://dotnet.microsoft.com/downlo
 git clone https://github.com/Ziadtareks/WinVelo.git
 cd WinVelo
 
-dotnet build Tweakora.sln -c Release
-dotnet test src/Tweakora.Tests/Tweakora.Tests.csproj
+dotnet build WinVelo.sln -c Release
+dotnet test src/WinVelo.Tests/WinVelo.Tests.csproj
 dotnet run --project tools/CatalogValidator/CatalogValidator.csproj
 
 # run the app without touching your system
-dotnet run --project src/Tweakora.App/Tweakora.App.csproj -- --test-mode
+dotnet run --project src/WinVelo.App/WinVelo.App.csproj -- --test-mode
 
 # build the portable package into dist\
 .\build\publish.ps1
 ```
-
-The source folders still use the project's former name, *Tweakora*.
 
 ### Adding a tweak
 

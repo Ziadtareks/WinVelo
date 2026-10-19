@@ -37,16 +37,16 @@ jobs:
           dotnet-version: '10.0.x'
 
       - name: Restore Dependencies
-        run: dotnet restore Tweakora.sln
+        run: dotnet restore WinVelo.sln
 
       - name: Validate Catalog Schema & Sources
         run: dotnet run --project tools/CatalogValidator/CatalogValidator.csproj
 
       - name: Build Release Binaries
-        run: dotnet build Tweakora.sln --configuration Release --no-restore
+        run: dotnet build WinVelo.sln --configuration Release --no-restore
 
       - name: Run Unit Tests
-        run: dotnet test src/Tweakora.Tests/Tweakora.Tests.csproj --configuration Release --no-build --verbosity normal
+        run: dotnet test src/WinVelo.Tests/WinVelo.Tests.csproj --configuration Release --no-build --verbosity normal
 
       - name: Check Code Signing Configuration
         id: signing_check
@@ -77,8 +77,8 @@ jobs:
           org-id: ${{ secrets.SIGNPATH_ORGANIZATION_ID }}
           project-slug: ${{ secrets.SIGNPATH_PROJECT_SLUG }}
           signing-policy-slug: ${{ secrets.SIGNPATH_SIGNING_POLICY_SLUG }}
-          artifact-path: 'src/Tweakora.App/bin/Release/net10.0-windows/win-x64/publish/WinVelo.exe'
-          output-path: 'src/Tweakora.App/bin/Release/net10.0-windows/win-x64/publish/WinVelo.exe'
+          artifact-path: 'src/WinVelo.App/bin/Release/net10.0-windows/win-x64/publish/WinVelo.exe'
+          output-path: 'src/WinVelo.App/bin/Release/net10.0-windows/win-x64/publish/WinVelo.exe'
 
       - name: Package Portable Release
         shell: pwsh

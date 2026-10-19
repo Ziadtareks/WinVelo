@@ -2,7 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using Json.Schema;
-using Tweakora.Core.Safety;
+using WinVelo.Core.Safety;
 
 namespace CatalogValidator;
 
@@ -11,16 +11,16 @@ public static class Program
     public static int Main(string[] args)
     {
         Console.WriteLine("========================================");
-        Console.WriteLine("  Tweakora Catalog Validator (CI Tool) ");
+        Console.WriteLine("  WinVelo Catalog Validator (CI Tool) ");
         Console.WriteLine("========================================");
 
-        string rootDir = @"C:\Dev\Tweakora";
+        string rootDir = @"C:\Dev\WinVelo";
         string? candidateRoot = AppContext.BaseDirectory;
-        while (candidateRoot != null && !File.Exists(Path.Combine(candidateRoot, "Tweakora.sln")))
+        while (candidateRoot != null && !File.Exists(Path.Combine(candidateRoot, "WinVelo.sln")))
         {
             candidateRoot = Directory.GetParent(candidateRoot)?.FullName;
         }
-        if (candidateRoot != null && File.Exists(Path.Combine(candidateRoot, "Tweakora.sln")))
+        if (candidateRoot != null && File.Exists(Path.Combine(candidateRoot, "WinVelo.sln")))
         {
             rootDir = candidateRoot;
         }

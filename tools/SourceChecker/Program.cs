@@ -1,14 +1,14 @@
 using System.Net.Http.Headers;
 using System.Text.Json;
 
-namespace Tweakora.Tools.SourceChecker;
+namespace WinVelo.Tools.SourceChecker;
 
 public class Program
 {
     public static async Task<int> Main(string[] args)
     {
         Console.WriteLine("========================================");
-        Console.WriteLine("  Tweakora Catalog Source Checker (CI)  ");
+        Console.WriteLine("  WinVelo Catalog Source Checker (CI)  ");
         Console.WriteLine("========================================");
 
         string root = AppDomain.CurrentDomain.BaseDirectory;

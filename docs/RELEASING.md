@@ -21,10 +21,10 @@ Ensure the local repository is clean and all verification gates pass:
 git status
 
 # 2. Run all unit tests
-dotnet test src/Tweakora.Tests/Tweakora.Tests.csproj -c Debug
+dotnet test src/WinVelo.Tests/WinVelo.Tests.csproj -c Debug
 
 # 3. Run UI tests in safe simulation test mode
-dotnet test src/Tweakora.UiTests/Tweakora.UiTests.csproj -c Debug
+dotnet test src/WinVelo.UiTests/WinVelo.UiTests.csproj -c Debug
 
 # 4. Verify Catalog Schema and Evidence
 dotnet run --project tools/CatalogValidator/CatalogValidator.csproj

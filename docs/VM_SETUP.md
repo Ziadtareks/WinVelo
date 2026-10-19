@@ -1,4 +1,4 @@
-# VirtualBox VM Setup Guide for Tweakora Integration Testing
+# VirtualBox VM Setup Guide for WinVelo Integration Testing
 
 This guide explains how to set up the Windows 11 VirtualBox virtual machine for autonomous real-mode integration testing.
 
@@ -27,7 +27,7 @@ Use the VirtualBox GUI or run these commands in PowerShell:
 
 | Setting | Required Value |
 |---|---|
-| **VM Name** | `Tweakora-Test-VM` |
+| **VM Name** | `WinVelo-Test-VM` |
 | **OS Type** | Windows 11 (64-bit) |
 | **Base Memory (RAM)** | `4096 MB` (4 GB) |
 | **Processors** | `2 CPUs` |
@@ -41,7 +41,7 @@ Use the VirtualBox GUI or run these commands in PowerShell:
 1. Boot the VM using the Windows 11 ISO.
 2. Complete Windows Setup.
 3. When prompted to create a user account, create a local administrator with:
-   - **Username**: `tweakora-admin`
+   - **Username**: `winvelo-admin`
    - **Password**: `<choose-a-local-password>`
 4. Verify that this user has Administrator rights.
 
@@ -62,7 +62,7 @@ Use the VirtualBox GUI or run these commands in PowerShell:
 2. Shut down the VM cleanly.
 3. In VirtualBox Manager (or via PowerShell), take a snapshot named exactly `clean`:
    ```powershell
-   & "C:\Program Files\Oracle\VirtualBox\VBoxManage.exe" snapshot "Tweakora-Test-VM" take "clean" --description "Base clean Windows 11 state"
+   & "C:\Program Files\Oracle\VirtualBox\VBoxManage.exe" snapshot "WinVelo-Test-VM" take "clean" --description "Base clean Windows 11 state"
    ```
 
 ---

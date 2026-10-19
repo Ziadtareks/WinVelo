@@ -1,0 +1,96 @@
+using CommunityToolkit.Mvvm.ComponentModel;
+using WinVelo.Core.Models;
+using WinVelo.App.Localization;
+
+namespace WinVelo.App.ViewModels;
+
+public sealed partial class ProfilePreviewItemModel : ObservableObject
+{
+    public required TweakDefinition Tweak { get; init; }
+    public required string Id { get; init; }
+    public required string Name { get; init; }
+    public required string Risk { get; init; }
+    public required bool Reversible { get; init; }
+    public required bool RequiresReboot { get; init; }
+    public required bool RequiresExplorerRestart { get; init; }
+
+    [ObservableProperty]
+    private string _stateText = LocalizationManager.T("Detecting...");
+
+    [ObservableProperty]
+    private string _stateBg = "#334155";
+
+    [ObservableProperty]
+    private string _stateFg = "#94A3B8";
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsSelectable))]
+    private bool _isAlreadyApplied;
+
+    [ObservableProperty]
+    private bool _isSelected = true;
+
+    partial void OnIsSelectedChanged(bool value)
+    {
+        OnSelectionChanged?.Invoke();
+    }
+
+    public Action? OnSelectionChanged { get; set; }
+
+    public string Subcategory => ToDisplayGroup(!string.IsNullOrWhiteSpace(Tweak.Subcategory)
+        ? Tweak.Subcategory
+        : (!string.IsNullOrWhiteSpace(Tweak.Category) ? Tweak.Category : LocalizationManager.T("General")));
+
+    private static readonly Dictionary<string, string> GroupNames = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["z__Advanced Tweaks - CAUTION"] = "Advanced (use with care)",
+        ["clicktodo"] = "Click to Do",
+        ["dvr"] = "Game DVR",
+        ["gamebar"] = "Game Bar",
+        ["ui"] = "UI",
+        ["ai"] = "AI",
+    };
+
+    /// <summary>Turns raw catalog subcategory keys (e.g. "copilot", "z__Advanced Tweaks - CAUTION") into readable group titles.</summary>
+    public static string ToDisplayGroup(string raw)
+    {
+        if (GroupNames.TryGetValue(raw, out var name)) return LocalizationManager.T(name);
+        string s = raw.StartsWith("z__", StringComparison.Ordinal) ? raw[3..] : raw;
+        return LocalizationManager.T(s.Length > 0 && s == s.ToLowerInvariant()
+            ? System.Globalization.CultureInfo.InvariantCulture.TextInfo.ToTitleCase(s)
+            : s);
+    }
+
+    public bool IsSelectable => !IsAlreadyApplied;
+
+    public string ReversibleText => Reversible ? LocalizationManager.T("Yes") : LocalizationManager.T("No");
+    public string RequiresRebootText => RequiresReboot ? LocalizationManager.T("Yes") : LocalizationManager.T("No");
+    public string RequiresExplorerRestartText => RequiresExplorerRestart ? LocalizationManager.T("Yes") : LocalizationManager.T("No");
+
+    public string RiskBadgeBg => Risk switch
+    {
+        "Safe" => "#064E3B",
+        "Low" => "#1E3A8A",
+        "Moderate" or "Medium" => "#451A03",
+        "Caution" or "High" => "#450A0A",
+        _ => "#1E222D"
+    };
+
+    public string RiskBadgeFg => Risk switch
+    {
+        "Safe" => "#10B981",
+        "Low" => "#60A5FA",
+        "Moderate" or "Medium" => "#F59E0B",
+        "Caution" or "High" => "#EF4444",
+        _ => "#94A3B8"
+    };
+
+    public string RiskBadgeBorder => Risk switch
+    {
+        "Safe" => "#059669",
+        "Low" => "#3B82F6",
+        "Moderate" or "Medium" => "#D97706",
+        "Caution" or "High" => "#DC2626",
+        _ => "#334155"
+    };
+}

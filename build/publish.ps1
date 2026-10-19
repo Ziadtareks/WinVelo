@@ -59,11 +59,11 @@ if (Test-Path $zipPath) { Remove-Item -Force $zipPath }
 New-Item -ItemType Directory -Path $distDir -Force | Out-Null
 
 Write-Host "`n[2/5] Publishing WinVelo.exe..." -ForegroundColor Yellow
-dotnet publish src/Tweakora.App/Tweakora.App.csproj @singleFileArgs -o $outDir
+dotnet publish src/WinVelo.App/WinVelo.App.csproj @singleFileArgs -o $outDir
 if ($LASTEXITCODE -ne 0) { throw "dotnet publish failed for the app." }
 
 Write-Host "`n[3/5] Publishing winvelo-cli.exe..." -ForegroundColor Yellow
-dotnet publish src/Tweakora.Cli/Tweakora.Cli.csproj @singleFileArgs -o $tempCli
+dotnet publish src/WinVelo.Cli/WinVelo.Cli.csproj @singleFileArgs -o $tempCli
 if ($LASTEXITCODE -ne 0) { throw "dotnet publish failed for the CLI." }
 Copy-Item (Join-Path $tempCli "winvelo-cli.exe") $outDir -Force
 Remove-Item -Recurse -Force $tempCli

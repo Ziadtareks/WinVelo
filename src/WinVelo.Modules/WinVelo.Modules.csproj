@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <RootNamespace>WinVelo.Modules</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WinVelo.Core\WinVelo.Core.csproj" />
+    <ProjectReference Include="..\WinVelo.Platform\WinVelo.Platform.csproj" />
+  </ItemGroup>
+
+</Project>

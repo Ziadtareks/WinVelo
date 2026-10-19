@@ -116,6 +116,6 @@ For local development or testing with SmartAppControl/Device Guard in audit mode
 $cert = New-SelfSignedCertificate -Type CodeSigningCert -Subject "CN=WinVelo-Dev-Test" -CertStoreLocation "Cert:\CurrentUser\My"
 
 # Sign local test binary
-Set-AuthenticodeSignature -Certificate $cert -FilePath .\src\Tweakora.App\bin\Release\net10.0-windows\WinVelo.exe -TimestampServer "http://timestamp.digicert.com"
+Set-AuthenticodeSignature -Certificate $cert -FilePath .\src\WinVelo.App\bin\Release\net10.0-windows\WinVelo.exe -TimestampServer "http://timestamp.digicert.com"
 ```
 *(Note: Self-signed certificates are not trusted by other computers and will not suppress SmartScreen).*

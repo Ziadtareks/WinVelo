@@ -1,0 +1,293 @@
+<UserControl x:Class="WinVelo.App.Views.ConfigTabView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="clr-namespace:WinVelo.App.Localization"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:vm="clr-namespace:WinVelo.App.ViewModels"
+             AutomationProperties.AutomationId="ConfigTabView">
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+    </UserControl.Resources>
+
+    <Grid Margin="16,12,16,12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />    <!-- Content -->
+            <RowDefinition Height="Auto" /> <!-- Status Bar -->
+        </Grid.RowDefinitions>
+
+        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto" Margin="0,0,0,8">
+            <StackPanel>
+                <!-- TOP GRID: Quick Fixes & Legacy Control Panels -->
+                <Grid Margin="0,0,0,14">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- QUICK FIXES & TOOLS -->
+                    <Border Grid.Column="0" Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                            BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                            BorderThickness="1" CornerRadius="8" Padding="12" Margin="0,0,6,0">
+                        <StackPanel>
+                            <DockPanel Margin="0,0,0,8">
+                                <ui:SymbolIcon Symbol="Wrench24" FontSize="18" Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}" Margin="0,0,6,0" VerticalAlignment="Center" />
+                                <TextBlock Text="{loc:Tr Config_QuickSystemFixes}" FontSize="15" FontWeight="Bold" VerticalAlignment="Center" />
+                            </DockPanel>
+                            <TextBlock Text="{loc:Tr Config_OneClickRepairsForWindows}"
+                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12" Margin="0,0,0,12" TextWrapping="Wrap" />
+
+                            <UniformGrid Columns="2" Margin="0,0,0,8">
+                                <ui:Button AutomationProperties.AutomationId="Fix_AutoLogon"
+                                           AutomationProperties.Name="AutoLogon (Sysinternals)"
+                                           Content="{loc:Tr Config_AutologonSysinternals}" Icon="{ui:SymbolIcon Person24}"
+                                           Command="{Binding RunFixCommand}" CommandParameter="autologon"
+                                           Margin="3" HorizontalAlignment="Stretch" />
+
+                                <ui:Button AutomationProperties.AutomationId="Fix_UpdateReset"
+                                           AutomationProperties.Name="Reset Windows Update"
+                                           Content="{loc:Tr Config_ResetWindowsUpdate}" Icon="{ui:SymbolIcon ArrowSync24}"
+                                           Command="{Binding RunFixCommand}" CommandParameter="update_reset"
+                                           Margin="3" HorizontalAlignment="Stretch" />
+
+                                <ui:Button AutomationProperties.AutomationId="Fix_NetworkReset"
+                                           AutomationProperties.Name="Reset Network / Winsock"
+                                           Content="{loc:Tr Config_ResetNetworkWinsock}" Icon="{ui:SymbolIcon Globe24}"
+                                           Command="{Binding RunFixCommand}" CommandParameter="network_reset"
+                                           Margin="3" HorizontalAlignment="Stretch" />
+
+                                <ui:Button AutomationProperties.AutomationId="Fix_DismSfc"
+                                           AutomationProperties.Name="DISM and SFC Scan"
+                                           Content="{loc:Tr Config_DismSfcScan}" Icon="{ui:SymbolIcon ShieldCheckmark24}"
+                                           Command="{Binding RunFixCommand}" CommandParameter="dism_sfc"
+                                           Margin="3" HorizontalAlignment="Stretch" />
+
+                                <ui:Button AutomationProperties.AutomationId="Fix_WinGetReinstall"
+                                           AutomationProperties.Name="Reinstall WinGet"
+                                           Content="{loc:Tr Config_ReinstallWinget}" Icon="{ui:SymbolIcon ArrowDownload24}"
+                                           Command="{Binding RunFixCommand}" CommandParameter="winget_reinstall"
+                                           Margin="3" HorizontalAlignment="Stretch" />
+
+                                <ui:Button AutomationProperties.AutomationId="Fix_SyncTime"
+                                           AutomationProperties.Name="Sync Time (NTP)"
+                                           Content="{loc:Tr Config_SyncTimeNtp}" Icon="{ui:SymbolIcon Clock24}"
+                                           Command="{Binding RunFixCommand}" CommandParameter="sync_time"
+                                           Margin="3" HorizontalAlignment="Stretch" />
+                            </UniformGrid>
+
+                            <!-- OpenSSH Section -->
+                            <Border Background="{DynamicResource ControlFillColorDefaultBrush}"
+                                    BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                                    BorderThickness="1" CornerRadius="6" Padding="10" Margin="3,4,3,0">
+                                <DockPanel LastChildFill="False">
+                                    <StackPanel DockPanel.Dock="Left">
+                                        <TextBlock Text="{loc:Tr Config_OpensshServer}" FontWeight="SemiBold" FontSize="13" />
+                                        <TextBlock Text="{loc:Tr Config_InstallsAndEnablesSshRemote}"
+                                                   FontSize="11" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                                    </StackPanel>
+                                    <ui:Button DockPanel.Dock="Right" AutomationProperties.AutomationId="OpenSshButton"
+                                               AutomationProperties.Name="Configure OpenSSH"
+                                               Content="{loc:Tr Config_ConfigureOpenssh}" Icon="{ui:SymbolIcon LockClosed24}"
+                                               Command="{Binding PromptOpenSshCommand}" VerticalAlignment="Center" />
+                                </DockPanel>
+                            </Border>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- 14 LEGACY CONTROL PANELS -->
+                    <Border Grid.Column="1" Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                            BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                            BorderThickness="1" CornerRadius="8" Padding="12" Margin="6,0,0,0">
+                        <StackPanel>
+                            <DockPanel Margin="0,0,0,8">
+                                <ui:SymbolIcon Symbol="Desktop24" FontSize="18" Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}" Margin="0,0,6,0" VerticalAlignment="Center" />
+                                <TextBlock Text="{loc:Tr Config_LegacyControlPanels14Shortcuts}" FontSize="15" FontWeight="Bold" VerticalAlignment="Center" />
+                            </DockPanel>
+                            <TextBlock Text="{loc:Tr Config_InstantAccessToClassicWindows}"
+                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12" Margin="0,0,0,12" TextWrapping="Wrap" />
+
+                            <ItemsControl ItemsSource="{Binding LegacyPanels}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <UniformGrid Columns="2" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <ui:Button AutomationProperties.AutomationId="{Binding Key, StringFormat='{}Panel_{0}'}"
+                                                   AutomationProperties.Name="{Binding Name}"
+                                                   Content="{Binding Name}" Margin="3" HorizontalAlignment="Stretch"
+                                                   HorizontalContentAlignment="Left" Appearance="Transparent"
+                                                   Command="{Binding DataContext.LaunchPanelCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                   CommandParameter="{Binding}" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <!-- WINDOWS FEATURES LIST -->
+                <Border Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                        BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                        BorderThickness="1" CornerRadius="8" Padding="12">
+                    <StackPanel>
+                        <DockPanel Margin="0,0,0,10">
+                            <StackPanel DockPanel.Dock="Left">
+                                <TextBlock Text="{loc:Tr Config_WindowsFeatures}" FontSize="15" FontWeight="Bold" />
+                                <TextBlock Text="{loc:Tr Config_EnableOrDisableOptionalSystem}"
+                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12" />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding SelectedFeaturesCount, StringFormat={loc:Tr Config_Selected0}}"
+                                           VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,0,12,0" />
+                                <ui:Button AutomationProperties.AutomationId="InstallFeaturesButton"
+                                           AutomationProperties.Name="Enable Features"
+                                           Content="{loc:Tr Config_EnableFeatures}" Appearance="Primary" Icon="{ui:SymbolIcon Checkmark24}"
+                                           Command="{Binding InstallSelectedFeaturesCommand}" Margin="0,0,6,0" />
+                                <ui:Button AutomationProperties.AutomationId="UninstallFeaturesButton"
+                                           AutomationProperties.Name="Disable Features"
+                                           Content="{loc:Tr Config_DisableFeatures}" Appearance="Secondary" Icon="{ui:SymbolIcon Dismiss24}"
+                                           Command="{Binding UninstallSelectedFeaturesCommand}" />
+                            </StackPanel>
+                        </DockPanel>
+
+                        <ItemsControl ItemsSource="{Binding FilteredFeatures}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel Orientation="Horizontal" ItemWidth="340" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="{DynamicResource ControlFillColorDefaultBrush}"
+                                            BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                                            BorderThickness="1" CornerRadius="6" Margin="4" Padding="10,8"
+                                            ToolTip="{Binding Description}">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <CheckBox Grid.Column="0" IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                                      AutomationProperties.AutomationId="{Binding Key, StringFormat='FeatureCheck_{0}'}"
+                                                      AutomationProperties.Name="{Binding Name, StringFormat='Select {0}'}"
+                                                      VerticalAlignment="Center" Margin="0,0,8,0" />
+                                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="12" TextTrimming="CharacterEllipsis" />
+                                                <TextBlock Text="{Binding Category, Converter={StaticResource Tr}}" FontSize="11" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Bottom Status Bar -->
+        <Border Grid.Row="1" Background="{DynamicResource ControlFillColorSecondaryBrush}"
+                BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                BorderThickness="1" CornerRadius="6" Padding="10,6">
+            <DockPanel LastChildFill="False">
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding StatusMessage}" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center" />
+                    <Button Style="{DynamicResource ModernGhostBtn}"
+                            AutomationProperties.Name="Show Failed Details"
+                            Padding="4,1" Margin="6,0,0,0"
+                            Visibility="{Binding HasFailedDetails, Converter={StaticResource BoolToVis}}"
+                            Command="{Binding ShowDetailsDialogCommand}">
+                        <TextBlock Text="{loc:Tr Config_Details}" FontSize="11" Foreground="#60A5FA" TextDecorations="Underline" />
+                    </Button>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <!-- OpenSSH Confirmation Modal -->
+        <Grid Grid.Row="0" Grid.RowSpan="2" Background="#70000000"
+              Visibility="{Binding IsOpenSshConfirmOpen, Converter={StaticResource BoolToVis}}">
+            <Border Background="{DynamicResource SolidBackgroundFillColorBaseBrush}"
+                    BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                    BorderThickness="1" CornerRadius="8"
+                    Width="500" VerticalAlignment="Center" Margin="20" Padding="20">
+                <StackPanel>
+                    <DockPanel Margin="0,0,0,12">
+                        <ui:SymbolIcon Symbol="Warning24" Foreground="#B06000" FontSize="24" Margin="0,0,10,0" VerticalAlignment="Center" />
+                        <TextBlock Text="{loc:Tr Config_OpensshServerSecurityConfirmation}" FontSize="16" FontWeight="Bold" VerticalAlignment="Center" />
+                    </DockPanel>
+                    <TextBlock Text="{loc:Tr Config_EnablingOpensshServerInstallsThe}"
+                               TextWrapping="Wrap" Margin="0,0,0,16" FontSize="13" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                    <DockPanel LastChildFill="False">
+                        <ui:Button DockPanel.Dock="Right" Content="{loc:Tr Config_Cancel}"
+                                   AutomationProperties.Name="Cancel OpenSSH"
+                                   Command="{Binding CancelOpenSshCommand}" Margin="8,0,0,0" />
+                        <ui:Button DockPanel.Dock="Right" Content="{loc:Tr Config_ConfirmEnableOpenssh}" Appearance="Primary"
+                                   AutomationProperties.Name="Confirm and Enable OpenSSH"
+                                   Command="{Binding ConfirmOpenSshCommand}" />
+                    </DockPanel>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- EXECUTION DETAILS DIALOG OVERLAY -->
+        <Grid Grid.Row="0" Grid.RowSpan="2" Background="#80000000"
+              Visibility="{Binding IsDetailsDialogOpen, Converter={StaticResource BoolToVis}}"
+              Panel.ZIndex="2000">
+            <Border Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                    BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                    BorderThickness="1" CornerRadius="10"
+                    Width="700" MaxHeight="520" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Grid Margin="20">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <DockPanel Grid.Row="0" Margin="0,0,0,12">
+                        <TextBlock Text="{Binding DetailsDialogTitle}" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" />
+                        <Button DockPanel.Dock="Right" Content="✕" Style="{DynamicResource ModernGhostBtn}"
+                                AutomationProperties.Name="Close Execution Details"
+                                Command="{Binding CloseDetailsDialogCommand}" />
+                    </DockPanel>
+
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" MaxHeight="360">
+                        <ItemsControl ItemsSource="{Binding ExecutionDetailsItems}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="#1E2433" BorderBrush="#334155" BorderThickness="1"
+                                            CornerRadius="6" Padding="12,10" Margin="0,0,0,8">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
+                                            <DockPanel Grid.Row="0" LastChildFill="False">
+                                                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                                                    <Border Background="{Binding StatusBgColor}" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
+                                                        <TextBlock Text="{Binding DisplayStatus}" FontSize="10" FontWeight="Bold" Foreground="{Binding StatusFgColor}" />
+                                                    </Border>
+                                                    <TextBlock Text="{Binding Name}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" />
+                                                    <TextBlock Text="{Binding Id, StringFormat=' ({0})'}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" />
+                                                </StackPanel>
+                                            </DockPanel>
+                                            <TextBlock FlowDirection="LeftToRight" Grid.Row="1" Text="{Binding Reason}" FontSize="11" Foreground="#EF4444"
+                                                       TextWrapping="Wrap" Margin="0,6,0,0" FontFamily="Consolas, Cascadia Code, Courier New" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+
+                    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,14,0,0">
+                        <ui:Button Content="{loc:Tr Config_Close}" Appearance="Secondary"
+                                   AutomationProperties.Name="Close Details"
+                                   Command="{Binding CloseDetailsDialogCommand}" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

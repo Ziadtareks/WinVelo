@@ -1,26 +1,26 @@
 # ==============================================================================
-# Tweakora Real-Mode In-Guest Integration Test Runner
+# WinVelo Real-Mode In-Guest Integration Test Runner
 # Runs inside the Windows 11 VirtualBox test VM with --real-mode (NO FAKES)
 # ==============================================================================
 
 param(
-    [string]$AppDir = "C:\TweakoraTest",
-    [string]$ReportPath = "C:\TweakoraTest\integration-results.json"
+    [string]$AppDir = "C:\WinVeloTest",
+    [string]$ReportPath = "C:\WinVeloTest\integration-results.json"
 )
 
 $ErrorActionPreference = "Continue"
 
 Write-Host "==========================================================" -ForegroundColor Cyan
-Write-Host "   Tweakora Real-Mode In-Guest System Integration Tests   " -ForegroundColor Cyan
+Write-Host "   WinVelo Real-Mode In-Guest System Integration Tests   " -ForegroundColor Cyan
 Write-Host "==========================================================" -ForegroundColor Cyan
 Write-Host "Target Directory: $AppDir"
 Write-Host "Report Path:      $ReportPath"
 Write-Host "Testing Mode:     REAL WINDOWS OS EXECUTION (No Fakes)" -ForegroundColor Yellow
 Write-Host ""
 
-$CliExe = Join-Path $AppDir "tweakora-cli.exe"
+$CliExe = Join-Path $AppDir "winvelo-cli.exe"
 if (-not (Test-Path $CliExe)) {
-    Write-Host "[ERROR] tweakora-cli.exe not found at $CliExe" -ForegroundColor Red
+    Write-Host "[ERROR] winvelo-cli.exe not found at $CliExe" -ForegroundColor Red
     exit 1
 }
 
@@ -115,8 +115,8 @@ try {
 # ------------------------------------------------------------------------------
 Write-Host "`n>>> [3/6] Testing Smart Cleaner: Real Canary File Removal..." -ForegroundColor Cyan
 try {
-    $canaryPath = Join-Path $env:LOCALAPPDATA "Temp\tweakora_integration_canary.tmp"
-    Set-Content -Path $canaryPath -Value "TWEAKORA_CLEANER_VERIFICATION_PAYLOAD" -Force
+    $canaryPath = Join-Path $env:LOCALAPPDATA "Temp\winvelo_integration_canary.tmp"
+    Set-Content -Path $canaryPath -Value "WINVELO_CLEANER_VERIFICATION_PAYLOAD" -Force
 
     if (Test-Path $canaryPath) {
         Write-Host "Created canary file at: $canaryPath" -ForegroundColor DarkGray
@@ -212,7 +212,7 @@ $passCount = ($results | Where-Object { $_.Success }).Count
 $failCount = ($results | Where-Object { -not $_.Success }).Count
 
 $report = [PSCustomObject]@{
-    TestSuite      = "Tweakora Real-Mode Windows 11 Integration"
+    TestSuite      = "WinVelo Real-Mode Windows 11 Integration"
     ExecutionMode  = "Real-Mode (Windows Platform Drivers)"
     HostOS         = (Get-CimInstance Win32_OperatingSystem).Caption
     OSVersion      = (Get-CimInstance Win32_OperatingSystem).Version

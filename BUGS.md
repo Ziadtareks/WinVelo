@@ -5,7 +5,7 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
 ---
 
 ## BUG-001: Infinite Dispatcher Loop and StackOverflowException (0xC00000FD)
-- **Component**: `Tweakora.App` (`Views/TweaksPage.xaml`, `App.xaml.cs`)
+- **Component**: `WinVelo.App` (`Views/TweaksPage.xaml`, `App.xaml.cs`)
 - **Finding**: Opening the Tweaks page caused hundreds of cascading "WinVelo Error" dialogs and crashed the process with `0xC00000FD` (`A new guard page for the stack cannot be created`).
 - **Root Cause**:
   1. `TweaksPage.xaml` referenced `{StaticResource BoolToVisConverter}`, but the converter was declared locally on `MainWindow` instead of application-wide in `App.xaml`.
@@ -18,7 +18,7 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
 ---
 
 ## BUG-002: Window Backdrop Initialization Crash on Startup
-- **Component**: `Tweakora.App` (`Views/MainWindow.xaml`, `App.xaml.cs`)
+- **Component**: `WinVelo.App` (`Views/MainWindow.xaml`, `App.xaml.cs`)
 - **Finding**: Event Viewer recorded `System.InvalidOperationException: Cannot apply backdrop effect if ExtendsContentIntoTitleBar is false` from `Wpf.Ui.Controls.FluentWindow.OnBackdropTypeChanged`.
 - **Root Cause**: `FluentWindow` in `WPF-UI` requires title bar content extension to be enabled before applying Windows 11 Mica/Acrylic backdrops. The XAML set backdrop properties before enabling title bar extension.
 - **Fix**: Configured `ExtendsContentIntoTitleBar="True"` directly in XAML on `MainWindow` and guarded runtime backdrop application behind build-number and OS-capability checks.
@@ -26,7 +26,7 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
 ---
 
 ## BUG-003: Disconnected UI Command Handlers (Fake Success in Real Mode)
-- **Component**: `Tweakora.App` (`TweaksViewModel.cs`, `ToolboxViewModel.cs`, `InstallViewModel.cs`)
+- **Component**: `WinVelo.App` (`TweaksViewModel.cs`, `ToolboxViewModel.cs`, `InstallViewModel.cs`)
 - **Finding**:
   - `TweaksViewModel.RunTweaksAsync` and `UndoSelectedTweaksAsync` did not invoke the execution engine in real mode; they only flipped card status properties in memory and announced success.
   - `InstallViewModel.UpgradeAllAsync` ran a `Task.Delay` and announced all apps were up to date without invoking WinGet.
@@ -39,19 +39,19 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
 ---
 
 ## BUG-004: Hardcoded Fakes and `isSimulationMode` Flags in Production Code Paths
-- **Component**: `Tweakora.Modules`, `Tweakora.App`
+- **Component**: `WinVelo.Modules`, `WinVelo.App`
 - **Finding**: Domain services contained internal `if (isSimulationMode)` branches and directly instantiated `FakeRegistryService`, bypassing the real platform driver.
 - **Root Cause**: Architectural conflation between simulation mode (for automated FlaUI and unit tests) and production execution.
 - **Fix**:
-  - Extracted all simulation classes into a dedicated, isolated project `Tweakora.Simulation`.
-  - Removed all `isSimulationMode` flags and branches from production services in `Tweakora.Modules`.
-  - Added architecture tests (`NetArchTest` / reflection in `ArchitectureTests.cs`) that fail the build if any ViewModel, Module, or Service references `Tweakora.Simulation` or types prefixed with `Fake*`.
+  - Extracted all simulation classes into a dedicated, isolated project `WinVelo.Simulation`.
+  - Removed all `isSimulationMode` flags and branches from production services in `WinVelo.Modules`.
+  - Added architecture tests (`NetArchTest` / reflection in `ArchitectureTests.cs`) that fail the build if any ViewModel, Module, or Service references `WinVelo.Simulation` or types prefixed with `Fake*`.
   - Simulation is exclusively configured at the composition root (`App.xaml.cs` and `Program.cs`) when `--test-mode` is explicitly supplied.
 
 ---
 
 ## BUG-005: Missing WinUtil Registry `<RemoveEntry>` Deletion Semantics
-- **Component**: `Tweakora.Platform` (`WindowsRegistryService.cs`, `RegistryActionHandler.cs`)
+- **Component**: `WinVelo.Platform` (`WindowsRegistryService.cs`, `RegistryActionHandler.cs`)
 - **Finding**: WinUtil specifies `<RemoveEntry>` as a sentinel value in `config/tweaks.json` when applying or reverting tweaks that require deleting a property rather than writing a value. The engine treated this string as literal text to write into the registry.
 - **Root Cause**: Lack of explicit sentinel handling for `<RemoveEntry>` in `RegistryActionHandler`.
 - **Fix**: Added explicit handling in `RegistryActionHandler`: when `Value == "<RemoveEntry>"` or `ActionType == ActionType.RegistryDeleteValue`, the handler calls `DeleteValue` via `IRegistryService`.
@@ -59,7 +59,7 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
 ---
 
 ## BUG-006: Incomplete Service Startup Restoration on Undo
-- **Component**: `Tweakora.Core` (`ServicesActionHandler.cs`, `TweakDefinition.cs`)
+- **Component**: `WinVelo.Core` (`ServicesActionHandler.cs`, `TweakDefinition.cs`)
 - **Finding**: In WinUtil, services specify `StartupType` on apply and `OriginalType` on undo. When a tweak was undone without a prior session journal, the engine did not know the original service startup type.
 - **Root Cause**: `ServiceAction` only stored the target apply startup type without capturing the upstream `OriginalType` metadata.
 - **Fix**: Updated `ServiceAction` schema to store `OriginalType` (`Automatic`, `Manual`, `Disabled`), enabling exact restoration even during stateless undos.
@@ -67,7 +67,7 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
 ---
 
 ## BUG-007: WinGet Error Handling and Per-User Scope Silent Skips
-- **Component**: `Tweakora.Platform` (`WindowsPackageManagerService.cs`)
+- **Component**: `WinVelo.Platform` (`WindowsPackageManagerService.cs`)
 - **Finding**: WinGet fails with code `-1978335107` (`APPINSTALLER_CLI_ERROR_ADMIN_CONTEXT_ACTION_PROHIBITED`) when an elevated administrator tries to install or update an application installed in per-user scope. The installer reported this as an unknown failure.
 - **Root Cause**: Absence of WinGet exit code mapping matching WinUtil's `Install-WinUtilProgramWinget.ps1`.
 - **Fix**: Implemented complete exit code classification:
@@ -80,7 +80,7 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
 ---
 
 ## BUG-008: Updates Tab "Disable All" Lacked Mandatory Safety Confirmation
-- **Component**: `Tweakora.App` (`UpdatesViewModel.cs`, `Views/UpdatesPage.xaml`)
+- **Component**: `WinVelo.App` (`UpdatesViewModel.cs`, `Views/UpdatesPage.xaml`)
 - **Finding**: "Disable All Updates" is a high-risk operation that disables critical security patches and background services. In previous builds, it could be triggered with a single accidental click.
 - **Root Cause**: Missing interactive confirmation dialog with type-to-confirm barrier.
 - **Fix**: Added high-risk modal barrier requiring the user to type `"I understand"` before the disable updates operation can be staged or executed.
@@ -88,7 +88,7 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
 ---
 
 ## BUG-009: PowerShell Runner Deadlocks, Escaping Bugs, and Catalog Script Failures
-- **Component**: `Tweakora.Platform` (`WindowsShellService.cs`), `Tweakora.Core` (`PowerShellActionHandler.cs`), `Catalog/Tweaks`
+- **Component**: `WinVelo.Platform` (`WindowsShellService.cs`), `WinVelo.Core` (`PowerShellActionHandler.cs`), `Catalog/Tweaks`
 - **Finding**:
   1. `ExecutePowerShellAsync` executed scripts via `-Command` with manual quote replacement, causing syntax failures on complex multiline scripts.
   2. StandardOutput and StandardError were read sequentially, causing potential OS buffer deadlocks on large script outputs.
@@ -106,24 +106,24 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
 ---
 
 ## BUG-010: Dishonest Result Reporting on Batch Operations in UI and CLI
-- **Component**: `Tweakora.App` (`DashboardViewModel`, `TweaksViewModel`, `ConfigViewModel`), `Tweakora.Cli` (`Program.cs`), `Tweakora.Core` (`OperationRunner`, `TweakRunner`)
+- **Component**: `WinVelo.App` (`DashboardViewModel`, `TweaksViewModel`, `ConfigViewModel`), `WinVelo.Cli` (`Program.cs`), `WinVelo.Core` (`OperationRunner`, `TweakRunner`)
 - **Finding**:
   1. In `DashboardViewModel`, applying profiles (Everyday, Gaming, Privacy, Restore Defaults) unconditionally reported success ("Profile applied!" / "Restore Defaults applied!") and returned success colors even when tweaks failed or the process ran without administrative rights.
   2. In `TweaksViewModel`, batch execution set cards to `IsActive = true` indiscriminately across all selected items without verifying which specific tweaks succeeded, and reported "Applied all tweaks successfully." on partial failures.
   3. In `ConfigViewModel`, features and fixes reported unconditional success without reflecting failure counts or details.
-  4. In `Tweakora.Cli`, running `--tweaks`, `--config`, or `--preset` with partial failures printed success logs, returned exit code 0, and omitted structured failure information.
+  4. In `WinVelo.Cli`, running `--tweaks`, `--config`, or `--preset` with partial failures printed success logs, returned exit code 0, and omitted structured failure information.
 - **Root Cause**: Batch operation handlers relied on monolithic execution flags rather than itemized result verification, lacking failure aggregation and granular status mapping.
 - **Fix**:
   1. Updated `OperationRunner` and `TweakRunner` with `Applied`, `Restored`, `Failed`, `FailedRolledBack`, and `FailedRollbackIncomplete` statuses, explicit `IsFailure` checks, and `TotalRequested` metrics.
   2. Enforced strict honest string formatting: `"Applied {succ} of {total} — {fail} failed (details)"` and `"Restored {succ} of {total} — {fail} failed (details)"`.
   3. Populated detailed execution failure dialogs in `DashboardTabView`, `TweaksTabView`, and `ConfigTabView` with error reasons.
   4. In `TweaksViewModel`, guaranteed that only succeeded items have `IsActive = true`; failed items retain their pre-operation state.
-  5. In `Tweakora.Cli`, printed `[Failed] <id>: <reason>` for each failure, formatted `"Applied {succ} of {total} — {fail} failed"`, and exited with non-zero exit code (`1`) on any failure.
+  5. In `WinVelo.Cli`, printed `[Failed] <id>: <reason>` for each failure, formatted `"Applied {succ} of {total} — {fail} failed"`, and exited with non-zero exit code (`1`) on any failure.
 
 ---
 
 ## BUG-011: Flawed Undo Engine, Journal Replay Corruption, and Missing Script Undo Execution
-- **Component**: `Tweakora.Core` (`TweakRunner.cs`, `RollbackJournalManager.cs`, `JournalActionRecord.cs`, `IActionHandler.cs`)
+- **Component**: `WinVelo.Core` (`TweakRunner.cs`, `RollbackJournalManager.cs`, `JournalActionRecord.cs`, `IActionHandler.cs`)
 - **Finding**:
   1. `UndoTweakAsync` relied solely on journal records whenever any existed. PowerShell/Script actions have `PreviousData = null`, so their journal undo was a no-op while catalog `undo` scripts were ignored (e.g. undoing Edge removal never ran the reinstall script, yet reported "Restored").
   2. Stateless undos did not isolate script actions from registry actions; applying catalog undo registry actions risked overwriting genuine user pre-tweak registry baselines with hardcoded catalog defaults.
@@ -139,7 +139,7 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
 ---
 
 ## BUG-012: Irreversible Destructive Tweaks Allowed Without Confirmation or Warning Gates
-- **Component**: `Catalog` (`tweak.schema.json`, `advanced.json`, `essential.json`), `Tweakora.Core` (`TweakDefinition.cs`, `IrreversibleItemModel.cs`), `Tweakora.Cli` (`Program.cs`), `Tweakora.App` (`TweaksViewModel.cs`, `TweaksTabView.xaml`, `DashboardViewModel.cs`, `DashboardTabView.xaml`), `CatalogValidator`
+- **Component**: `Catalog` (`tweak.schema.json`, `advanced.json`, `essential.json`), `WinVelo.Core` (`TweakDefinition.cs`, `IrreversibleItemModel.cs`), `WinVelo.Cli` (`Program.cs`), `WinVelo.App` (`TweaksViewModel.cs`, `TweaksTabView.xaml`, `DashboardViewModel.cs`, `DashboardTabView.xaml`), `CatalogValidator`
 - **Finding**:
   1. Permanent destructive tweaks that delete files (purging temp directories, deleting user Edge/OneDrive profiles) or permanently purge Windows update baselines (DISM `/ResetBase`) could be applied silently and indiscriminately without any warning or confirmation.
   2. The catalog schema and data models had no property to distinguish reversible tweaks from irreversible operations.
@@ -156,7 +156,7 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
 ---
 
 ## BUG-013: Single-Action State Detection Masked Composite Tweaks and Produced False Positives
-- **Component**: `Tweakora.Core` (`StateDetector.cs`, `TweakState.cs`), `Tweakora.Modules` (`TweakService.cs`, `ITweakService.cs`), `Tweakora.Cli` (`Program.cs`), `Tweakora.App` (`TweakCardModel`, `TweaksViewModel.cs`, `TweaksTabView.xaml`), `Tweakora.Tests` (`CompositeStateDetectionTests.cs`)
+- **Component**: `WinVelo.Core` (`StateDetector.cs`, `TweakState.cs`), `WinVelo.Modules` (`TweakService.cs`, `ITweakService.cs`), `WinVelo.Cli` (`Program.cs`), `WinVelo.App` (`TweakCardModel`, `TweaksViewModel.cs`, `TweaksTabView.xaml`), `WinVelo.Tests` (`CompositeStateDetectionTests.cs`)
 - **Finding**:
   1. State detection previously evaluated only a single registry key or service rule from `tweak.Detect` (e.g. `essential.services` changes 30 services but checked only `CscService`). If only 1 service was disabled while 29 were left running, the app reported the tweak as 100% "Applied".
   2. Tweaks with multiple registry/policy modifications had no intermediate state representation; partial configurations either caused false positives (if checked via a single sentinel) or false negatives.
@@ -175,7 +175,7 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
 ---
 
 ## BUG-014: Fallback Undo Created Corrupt Journal Baseline and Left Unfinished Sessions
-- **Component**: `Tweakora.Core` (`TweakRunner.cs`, `RollbackJournalManager.cs`, `IActionHandler.cs`, `RegistryActionHandler.cs`, `ServiceActionHandler.cs`, `TaskActionHandler.cs`, `PowerShellActionHandler.cs`)
+- **Component**: `WinVelo.Core` (`TweakRunner.cs`, `RollbackJournalManager.cs`, `IActionHandler.cs`, `RegistryActionHandler.cs`, `ServiceActionHandler.cs`, `TaskActionHandler.cs`, `PowerShellActionHandler.cs`)
 - **Finding**:
   1. When no active journal records existed for a tweak, the fallback undo executed catalog actions through `handler.ExecuteAsync`. Because `handler.ExecuteAsync` unconditionally performed write-ahead journaling, it captured the tweak's APPLIED value as a new baseline record and left an uncompleted journal session on disk.
   2. Because those newly created fallback records were never marked reverted, a subsequent `apply` found the wrong baseline via `FindExistingBaselineRecord`, corrupting all future rollbacks (restoring the applied value instead of default).
@@ -192,7 +192,7 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
 ---
 
 ## BUG-015: Detection detect.any Short-Circuited Stateful Verification of Composite Tweaks
-- **Component**: `Tweakora.Core` (`StateDetector.cs`), `Tweakora.Tests` (`RealRegistrySyncTests.cs`, `CompositeStateDetectionTests.cs`), `docs/TWEAK_GUIDE.md`
+- **Component**: `WinVelo.Core` (`StateDetector.cs`), `WinVelo.Tests` (`RealRegistrySyncTests.cs`, `CompositeStateDetectionTests.cs`), `docs/TWEAK_GUIDE.md`
 - **Finding**:
   1. `StateDetector.EvaluateTweakState` checked `tweak.Detect?.Any` first and returned `Applied` as soon as any single rule matched (`tweak.Detect.Any.Any(EvaluateRule)`).
   2. For composite tweaks like `essential.telemetry` (which modifies 12 distinct registry values and services), having just one policy key set caused the engine to report `Applied`, completely bypassing verification of the other 11 apply actions.
@@ -209,7 +209,7 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
 ---
 
 ## BUG-016: Native Command Failures Invisible in PowerShell Scripts
-- **Component**: `Catalog/Tweaks/*.json` (`advanced.json`, `essential.json`), `Tweakora.Tests` (`CatalogPowerShellSyntaxTests.cs`)
+- **Component**: `Catalog/Tweaks/*.json` (`advanced.json`, `essential.json`), `WinVelo.Tests` (`CatalogPowerShellSyntaxTests.cs`)
 - **Finding**: In Windows PowerShell 5.1, executing external native CLI tools (e.g., `winget`, `dism`, `powercfg`, `cleanmgr`, `netsh`) does not throw a terminating or non-terminating PowerShell exception when the process exits with a non-zero error code. Because the PowerShell runner wrapped script execution in try/catch, scripts that suffered complete native command failures continued running silently and returned success with exit code 0.
 - **Root Cause**: PowerShell 5.1 treats native executable stderr output and non-zero exit codes as normal pipeline output rather than exceptions, requiring explicit post-call checks against `$LASTEXITCODE`.
 - **Fix**:
@@ -239,7 +239,7 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
 ---
 
 ## BUG-018: Write-Ahead Journal Unfinished Sessions Orphaned Without Crash Recovery
-- **Component**: `Tweakora.Core` (`RollbackJournalManager.cs`, `TweakRunner.cs`), `Tweakora.Modules` (`ITweakService.cs`, `TweakService.cs`), `Tweakora.Cli` (`Program.cs`), `Tweakora.App` (`MainWindow.xaml`, `MainWindow.xaml.cs`, `MainViewModel.cs`), `Tweakora.Tests` (`JournalCrashRecoveryTests.cs`)
+- **Component**: `WinVelo.Core` (`RollbackJournalManager.cs`, `TweakRunner.cs`), `WinVelo.Modules` (`ITweakService.cs`, `TweakService.cs`), `WinVelo.Cli` (`Program.cs`), `WinVelo.App` (`MainWindow.xaml`, `MainWindow.xaml.cs`, `MainViewModel.cs`), `WinVelo.Tests` (`JournalCrashRecoveryTests.cs`)
 - **Finding**:
   1. `RollbackJournalManager.GetUnfinishedSessions` successfully identified interrupted/uncompleted journal sessions on disk, but neither CLI nor GUI consumed them.
   2. If the application or system crashed mid-apply, partial state modifications remained unmanaged, and subsequent runs ignored the unfinished session files.
@@ -255,7 +255,7 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
 ---
 
 ## BUG-019: Hardcoded Profile Filters, Blind Auto-Apply, and Dishonest Rollback Claims
-- **Component**: `Tweakora.App` (`DashboardViewModel.cs`, `DashboardTabView.xaml`, `ProfilePreviewItemModel.cs`), `Tweakora.Cli` (`Program.cs`), `Catalog/Presets`, `tools/CatalogValidator`
+- **Component**: `WinVelo.App` (`DashboardViewModel.cs`, `DashboardTabView.xaml`, `ProfilePreviewItemModel.cs`), `WinVelo.Cli` (`Program.cs`), `Catalog/Presets`, `tools/CatalogValidator`
 - **Finding**:
   1. `DashboardViewModel` used hardcoded string-matching queries (`Origin` matches, `Description.Contains("Game")`, `Take(14)` / `Take(18)`, and a dead `Category=="Essential"` filter) instead of declarative preset definitions from disk.
   2. Clicking a profile button applied tweaks directly to the host without displaying a preview of what was about to be changed, their risk levels, reversibility, or whether they were already applied.
@@ -273,7 +273,7 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
 ---
 
 ## BUG-020: Windows Servicing Components Left Unprotected Against Destructive Tweaks and Lacking Health Integrity Verification
-- **Component**: `Tweakora.Core` (`ServicingProtection.cs`), `tools/CatalogValidator` (`Program.cs`), `Catalog/Tweaks` (`essential.json`), `Catalog/schema` (`tweak.schema.json`), `Tweakora.Modules` (`TweakService.cs`), `Tweakora.Cli` (`Program.cs`), `Tweakora.App` (`DashboardViewModel.cs`), `Tweakora.Tests` (`ServicingProtectionTests.cs`)
+- **Component**: `WinVelo.Core` (`ServicingProtection.cs`), `tools/CatalogValidator` (`Program.cs`), `Catalog/Tweaks` (`essential.json`), `Catalog/schema` (`tweak.schema.json`), `WinVelo.Modules` (`TweakService.cs`), `WinVelo.Cli` (`Program.cs`), `WinVelo.App` (`DashboardViewModel.cs`), `WinVelo.Tests` (`ServicingProtectionTests.cs`)
 - **Finding**:
   1. The catalog validator allowed tweaks to disable or alter critical Windows servicing components (such as Windows Update, BITS, Store InstallService, TrustedInstaller, Defender, etc.) without safety gating.
   2. `essential.disablestoresearch` denied permissions to the Store database (`store.db`) using `icacls ... /deny *S-1-1-0:F`, which broke Microsoft Store operations and app updates, yet was categorized as "Safe" without any side-effects disclosure.
@@ -290,7 +290,7 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
 ---
 
 ## BUG-021: Placebo Tweaks, Unproven Performance Claims, and Optimization Score Gaming
-- **Component**: `Catalog/Tweaks`, `Catalog/schema`, `tools/CatalogValidator`, `Tweakora.App` (`DashboardViewModel`, `DashboardTabView`, `TweaksViewModel`, `TweaksTabView`, `StartupViewModel`, `StartupTabView`, `ToolboxViewModel`, `ToolboxPage`, `MainViewModel`), `Tweakora.Modules` (`NetworkOptimizerService`, `MemoryOptimizerService`), `Tweakora.Tests` (`PlaceboAndClaimScrubTests.cs`)
+- **Component**: `Catalog/Tweaks`, `Catalog/schema`, `tools/CatalogValidator`, `WinVelo.App` (`DashboardViewModel`, `DashboardTabView`, `TweaksViewModel`, `TweaksTabView`, `StartupViewModel`, `StartupTabView`, `ToolboxViewModel`, `ToolboxPage`, `MainViewModel`), `WinVelo.Modules` (`NetworkOptimizerService`, `MemoryOptimizerService`), `WinVelo.Tests` (`PlaceboAndClaimScrubTests.cs`)
 - **Finding**:
   1. The catalog lacked an evidence classification system, allowing unproven community claims (such as reducing `MouseDataQueueSize` or CPU unparking on modern Windows schedulers) to be presented alongside documented tweaks.
   2. Tweaks addressing situational hardware bugs (such as disabling MPO to prevent multi-monitor flicker or disabling power throttling on plugged-in machines) were marketed as universal performance/FPS boosts without disclosing battery life or windowed presentation trade-offs.
@@ -313,7 +313,7 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
 ---
 
 ## BUG-022: Uncalibrated Risk Ratings and Absence of Minimum Risk Floors
-- **Component**: `Catalog/Tweaks`, `tools/CatalogValidator`, `docs/TWEAK_GUIDE.md`, `docs/RISK_AUDIT.md`, `src/Tweakora.Tests/RiskRubricTests.cs`
+- **Component**: `Catalog/Tweaks`, `tools/CatalogValidator`, `docs/TWEAK_GUIDE.md`, `docs/RISK_AUDIT.md`, `src/WinVelo.Tests/RiskRubricTests.cs`
 - **Finding**:
   1. 116 of 149 tweaks were previously rated as "Safe", despite 77 tweaks modifying machine-wide system policies in `HKLM`, disabling relied-upon features (hibernation, widgets, Copilot, background apps), altering services, or requiring a system reboot.
   2. Irreversible tweaks and machine-level security and networking changes had arbitrary risk ratings with no formal criteria or minimum floors.
@@ -329,7 +329,7 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
 ---
 
 ## BUG-023: Missing Tweak Explanations, Side Effects Disclosures, Source Citations, and Recommended-Only View Filter
-- **Component**: `Catalog/Tweaks`, `Catalog/schema/tweak.schema.json`, `tools/CatalogValidator/Program.cs`, `src/Tweakora.App/ViewModels/TweaksViewModel.cs`, `src/Tweakora.App/Views/TweaksTabView.xaml`, `src/Tweakora.Tests/TweakExplanationTests.cs`
+- **Component**: `Catalog/Tweaks`, `Catalog/schema/tweak.schema.json`, `tools/CatalogValidator/Program.cs`, `src/WinVelo.App/ViewModels/TweaksViewModel.cs`, `src/WinVelo.App/Views/TweaksTabView.xaml`, `src/WinVelo.Tests/TweakExplanationTests.cs`
 - **Finding**:
   1. Tweaks lacked granular explanations of their exact system behavior (`whatItDoes`), side effects/potential trade-offs (`sideEffects`), and authoritative documentation citations (`sources`).
   2. Users had no O&O ShutUp10++-style expandable drawer on tweak cards to inspect what a tweak does, what it might break, or view documentation before toggling.
@@ -349,19 +349,19 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
 ---
 
 ## BUG-024: CLI Modifying Commands Lacked Interactive Confirmation and Non-Interactive Safety Guard
-- **Component**: `src/Tweakora.Cli/Program.cs`, `src/Tweakora.Tests/CliConfirmationTests.cs`
+- **Component**: `src/WinVelo.Cli/Program.cs`, `src/WinVelo.Tests/CliConfirmationTests.cs`
 - **Finding**:
   1. CLI commands that modify host machine state (`--apply`, `--undo`, `--preset ... --run`, `--config ... --run`, `--recover rollback`) could be executed without interactive confirmation or explicit authorization (`--yes`), allowing accidental execution against the host OS.
   2. In non-interactive environments (e.g. background tasks, scripts, CI, redirected standard input), commands could execute silently without an explicit `--yes` flag.
 - **Root Cause**: Absence of a confirmation gate on mutating CLI execution paths.
 - **Fix**:
-  1. Implemented `Program.CheckConfirmationGate(args, operationDescription)` in `src/Tweakora.Cli/Program.cs`.
+  1. Implemented `Program.CheckConfirmationGate(args, operationDescription)` in `src/WinVelo.Cli/Program.cs`.
   2. Enforced that any command mutating host state prompts interactively for confirmation `(y/N)` unless `--yes` / `-y` is supplied.
   3. When standard input is non-interactive (`Console.IsInputRedirected == true`), commands strictly refuse to execute unless `--yes` is explicitly passed.
 ---
 
 ## BUG-025: Catalog Explanations Desynchronized From Actual Action Payloads and Missing Auto-Generated Technical Change Specifications
-- **Component**: `Catalog/Tweaks/*.json`, `src/Tweakora.Core/Utilities/TweakActionFormatter.cs`, `src/Tweakora.App/ViewModels/TweaksViewModel.cs`, `src/Tweakora.App/Views/TweaksTabView.xaml`, `src/Tweakora.Cli/Program.cs`, `src/Tweakora.Tests/TweakExplanationTests.cs`, `src/Tweakora.Tests/CliConfirmationTests.cs`
+- **Component**: `Catalog/Tweaks/*.json`, `src/WinVelo.Core/Utilities/TweakActionFormatter.cs`, `src/WinVelo.App/ViewModels/TweaksViewModel.cs`, `src/WinVelo.App/Views/TweaksTabView.xaml`, `src/WinVelo.Cli/Program.cs`, `src/WinVelo.Tests/TweakExplanationTests.cs`, `src/WinVelo.Tests/CliConfirmationTests.cs`
 - **Finding**:
   1. Human-written descriptions (`whatItDoes` and `sideEffects`) in several catalog tweaks contradicted actual underlying action data:
      - `performance.input.buffer-queue`: text stated `MouseDataQueueSize=16` (actions set both `MouseDataQueueSize=20` and `KeyboardDataQueueSize=20`).
@@ -377,7 +377,7 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
 - **Root Cause**: Manual authoring of explanation text without automated cross-validation tests between text tokens (registry value names and setting numbers) and actual JSON action payloads.
 - **Fix**:
   1. Audited all 149 catalog tweaks and aligned all descriptions with actual action payloads and registry keys.
-  2. Implemented `TweakActionFormatter` in `Tweakora.Core.Utilities` generating deterministic "Exact changes" lists from apply actions for Registry, Service, Task, PowerShell, AppX, Feature, and File actions.
+  2. Implemented `TweakActionFormatter` in `WinVelo.Core.Utilities` generating deterministic "Exact changes" lists from apply actions for Registry, Service, Task, PowerShell, AppX, Feature, and File actions.
   3. Integrated "EXACT CHANGES (ENGINE SPECIFICATION)" into the UI details drawer (`TweaksTabView.xaml` and `TweakCardModel`).
   4. Added `--info <tweakId>` command to `winvelo-cli` displaying metadata, descriptions, side effects, and exact changes specifications.
   5. Added regression test `AllTweaks_RegistryValueNamesAndNumbersInExplanations_MatchCatalogActions` in `TweakExplanationTests.cs` enforcing that every registry value name and setting number mentioned in explanations exists in that tweak's apply/undo actions.
@@ -386,7 +386,7 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
 ---
 
 ## BUG-026: Lenient Evidence Classification, Unverified Documentation Claims, and Gamified Optimization Meter
-- **Component**: `Catalog/Tweaks/*.json`, `Catalog/schema/tweak.schema.json`, `src/Tweakora.Core/Models/TweakDefinition.cs`, `tools/CatalogValidator/Program.cs`, `src/Tweakora.App/ViewModels/DashboardViewModel.cs`, `src/Tweakora.App/Views/DashboardTabView.xaml`, `src/Tweakora.App/ViewModels/TweaksViewModel.cs`, `src/Tweakora.App/Views/TweaksTabView.xaml`, `src/Tweakora.Cli/Program.cs`, `docs/EVIDENCE_AUDIT.md`, `src/Tweakora.Tests/TweakExplanationTests.cs`, `src/Tweakora.Tests/PlaceboAndClaimScrubTests.cs`
+- **Component**: `Catalog/Tweaks/*.json`, `Catalog/schema/tweak.schema.json`, `src/WinVelo.Core/Models/TweakDefinition.cs`, `tools/CatalogValidator/Program.cs`, `src/WinVelo.App/ViewModels/DashboardViewModel.cs`, `src/WinVelo.App/Views/DashboardTabView.xaml`, `src/WinVelo.App/ViewModels/TweaksViewModel.cs`, `src/WinVelo.App/Views/TweaksTabView.xaml`, `src/WinVelo.Cli/Program.cs`, `docs/EVIDENCE_AUDIT.md`, `src/WinVelo.Tests/TweakExplanationTests.cs`, `src/WinVelo.Tests/PlaceboAndClaimScrubTests.cs`
 - **Finding**:
   1. The initial evidence pass defaulted 132 tweaks to "documented", even when the cited source was merely a general discussion of a Windows subsystem rather than vendor documentation explicitly naming the setting (registry value, policy name, or CSP property).
   2. Tweaks with "documented" evidence lacked verification proof and verbatim source quotes (`sourceQuote`).
@@ -405,7 +405,7 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
 ---
 
 ## BUG-027: Ambiguous Evidence Semantics for Ordinary UI Settings and Incomplete Recommended-Only Criteria
-- **Component**: `Catalog/Tweaks/*.json`, `Catalog/schema/tweak.schema.json`, `src/Tweakora.Core/Models/TweakDefinition.cs`, `tools/CatalogValidator/Program.cs`, `src/Tweakora.App/ViewModels/TweaksViewModel.cs`, `src/Tweakora.App/Views/TweaksTabView.xaml`, `src/Tweakora.Cli/Program.cs`, `docs/EVIDENCE_AUDIT.md`, `src/Tweakora.Tests/TweakExplanationTests.cs`, `src/Tweakora.Tests/PlaceboAndClaimScrubTests.cs`
+- **Component**: `Catalog/Tweaks/*.json`, `Catalog/schema/tweak.schema.json`, `src/WinVelo.Core/Models/TweakDefinition.cs`, `tools/CatalogValidator/Program.cs`, `src/WinVelo.App/ViewModels/TweaksViewModel.cs`, `src/WinVelo.App/Views/TweaksTabView.xaml`, `src/WinVelo.Cli/Program.cs`, `docs/EVIDENCE_AUDIT.md`, `src/WinVelo.Tests/TweakExplanationTests.cs`, `src/WinVelo.Tests/PlaceboAndClaimScrubTests.cs`
 - **Finding**:
   1. The previous audit grouped 131 tweaks under `evidence: "situational"`. Most of these were ordinary Windows Settings (e.g., dark mode, file extensions, taskbar alignment, hidden files, transparency), which broke the intended definition of "situational" as "fixes a specific named problem or workaround".
   2. Users looking at ordinary UI preferences had no indication where that setting could be toggled natively in Windows Settings or Control Panel.
@@ -422,7 +422,7 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
 ---
 
 ## BUG-028: Navigation Tab Bloat and Fragmented System Utilities Architecture
-- **Component**: `src/Tweakora.App/Views/MainWindow.xaml`, `src/Tweakora.App/ViewModels/MainViewModel.cs`, `src/Tweakora.App/ViewModels/ToolsViewModel.cs`, `src/Tweakora.App/Views/ToolsTabView.xaml`, `src/Tweakora.App/ViewModels/HistoryViewModel.cs`, `src/Tweakora.App/Views/HistoryTabView.xaml`, `src/Tweakora.App/App.xaml.cs`
+- **Component**: `src/WinVelo.App/Views/MainWindow.xaml`, `src/WinVelo.App/ViewModels/MainViewModel.cs`, `src/WinVelo.App/ViewModels/ToolsViewModel.cs`, `src/WinVelo.App/Views/ToolsTabView.xaml`, `src/WinVelo.App/ViewModels/HistoryViewModel.cs`, `src/WinVelo.App/Views/HistoryTabView.xaml`, `src/WinVelo.App/App.xaml.cs`
 - **Finding**:
   1. The application shell exposed 8 disparate top-level navigation tabs (`Dashboard`, `Tweaks`, `Install`, `Config`, `Updates`, `Toolbox`, `Startup`, `Backups`), leading to cognitive clutter, duplicated entry points, and inconsistent categorization.
   2. System configuration utilities (Startup apps, Services, Cleaner, DNS, Windows Fixes, Windows Update Mode, Optional Features, and Restore Points) were fragmented across multiple tabs and side drawers.
@@ -438,7 +438,7 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
 ---
 
 ## BUG-029: Gimmicky Telemetry Gauges, 1-Second Polling Timers, and Missing Calm System Status Indicators
-- **Component**: `src/Tweakora.App/Views/DashboardTabView.xaml`, `src/Tweakora.App/ViewModels/DashboardViewModel.cs`, `src/Tweakora.Core/Interfaces/IPlatformServices.cs`, `src/Tweakora.Platform/WindowsRestoreService.cs`, `src/Tweakora.Simulation/SimulationServices.cs`, `src/Tweakora.Modules/Tweaks/TweakService.cs`
+- **Component**: `src/WinVelo.App/Views/DashboardTabView.xaml`, `src/WinVelo.App/ViewModels/DashboardViewModel.cs`, `src/WinVelo.Core/Interfaces/IPlatformServices.cs`, `src/WinVelo.Platform/WindowsRestoreService.cs`, `src/WinVelo.Simulation/SimulationServices.cs`, `src/WinVelo.Modules/Tweaks/TweakService.cs`
 - **Finding**:
   1. The Home tab featured animated 1-second live RAM polling (`DispatcherTimer`), CPU/RAM telemetry meters, and a "Free Up RAM (Purge Cache)" button that functioned as placebo decoration.
   2. Essential system security and servicing states — admin status, System Restore status with latest restore point creation timestamp, exact count of tweaks applied by WinVelo, servicing health-check summary, and pending reboot / explorer restart notifications — were either absent or buried.
@@ -455,7 +455,7 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
 ---
 
 ## BUG-030: Absence of First-Run Onboarding Wizard, Unverified System Restore Baseline, and Lack of Simple vs Advanced Modes
-- **Component**: `src/Tweakora.Core/Models/UserSettings.cs`, `src/Tweakora.Core/Interfaces/IAppSettingsService.cs`, `src/Tweakora.Platform/AppSettingsService.cs`, `src/Tweakora.App/ViewModels/FirstRunWizardViewModel.cs`, `src/Tweakora.App/Views/FirstRunWizardView.xaml`, `src/Tweakora.App/ViewModels/MainViewModel.cs`, `src/Tweakora.App/Views/MainWindow.xaml`, `src/Tweakora.Core/Interfaces/IPlatformServices.cs`, `src/Tweakora.Platform/WindowsRestoreService.cs`, `src/Tweakora.Simulation/SimulationServices.cs`, `src/Tweakora.Tests/FirstRunWizardTests.cs`
+- **Component**: `src/WinVelo.Core/Models/UserSettings.cs`, `src/WinVelo.Core/Interfaces/IAppSettingsService.cs`, `src/WinVelo.Platform/AppSettingsService.cs`, `src/WinVelo.App/ViewModels/FirstRunWizardViewModel.cs`, `src/WinVelo.App/Views/FirstRunWizardView.xaml`, `src/WinVelo.App/ViewModels/MainViewModel.cs`, `src/WinVelo.App/Views/MainWindow.xaml`, `src/WinVelo.Core/Interfaces/IPlatformServices.cs`, `src/WinVelo.Platform/WindowsRestoreService.cs`, `src/WinVelo.Simulation/SimulationServices.cs`, `src/WinVelo.Tests/FirstRunWizardTests.cs`
 - **Finding**:
   1. The application launched directly into the full tweaking surface without explaining what WinVelo does and does not do, creating confusion for new or non-technical users.
   2. Users lacked an upfront onboarding safety check to enable System Restore and create a verified baseline restore point before applying system changes.
@@ -474,7 +474,7 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
 ---
 
 ## BUG-031: Tweaks Page Usability Gaps: Divergent Execution Dialogs, Missing Risk/State Filter Suite, and Lack of Instant Apply Undo Toasts
-- **Component**: `src/Tweakora.App/ViewModels/UnifiedExecutionDialogViewModel.cs`, `src/Tweakora.App/Views/UnifiedExecutionDialogView.xaml`, `src/Tweakora.App/ViewModels/TweaksViewModel.cs`, `src/Tweakora.App/Views/TweaksTabView.xaml`, `src/Tweakora.App/ViewModels/DashboardViewModel.cs`, `src/Tweakora.App/ViewModels/MainViewModel.cs`, `src/Tweakora.App/Views/MainWindow.xaml`, `src/Tweakora.Tests/EngineTests/CompositeStateDetectionTests.cs`
+- **Component**: `src/WinVelo.App/ViewModels/UnifiedExecutionDialogViewModel.cs`, `src/WinVelo.App/Views/UnifiedExecutionDialogView.xaml`, `src/WinVelo.App/ViewModels/TweaksViewModel.cs`, `src/WinVelo.App/Views/TweaksTabView.xaml`, `src/WinVelo.App/ViewModels/DashboardViewModel.cs`, `src/WinVelo.App/ViewModels/MainViewModel.cs`, `src/WinVelo.App/Views/MainWindow.xaml`, `src/WinVelo.Tests/EngineTests/CompositeStateDetectionTests.cs`
 - **Finding**:
   1. The UI maintained fragmented, disparate dialog implementations for preset previews, multi-select apply, single tweak execution, and rollback reporting.
   2. Safe and Low risk tweaks required redundant confirmation steps or failed to provide immediate undo capability via non-intrusive toast notifications.
@@ -495,7 +495,7 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
 ---
 
 ## BUG-032: History Page Gaps: Missing Unified Rollback Integration, Unsorted Sessions, and Buried System Restore Points
-- **Component**: `src/Tweakora.App/ViewModels/HistoryViewModel.cs`, `src/Tweakora.App/Views/HistoryTabView.xaml`, `src/Tweakora.Core/Interfaces/IPlatformServices.cs`, `src/Tweakora.Platform/WindowsRestoreService.cs`, `src/Tweakora.Simulation/SimulationServices.cs`, `src/Tweakora.App/ViewModels/MainViewModel.cs`, `src/Tweakora.Tests/HistoryPageTests.cs`
+- **Component**: `src/WinVelo.App/ViewModels/HistoryViewModel.cs`, `src/WinVelo.App/Views/HistoryTabView.xaml`, `src/WinVelo.Core/Interfaces/IPlatformServices.cs`, `src/WinVelo.Platform/WindowsRestoreService.cs`, `src/WinVelo.Simulation/SimulationServices.cs`, `src/WinVelo.App/ViewModels/MainViewModel.cs`, `src/WinVelo.Tests/HistoryPageTests.cs`
 - **Finding**:
   1. The History page did not guarantee that journal sessions were sorted newest first, creating confusion when tracking recent modifications.
   2. The page displayed raw, ungrouped journal action records without categorizing them by tweak name or surfacing tweak-level status (Active vs Reverted).
@@ -515,7 +515,7 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
 ---
 
 ## BUG-033: Quality Bar: Outdated Monolithic UI Test Suite, Unchecked Startup Latency, and Outdated Legacy Documentation
-- **Component**: `src/Tweakora.UiTests/TweakoraUiTests.cs`, `src/Tweakora.App/Views/FirstRunWizardView.xaml`, `docs/screenshots/`, `README.md`
+- **Component**: `src/WinVelo.UiTests/WinVeloUiTests.cs`, `src/WinVelo.App/Views/FirstRunWizardView.xaml`, `docs/screenshots/`, `README.md`
 - **Finding**:
   1. The FlaUI automation suite targeted obsolete 8-tab navigation IDs (`Tab_Config`, `Tab_Toolbox`, `Tab_Backups`) rather than the modern 5-tab structure (`Home`, `Tweaks`, `Apps`, `Tools`, `History`) and lacked dedicated test coverage for the preview → apply → instant undo-toast workflow.
   2. Automated testing risked interference from the first-run setup wizard overlay due to missing automation IDs on setup buttons.
@@ -523,7 +523,7 @@ This document catalogs all historical, discovered, and audited bugs, crashes, st
   4. Documentation screenshots in `docs/screenshots/` reflected obsolete UI tabs and widgets.
 - **Root Cause**: Fast architectural evolution across Phases 2 and 3 without updating the high-level UI automation harness and visual artifacts.
 - **Fix**:
-  1. Refactored `TweakoraUiTests.cs` into modular tests covering all 5 tabs and dedicated flows:
+  1. Refactored `WinVeloUiTests.cs` into modular tests covering all 5 tabs and dedicated flows:
      - `Test_01_HomePage_LoadsCalmStatus`
      - `Test_02_TweaksPage_LoadsFiltersAndCatalog`
      - `Test_03_AppsPage_LoadsCatalogAndSearch`

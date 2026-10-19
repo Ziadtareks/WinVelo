@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <AssemblyName>winvelo-cli</AssemblyName>
+    <ApplicationIcon>..\WinVelo.App\Assets\winvelo.ico</ApplicationIcon>
+    <RootNamespace>WinVelo.Cli</RootNamespace>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+    <CopyOutputSymbolsToPublishDirectory>false</CopyOutputSymbolsToPublishDirectory>
+    <AllowedReferenceRelatedFileExtensions>none</AllowedReferenceRelatedFileExtensions>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WinVelo.Core\WinVelo.Core.csproj" />
+    <ProjectReference Include="..\WinVelo.Platform\WinVelo.Platform.csproj" />
+    <ProjectReference Include="..\WinVelo.Modules\WinVelo.Modules.csproj" />
+    <ProjectReference Include="..\WinVelo.Simulation\WinVelo.Simulation.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\Catalog\**\*" Link="Catalog\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

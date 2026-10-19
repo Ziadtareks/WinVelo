@@ -39,7 +39,7 @@ $running = Get-Process -Name "WinVelo", "winvelo-cli" -ErrorAction SilentlyConti
 if ($running) { throw "Close WinVelo / winvelo-cli first (PID $(($running.Id) -join ', '))." }
 
 Step "1/6 Build"
-Run "dotnet build" { dotnet build Tweakora.sln -c Release --nologo -v minimal }
+Run "dotnet build" { dotnet build WinVelo.sln -c Release --nologo -v minimal }
 
 Step "2/6 Catalog and presets"
 Run "Catalog validator" { dotnet run --project tools/CatalogValidator/CatalogValidator.csproj -c Release --no-build }
@@ -52,14 +52,14 @@ Write-Host "[OK] Presets match the generator." -ForegroundColor Green
 
 if (-not $SkipTests) {
     Step "3/6 Unit tests"
-    Run "Unit tests" { dotnet test src/Tweakora.Tests/Tweakora.Tests.csproj -c Release --no-build --nologo }
+    Run "Unit tests" { dotnet test src/WinVelo.Tests/WinVelo.Tests.csproj -c Release --no-build --nologo }
 } else {
     Write-Host "`n(Skipping tests)" -ForegroundColor Yellow
 }
 
 if (-not $SkipScreenshots) {
     Step "4/6 Screenshots (test mode, no system changes)"
-    $appExe = Join-Path $repoRoot "src\Tweakora.App\bin\Release\net10.0-windows\WinVelo.exe"
+    $appExe = Join-Path $repoRoot "src\WinVelo.App\bin\Release\net10.0-windows\WinVelo.exe"
     if (-not (Test-Path $appExe)) { throw "Built app not found at $appExe" }
     $shotDir = Join-Path $repoRoot "docs\screenshots"
     $p = Start-Process -FilePath $appExe -ArgumentList @("--test-mode", "--capture-screenshots", "`"$shotDir`"") -PassThru -Wait

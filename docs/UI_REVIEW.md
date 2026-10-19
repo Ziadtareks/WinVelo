@@ -23,7 +23,7 @@ All items requested in the UI polish, catalog cleanup, and category presets pass
   - Modal footer containing *Cancel* and *Apply Selected Tweaks* is pinned outside the scroll container and never scrolls out of view.
 - **Item 5 (Screenshot Pipeline & Integrity Verification)**:
   - Re-captured all dark and light theme assets in `--test-mode` at 1440x900 resolution with the wizard dismissed and Clean UI Full (56 tweaks) loaded in `preview.png`.
-  - Verified `Test_09` in `src/Tweakora.UiTests` passes: every required screenshot exceeds 20 KB (smallest is `settings.png` at 27,256 bytes, largest is `overview.png` at 275,919 bytes), has high pixel variance (> 25.0), and has a unique MD5 hash proving zero duplication or blank captures.
+  - Verified `Test_09` in `src/WinVelo.UiTests` passes: every required screenshot exceeds 20 KB (smallest is `settings.png` at 27,256 bytes, largest is `overview.png` at 275,919 bytes), has high pixel variance (> 25.0), and has a unique MD5 hash proving zero duplication or blank captures.
 
 ---
 

@@ -1,6 +1,6 @@
-﻿# Tweakora Topic Tags Audit
+﻿# WinVelo Topic Tags Audit
 
-This document provides a complete audit of semantic topic tags assigned to all catalog tweaks in WinVelo (Tweakora).
+This document provides a complete audit of semantic topic tags assigned to all catalog tweaks in WinVelo (WinVelo).
 Tags are assigned based on what each tweak actually does (its apply actions and functional effects), not from name alone.
 
 Allowed topic tags: `gaming`, `privacy`, `ai`, `ui`, `performance`, `network`, `updates`, `apps`.

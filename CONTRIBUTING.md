@@ -110,13 +110,13 @@ Before submitting a Pull Request, verify that your changes pass all checks:
 
 2. **Run All Unit Tests**:
    ```powershell
-   dotnet test src/Tweakora.Tests/Tweakora.Tests.csproj -c Debug
+   dotnet test src/WinVelo.Tests/WinVelo.Tests.csproj -c Debug
    ```
    *All tests must pass.*
 
 3. **Run UI Tests in Test Mode**:
    ```powershell
-   dotnet test src/Tweakora.UiTests/Tweakora.UiTests.csproj -c Debug
+   dotnet test src/WinVelo.UiTests/WinVelo.UiTests.csproj -c Debug
    ```
    *All UI automation tests must pass in `--test-mode`.*
 
