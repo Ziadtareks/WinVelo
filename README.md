@@ -10,6 +10,7 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/Ziadtareks/WinVelo/actions/workflows/build-and-test.yml"><img src="https://github.com/Ziadtareks/WinVelo/actions/workflows/build-and-test.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/Ziadtareks/WinVelo/releases/latest"><img src="https://img.shields.io/badge/release-v1.0.1-2563EB.svg" alt="Release v1.0.1"></a>
   <img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10 | 11">
   <img src="https://img.shields.io/badge/tweaks-140-10B981.svg" alt="140 tweaks">

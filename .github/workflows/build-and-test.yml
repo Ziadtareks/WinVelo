@@ -1,33 +1,98 @@
-name: Build and Test
+name: CI
 
 on:
   push:
-    branches: [ "main" ]
   pull_request:
-    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+  # Defence in depth: the real Windows services refuse to start while test mode is on,
+  # so no test can ever change the runner's registry, services or tasks.
+  WINVELO_TEST_MODE: '1'
 
 jobs:
   build:
-    name: Build & Test on Windows
+    name: Build, test and validate (Windows)
     runs-on: windows-latest
 
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    - name: Setup .NET 10
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: '10.0.x'
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
 
-    - name: Restore Dependencies
-      run: dotnet restore WinVelo.sln
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.NUGET_PACKAGES }}
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', 'Directory.Build.props') }}
+          restore-keys: nuget-${{ runner.os }}-
 
-    - name: Validate Catalog JSON
-      run: dotnet run --project tools/CatalogValidator/CatalogValidator.csproj
+      - name: Restore
+        run: dotnet restore WinVelo.sln
 
-    - name: Build Solution
-      run: dotnet build WinVelo.sln --configuration Release --no-restore
+      # The solution builds with 0 warnings; keep it that way.
+      - name: Build (warnings are errors)
+        run: dotnet build WinVelo.sln --configuration Release --no-restore -p:TreatWarningsAsErrors=true
 
-    - name: Run Tests
-      run: dotnet test WinVelo.sln --configuration Release --no-build --verbosity normal
+      - name: Validate catalog
+        run: dotnet run --project tools/CatalogValidator/CatalogValidator.csproj --configuration Release --no-build
+
+      - name: Unit tests
+        run: dotnet test src/WinVelo.Tests/WinVelo.Tests.csproj --configuration Release --no-build --logger "trx;LogFileName=unit-tests.trx" --results-directory TestResults
+
+      - name: Check for vulnerable NuGet packages
+        shell: pwsh
+        run: |
+          $out = dotnet list WinVelo.sln package --vulnerable --include-transitive 2>&1 | Out-String
+          Write-Host $out
+          if ($out -match 'has the following vulnerable packages') { throw "Vulnerable NuGet packages found." }
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: TestResults
+          if-no-files-found: ignore
+
+  ui-tests:
+    # FlaUI drives the real WPF window in --test-mode (no system changes). GitHub's hosted runners have
+    # a desktop session, but UI automation there can be timing-sensitive, so this job reports without
+    # blocking merges. Make it required once it has been green for a while.
+    name: UI tests (test mode, non-blocking)
+    runs-on: windows-latest
+    needs: build
+    continue-on-error: true
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.NUGET_PACKAGES }}
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', 'Directory.Build.props') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      - name: UI tests
+        run: dotnet test src/WinVelo.UiTests/WinVelo.UiTests.csproj --configuration Debug
