@@ -4,9 +4,9 @@
   <trustInfo xmlns="urn:schemas-microsoft-com:asm.v2">
     <security>
       <requestedPrivileges xmlns="urn:schemas-microsoft-com:asm.v3">
-        <!-- WinVelo requires Administrator to read/write system registry, services, and tasks safely -->
-        <!-- asInvoker: --test-mode never needs administrator rights. In normal mode App asks for elevation once at
-             startup (AppAdminGuard.TryRelaunchElevated); if the user says no, WinVelo opens read-only. -->
+        <!-- asInvoker: test mode never needs administrator rights. In normal mode the app asks for elevation once
+             at startup (AppAdminGuard.TryRelaunchElevated); if the user says no, WinVelo opens read-only.
+             Note: XML comments must never contain two hyphens in a row, or Windows refuses to start the exe. -->
         <requestedExecutionLevel level="asInvoker" uiAccess="false" />
       </requestedPrivileges>
     </security>
