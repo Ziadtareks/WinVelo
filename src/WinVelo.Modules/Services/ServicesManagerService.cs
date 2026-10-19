@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using WinVelo.Core.Safety;
 using WinVelo.Core.Interfaces;
 
 namespace WinVelo.Modules.Services;
@@ -65,6 +66,12 @@ public sealed class ServicesManagerService : IServicesManagerService
 
     public Task<bool> SetStartupTypeAsync(string serviceName, string startupType)
     {
+        // Windows Update, BITS, the Store and Windows Security services are never weakened, not even by hand.
+        if (ServicingGuard.CheckService(serviceName, "SetStartup", startupType) != null)
+        {
+            return Task.FromResult(false);
+        }
+
         try
         {
             _services.SetStartupType(serviceName, startupType);
@@ -78,6 +85,11 @@ public sealed class ServicesManagerService : IServicesManagerService
 
     public Task<bool> ToggleServiceStateAsync(string serviceName, bool start)
     {
+        if (!start && ServicingGuard.CheckService(serviceName, "Stop", null) != null)
+        {
+            return Task.FromResult(false);
+        }
+
         try
         {
             if (start)

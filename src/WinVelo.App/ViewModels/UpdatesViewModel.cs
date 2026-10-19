@@ -65,7 +65,7 @@ public sealed partial class UpdatesViewModel : ObservableObject
         ActiveModeTitle = ActiveMode switch
         {
             UpdateProfileMode.Security => LocalizationManager.T("Security (Recommended)"),
-            UpdateProfileMode.DisableAll => LocalizationManager.T("Updates Disabled (Caution)"),
+            UpdateProfileMode.DisableAll => LocalizationManager.T("Automatic updates off (Caution)"),
             _ => LocalizationManager.T("Default (Out of Box)")
         };
     }
@@ -88,8 +88,10 @@ public sealed partial class UpdatesViewModel : ObservableObject
     {
         if (SelectedMode == UpdateProfileMode.DisableAll)
         {
+            // Arabic users can confirm in Arabic; typing English must not be required.
             IsApplyEnabled = string.Equals(TypedConfirmation?.Trim(), "I understand", StringComparison.OrdinalIgnoreCase) ||
-                             string.Equals(TypedConfirmation?.Trim(), "CONFIRM", StringComparison.OrdinalIgnoreCase);
+                             string.Equals(TypedConfirmation?.Trim(), "CONFIRM", StringComparison.OrdinalIgnoreCase) ||
+                             string.Equals(TypedConfirmation?.Trim(), "أفهم", StringComparison.Ordinal);
         }
         else
         {
@@ -121,7 +123,7 @@ public sealed partial class UpdatesViewModel : ObservableObject
             ActiveModeTitle = SelectedMode switch
             {
                 UpdateProfileMode.Security => LocalizationManager.T("Security (Recommended)"),
-                UpdateProfileMode.DisableAll => LocalizationManager.T("Updates Disabled (Caution)"),
+                UpdateProfileMode.DisableAll => LocalizationManager.T("Automatic updates off (Caution)"),
                 _ => LocalizationManager.T("Default (Out of Box)")
             };
             StatusMessage = LocalizationManager.T("Applied {0} profile: {1}.", ActiveModeTitle, report.Summary);

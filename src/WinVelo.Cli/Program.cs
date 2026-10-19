@@ -1445,7 +1445,7 @@ public static class Program
         Console.WriteLine("  winvelo-cli --feature <key> --disable    Disable an optional Windows feature");
         Console.WriteLine("  winvelo-cli --clean <category|all>       Clean safe temporary file categories");
         Console.WriteLine("  winvelo-cli --dns <id>                   Apply a DNS preset (e.g. dns.cloudflare.standard)");
-        Console.WriteLine("  winvelo-cli --update-mode <mode>         Set update mode (Default, Security, DisableAll)");
+        Console.WriteLine("  winvelo-cli --update-mode <mode>         Set update mode (Default, Security, DisableAll = automatic updates off; Windows Update keeps working)");
         Console.WriteLine("  winvelo-cli --fix <id>                   Execute a system maintenance fix");
         Console.WriteLine("  winvelo-cli --config <path> --run        Apply configuration profile (protected by journal)");
         Console.WriteLine("  winvelo-cli --diagnostics <out.zip>      Export read-only diagnostic bundle for bug reports");

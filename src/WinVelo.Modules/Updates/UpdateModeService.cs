@@ -134,16 +134,28 @@ public sealed class UpdateModeService : IUpdateModeService
         _registry.DeleteValue("HKLM", @"SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU", "NoAutoUpdate");
     }
 
+    /// <summary>
+    /// Turns off AUTOMATIC updates with the documented NoAutoUpdate policy only. Windows Update, BITS and the
+    /// Update Orchestrator are never disabled or stopped (see ServicingGuard): the user can still check for and
+    /// install updates from Settings, and the Store keeps working. Earlier versions disabled those services;
+    /// they are set back to their default startup type here so that choosing this mode also repairs that.
+    /// </summary>
     private void ApplyDisableAllMode()
     {
         _registry.SetValue("HKLM", @"SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU", "NoAutoUpdate", 1, "DWord");
         _registry.SetValue("HKLM", @"SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU", "AUOptions", 1, "DWord");
 
-        _services.StopService("BITS");
-        _services.SetStartupType("BITS", "Disabled");
-        _services.StopService("wuauserv");
-        _services.SetStartupType("wuauserv", "Disabled");
-        _services.StopService("UsoSvc");
-        _services.SetStartupType("UsoSvc", "Disabled");
+        RestoreServiceIfDisabled("BITS", "Manual");
+        RestoreServiceIfDisabled("wuauserv", "Manual");
+        RestoreServiceIfDisabled("UsoSvc", "Automatic");
+    }
+
+    private void RestoreServiceIfDisabled(string serviceName, string defaultStartup)
+    {
+        if (_services.ServiceExists(serviceName) &&
+            string.Equals(_services.GetStartupType(serviceName), "Disabled", StringComparison.OrdinalIgnoreCase))
+        {
+            _services.SetStartupType(serviceName, defaultStartup);
+        }
     }
 }

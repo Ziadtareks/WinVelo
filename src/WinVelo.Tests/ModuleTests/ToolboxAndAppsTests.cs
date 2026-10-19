@@ -59,19 +59,20 @@ public class ToolboxAndAppsTests
     public async Task ServicesManagerService_GetServices_ReturnsPopulatedList()
     {
         var fakeSvc = new FakeServicesService();
-        fakeSvc.Services["wuauserv"] = ("Manual", "Running");
+        fakeSvc.Services["Spooler"] = ("Manual", "Running");
         var service = new ServicesManagerService(fakeSvc);
 
         var services = service.GetServices();
         Assert.NotEmpty(services);
 
-        bool changed = await service.SetStartupTypeAsync("wuauserv", "Disabled");
+        // Protected services (wuauserv, BITS, ...) are covered by ServicesManager_RefusesToDisableOrStopProtectedServices.
+        bool changed = await service.SetStartupTypeAsync("Spooler", "Disabled");
         Assert.True(changed);
-        Assert.Equal("Disabled", fakeSvc.GetStartupType("wuauserv"));
+        Assert.Equal("Disabled", fakeSvc.GetStartupType("Spooler"));
 
-        bool stopped = await service.ToggleServiceStateAsync("wuauserv", false);
+        bool stopped = await service.ToggleServiceStateAsync("Spooler", false);
         Assert.True(stopped);
-        Assert.Equal("Stopped", fakeSvc.GetState("wuauserv"));
+        Assert.Equal("Stopped", fakeSvc.GetState("Spooler"));
     }
 
     [Fact]
@@ -156,5 +157,36 @@ public class ToolboxAndAppsTests
         // Apply DisableAll mode
         await service.ApplyModeAsync(UpdateProfileMode.DisableAll, runner);
         Assert.Equal(UpdateProfileMode.DisableAll, service.DetectCurrentMode());
+    }
+
+    [Fact]
+    public async Task UpdateModeService_DisableAll_OnlySetsThePolicy_AndRepairsDisabledServices()
+    {
+        var fakeReg = new FakeRegistryService();
+        var fakeSvc = new FakeServicesService();
+        fakeSvc.Services["wuauserv"] = ("Disabled", "Stopped"); // left behind by WinVelo 1.0.1's DisableAll
+        fakeSvc.Services["BITS"] = ("Manual", "Running");
+        var service = new UpdateModeService(fakeReg, fakeSvc, new FakeTaskSchedulerService());
+
+        await service.ApplyModeAsync(UpdateProfileMode.DisableAll, new OperationRunner());
+
+        Assert.Equal(1, fakeReg.GetValue("HKLM", @"SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU", "NoAutoUpdate"));
+        Assert.Equal("Manual", fakeSvc.GetStartupType("wuauserv"));
+        Assert.Equal("Manual", fakeSvc.GetStartupType("BITS"));
+        Assert.Equal("Running", fakeSvc.GetState("BITS"));
+    }
+
+    [Fact]
+    public async Task ServicesManager_RefusesToDisableOrStopProtectedServices()
+    {
+        var fakeSvc = new FakeServicesService();
+        var manager = new ServicesManagerService(fakeSvc);
+
+        Assert.False(await manager.SetStartupTypeAsync("wuauserv", "Disabled"));
+        Assert.False(await manager.ToggleServiceStateAsync("BITS", start: false));
+        Assert.Equal("Automatic", fakeSvc.GetStartupType("wuauserv"));
+        Assert.Equal("Running", fakeSvc.GetState("BITS"));
+
+        Assert.True(await manager.SetStartupTypeAsync("DiagTrack", "Disabled"));
     }
 }
