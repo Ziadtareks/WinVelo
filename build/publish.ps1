@@ -6,16 +6,29 @@
       WinVelo.exe          - the app (self-contained single file, .NET runtime included)
       winvelo-cli.exe      - the command-line tool (self-contained single file)
       LICENSE, README.md, THIRD-PARTY-NOTICES.md
-    Then zips it to dist/WinVelo-v<Version>-portable.zip and writes dist/SHA256SUMS.txt.
+    Then zips it to dist/WinVelo-v<Version>-portable.zip and writes the SHA-256 hashes:
+      dist/WinVelo-v<Version>-portable.zip.sha256   - one line "<hash>  <file name>" (sha256sum format)
+      dist/SHA256SUMS.txt                           - the zip and both exe files
+
+    The release workflow signs the exe files between the two stages:
+      .\build\publish.ps1 -SkipZip       # build dist/WinVelo-v<Version>-portable/
+      (sign WinVelo.exe and winvelo-cli.exe)
+      .\build\publish.ps1 -PackageOnly   # zip the folder and write the hash files
 .EXAMPLE
     .\build\publish.ps1
-    .\build\publish.ps1 -Version 1.0.1
+    .\build\publish.ps1 -Version 1.0.2
 #>
 
 [CmdletBinding()]
 param(
-    [string]$Version = ""
+    [string]$Version = "",
+    # Build the folder but do not zip it (so the exe files can be signed first).
+    [switch]$SkipZip,
+    # Skip the build and only zip an existing dist/WinVelo-v<Version>-portable/ folder and write its hashes.
+    [switch]$PackageOnly
 )
+
+if ($SkipZip -and $PackageOnly) { throw "Use either -SkipZip or -PackageOnly, not both." }
 
 $ErrorActionPreference = "Stop"
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
@@ -27,7 +40,7 @@ if ([string]::IsNullOrWhiteSpace($Version)) {
 }
 
 $running = Get-Process -Name "WinVelo", "winvelo-cli" -ErrorAction SilentlyContinue
-if ($running) {
+if ($running -and -not $PackageOnly) {
     throw "WinVelo or winvelo-cli is running (PID $(($running.Id) -join ', ')). Close it before publishing."
 }
 
@@ -37,6 +50,7 @@ $outDir      = Join-Path $distDir $name
 $zipPath     = Join-Path $distDir "$name.zip"
 $tempCli     = Join-Path $distDir "_temp_cli"
 $shaSumsFile = Join-Path $distDir "SHA256SUMS.txt"
+$zipHashFile = "$zipPath.sha256"
 
 $singleFileArgs = @(
     "-c", "Release",
@@ -51,6 +65,12 @@ $singleFileArgs = @(
 )
 
 Write-Host "=== WinVelo portable release v$Version ===" -ForegroundColor Cyan
+
+function Write-Utf8NoBom([string]$path, [string]$text) {
+    [System.IO.File]::WriteAllText($path, $text, (New-Object System.Text.UTF8Encoding($false)))
+}
+
+if (-not $PackageOnly) {
 
 Write-Host "`n[1/5] Cleaning old output..." -ForegroundColor Yellow
 foreach ($p in @($outDir, $tempCli)) { if (Test-Path $p) { Remove-Item -Recurse -Force $p } }
@@ -88,20 +108,29 @@ $stray = Get-ChildItem $outDir -Recurse -File -Include *.dll, *.pdb, *.deps.json
 if ($stray) { throw "Package check failed: found $(($stray.Name) -join ', ')." }
 Write-Host "  [OK] Package contains only the two exe files and the license/readme files." -ForegroundColor Green
 
-Write-Host "`n[5/5] Zipping and computing SHA-256..." -ForegroundColor Yellow
-Compress-Archive -Path $outDir -DestinationPath $zipPath -Force
-$zipHash = (Get-FileHash -Algorithm SHA256 $zipPath).Hash.ToUpperInvariant()
-$exeHash = (Get-FileHash -Algorithm SHA256 (Join-Path $outDir "WinVelo.exe")).Hash.ToUpperInvariant()
-
-$legacy = ""
-if (Test-Path $shaSumsFile) {
-    $existing = Get-Content $shaSumsFile -Raw
-    $idx = $existing.IndexOf("# Legacy Releases")
-    if ($idx -ge 0) { $legacy = $existing.Substring($idx).Trim() }
+if ($SkipZip) {
+    Write-Host "`n=== Folder ready (not zipped): $outDir ===" -ForegroundColor Green
+    Write-Host "Sign the exe files, then run: .\build\publish.ps1 -Version $Version -PackageOnly"
+    return
 }
-$lines = @("# WinVelo Releases", "$zipHash  $name.zip", "$exeHash  $name/WinVelo.exe")
-if ($legacy) { $lines += @("", $legacy) }
-[System.IO.File]::WriteAllText($shaSumsFile, ($lines -join "`r`n") + "`r`n", (New-Object System.Text.UTF8Encoding($false)))
+
+} # end of build stage
+
+if (-not (Test-Path (Join-Path $outDir "WinVelo.exe"))) {
+    throw "Nothing to package: $outDir\WinVelo.exe is missing. Run .\build\publish.ps1 -SkipZip first."
+}
+
+Write-Host "`n[5/5] Zipping and computing SHA-256..." -ForegroundColor Yellow
+if (Test-Path $zipPath) { Remove-Item -Force $zipPath }
+Compress-Archive -Path $outDir -DestinationPath $zipPath -Force
+$zipHash = (Get-FileHash -Algorithm SHA256 $zipPath).Hash.ToLowerInvariant()
+$exeHash = (Get-FileHash -Algorithm SHA256 (Join-Path $outDir "WinVelo.exe")).Hash.ToLowerInvariant()
+$cliHash = (Get-FileHash -Algorithm SHA256 (Join-Path $outDir "winvelo-cli.exe")).Hash.ToLowerInvariant()
+
+# sha256sum format ("<hash>  <file>"), so both Get-FileHash and `sha256sum -c` can check it.
+Write-Utf8NoBom $zipHashFile "$zipHash  $name.zip`n"
+$lines = @("$zipHash  $name.zip", "$exeHash  $name/WinVelo.exe", "$cliHash  $name/winvelo-cli.exe")
+Write-Utf8NoBom $shaSumsFile (($lines -join "`n") + "`n")
 
 $exeMb = [Math]::Round((Get-Item (Join-Path $outDir "WinVelo.exe")).Length / 1MB, 1)
 $zipMb = [Math]::Round((Get-Item $zipPath).Length / 1MB, 1)
@@ -110,3 +139,4 @@ Write-Host "Folder : $outDir"
 Write-Host "Zip    : $zipPath ($zipMb MB)"
 Write-Host "Exe    : WinVelo.exe ($exeMb MB)"
 Write-Host "SHA256 : $zipHash"
+Write-Host "Hashes : $zipHashFile, $shaSumsFile"

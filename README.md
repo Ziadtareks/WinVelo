@@ -30,9 +30,51 @@ There is nothing to install and you don't need to download .NET, because the run
 
 > **Advanced:** to try your own tweak definitions, create a `Catalog` folder next to `WinVelo.exe` with the same layout as [`Catalog`](Catalog) in this repository (for example `Catalog\Tweaks\extras.json`). Each file you put there replaces the built-in file with the same path. A broken file or tweak is skipped and reported; the rest keeps working.
 
-> **Windows SmartScreen:** WinVelo isn't code-signed yet, so Windows may show *"Windows protected your PC"*. Click **More info**, then **Run anyway**. You can check the download against the SHA-256 hash on the release page.
+> **Windows SmartScreen:** WinVelo isn't code-signed yet, so Windows may show *"Windows protected your PC"*. Check your download first (see below), then click **More info** and **Run anyway**.
 
 **Requirements:** Windows 10 version 2004 (build 19041) or newer, or Windows 11, 64-bit.
+
+### Verify your download
+
+From v1.0.2 on, releases are built by GitHub Actions from the tagged source ([release workflow](.github/workflows/release.yml)), not on a developer PC. Each release has three files:
+
+| File | What it is |
+|---|---|
+| `WinVelo-v<version>-portable.zip` | The app and the CLI |
+| `WinVelo-v<version>-portable.zip.sha256` | The SHA-256 hash of the zip |
+| `SHA256SUMS.txt` | Hashes of the zip, `WinVelo.exe` and `winvelo-cli.exe` |
+
+1. Download the zip and its `.sha256` file into the same folder.
+2. In PowerShell, in that folder, run (replace `<version>`):
+
+   ```powershell
+   $zip      = "WinVelo-v<version>-portable.zip"
+   $expected = (Get-Content "$zip.sha256" -Raw).Split(' ')[0]
+   $actual   = (Get-FileHash $zip -Algorithm SHA256).Hash
+   if ($actual -eq $expected) { "OK: the hash matches" } else { "STOP: the hash does NOT match" }
+   ```
+
+   `-eq` ignores upper/lower case, so it works with the lowercase hash in the file.
+3. Optional, stronger check (v1.0.2 and later): the zip carries a [build provenance attestation](https://docs.github.com/actions/security-for-github-actions/using-artifact-attestations) that proves it was built by this repository's workflow. With the [GitHub CLI](https://cli.github.com/):
+
+   ```powershell
+   gh attestation verify WinVelo-v<version>-portable.zip --repo Ziadtareks/WinVelo
+   ```
+
+If a hash does not match, do not run the file. Download it again from the [releases page](https://github.com/Ziadtareks/WinVelo/releases) and [open an issue](https://github.com/Ziadtareks/WinVelo/issues) if it still fails.
+
+### Antivirus false positives
+
+Some antivirus products flag Windows tweak tools, including WinVelo, as "potentially unwanted" or with a generic heuristic name. This happens because a tweak tool does what malware also does: it asks for administrator rights, changes registry policies, stops services and scheduled tasks, and runs PowerShell. A new, unsigned exe that few people have downloaded yet also has no reputation, which makes a heuristic warning more likely.
+
+What you can do:
+
+- Check the hash and the attestation as shown above. If they match, the file is exactly what GitHub Actions built from the public source.
+- Read the source of what you are about to run. Every tweak is plain JSON in [`Catalog/Tweaks`](Catalog/Tweaks), and the app shows every registry value, service and task before it changes anything.
+- Try it without touching your PC first: `WinVelo.exe --test-mode`.
+- If your antivirus still flags a release whose hash matches, please report it to the antivirus vendor as a false positive and [tell us](https://github.com/Ziadtareks/WinVelo/issues).
+
+Never turn off your antivirus to run WinVelo. Code signing is planned ([docs/SIGNING.md](docs/SIGNING.md)) and will reduce these warnings.
 
 ---
 

@@ -52,16 +52,15 @@ git push origin v1.0.0
 ## Step 3: Monitor CI Pipeline Execution
 
 1. Navigate to `https://github.com/Ziadtareks/WinVelo/actions`.
-2. Select the **Release Pipeline** workflow run triggered by your tag `v1.0.0`.
+2. Select the **Release** workflow run triggered by your tag `v1.0.0`.
 3. The workflow will:
-   - Restore dependencies and validate the catalog schema.
-   - Compile Release binaries.
-   - Run the test suite.
-   - Check for code signing secrets (or skip cleanly if unsigned).
-   - Package `WinVelo-v1.0.0-portable.zip` (single-file `WinVelo.exe` + `winvelo-cli.exe`, `Catalog/`, license files).
-   - Calculate SHA-256 hashes and update `dist/SHA256SUMS.txt`.
-   - Cryptographically attest build provenance via GitHub OIDC (`actions/attest-build-provenance`).
-   - Create a **Draft** GitHub Release with all assets attached.
+   - Check that the tag matches `<Version>` in `Directory.Build.props`.
+   - Restore, build, validate the catalog and the README tweak count, and run the unit tests.
+   - Build the portable folder (`build\publish.ps1 -SkipZip`).
+   - Sign the exe files, only when signing is turned on (see [SIGNING.md](SIGNING.md)).
+   - Zip the folder and write `WinVelo-v1.0.0-portable.zip.sha256` and `SHA256SUMS.txt` (`build\publish.ps1 -PackageOnly`).
+   - Attest build provenance (`actions/attest-build-provenance`).
+   - Create a **Draft** GitHub Release with the zip and both hash files.
 
 ---
 
@@ -69,11 +68,11 @@ git push origin v1.0.0
 
 1. Go to `https://github.com/Ziadtareks/WinVelo/releases`.
 2. Locate the **Draft** release titled `WinVelo v1.0.0`.
-3. Verify that the two release artifacts are attached:
+3. Verify that the three release files are attached:
    - `WinVelo-v1.0.0-portable.zip`
+   - `WinVelo-v1.0.0-portable.zip.sha256`
    - `SHA256SUMS.txt`
-4. Confirm that the SHA-256 hashes in `SHA256SUMS.txt` match your local build output:
-   - The zip hash printed at the end of `build\publish.ps1`
+4. Download the zip and check it as described in the README (*Verify your download*). Do not compare it with a local build: builds are not byte-for-byte reproducible, so a local zip has a different hash.
 5. Click **"Publish release"**.
 
 ---
