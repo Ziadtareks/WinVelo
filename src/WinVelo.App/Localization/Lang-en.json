@@ -300,5 +300,6 @@
   "Wizard_SystemRestorePointVerification": "SYSTEM RESTORE POINT VERIFICATION",
   "Wizard_TransparentEvidenceBasedSettings": "Transparent, Evidence-Based Settings",
   "Wizard_TurnOnSystemRestoreDrive": "Turn On System Restore (Drive C:\\)",
-  "Wizard_WinveloIsBuiltOnTransparency": "WinVelo is built on transparency, safety, and strict verification."
+  "Wizard_WinveloIsBuiltOnTransparency": "WinVelo is built on transparency, safety, and strict verification.",
+  "Apps_Cancel": "Cancel"
 }

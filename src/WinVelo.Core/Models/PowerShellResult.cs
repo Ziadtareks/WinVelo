@@ -13,6 +13,12 @@ public sealed class PowerShellResult
     public required bool TimedOut { get; init; }
     public required TimeSpan Duration { get; init; }
 
+    /// <summary>True when the caller cancelled the run (the process was stopped).</summary>
+    public bool Cancelled { get; init; }
+
+    /// <summary>True when the program could not be started at all (for example it is not installed).</summary>
+    public bool FailedToStart { get; init; }
+
     /// <summary>
     /// True only if the process exited with code 0 and did not time out.
     /// </summary>

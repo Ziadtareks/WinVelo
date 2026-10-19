@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using WinVelo.Core.Utilities;
 using WinVelo.Core.Operations;
 using WinVelo.Modules.Apps;
 using WinVelo.App.Localization;
@@ -17,6 +19,8 @@ public sealed partial class InstallViewModel : ObservableObject
     private readonly IAppInstallService _installService;
     private readonly IOperationRunner _runner;
     private readonly List<ApplicationItem> _allApps = new();
+    private CancellationTokenSource? _operationCts;
+    private Task? _statusDetection;
 
     public ObservableCollection<ApplicationItem> FilteredApps { get; } = new();
     public ObservableCollection<string> Categories { get; } = new();
@@ -44,6 +48,7 @@ public sealed partial class InstallViewModel : ObservableObject
     [NotifyCanExecuteChangedFor(nameof(InstallSelectedCommand))]
     [NotifyCanExecuteChangedFor(nameof(UninstallSelectedCommand))]
     [NotifyCanExecuteChangedFor(nameof(UpgradeAllCommand))]
+    [NotifyCanExecuteChangedFor(nameof(CancelOperationCommand))]
     private bool _isBusy;
 
     [ObservableProperty]
@@ -93,7 +98,7 @@ public sealed partial class InstallViewModel : ObservableObject
         {
             string best = await _installService.DetectBestPackageManagerAsync();
             PackageManager = best;
-            PackageManagerStatus = $"{best} (Auto-Selected)";
+            PackageManagerStatus = LocalizationManager.T("{0} (Auto-Selected)", best);
         }
         catch
         {
@@ -128,11 +133,26 @@ public sealed partial class InstallViewModel : ObservableObject
 
         ApplyFilter();
         UpdateSelectedCount();
+        _statusDetection = null;
+    }
 
-        _ = Task.Run(async () =>
+    /// <summary>
+    /// Checks which apps are installed ("winget list"). winget may refresh its package list online, so this
+    /// runs only when the user opens the Apps page, never at startup (see PRIVACY.md).
+    /// </summary>
+    public Task EnsureInstalledStatusAsync()
+    {
+        return _statusDetection ??= Task.Run(async () =>
         {
-            await _installService.DetectInstalledStatusAsync(_allApps);
-            ExtractInstalledAppIcons();
+            try
+            {
+                await _installService.DetectInstalledStatusAsync(_allApps);
+                ExtractInstalledAppIcons();
+            }
+            catch (Exception ex)
+            {
+                Serilog.Log.Warning(ex, "Could not detect installed apps.");
+            }
         });
     }
 
@@ -399,6 +419,37 @@ public sealed partial class InstallViewModel : ObservableObject
 
     private bool CanExecuteAction() => !IsBusy;
 
+    private bool CanCancel() => IsBusy;
+
+    [RelayCommand(CanExecute = nameof(CanCancel))]
+    private void CancelOperation()
+    {
+        _operationCts?.Cancel();
+        StatusMessage = LocalizationManager.T("Cancelling… the current app finishes or stops first.");
+    }
+
+    /// <summary>Starts a cancellable operation, or returns null (with a message) when the package manager is missing.</summary>
+    private async Task<CancellationToken?> BeginOperationAsync()
+    {
+        bool available = await _installService.IsPackageManagerAvailableAsync(PackageManager);
+        if (!available)
+        {
+            StatusMessage = PackageManager.Equals("Chocolatey", StringComparison.OrdinalIgnoreCase)
+                ? LocalizationManager.T("Chocolatey is not installed. Choose WinGet, or install Chocolatey from chocolatey.org first.")
+                : LocalizationManager.T("WinGet is not installed. Install or update \"App Installer\" from the Microsoft Store, then try again.");
+            return null;
+        }
+
+        _operationCts?.Dispose();
+        _operationCts = new CancellationTokenSource();
+        return _operationCts.Token;
+    }
+
+    private string Finished(string completedFormat, OperationExecutionReport report, CancellationToken token) =>
+        token.IsCancellationRequested
+            ? LocalizationManager.T("Cancelled: {0}.", report.Summary)
+            : LocalizationManager.T(completedFormat, report.Summary);
+
     [RelayCommand(CanExecute = nameof(CanExecuteAction))]
     private async Task InstallSelectedAsync()
     {
@@ -420,9 +471,10 @@ public sealed partial class InstallViewModel : ObservableObject
 
         try
         {
+            if (await BeginOperationAsync() is not CancellationToken token) return;
             StatusMessage = LocalizationManager.T("Installing {0} application(s) via {1}...", selected.Count, PackageManager);
-            var report = await Task.Run(async () => await _installService.InstallAppsAsync(selected, PackageManager, _runner));
-            StatusMessage = LocalizationManager.T("Installation completed: {0}.", report.Summary);
+            var report = await Task.Run(async () => await _installService.InstallAppsAsync(selected, PackageManager, _runner, token));
+            StatusMessage = Finished("Installation completed: {0}.", report, token);
         }
         catch (Exception ex)
         {
@@ -455,9 +507,10 @@ public sealed partial class InstallViewModel : ObservableObject
 
         try
         {
+            if (await BeginOperationAsync() is not CancellationToken token) return;
             StatusMessage = LocalizationManager.T("Uninstalling {0} application(s) via {1}...", selected.Count, PackageManager);
-            var report = await Task.Run(async () => await _installService.UninstallAppsAsync(selected, PackageManager, _runner));
-            StatusMessage = LocalizationManager.T("Uninstallation completed: {0}.", report.Summary);
+            var report = await Task.Run(async () => await _installService.UninstallAppsAsync(selected, PackageManager, _runner, token));
+            StatusMessage = Finished("Uninstallation completed: {0}.", report, token);
         }
         catch (Exception ex)
         {
@@ -483,9 +536,12 @@ public sealed partial class InstallViewModel : ObservableObject
 
         try
         {
+            if (await BeginOperationAsync() is not CancellationToken token) return;
             StatusMessage = LocalizationManager.T("Checking and upgrading all applications via {0}...", PackageManager);
-            string output = await Task.Run(async () => await _installService.UpgradeAllAsync(PackageManager));
-            StatusMessage = LocalizationManager.T("Upgrade check completed.");
+            string output = await Task.Run(async () => await _installService.UpgradeAllAsync(PackageManager, token));
+            StatusMessage = token.IsCancellationRequested
+                ? LocalizationManager.T("Upgrade cancelled.")
+                : LocalizationManager.T("Upgrade check completed.");
             OperationLogs.Add(output);
         }
         catch (Exception ex)
@@ -501,7 +557,11 @@ public sealed partial class InstallViewModel : ObservableObject
     [RelayCommand]
     private void OpenAppWebsite(ApplicationItem app)
     {
-        if (string.IsNullOrWhiteSpace(app.Link)) return;
+        if (!SafeUrl.IsWebUrl(app.Link))
+        {
+            StatusMessage = LocalizationManager.T("This app has no valid website link.");
+            return;
+        }
         try
         {
             Process.Start(new ProcessStartInfo

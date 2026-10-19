@@ -68,6 +68,14 @@ public interface IShellService
     void RestartExplorer();
     void RefreshShellEnvironment();
     Task<PowerShellResult> ExecutePowerShellAsync(string script, int timeoutSeconds = 60);
+
+    /// <summary>
+    /// Runs a program with each argument passed separately (no shell, no command string), so values such as
+    /// package ids can never be interpreted as commands. Cancelling kills the process tree.
+    /// </summary>
+    Task<PowerShellResult> RunProcessAsync(string fileName, IReadOnlyList<string> arguments, int timeoutSeconds = 60, CancellationToken cancellationToken = default);
+
+    /// <summary>Opens an http(s) link in the default browser. Anything else is ignored.</summary>
     void OpenUrl(string url);
     void LaunchApplet(string appletCommand);
 }

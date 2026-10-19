@@ -3,6 +3,7 @@ using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using Json.Schema;
 using WinVelo.Core.Safety;
+using WinVelo.Core.Utilities;
 
 namespace CatalogValidator;
 
@@ -14,7 +15,7 @@ public static class Program
         Console.WriteLine("  WinVelo Catalog Validator (CI Tool) ");
         Console.WriteLine("========================================");
 
-        string rootDir = @"C:\Dev\WinVelo";
+        string rootDir = Directory.GetCurrentDirectory();
         string? candidateRoot = AppContext.BaseDirectory;
         while (candidateRoot != null && !File.Exists(Path.Combine(candidateRoot, "WinVelo.sln")))
         {
@@ -23,10 +24,6 @@ public static class Program
         if (candidateRoot != null && File.Exists(Path.Combine(candidateRoot, "WinVelo.sln")))
         {
             rootDir = candidateRoot;
-        }
-        else if (!Directory.Exists(rootDir))
-        {
-            rootDir = Directory.GetCurrentDirectory();
         }
 
         string schemaPath = Path.Combine(rootDir, "Catalog", "schema", "tweak.schema.json");
@@ -509,12 +506,93 @@ public static class Program
         ValidateNoExactDuplicates(tweakMap, ref errorCount);
         ValidateAliasesLock(tweakMap, tweaksDir, ref errorCount);
         ValidateNoConflictingRegistryData(tweakMap, ref errorCount);
+        ValidateApplications(Path.Combine(rootDir, "Catalog", "Apps", "applications.json"), ref errorCount);
 
         Console.WriteLine("\n----------------------------------------");
         Console.WriteLine($"Summary: {totalTweaks} tweak(s) and {totalPresets} preset(s) validated. {errorCount} error(s).");
         Console.WriteLine("----------------------------------------");
 
         return errorCount == 0 ? 0 : 1;
+    }
+
+    /// <summary>
+    /// Every app in the installer list needs a well-formed winget id (or none), a well-formed Chocolatey id (or none),
+    /// at least one of the two, an http(s) website and a unique key and winget id. Ids are passed to winget/choco as
+    /// separate arguments, and this check keeps anything that is not a plain id out of the catalog.
+    /// </summary>
+    public static void ValidateApplications(string applicationsPath, ref int errorCount)
+    {
+        Console.WriteLine("\n[CHECKING APPS] Validating Catalog/Apps/applications.json...");
+        int before = errorCount;
+        JsonObject? apps;
+        try
+        {
+            apps = JsonNode.Parse(File.ReadAllText(applicationsPath)) as JsonObject;
+        }
+        catch (Exception ex) when (ex is IOException or JsonException or UnauthorizedAccessException)
+        {
+            Console.WriteLine($"  [FAIL] Could not read {applicationsPath}: {ex.Message}");
+            errorCount++;
+            return;
+        }
+
+        if (apps == null)
+        {
+            Console.WriteLine("  [FAIL] applications.json must be a JSON object of apps.");
+            errorCount++;
+            return;
+        }
+
+        var wingetIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var (key, node) in apps)
+        {
+            if (node is not JsonObject app)
+            {
+                Console.WriteLine($"  [FAIL] App '{key}' is not an object.");
+                errorCount++;
+                continue;
+            }
+
+            string winget = app["winget"]?.ToString() ?? string.Empty;
+            string choco = app["choco"]?.ToString() ?? string.Empty;
+            string link = app["link"]?.ToString() ?? string.Empty;
+
+            if (string.IsNullOrWhiteSpace(app["name"]?.ToString()))
+            {
+                Console.WriteLine($"  [FAIL] App '{key}' has no name.");
+                errorCount++;
+            }
+            if (winget.Length == 0 && choco.Length == 0)
+            {
+                Console.WriteLine($"  [FAIL] App '{key}' has neither a winget nor a Chocolatey id.");
+                errorCount++;
+            }
+            if (winget.Length > 0 && !PackageIds.IsValidWingetId(winget))
+            {
+                Console.WriteLine($"  [FAIL] App '{key}' has an invalid winget id '{winget}' (expected Publisher.Package or a 12-character Store id).");
+                errorCount++;
+            }
+            if (winget.Length > 0 && !wingetIds.Add(winget))
+            {
+                Console.WriteLine($"  [FAIL] App '{key}' reuses winget id '{winget}'.");
+                errorCount++;
+            }
+            if (choco.Length > 0 && !PackageIds.IsValidChocolateyId(choco))
+            {
+                Console.WriteLine($"  [FAIL] App '{key}' has an invalid Chocolatey id '{choco}'.");
+                errorCount++;
+            }
+            if (link.Length > 0 && !SafeUrl.IsWebUrl(link))
+            {
+                Console.WriteLine($"  [FAIL] App '{key}' has a link that is not an http(s) URL: '{link}'.");
+                errorCount++;
+            }
+        }
+
+        if (errorCount == before)
+        {
+            Console.WriteLine($"  [PASS] {apps.Count} app(s) have well-formed package ids and links.");
+        }
     }
 
     private static bool TouchesServicing(JsonNode item, out string servicingReason)

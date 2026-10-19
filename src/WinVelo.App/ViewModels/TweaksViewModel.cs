@@ -253,7 +253,7 @@ public sealed partial class TweakCardModel : ObservableObject
     [RelayCommand]
     public void OpenUrl(string? url)
     {
-        if (string.IsNullOrWhiteSpace(url) || !url.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+        if (!WinVelo.Core.Utilities.SafeUrl.IsWebUrl(url))
             return;
 
         try

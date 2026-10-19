@@ -72,11 +72,13 @@ public sealed partial class ApplicationItem : ObservableObject
     [ObservableProperty]
     private string _statusText = "Ready";
 
+    /// <summary>
+    /// The id for the chosen package manager. A winget id is never passed to Chocolatey (or the other way
+    /// round): the two use different names, so that would install the wrong package or nothing.
+    /// </summary>
     public string GetPackageId(string packageManager)
     {
-        return packageManager.Equals("Chocolatey", StringComparison.OrdinalIgnoreCase)
-            ? (!string.IsNullOrWhiteSpace(ChocoId) ? ChocoId : WingetId)
-            : (!string.IsNullOrWhiteSpace(WingetId) ? WingetId : ChocoId);
+        return packageManager.Equals("Chocolatey", StringComparison.OrdinalIgnoreCase) ? ChocoId : WingetId;
     }
 }
 
@@ -263,76 +265,62 @@ public sealed class AppInstallService : IAppInstallService
 
     public async Task<bool> IsPackageManagerAvailableAsync(string packageManager)
     {
-        try
-        {
-            if (packageManager.Equals("WinGet", StringComparison.OrdinalIgnoreCase))
-            {
-                string localAppWinget = Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                    @"Microsoft\WindowsApps\winget.exe");
-                if (File.Exists(localAppWinget)) return true;
-
-                var res = await _shell.ExecutePowerShellAsync("(Get-Command winget.exe -ErrorAction SilentlyContinue) -ne $null", 5);
-                return res.Success && res.StdOut.Contains("True", StringComparison.OrdinalIgnoreCase);
-            }
-            else if (packageManager.Equals("Chocolatey", StringComparison.OrdinalIgnoreCase))
-            {
-                string chocoPath = Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
-                    @"chocolatey\bin\choco.exe");
-                if (File.Exists(chocoPath)) return true;
-
-                var res = await _shell.ExecutePowerShellAsync("(Get-Command choco.exe -ErrorAction SilentlyContinue) -ne $null", 5);
-                return res.Success && res.StdOut.Contains("True", StringComparison.OrdinalIgnoreCase);
-            }
-        }
-        catch
-        {
-            // Fallback gracefully
-        }
-
-        return packageManager.Equals("WinGet", StringComparison.OrdinalIgnoreCase);
+        // Ask the tool itself: a missing winget/choco fails to start, which is reported as "not available".
+        var res = await _shell.RunProcessAsync(PackageCommands.Executable(packageManager), new[] { "--version" }, 15);
+        return res.Success;
     }
 
     public async Task DetectInstalledStatusAsync(IEnumerable<ApplicationItem> apps, CancellationToken cancellationToken = default)
     {
-        try
+        var res = await _shell.RunProcessAsync(
+            "winget.exe",
+            new[] { "list", "--accept-source-agreements", "--disable-interactivity" },
+            60,
+            cancellationToken);
+        if (!res.Success || string.IsNullOrWhiteSpace(res.StdOut))
         {
-            // Rapid detection of installed applications via winget list
-            var res = await _shell.ExecutePowerShellAsync("winget list --accept-source-agreements", 30);
-            string output = res.StdOut;
-            if (!string.IsNullOrWhiteSpace(output))
+            return;
+        }
+
+        foreach (var app in apps)
+        {
+            if (cancellationToken.IsCancellationRequested) break;
+            if (PackageCommands.ListContains(res.StdOut, app.WingetId, app.Name))
             {
-                foreach (var app in apps)
-                {
-                    if (cancellationToken.IsCancellationRequested) break;
-                    if (!string.IsNullOrWhiteSpace(app.WingetId) && output.Contains(app.WingetId, StringComparison.OrdinalIgnoreCase))
-                    {
-                        app.IsInstalled = true;
-                        app.StatusText = "Installed";
-                    }
-                    else if (output.Contains(app.Name, StringComparison.OrdinalIgnoreCase))
-                    {
-                        app.IsInstalled = true;
-                        app.StatusText = "Installed";
-                    }
-                }
+                app.IsInstalled = true;
+                app.StatusText = "Installed";
             }
         }
-        catch
-        {
-            // Fallback gracefully without throwing
-        }
     }
 
-    public async Task<OperationExecutionReport> InstallAppsAsync(
+    public Task<OperationExecutionReport> InstallAppsAsync(
         IReadOnlyList<ApplicationItem> apps,
         string packageManager,
         IOperationRunner runner,
         CancellationToken cancellationToken = default)
     {
+        return RunPackageActionAsync(PackageAction.Install, apps, packageManager, runner, cancellationToken);
+    }
+
+    public Task<OperationExecutionReport> UninstallAppsAsync(
+        IReadOnlyList<ApplicationItem> apps,
+        string packageManager,
+        IOperationRunner runner,
+        CancellationToken cancellationToken = default)
+    {
+        return RunPackageActionAsync(PackageAction.Uninstall, apps, packageManager, runner, cancellationToken);
+    }
+
+    private async Task<OperationExecutionReport> RunPackageActionAsync(
+        PackageAction action,
+        IReadOnlyList<ApplicationItem> apps,
+        string packageManager,
+        IOperationRunner runner,
+        CancellationToken cancellationToken)
+    {
+        bool install = action == PackageAction.Install;
         return await runner.RunAsync(
-            $"Install Applications ({packageManager})",
+            $"{(install ? "Install" : "Uninstall")} Applications ({packageManager})",
             apps,
             async (app, ct) =>
             {
@@ -344,112 +332,51 @@ public sealed class AppInstallService : IAppInstallService
                         Id = app.Key,
                         Name = app.Name,
                         Status = OperationItemStatus.Skipped,
-                        Reason = $"No package ID available for {packageManager}."
+                        Reason = $"No {packageManager} package id for {app.Name}."
+                    };
+                }
+
+                IReadOnlyList<string> arguments;
+                try
+                {
+                    arguments = PackageCommands.Arguments(packageManager, action, pkgId);
+                }
+                catch (ArgumentException ex)
+                {
+                    return new OperationItemResult
+                    {
+                        Id = app.Key,
+                        Name = app.Name,
+                        Status = OperationItemStatus.Failed,
+                        Reason = ex.Message
                     };
                 }
 
                 app.IsBusy = true;
-                app.StatusText = "Installing...";
-
-                string script = packageManager.Equals("Chocolatey", StringComparison.OrdinalIgnoreCase)
-                    ? $"choco install \"{pkgId}\" -y --no-progress"
-                    : $"winget install --id \"{pkgId}\" --exact --silent --accept-package-agreements --accept-source-agreements --disable-interactivity";
-
+                app.StatusText = install ? "Installing..." : "Uninstalling...";
                 try
                 {
-                    var res = await _shell.ExecutePowerShellAsync(script, 300);
-                    bool success = res.Success &&
-                                   !res.StdOut.Contains("Error", StringComparison.OrdinalIgnoreCase) &&
-                                   !res.StdOut.Contains("Failed", StringComparison.OrdinalIgnoreCase) &&
-                                   !res.StdOut.Contains("Exit code: 1", StringComparison.OrdinalIgnoreCase);
+                    var res = await _shell.RunProcessAsync(PackageCommands.Executable(packageManager), arguments, install ? 1800 : 900, ct);
+                    var outcome = PackageCommands.Interpret(packageManager, action, res);
 
-                    if (success)
+                    if (outcome.Status == OperationItemStatus.Succeeded)
                     {
-                        app.IsInstalled = true;
-                        app.StatusText = "Installed";
+                        app.IsInstalled = install;
+                        app.StatusText = install ? "Installed" : "Uninstalled";
                     }
                     else
                     {
-                        app.StatusText = "Install Failed";
+                        app.StatusText = outcome.Status == OperationItemStatus.Skipped
+                            ? "Cancelled"
+                            : (install ? "Install Failed" : "Uninstall Failed");
                     }
-
-                    string reason = success
-                        ? "Installed successfully."
-                        : (!string.IsNullOrWhiteSpace(res.StdErr) ? res.StdErr.Trim() : (!string.IsNullOrWhiteSpace(res.StdOut) ? res.StdOut.Trim() : "Install failed."));
 
                     return new OperationItemResult
                     {
                         Id = app.Key,
                         Name = app.Name,
-                        Status = success ? OperationItemStatus.Succeeded : OperationItemStatus.Failed,
-                        Reason = reason
-                    };
-                }
-                finally
-                {
-                    app.IsBusy = false;
-                }
-            },
-            cancellationToken);
-    }
-
-    public async Task<OperationExecutionReport> UninstallAppsAsync(
-        IReadOnlyList<ApplicationItem> apps,
-        string packageManager,
-        IOperationRunner runner,
-        CancellationToken cancellationToken = default)
-    {
-        return await runner.RunAsync(
-            $"Uninstall Applications ({packageManager})",
-            apps,
-            async (app, ct) =>
-            {
-                string pkgId = app.GetPackageId(packageManager);
-                if (string.IsNullOrWhiteSpace(pkgId))
-                {
-                    return new OperationItemResult
-                    {
-                        Id = app.Key,
-                        Name = app.Name,
-                        Status = OperationItemStatus.Skipped,
-                        Reason = $"No package ID available for {packageManager}."
-                    };
-                }
-
-                app.IsBusy = true;
-                app.StatusText = "Uninstalling...";
-
-                string script = packageManager.Equals("Chocolatey", StringComparison.OrdinalIgnoreCase)
-                    ? $"choco uninstall \"{pkgId}\" -y"
-                    : $"winget uninstall --id \"{pkgId}\" --exact --silent --disable-interactivity";
-
-                try
-                {
-                    var res = await _shell.ExecutePowerShellAsync(script, 180);
-                    bool success = res.Success &&
-                                   !res.StdOut.Contains("Error", StringComparison.OrdinalIgnoreCase) &&
-                                   !res.StdOut.Contains("Failed", StringComparison.OrdinalIgnoreCase);
-
-                    if (success)
-                    {
-                        app.IsInstalled = false;
-                        app.StatusText = "Uninstalled";
-                    }
-                    else
-                    {
-                        app.StatusText = "Uninstall Failed";
-                    }
-
-                    string reason = success
-                        ? "Uninstalled successfully."
-                        : (!string.IsNullOrWhiteSpace(res.StdErr) ? res.StdErr.Trim() : (!string.IsNullOrWhiteSpace(res.StdOut) ? res.StdOut.Trim() : "Uninstall failed."));
-
-                    return new OperationItemResult
-                    {
-                        Id = app.Key,
-                        Name = app.Name,
-                        Status = success ? OperationItemStatus.Succeeded : OperationItemStatus.Failed,
-                        Reason = reason
+                        Status = outcome.Status,
+                        Reason = outcome.Message
                     };
                 }
                 finally
@@ -462,11 +389,16 @@ public sealed class AppInstallService : IAppInstallService
 
     public async Task<string> UpgradeAllAsync(string packageManager, CancellationToken cancellationToken = default)
     {
-        string script = packageManager.Equals("Chocolatey", StringComparison.OrdinalIgnoreCase)
-            ? "choco upgrade all -y"
-            : "winget upgrade --all --silent --accept-package-agreements --accept-source-agreements --disable-interactivity";
-
-        var res = await _shell.ExecutePowerShellAsync(script, 600);
-        return res.Success ? (string.IsNullOrWhiteSpace(res.StdOut) ? "Upgrade completed." : res.StdOut) : $"Upgrade failed: {res.StdErr}";
+        var res = await _shell.RunProcessAsync(
+            PackageCommands.Executable(packageManager),
+            PackageCommands.UpgradeAllArguments(packageManager),
+            3600,
+            cancellationToken);
+        var outcome = PackageCommands.Interpret(packageManager, PackageAction.Upgrade, res);
+        if (outcome.Status == OperationItemStatus.Succeeded)
+        {
+            return string.IsNullOrWhiteSpace(res.StdOut) ? "Upgrade completed." : res.StdOut;
+        }
+        return outcome.Message;
     }
 }

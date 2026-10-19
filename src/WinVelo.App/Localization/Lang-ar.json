@@ -809,5 +809,13 @@
   "WinVelo could not load any tweaks.\n\nIf you put a Catalog folder next to WinVelo.exe, it may contain broken files: delete or fix that folder and start WinVelo again. Without that folder, WinVelo uses its built-in tweak list.\n\nDetails are in the log folder:\n{0}": "تعذّر على WinVelo تحميل أي تعديل.\n\nإذا وضعت مجلد Catalog بجانب WinVelo.exe فقد يحتوي على ملفات تالفة: احذف هذا المجلد أو أصلحه ثم شغّل WinVelo من جديد. بدون هذا المجلد يستخدم WinVelo قائمة التعديلات المدمجة فيه.\n\nالتفاصيل في مجلد السجلات:\n{0}",
   "Tweak list not available": "قائمة التعديلات غير متاحة",
   "Some catalog entries could not be read and were skipped. Everything else works normally.\n\n{0}\n\nDetails are in the log folder:\n{1}": "تعذّرت قراءة بعض عناصر الكتالوج فتم تخطيها. كل ما عداها يعمل بشكل طبيعي.\n\n{0}\n\nالتفاصيل في مجلد السجلات:\n{1}",
-  "Some tweaks were skipped": "تم تخطي بعض التعديلات"
+  "Some tweaks were skipped": "تم تخطي بعض التعديلات",
+  "Apps_Cancel": "إلغاء",
+  "Cancelling… the current app finishes or stops first.": "جارٍ الإلغاء… سيكتمل التطبيق الحالي أو يتوقف أولًا.",
+  "Chocolatey is not installed. Choose WinGet, or install Chocolatey from chocolatey.org first.": "Chocolatey غير مثبّت. اختر WinGet، أو ثبّت Chocolatey أولًا من chocolatey.org.",
+  "WinGet is not installed. Install or update \"App Installer\" from the Microsoft Store, then try again.": "WinGet غير مثبّت. ثبّت أو حدّث \"App Installer\" من Microsoft Store ثم حاول مرة أخرى.",
+  "Cancelled: {0}.": "تم الإلغاء: {0}.",
+  "Upgrade cancelled.": "تم إلغاء التحديث.",
+  "This app has no valid website link.": "لا يوجد رابط صالح لموقع هذا التطبيق.",
+  "{0} (Auto-Selected)": "{0} (تم اختياره تلقائيًا)"
 }

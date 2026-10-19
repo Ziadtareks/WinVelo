@@ -52,6 +52,20 @@
 
                 <!-- Right: Active Status / Apps Count -->
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center">
+                    <!-- Result of the last install/uninstall/upgrade (also shows "winget is not installed" etc.) -->
+                    <TextBlock Text="{Binding StatusMessage}"
+                               AutomationProperties.AutomationId="AppsStatusMessage"
+                               MaxWidth="420" TextTrimming="CharacterEllipsis" ToolTip="{Binding StatusMessage}"
+                               FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}"
+                               VerticalAlignment="Center" Margin="0,0,10,0" />
+                    <ProgressBar IsIndeterminate="True" Width="80" Height="4" Margin="0,0,10,0" VerticalAlignment="Center"
+                                 Visibility="{Binding IsBusy, Converter={StaticResource BoolToVis}}" />
+                    <ui:Button AutomationProperties.AutomationId="CancelAppOperationButton"
+                               AutomationProperties.Name="Cancel"
+                               Appearance="Secondary" Icon="{ui:SymbolIcon Dismiss24}"
+                               Content="{loc:Tr Apps_Cancel}" Command="{Binding CancelOperationCommand}"
+                               Visibility="{Binding IsBusy, Converter={StaticResource BoolToVis}}"
+                               VerticalAlignment="Center" Margin="0,0,10,0" Padding="10,4" />
                     <Border Background="{DynamicResource StatusDefaultBgBrush}" CornerRadius="10" Padding="10,3" VerticalAlignment="Center">
                         <TextBlock Text="{Binding FilteredApps.Count, StringFormat={loc:Tr Apps_0Apps}}"
                                    FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" FontWeight="SemiBold" />

@@ -25,7 +25,9 @@ Below is an exhaustive list of every feature that can initiate an outbound netwo
 ### A. Software Package Installation (Apps Tab)
 - **Mechanism**: Calls the official Microsoft Windows Package Manager (`winget.exe`) or Chocolatey (`choco.exe`).
 - **Destinations**: Microsoft Package Manager CDN (`winget.azureedge.net`, `cdn.winget.microsoft.com`) and vendor software repositories for packages the user chooses to install.
-- **Trigger**: Occurs **only** when the user selects packages and clicks "Install".
+- **Trigger**: Occurs when the user selects packages and clicks **Install**, **Uninstall** or **Upgrade all**.
+- **Installed-app check**: when you open the **Apps** page, WinVelo runs `winget list` once to show which apps are already installed. winget may refresh its package list from the Microsoft source while doing this. This never happens at startup or on other pages.
+- **No downloads by WinVelo itself**: WinVelo does not download or install winget or Chocolatey. It only uses them when they are already installed.
 
 ### B. DNS Benchmark & Speed Measurement (Tools Tab)
 - **Mechanism**: Sends standard ICMP echo requests (pings) or basic DNS resolution probes to public DNS servers to measure latency.

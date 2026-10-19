@@ -52,7 +52,7 @@
     "category": "Social",
     "description": "Official Windows desktop client for WhatsApp messaging and calls.",
     "link": "https://www.whatsapp.com/",
-    "winget": "WhatsApp.WhatsApp",
+    "winget": "9NKSQGP7F2NH",
     "choco": "whatsapp"
   },
   "zoom": {
@@ -108,7 +108,7 @@
     "category": "Media",
     "description": "Image and photo editing software with layer support, blending, and effects.",
     "link": "https://www.getpaint.net/",
-    "winget": "dotPDNLLC.paintdotnet",
+    "winget": "dotPDN.PaintDotNet",
     "choco": "paint.net"
   },
   "sharex": {
@@ -172,7 +172,7 @@
     "category": "Utilities",
     "description": "Fast, lightweight remote desktop software with low latency screen control.",
     "link": "https://anydesk.com/",
-    "winget": "AnyDeskSoftwareGmbH.AnyDesk",
+    "winget": "AnyDesk.AnyDesk",
     "choco": "anydesk"
   },
   "bitwarden": {

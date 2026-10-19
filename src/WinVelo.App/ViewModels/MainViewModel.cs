@@ -281,6 +281,7 @@ public sealed partial class MainViewModel : ObservableObject
             case "Apps" or "Install":
                 ActiveTab = "Apps";
                 CurrentPage = InstallVM;
+                _ = InstallVM.EnsureInstalledStatusAsync();
                 break;
             case "Tools" or "Toolbox":
                 ActiveTab = "Tools";

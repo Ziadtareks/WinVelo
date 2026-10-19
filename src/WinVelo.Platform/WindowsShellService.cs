@@ -5,6 +5,7 @@ using System.Threading;
 using WinVelo.Core.Interfaces;
 using WinVelo.Core.Models;
 using WinVelo.Core.Safety;
+using WinVelo.Core.Utilities;
 
 namespace WinVelo.Platform;
 
@@ -95,19 +96,48 @@ public sealed class WindowsShellService : IShellService
         byte[] scriptBytes = Encoding.Unicode.GetBytes(wrappedScript);
         string encodedCommand = Convert.ToBase64String(scriptBytes);
 
-        var stopwatch = Stopwatch.StartNew();
-        using var process = new Process
+        return await RunCoreAsync(
+            "powershell.exe",
+            new[] { "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-EncodedCommand", encodedCommand },
+            effectiveTimeout,
+            CancellationToken.None,
+            outputEncoding: null);
+    }
+
+    public Task<PowerShellResult> RunProcessAsync(string fileName, IReadOnlyList<string> arguments, int timeoutSeconds = 60, CancellationToken cancellationToken = default)
+    {
+        EnsureNotTestMode();
+        int effectiveTimeout = timeoutSeconds <= 0 ? 60 : Math.Min(timeoutSeconds, 3600);
+        return RunCoreAsync(fileName, arguments, effectiveTimeout, cancellationToken, Encoding.UTF8);
+    }
+
+    private static async Task<PowerShellResult> RunCoreAsync(
+        string fileName,
+        IReadOnlyList<string> arguments,
+        int timeoutSeconds,
+        CancellationToken cancellationToken,
+        Encoding? outputEncoding)
+    {
+        var startInfo = new ProcessStartInfo
         {
-            StartInfo = new ProcessStartInfo
-            {
-                FileName = "powershell.exe",
-                Arguments = $"-NoProfile -NonInteractive -ExecutionPolicy Bypass -EncodedCommand {encodedCommand}",
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            }
+            FileName = fileName,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
         };
+        if (outputEncoding != null)
+        {
+            startInfo.StandardOutputEncoding = outputEncoding;
+            startInfo.StandardErrorEncoding = outputEncoding;
+        }
+        foreach (string argument in arguments)
+        {
+            startInfo.ArgumentList.Add(argument);
+        }
+
+        var stopwatch = Stopwatch.StartNew();
+        using var process = new Process { StartInfo = startInfo };
 
         try
         {
@@ -122,11 +152,13 @@ public sealed class WindowsShellService : IShellService
                 StdOut = string.Empty,
                 StdErr = ex.Message,
                 TimedOut = false,
+                FailedToStart = true,
                 Duration = stopwatch.Elapsed
             };
         }
 
-        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(effectiveTimeout));
+        using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        cts.CancelAfter(TimeSpan.FromSeconds(timeoutSeconds));
         var stdoutTask = process.StandardOutput.ReadToEndAsync();
         var stderrTask = process.StandardError.ReadToEndAsync();
 
@@ -168,12 +200,14 @@ public sealed class WindowsShellService : IShellService
             {
             }
 
+            bool cancelledByCaller = cancellationToken.IsCancellationRequested;
             return new PowerShellResult
             {
                 ExitCode = -1,
                 StdOut = stdout,
-                StdErr = stderr,
-                TimedOut = true,
+                StdErr = cancelledByCaller ? "Cancelled." : stderr,
+                TimedOut = !cancelledByCaller,
+                Cancelled = cancelledByCaller,
                 Duration = stopwatch.Elapsed
             };
         }
@@ -181,7 +215,8 @@ public sealed class WindowsShellService : IShellService
 
     public void OpenUrl(string url)
     {
-        // Opening a URL in the user's browser is safe and non-mutating
+        // Only http(s) links: a catalog value must never start a program or open a local file.
+        if (!SafeUrl.IsWebUrl(url)) return;
         Process.Start(new ProcessStartInfo
         {
             FileName = url,

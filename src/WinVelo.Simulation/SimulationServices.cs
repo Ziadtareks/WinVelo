@@ -399,6 +399,29 @@ public sealed class FakeShellService : IShellService
         });
     }
 
+    /// <summary>Every program run through <see cref="RunProcessAsync"/>: the file name followed by its arguments.</summary>
+    public List<IReadOnlyList<string>> ExecutedProcesses { get; } = new();
+    public Func<string, IReadOnlyList<string>, PowerShellResult>? ProcessResultFactory { get; set; }
+
+    public Task<PowerShellResult> RunProcessAsync(string fileName, IReadOnlyList<string> arguments, int timeoutSeconds = 60, CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        ExecutedProcesses.Add(new[] { fileName }.Concat(arguments).ToList());
+        if (ProcessResultFactory != null)
+        {
+            return Task.FromResult(ProcessResultFactory(fileName, arguments));
+        }
+
+        return Task.FromResult(new PowerShellResult
+        {
+            ExitCode = 0,
+            StdOut = $"Simulated run of {fileName}",
+            StdErr = string.Empty,
+            TimedOut = false,
+            Duration = TimeSpan.FromMilliseconds(10)
+        });
+    }
+
     public void OpenUrl(string url)
     {
         OpenedUrls.Add(url);
