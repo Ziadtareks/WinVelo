@@ -186,7 +186,7 @@
                                                             CornerRadius="6" Padding="12,8" Margin="0,4,0,0">
                                                         <DockPanel LastChildFill="True">
                                                             <Border DockPanel.Dock="Right" Background="#450A0A" BorderBrush="#DC2626" BorderThickness="1" CornerRadius="4" Padding="8,3" VerticalAlignment="Center">
-                                                                <TextBlock Text="{Binding Reason}" FontSize="10" FontWeight="Bold" Foreground="#FCA5A5" />
+                                                                <TextBlock Text="{Binding Reason, Converter={StaticResource Tr}}" FontSize="10" FontWeight="Bold" Foreground="#FCA5A5" />
                                                             </Border>
                                                             <StackPanel VerticalAlignment="Center">
                                                                 <TextBlock Text="{Binding Name}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" />
@@ -269,7 +269,7 @@
                                             <StackPanel Grid.Column="0">
                                                 <TextBlock Text="{Binding Name}" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" />
                                                 <TextBlock FlowDirection="LeftToRight" Text="{Binding Id}" FontSize="11" Foreground="#94A3B8" FontFamily="Consolas, Cascadia Code, Courier New" Margin="0,2,0,0" />
-                                                <TextBlock Text="{Binding Reason}" FontSize="11" Foreground="#F87171" TextWrapping="Wrap" Margin="0,4,0,0"
+                                                <TextBlock Text="{Binding Reason, Converter={StaticResource Tr}}" FontSize="11" Foreground="#F87171" TextWrapping="Wrap" Margin="0,4,0,0"
                                                            Visibility="{Binding HasReason, Converter={StaticResource BoolToVisConverter}}" />
                                             </StackPanel>
                                             <Border Grid.Column="1" Background="{Binding StatusBg}" CornerRadius="4" Padding="8,4" VerticalAlignment="Center">

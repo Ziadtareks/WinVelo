@@ -845,5 +845,11 @@
   "Upgrade completed.": "اكتمل التحديث.",
   "Tools_StopCleanup": "إيقاف",
   "Stopping cleanup…": "جارٍ إيقاف التنظيف…",
-  "Cleanup stopped. Files that were already deleted stay deleted.": "توقف التنظيف. الملفات التي حُذفت بالفعل تبقى محذوفة."
+  "Cleanup stopped. Files that were already deleted stay deleted.": "توقف التنظيف. الملفات التي حُذفت بالفعل تبقى محذوفة.",
+  "Service '{0}' is not installed on this edition of Windows (skipped).": "الخدمة '{0}' غير مثبّتة في إصدار Windows هذا (تم تخطيها).",
+  "Could not change service '{0}': {1}": "تعذّر تغيير الخدمة '{0}': {1}",
+  "Could not start service '{0}': {1}": "تعذّر تشغيل الخدمة '{0}': {1}",
+  "Could not stop service '{0}': {1}": "تعذّر إيقاف الخدمة '{0}': {1}",
+  "Could not restore the startup type of service '{0}': {1}": "تعذّرت استعادة نوع بدء تشغيل الخدمة '{0}': {1}",
+  "Could not restore the running state of service '{0}': {1}": "تعذّرت استعادة حالة تشغيل الخدمة '{0}': {1}"
 }

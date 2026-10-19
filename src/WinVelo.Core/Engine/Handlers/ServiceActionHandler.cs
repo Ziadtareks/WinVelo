@@ -31,7 +31,7 @@ public sealed class ServiceActionHandler : IActionHandler
             return Task.FromResult(new ActionResult
             {
                 Success = true,
-                Message = $"Service '{action.ServiceName}' not installed on this OS edition (skipped per WinUtil policy)."
+                Message = string.Format(ServiceMessages.NotInstalled, action.ServiceName)
             });
         }
 
@@ -92,12 +92,12 @@ public sealed class ServiceActionHandler : IActionHandler
                                 }
                                 catch (Exception regEx)
                                 {
-                                    // If even Registry write is blocked by TrustedInstaller / Tamper Protection,
-                                    // log clean warning and skip gracefully without failing the batch.
+                                    // Blocked by TrustedInstaller / Tamper Protection: nothing changed, so this is a failure.
+                                    // The runner rolls back the tweak's earlier steps.
                                     return Task.FromResult(new ActionResult
                                     {
-                                        Success = true,
-                                        Message = $"[WARN] Service '{action.ServiceName}' protected by Windows Tamper Protection — skipped: {regEx.Message}"
+                                        Success = false,
+                                        Message = string.Format(ServiceMessages.ChangeFailed, action.ServiceName, regEx.Message)
                                     });
                                 }
                             }
@@ -113,8 +113,8 @@ public sealed class ServiceActionHandler : IActionHandler
                         {
                             return Task.FromResult(new ActionResult
                             {
-                                Success = true,
-                                Message = $"[WARN] Could not start service '{action.ServiceName}' (skipped): {ex.Message}"
+                                Success = false,
+                                Message = string.Format(ServiceMessages.StartFailed, action.ServiceName, ex.Message)
                             });
                         }
                         break;
@@ -128,8 +128,8 @@ public sealed class ServiceActionHandler : IActionHandler
                         {
                             return Task.FromResult(new ActionResult
                             {
-                                Success = true,
-                                Message = $"[WARN] Could not stop service '{action.ServiceName}' (skipped): {ex.Message}"
+                                Success = false,
+                                Message = string.Format(ServiceMessages.StopFailed, action.ServiceName, ex.Message)
                             });
                         }
                         break;
@@ -142,8 +142,8 @@ public sealed class ServiceActionHandler : IActionHandler
             {
                 return Task.FromResult(new ActionResult
                 {
-                    Success = true,
-                    Message = $"[WARN] Service '{action.ServiceName}' action failed: {ex.Message} (skipped)"
+                    Success = false,
+                    Message = string.Format(ServiceMessages.ChangeFailed, action.ServiceName, ex.Message)
                 });
             }
         }
@@ -162,7 +162,7 @@ public sealed class ServiceActionHandler : IActionHandler
             return Task.FromResult(new ActionResult
             {
                 Success = true,
-                Message = $"Service '{record.TargetIdentifier}' not found during rollback (skipped)."
+                Message = string.Format(ServiceMessages.NotInstalled, record.TargetIdentifier)
             });
         }
 
@@ -189,7 +189,11 @@ public sealed class ServiceActionHandler : IActionHandler
                 string svcKey = $@"SYSTEM\CurrentControlSet\Services\{record.TargetIdentifier}";
                 context.Registry.SetValue("HKLM", svcKey, "Start", startDword, "DWord");
             }
-            catch { }
+            catch (Exception ex)
+            {
+                // Not restored: report it, and the journal record stays so the undo can be retried.
+                return Task.FromResult(new ActionResult { Success = false, Message = string.Format(ServiceMessages.RestoreFailed, record.TargetIdentifier, ex.Message) });
+            }
         }
 
         try
@@ -203,7 +207,10 @@ public sealed class ServiceActionHandler : IActionHandler
                 context.Services.StopService(record.TargetIdentifier);
             }
         }
-        catch { }
+        catch (Exception ex)
+        {
+            return Task.FromResult(new ActionResult { Success = false, Message = string.Format(ServiceMessages.RestoreStateFailed, record.TargetIdentifier, ex.Message) });
+        }
 
         return Task.FromResult(new ActionResult { Success = true });
     }
@@ -223,4 +230,18 @@ public sealed class ServiceActionHandler : IActionHandler
             ProposedState = action.StartupType ?? action.Operation
         };
     }
+}
+
+/// <summary>
+/// Result texts of service actions. They are fixed English patterns so the app can show them translated
+/// (Lang-ar.json has the same patterns with {0} = service name, {1} = Windows error).
+/// </summary>
+public static class ServiceMessages
+{
+    public const string NotInstalled = "Service '{0}' is not installed on this edition of Windows (skipped).";
+    public const string ChangeFailed = "Could not change service '{0}': {1}";
+    public const string StartFailed = "Could not start service '{0}': {1}";
+    public const string StopFailed = "Could not stop service '{0}': {1}";
+    public const string RestoreFailed = "Could not restore the startup type of service '{0}': {1}";
+    public const string RestoreStateFailed = "Could not restore the running state of service '{0}': {1}";
 }

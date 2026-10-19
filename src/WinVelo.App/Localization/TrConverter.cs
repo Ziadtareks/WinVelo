@@ -16,7 +16,7 @@ public sealed class TrConverter : IValueConverter
         string text = value.ToString() ?? string.Empty;
         return parameter is string format && format.Contains("{0}", StringComparison.Ordinal)
             ? LocalizationManager.T(format, LocalizationManager.T(text))
-            : LocalizationManager.T(text);
+            : LocalizationManager.TranslateMessage(text);
     }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) => Binding.DoNothing;
