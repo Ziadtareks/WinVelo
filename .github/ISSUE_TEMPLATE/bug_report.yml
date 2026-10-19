@@ -11,7 +11,7 @@ body:
     attributes:
       label: WinVelo version
       description: Shown in Settings, or run `winvelo-cli --help`.
-      placeholder: v1.0.2
+      placeholder: v1.0.3
     validations:
       required: true
   - type: input

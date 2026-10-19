@@ -43,7 +43,7 @@ There is nothing to install and you don't need to download .NET, because the run
 
 ### Verify your download
 
-Releases are normally built by GitHub Actions from the tagged source ([release workflow](.github/workflows/release.yml)), not on a developer PC. Exception: **v1.0.2 was built locally** because GitHub Actions was unavailable for the account, so it has no build attestation. Each release has three files:
+Releases are normally built by GitHub Actions from the tagged source ([release workflow](.github/workflows/release.yml)), not on a developer PC. Exception: **v1.0.2 and v1.0.3 were built locally** because GitHub Actions is unavailable for the account, so they have no build attestation. Each release has three files:
 
 | File | What it is |
 |---|---|
