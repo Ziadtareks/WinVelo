@@ -52,7 +52,9 @@ public static class Program
         bool isSelfTest = args.Contains("--self-test");
         bool isTestMode = args.Contains("--test-mode");
         bool isDetectAll = args.Contains("--detect-all");
-        bool isRealMode = args.Contains("--real-mode") || (isSelfTest && !isTestMode) || (isDetectAll && !isTestMode);
+        // Only --real-mode changes the real system. --detect-all only reads, so it inspects the real PC by default.
+        // (--self-test used to switch to real mode on its own; it now needs --real-mode like every other change.)
+        bool isRealMode = args.Contains("--real-mode") || (isDetectAll && !isTestMode);
         bool isDryRun = args.Contains("--dry-run");
         bool isRun = args.Contains("--run") || args.Contains("--apply") || args.Contains("--enable") || args.Contains("--disable") || args.Contains("--clean") || args.Contains("--dns") || args.Contains("--update-mode") || args.Contains("--fix") || args.Contains("--undo") || isSelfTest;
 
@@ -1431,7 +1433,7 @@ public static class Program
     {
         Console.WriteLine("Usage:");
         Console.WriteLine("  winvelo-cli --info <tweakId>             Show detailed technical specification and exact changes");
-        Console.WriteLine("  winvelo-cli --self-test --level 1        Run automated safe HKCU self-test with restore point");
+        Console.WriteLine("  winvelo-cli --self-test --level 1        HKCU apply/undo self-test (simulation; add --real-mode for this PC)");
         Console.WriteLine("  winvelo-cli --detect-all                 Non-destructive read-only detection across all tweaks");
         Console.WriteLine("  winvelo-cli --health-check [--restore]   Verify Windows Update, Store, and servicing integrity");
         Console.WriteLine("  winvelo-cli --preset <name> [--dry-run]  Preview or apply a preset (recommended, privacy, ai, clean-ui, performance, gaming)");

@@ -90,8 +90,9 @@ graph TD
   # Revert a specific tweak
   winvelo-cli.exe --tweak "ui.explorer.classic-context-menu" --undo --real-mode
 
-  # Automated non-destructive HKCU roundtrip self-test
+  # HKCU apply/undo round trip of every Level 1 tweak (simulation unless --real-mode is given)
   winvelo-cli.exe --self-test --level 1
+  winvelo-cli.exe --self-test --level 1 --real-mode   # on the real PC, creates a restore point first
   ```
 
 ---
