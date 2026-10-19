@@ -61,6 +61,11 @@ public partial class App : Application
         else
         {
             TestModeManager.DisableTestMode();
+            if (AppAdminGuard.TryRelaunchElevated(args))
+            {
+                // The elevated copy takes over; nothing has been opened or written yet.
+                Environment.Exit(0);
+            }
             WinVeloStoragePaths.InitializeStorage(false);
             var (winBuild, winEdition) = WinVelo.Platform.WindowsVersionInfo.Read();
             WinVelo.Core.WindowsCompatibility.Configure(winBuild, winEdition);

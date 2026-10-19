@@ -442,6 +442,8 @@ public sealed partial class MainViewModel : ObservableObject
                 UseShellExecute = true,
                 Verb = "runas"
             };
+            // Keep the language and other options of this window.
+            foreach (string a in Environment.GetCommandLineArgs().Skip(1)) psi.ArgumentList.Add(a);
             Process.Start(psi);
             Application.Current.Shutdown();
         }

@@ -153,7 +153,7 @@ WinVelo أداة مفتوحة المصدر لضبط Windows 10 و 11. تعرض �
 - **High**-risk tweaks and irreversible actions (for example removing Edge or OneDrive) are never part of a preset and ask for extra confirmation.
 - Some tweaks need a restart or an Explorer restart. The preview tells you which ones.
 - Tweaks that only work on a certain Windows build or edition are skipped on other PCs, and the tweak card says why.
-- You can try the whole interface without touching your system: `WinVelo.exe --test-mode`.
+- You can try the whole interface without touching your system: `WinVelo.exe --test-mode`. Test mode does not ask for administrator rights.
 
 ---
 

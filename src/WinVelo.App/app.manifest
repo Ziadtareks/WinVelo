@@ -5,7 +5,9 @@
     <security>
       <requestedPrivileges xmlns="urn:schemas-microsoft-com:asm.v3">
         <!-- WinVelo requires Administrator to read/write system registry, services, and tasks safely -->
-        <requestedExecutionLevel level="requireAdministrator" uiAccess="false" />
+        <!-- asInvoker: --test-mode never needs administrator rights. In normal mode App asks for elevation once at
+             startup (AppAdminGuard.TryRelaunchElevated); if the user says no, WinVelo opens read-only. -->
+        <requestedExecutionLevel level="asInvoker" uiAccess="false" />
       </requestedPrivileges>
     </security>
   </trustInfo>
