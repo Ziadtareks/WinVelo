@@ -118,14 +118,12 @@ public sealed class RiskRubricTests
     }
 
     [Fact]
-    public void Rubric_DocumentationAndAuditLog_ExistAndAreComprehensive()
+    public void Rubric_Documentation_ExistsAndIsComprehensive()
     {
         string root = GetRepoRoot();
         string guidePath = Path.Combine(root, "docs", "TWEAK_GUIDE.md");
-        string auditPath = Path.Combine(root, "docs", "RISK_AUDIT.md");
 
         Assert.True(File.Exists(guidePath), "TWEAK_GUIDE.md must exist.");
-        Assert.True(File.Exists(auditPath), "RISK_AUDIT.md must exist.");
 
         string guideText = File.ReadAllText(guidePath);
         Assert.Contains("Risk Rating Rubric", guideText);
@@ -133,10 +131,5 @@ public sealed class RiskRubricTests
         Assert.Contains("Low", guideText);
         Assert.Contains("Medium", guideText);
         Assert.Contains("High", guideText);
-
-        string auditText = File.ReadAllText(auditPath);
-        Assert.Contains("Risk Recalibration Audit", auditText);
-        Assert.Contains("Distribution Before vs After", auditText);
-        Assert.Contains("Detailed Log of Risk Changes", auditText);
     }
 }

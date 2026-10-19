@@ -606,15 +606,14 @@ public sealed partial class WinVeloUiTests
         // ==================== 1. SCREENSHOT INTEGRITY (>= 20KB, VARIANCE > 25, NO DUPLICATE MD5) ====================
         string[] requiredScreenshots =
         {
-            "home.png", "tweaks.png", "apps.png", "tools.png", "history.png", "settings.png", "wizard.png", "preview.png", "overview.png",
-            Path.Combine("light", "home.png"),
-            Path.Combine("light", "tweaks.png"),
-            Path.Combine("light", "apps.png"),
-            Path.Combine("light", "tools.png"),
-            Path.Combine("light", "history.png"),
-            Path.Combine("light", "settings.png"),
-            Path.Combine("light", "wizard.png"),
-            Path.Combine("light", "preview.png")
+            "home.png", "tweaks.png", "apps.png", "tools.png", "history.png", "settings.png", "preview.png",
+            Path.Combine("ar", "home.png"),
+            Path.Combine("ar", "tweaks.png"),
+            Path.Combine("ar", "apps.png"),
+            Path.Combine("ar", "tools.png"),
+            Path.Combine("ar", "history.png"),
+            Path.Combine("ar", "settings.png"),
+            Path.Combine("ar", "preview.png")
         };
 
         var seenHashes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);

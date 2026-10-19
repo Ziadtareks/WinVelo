@@ -387,174 +387,66 @@ public partial class App : Application
         }
     }
 
-    private static Visual GetWindowVisual(MainWindow window) => (Visual?)window.Content ?? window;
-
     private void CaptureAllScreenshots(MainWindow window, string targetDir)
     {
         try
         {
             Log.Information("Starting automated UI screenshot capture to {TargetDir}...", targetDir);
             Directory.CreateDirectory(targetDir);
-            string darkDir = Path.Combine(targetDir, "dark");
-            string lightDir = Path.Combine(targetDir, "light");
-            Directory.CreateDirectory(darkDir);
-            Directory.CreateDirectory(lightDir);
 
             window.Width = 1440;
             window.Height = 900;
             FlushUi(window);
 
             var vm = (MainViewModel)window.DataContext;
-            // Dismiss wizard initially so all page captures are clean
+            // Dismiss wizard so every page capture is clean
             vm.IsWizardOpen = false;
             FlushUi(window);
 
-            // ==================== 1. DARK THEME CAPTURES ====================
             Wpf.Ui.Appearance.ApplicationThemeManager.Apply(Wpf.Ui.Appearance.ApplicationTheme.Dark);
             DesignThemeManager.ApplyTheme(Wpf.Ui.Appearance.ApplicationTheme.Dark);
             FlushUi(window);
 
-            // Home
             vm.SwitchTabCommand.Execute("Home");
             FlushUi(window);
-            SaveVisualToPng(window, 1440, 900, Path.Combine(darkDir, "home.png"));
             SaveVisualToPng(window, 1440, 900, Path.Combine(targetDir, "home.png"));
-            SaveVisualToPng(window, 1440, 900, Path.Combine(targetDir, "dashboard.png"));
 
-            // Tweaks
             vm.SwitchTabCommand.Execute("Tweaks");
             FlushUi(window);
-            SaveVisualToPng(window, 1440, 900, Path.Combine(darkDir, "tweaks.png"));
             SaveVisualToPng(window, 1440, 900, Path.Combine(targetDir, "tweaks.png"));
 
-            // Apps
             vm.SwitchTabCommand.Execute("Apps");
             FlushUi(window);
-            SaveVisualToPng(window, 1440, 900, Path.Combine(darkDir, "apps.png"));
             SaveVisualToPng(window, 1440, 900, Path.Combine(targetDir, "apps.png"));
-            SaveVisualToPng(window, 1440, 900, Path.Combine(targetDir, "install.png"));
 
-            // Tools
             vm.SwitchTabCommand.Execute("Tools");
             FlushUi(window);
-            SaveVisualToPng(window, 1440, 900, Path.Combine(darkDir, "tools.png"));
             SaveVisualToPng(window, 1440, 900, Path.Combine(targetDir, "tools.png"));
 
-            // History
             vm.SwitchTabCommand.Execute("History");
             FlushUi(window);
-            SaveVisualToPng(window, 1440, 900, Path.Combine(darkDir, "history.png"));
             SaveVisualToPng(window, 1440, 900, Path.Combine(targetDir, "history.png"));
 
-            // Settings
             vm.SwitchTabCommand.Execute("Settings");
             FlushUi(window);
-            SaveVisualToPng(window, 1440, 900, Path.Combine(darkDir, "settings.png"));
             SaveVisualToPng(window, 1440, 900, Path.Combine(targetDir, "settings.png"));
 
             // Unified Execution Preview Dialog (Home -> Review on a Preset: clean-ui Full)
             vm.SwitchTabCommand.Execute("Home");
             FlushUi(window);
-            var bigPreset = vm.DashboardVM.Profiles.FirstOrDefault(p => p.Id == "preset.clean-ui") ?? vm.DashboardVM.Profiles.FirstOrDefault();
-            if (bigPreset != null)
+            var preset = vm.DashboardVM.Profiles.FirstOrDefault(p => p.Id == "preset.clean-ui") ?? vm.DashboardVM.Profiles.FirstOrDefault();
+            if (preset != null)
             {
-                bigPreset.IsFullTier = true;
+                preset.IsFullTier = true;
                 FlushUi(window);
-                bigPreset.ApplyCommand.Execute(null);
+                preset.ApplyCommand.Execute(null);
                 FlushUi(window);
-                System.Threading.Thread.Sleep(500);
+                Thread.Sleep(500);
                 FlushUi(window);
-                SaveVisualToPng(window, 1440, 900, Path.Combine(darkDir, "preview.png"));
                 SaveVisualToPng(window, 1440, 900, Path.Combine(targetDir, "preview.png"));
-                SaveVisualToPng(window, 1440, 900, Path.Combine(targetDir, "diff-preview.png"));
                 vm.ExecutionDialogVM.CancelPreview();
                 FlushUi(window);
             }
-
-            // Command Palette Overlay
-            vm.ToggleCommandPaletteCommand.Execute(null);
-            FlushUi(window);
-            SaveVisualToPng(window, 1440, 900, Path.Combine(darkDir, "command-palette.png"));
-            SaveVisualToPng(window, 1440, 900, Path.Combine(targetDir, "command-palette.png"));
-            vm.ToggleCommandPaletteCommand.Execute(null);
-            FlushUi(window);
-
-            // First-Run Wizard Overlay (Opaque modal surface, 60% dim backdrop)
-            vm.OpenFirstRunWizard();
-            FlushUi(window);
-            SaveVisualToPng(window, 1440, 900, Path.Combine(darkDir, "wizard.png"));
-            SaveVisualToPng(window, 1440, 900, Path.Combine(targetDir, "wizard.png"));
-            vm.WizardVM.FinishCommand.Execute(null);
-            vm.IsWizardOpen = false;
-            FlushUi(window);
-
-            // ==================== 2. LIGHT THEME CAPTURES ====================
-            Wpf.Ui.Appearance.ApplicationThemeManager.Apply(Wpf.Ui.Appearance.ApplicationTheme.Light);
-            DesignThemeManager.ApplyTheme(Wpf.Ui.Appearance.ApplicationTheme.Light);
-            FlushUi(window);
-
-            // Home (Light)
-            vm.SwitchTabCommand.Execute("Home");
-            FlushUi(window);
-            SaveVisualToPng(window, 1440, 900, Path.Combine(lightDir, "home.png"));
-
-            // Tweaks (Light)
-            vm.SwitchTabCommand.Execute("Tweaks");
-            FlushUi(window);
-            SaveVisualToPng(window, 1440, 900, Path.Combine(lightDir, "tweaks.png"));
-
-            // Apps (Light)
-            vm.SwitchTabCommand.Execute("Apps");
-            FlushUi(window);
-            SaveVisualToPng(window, 1440, 900, Path.Combine(lightDir, "apps.png"));
-
-            // Tools (Light)
-            vm.SwitchTabCommand.Execute("Tools");
-            FlushUi(window);
-            SaveVisualToPng(window, 1440, 900, Path.Combine(lightDir, "tools.png"));
-
-            // History (Light)
-            vm.SwitchTabCommand.Execute("History");
-            FlushUi(window);
-            SaveVisualToPng(window, 1440, 900, Path.Combine(lightDir, "history.png"));
-
-            // Settings (Light)
-            vm.SwitchTabCommand.Execute("Settings");
-            FlushUi(window);
-            SaveVisualToPng(window, 1440, 900, Path.Combine(lightDir, "settings.png"));
-
-            // Preview (Light - Home -> Review on a Preset: clean-ui Full)
-            vm.SwitchTabCommand.Execute("Home");
-            FlushUi(window);
-            var lightBigPreset = vm.DashboardVM.Profiles.FirstOrDefault(p => p.Id == "preset.clean-ui") ?? vm.DashboardVM.Profiles.FirstOrDefault();
-            if (lightBigPreset != null)
-            {
-                lightBigPreset.IsFullTier = true;
-                FlushUi(window);
-                lightBigPreset.ApplyCommand.Execute(null);
-                FlushUi(window);
-                System.Threading.Thread.Sleep(500);
-                FlushUi(window);
-                SaveVisualToPng(window, 1440, 900, Path.Combine(lightDir, "preview.png"));
-                vm.ExecutionDialogVM.CancelPreview();
-                FlushUi(window);
-            }
-
-            // First-Run Wizard (Light)
-            vm.OpenFirstRunWizard();
-            FlushUi(window);
-            SaveVisualToPng(window, 1440, 900, Path.Combine(lightDir, "wizard.png"));
-            vm.WizardVM.FinishCommand.Execute(null);
-            vm.IsWizardOpen = false;
-            FlushUi(window);
-
-            // Restore Dark Theme default
-            Wpf.Ui.Appearance.ApplicationThemeManager.Apply(Wpf.Ui.Appearance.ApplicationTheme.Dark);
-            DesignThemeManager.ApplyTheme(Wpf.Ui.Appearance.ApplicationTheme.Dark);
-            FlushUi(window);
-
-            // ==================== 3. GENERATE OVERVIEW CONTACT SHEET ====================
-            BuildContactSheet(targetDir, Path.Combine(targetDir, "overview.png"));
 
             Log.Information("All UI screenshots successfully captured to {TargetDir}", targetDir);
         }
@@ -565,93 +457,6 @@ public partial class App : Application
         finally
         {
             Shutdown(0);
-        }
-    }
-
-    private static void BuildContactSheet(string targetDir, string overviewPath)
-    {
-        try
-        {
-            targetDir = Path.GetFullPath(targetDir);
-            overviewPath = Path.GetFullPath(overviewPath);
-            string[] files = { "home.png", "tweaks.png", "apps.png", "tools.png", "history.png", "settings.png", "wizard.png", "preview.png" };
-            string[] titles = { "Home", "Tweaks (ShutUp10++ List)", "Apps (Responsive Grid)", "Tools (Tile Grid)", "History & Activity Log", "Settings", "Setup Wizard (Modal)", "Preview Dialog" };
-
-            int cols = 4;
-            int rows = 2;
-            int thumbW = 440;
-            int thumbH = 275;
-            int pad = 24;
-            int topPad = 60;
-
-            int totalW = pad + cols * (thumbW + pad);
-            int totalH = topPad + rows * (thumbH + pad + 24);
-
-            var dv = new DrawingVisual();
-            using (var dc = dv.RenderOpen())
-            {
-                // Background
-                dc.DrawRectangle(new SolidColorBrush(Color.FromRgb(0x0F, 0x11, 0x17)), null, new Rect(0, 0, totalW, totalH));
-
-                // Title
-                var titleText = new FormattedText(
-                    $"WINVELO {WinVelo.Core.AppInfo.DisplayVersion.ToUpperInvariant()} — VISUAL CONTACT SHEET",
-                    System.Globalization.CultureInfo.InvariantCulture,
-                    FlowDirection.LeftToRight,
-                    new Typeface("Segoe UI Variable Display, Segoe UI, sans-serif"),
-                    20,
-                    new SolidColorBrush(Color.FromRgb(0xF9, 0xFA, 0xFB)),
-                    1.0);
-                dc.DrawText(titleText, new Point(pad, 18));
-
-                for (int i = 0; i < files.Length; i++)
-                {
-                    int c = i % cols;
-                    int r = i / cols;
-                    int x = pad + c * (thumbW + pad);
-                    int y = topPad + r * (thumbH + pad + 24);
-
-                    string src = Path.GetFullPath(Path.Combine(targetDir, files[i]));
-                    if (File.Exists(src))
-                    {
-                        var bi = new BitmapImage();
-                        bi.BeginInit();
-                        bi.UriSource = new Uri(src, UriKind.Absolute);
-                        bi.CacheOption = BitmapCacheOption.OnLoad;
-                        bi.EndInit();
-
-                        // Border card
-                        dc.DrawRoundedRectangle(new SolidColorBrush(Color.FromRgb(0x16, 0x19, 0x22)),
-                            new Pen(new SolidColorBrush(Color.FromRgb(0x2A, 0x30, 0x3C)), 1),
-                            new Rect(x - 2, y - 2, thumbW + 4, thumbH + 4), 6, 6);
-
-                        dc.DrawImage(bi, new Rect(x, y, thumbW, thumbH));
-
-                        // Label
-                        var caption = new FormattedText(
-                            titles[i],
-                            System.Globalization.CultureInfo.InvariantCulture,
-                            FlowDirection.LeftToRight,
-                            new Typeface("Segoe UI, sans-serif"),
-                            13,
-                            new SolidColorBrush(Color.FromRgb(0xD1, 0xD5, 0xDB)),
-                            1.0);
-                        dc.DrawText(caption, new Point(x, y + thumbH + 6));
-                    }
-                }
-            }
-
-            var rtb = new RenderTargetBitmap(totalW, totalH, 96, 96, PixelFormats.Pbgra32);
-            rtb.Render(dv);
-            var encoder = new PngBitmapEncoder();
-            encoder.Frames.Add(BitmapFrame.Create(rtb));
-            using var stream = File.Create(overviewPath);
-            encoder.Save(stream);
-            Log.Information("Generated contact sheet at {OverviewPath}", overviewPath);
-        }
-        catch (Exception ex)
-        {
-            Log.Warning(ex, "Failed to generate contact sheet overview");
         }
     }
 
