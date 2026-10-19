@@ -6,19 +6,40 @@ namespace WinVelo.Core.Engine;
 
 public sealed class RollbackJournalManager
 {
+    private static readonly JsonSerializerOptions WriteOptions = new() { WriteIndented = true };
+
     private readonly string _journalDirectory;
     private readonly object _lock = new();
+    private readonly Mutex? _fileMutex;
+    private readonly List<string> _damagedFiles = new();
     private RollbackJournalSession? _currentSession;
 
     public RollbackJournalManager(string journalDirectory)
     {
         _journalDirectory = journalDirectory;
         Directory.CreateDirectory(_journalDirectory);
+        _fileMutex = CreateFileMutex(_journalDirectory);
+    }
+
+    /// <summary>
+    /// Journal files that could not be read, even from their backup copy. They are never deleted, so a
+    /// person (or a later version) can still recover them; the app shows that they exist.
+    /// </summary>
+    public IReadOnlyList<string> DamagedFiles
+    {
+        get
+        {
+            lock (_damagedFiles)
+            {
+                return _damagedFiles.ToList();
+            }
+        }
     }
 
     public RollbackJournalSession StartSession(string? mode = null, string? appVersion = null)
     {
         lock (_lock)
+        using (AcquireFileLock())
         {
             mode ??= TestModeManager.IsTestMode ? "test" : "real";
             appVersion ??= AppInfo.Version;
@@ -40,6 +61,7 @@ public sealed class RollbackJournalManager
     public void RecordActionWriteAhead(JournalActionRecord record)
     {
         lock (_lock)
+        using (AcquireFileLock())
         {
             if (_currentSession == null)
             {
@@ -61,6 +83,7 @@ public sealed class RollbackJournalManager
     public void CompleteSession()
     {
         lock (_lock)
+        using (AcquireFileLock())
         {
             if (_currentSession != null)
             {
@@ -73,6 +96,7 @@ public sealed class RollbackJournalManager
     public void CompleteSession(RollbackJournalSession session)
     {
         lock (_lock)
+        using (AcquireFileLock())
         {
             session.IsCompleted = true;
             FlushSessionUnsafe(session);
@@ -86,6 +110,7 @@ public sealed class RollbackJournalManager
     public void CompleteSession(string sessionId)
     {
         lock (_lock)
+        using (AcquireFileLock())
         {
             if (_currentSession != null && _currentSession.SessionId == sessionId)
             {
@@ -93,13 +118,12 @@ public sealed class RollbackJournalManager
                 FlushSessionUnsafe(_currentSession);
             }
 
-            string filePath = Path.Combine(_journalDirectory, $"session-{sessionId}.json");
+            string filePath = SessionPath(sessionId);
             if (File.Exists(filePath))
             {
                 try
                 {
-                    string json = File.ReadAllText(filePath);
-                    RollbackJournalSession? session = JsonSerializer.Deserialize<RollbackJournalSession>(json);
+                    RollbackJournalSession? session = TryReadSession(filePath);
                     if (session != null)
                     {
                         session.IsCompleted = true;
@@ -116,6 +140,7 @@ public sealed class RollbackJournalManager
         get
         {
             lock (_lock)
+            using (AcquireFileLock())
             {
                 return _currentSession != null && !_currentSession.IsCompleted;
             }
@@ -125,6 +150,7 @@ public sealed class RollbackJournalManager
     public List<RollbackJournalSession> GetUnfinishedSessions()
     {
         lock (_lock)
+        using (AcquireFileLock())
         {
             List<RollbackJournalSession> unfinished = new();
             string[] files = Directory.GetFiles(_journalDirectory, "*.json");
@@ -132,8 +158,7 @@ public sealed class RollbackJournalManager
             {
                 try
                 {
-                    string json = File.ReadAllText(file);
-                    RollbackJournalSession? session = JsonSerializer.Deserialize<RollbackJournalSession>(json);
+                    RollbackJournalSession? session = TryReadSession(file);
                     if (session != null && !session.IsCompleted && session.Records.Count > 0)
                     {
                         // In real mode, exclude sessions without a marker (legacy sessions)
@@ -173,8 +198,7 @@ public sealed class RollbackJournalManager
         {
             try
             {
-                string json = File.ReadAllText(file);
-                RollbackJournalSession? session = JsonSerializer.Deserialize<RollbackJournalSession>(json);
+                RollbackJournalSession? session = TryReadSession(file);
                 if (session != null)
                 {
                     JournalActionRecord? record = session.Records
@@ -197,6 +221,7 @@ public sealed class RollbackJournalManager
     public void MarkTweakRecordsReverted(string tweakId)
     {
         lock (_lock)
+        using (AcquireFileLock())
         {
             if (_currentSession != null)
             {
@@ -215,8 +240,7 @@ public sealed class RollbackJournalManager
             {
                 try
                 {
-                    string json = File.ReadAllText(file);
-                    RollbackJournalSession? session = JsonSerializer.Deserialize<RollbackJournalSession>(json);
+                    RollbackJournalSession? session = TryReadSession(file);
                     if (session != null)
                     {
                         bool modified = false;
@@ -243,6 +267,7 @@ public sealed class RollbackJournalManager
         if (targetSet.Count == 0) return;
 
         lock (_lock)
+        using (AcquireFileLock())
         {
             if (_currentSession != null)
             {
@@ -264,8 +289,7 @@ public sealed class RollbackJournalManager
             {
                 try
                 {
-                    string json = File.ReadAllText(file);
-                    RollbackJournalSession? session = JsonSerializer.Deserialize<RollbackJournalSession>(json);
+                    RollbackJournalSession? session = TryReadSession(file);
                     if (session != null)
                     {
                         bool modified = false;
@@ -292,6 +316,7 @@ public sealed class RollbackJournalManager
     public List<RollbackJournalSession> GetAllSessions()
     {
         lock (_lock)
+        using (AcquireFileLock())
         {
             List<RollbackJournalSession> sessions = new();
             string[] files = Directory.GetFiles(_journalDirectory, "*.json")
@@ -302,8 +327,7 @@ public sealed class RollbackJournalManager
             {
                 try
                 {
-                    string json = File.ReadAllText(file);
-                    RollbackJournalSession? session = JsonSerializer.Deserialize<RollbackJournalSession>(json);
+                    RollbackJournalSession? session = TryReadSession(file);
                     if (session != null)
                     {
                         sessions.Add(session);
@@ -318,26 +342,134 @@ public sealed class RollbackJournalManager
         }
     }
 
+    /// <summary>
+    /// Writes a session atomically: the JSON goes to a temporary file that is flushed to disk, then replaces the
+    /// session file in one step (the previous copy is kept as session-&lt;id&gt;.bak). A crash or power cut
+    /// therefore leaves either the old or the new file, never a half-written one.
+    /// </summary>
     private void FlushSessionUnsafe(RollbackJournalSession session)
     {
         Directory.CreateDirectory(_journalDirectory);
-        string filePath = Path.Combine(_journalDirectory, $"session-{session.SessionId}.json");
-        string json = JsonSerializer.Serialize(session, new JsonSerializerOptions { WriteIndented = true });
+        string filePath = SessionPath(session.SessionId);
+        string tempPath = Path.ChangeExtension(filePath, ".tmp");
+        string backupPath = Path.ChangeExtension(filePath, ".bak");
+        byte[] bytes = JsonSerializer.SerializeToUtf8Bytes(session, WriteOptions);
 
-        for (int attempt = 0; attempt < 5; attempt++)
+        for (int attempt = 0; ; attempt++)
         {
             try
             {
-                using var fs = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite);
-                using var writer = new StreamWriter(fs);
-                writer.Write(json);
-                writer.Flush();
+                using (var fs = new FileStream(tempPath, FileMode.Create, FileAccess.Write, FileShare.None, 4096, FileOptions.WriteThrough))
+                {
+                    fs.Write(bytes, 0, bytes.Length);
+                    fs.Flush(flushToDisk: true);
+                }
+
+                if (File.Exists(filePath))
+                {
+                    File.Replace(tempPath, filePath, backupPath, ignoreMetadataErrors: true);
+                }
+                else
+                {
+                    File.Move(tempPath, filePath);
+                }
                 return;
             }
-            catch (Exception) when (attempt < 4)
+            catch (Exception ex) when (attempt < 4 && ex is IOException or UnauthorizedAccessException)
             {
-                Thread.Sleep(15);
+                // Antivirus or a backup tool may hold the file for a moment.
+                Thread.Sleep(25 * (attempt + 1));
             }
         }
+    }
+
+    private string SessionPath(string sessionId)
+    {
+        // Session ids are generated by StartSession ("yyyyMMdd_HHmmss_xxxxxxxx"); anything else must not become a path.
+        foreach (char c in sessionId)
+        {
+            if (!char.IsAsciiLetterOrDigit(c) && c != '_' && c != '-')
+            {
+                throw new ArgumentException($"Invalid journal session id '{sessionId}'.", nameof(sessionId));
+            }
+        }
+        return Path.Combine(_journalDirectory, $"session-{sessionId}.json");
+    }
+
+    /// <summary>
+    /// Reads a session file. When it is damaged (for example cut off by a crash in an older version), the backup
+    /// copy written by the previous save is used instead. Returns null only when neither can be read.
+    /// </summary>
+    private RollbackJournalSession? TryReadSession(string file)
+    {
+        if (TryDeserialize(file, out var session)) return session;
+
+        string backup = Path.ChangeExtension(file, ".bak");
+        if (File.Exists(backup) && TryDeserialize(backup, out var fromBackup))
+        {
+            return fromBackup;
+        }
+
+        lock (_damagedFiles)
+        {
+            if (!_damagedFiles.Contains(file)) _damagedFiles.Add(file);
+        }
+        return null;
+    }
+
+    private static bool TryDeserialize(string file, out RollbackJournalSession? session)
+    {
+        session = null;
+        try
+        {
+            string json = File.ReadAllText(file);
+            if (string.IsNullOrWhiteSpace(json)) return false;
+            session = JsonSerializer.Deserialize<RollbackJournalSession>(json);
+            return session != null;
+        }
+        catch (Exception ex) when (ex is JsonException or IOException or UnauthorizedAccessException or NotSupportedException)
+        {
+            return false;
+        }
+    }
+
+    private static Mutex? CreateFileMutex(string directory)
+    {
+        // One lock per journal folder, shared by every WinVelo process of this user session (app and CLI).
+        string full = Path.GetFullPath(directory).TrimEnd(Path.DirectorySeparatorChar).ToUpperInvariant();
+        byte[] hash = System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(full));
+        string name = @"Local\WinVelo.Journal." + Convert.ToHexString(hash, 0, 12);
+        try
+        {
+            return new Mutex(false, name);
+        }
+        catch (Exception ex) when (ex is UnauthorizedAccessException or IOException or WaitHandleCannotBeOpenedException or PlatformNotSupportedException)
+        {
+            return null; // fall back to the in-process lock only
+        }
+    }
+
+    private FileLock AcquireFileLock()
+    {
+        if (_fileMutex == null) return default;
+        try
+        {
+            if (!_fileMutex.WaitOne(TimeSpan.FromSeconds(30)))
+            {
+                throw new IOException("Another WinVelo window or winvelo-cli is busy with the rollback journal. Try again in a moment.");
+            }
+        }
+        catch (AbandonedMutexException)
+        {
+            // The other process ended while holding the lock. Every write is atomic, so the files are consistent.
+        }
+        return new FileLock(_fileMutex);
+    }
+
+    private readonly struct FileLock : IDisposable
+    {
+        private readonly Mutex? _mutex;
+        public FileLock(Mutex mutex) => _mutex = mutex;
+        public void Dispose() => _mutex?.ReleaseMutex();
     }
 }

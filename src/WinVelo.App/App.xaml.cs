@@ -318,6 +318,29 @@ public partial class App : Application
         {
             Log.Warning(ex, "Could not check the catalog for problems.");
         }
+
+        try
+        {
+            var journal = _host.Services.GetRequiredService<RollbackJournalManager>();
+            journal.GetAllSessions();
+            var damaged = journal.DamagedFiles;
+            if (damaged.Count > 0)
+            {
+                foreach (string file in damaged)
+                {
+                    Log.Error("Rollback journal file could not be read and was left untouched: {File}", file);
+                }
+                MessageBox.Show(owner,
+                    LocalizationManager.T("{0} rollback journal file(s) could not be read. WinVelo did not delete them, but it cannot undo the changes they describe.\n\nThe files are in:\n{1}\n\nPlease keep them and report this on GitHub.", damaged.Count, WinVeloStoragePaths.GetJournalDirectory(TestModeManager.IsTestMode)),
+                    LocalizationManager.T("Rollback journal problem"),
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "Could not check the rollback journal for damaged files.");
+        }
     }
 
     private static Visual GetWindowVisual(MainWindow window) => (Visual?)window.Content ?? window;

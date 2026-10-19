@@ -817,5 +817,7 @@
   "Cancelled: {0}.": "تم الإلغاء: {0}.",
   "Upgrade cancelled.": "تم إلغاء التحديث.",
   "This app has no valid website link.": "لا يوجد رابط صالح لموقع هذا التطبيق.",
-  "{0} (Auto-Selected)": "{0} (تم اختياره تلقائيًا)"
+  "{0} (Auto-Selected)": "{0} (تم اختياره تلقائيًا)",
+  "{0} rollback journal file(s) could not be read. WinVelo did not delete them, but it cannot undo the changes they describe.\n\nThe files are in:\n{1}\n\nPlease keep them and report this on GitHub.": "تعذّرت قراءة {0} من ملفات سجل التراجع. لم يحذفها WinVelo، لكنه لا يستطيع التراجع عن التغييرات المسجلة فيها.\n\nالملفات موجودة في:\n{1}\n\nيرجى الاحتفاظ بها والإبلاغ عن المشكلة على GitHub.",
+  "Rollback journal problem": "مشكلة في سجل التراجع"
 }
