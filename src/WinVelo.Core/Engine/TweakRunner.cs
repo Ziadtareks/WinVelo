@@ -297,6 +297,13 @@ public sealed class TweakRunner
 
                 foreach (JournalActionRecord record in statefulRecords)
                 {
+                    if (HandOverToNewerTweak(record))
+                    {
+                        executedSteps.Add($"Kept {record.ActionType} ({record.TargetIdentifier}): another applied tweak still sets it");
+                        _context.Journal.MarkRecordsReverted(new[] { record });
+                        continue;
+                    }
+
                     IActionHandler? handler = _handlers.FirstOrDefault(h => h.CanHandle(record.ActionType));
                     if (handler != null)
                     {
@@ -433,6 +440,16 @@ public sealed class TweakRunner
 
             foreach (JournalActionRecord record in recordsToRevert)
             {
+                if (!IsStatelessType(record.ActionType) && HandOverToNewerTweak(record))
+                {
+                    executedSteps.Add($"Kept {record.ActionType} ({record.TargetIdentifier}): another applied tweak still sets it");
+                    record.IsReverted = true;
+                    record.RevertedAtUtc = DateTime.UtcNow;
+                    _context.Journal.MarkRecordsReverted(new[] { record });
+                    _detector.InvalidateCache(record.TweakId);
+                    continue;
+                }
+
                 IActionHandler? handler = _handlers.FirstOrDefault(h => h.CanHandle(record.ActionType));
                 if (handler != null)
                 {
@@ -530,6 +547,31 @@ public sealed class TweakRunner
         if (string.IsNullOrWhiteSpace(type)) return false;
         return string.Equals(type, "PowerShell", StringComparison.OrdinalIgnoreCase) ||
                string.Equals(type, "Script", StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// Several tweaks can change the same registry value or service (for example "Telemetry - Disable" and
+    /// "Disable Advertising ID"). When the record being undone is OLDER than a still-applied record of another
+    /// tweak on the same target, restoring it now would switch that other tweak off, and undoing the other tweak
+    /// later would "restore" the value this tweak wrote. Instead the value is left alone and its original state is
+    /// handed to the next newer record, so whichever tweak is undone last puts back the true original.
+    /// Returns true when the restore must be skipped. Undoing the newest record restores normally: its saved value
+    /// is what the older tweaks had set.
+    /// </summary>
+    private bool HandOverToNewerTweak(JournalActionRecord record)
+    {
+        JournalActionRecord? nextNewer = _context.Journal.GetAllSessions()
+            .SelectMany(s => s.Records)
+            .Where(r => !r.IsReverted &&
+                        !string.Equals(r.TweakId, record.TweakId, StringComparison.OrdinalIgnoreCase) &&
+                        string.Equals(r.ActionType, record.ActionType, StringComparison.OrdinalIgnoreCase) &&
+                        string.Equals(r.TargetIdentifier, record.TargetIdentifier, StringComparison.OrdinalIgnoreCase) &&
+                        r.AppliedAtUtc > record.AppliedAtUtc)
+            .OrderBy(r => r.AppliedAtUtc)
+            .FirstOrDefault();
+
+        if (nextNewer == null) return false;
+        return _context.Journal.InheritBaseline(nextNewer, record);
     }
 
     private async Task<bool> EnsureSystemRestorePointAsync(Func<string, Task<bool>>? onRestorePointPromptAsync)

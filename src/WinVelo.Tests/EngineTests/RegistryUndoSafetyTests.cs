@@ -144,6 +144,55 @@ public sealed class RegistryUndoSafetyTests : IDisposable
         Assert.Contains("blocked", result.Message, StringComparison.OrdinalIgnoreCase);
     }
 
+    [Theory]
+    [InlineData(true)]   // undo the older tweak first
+    [InlineData(false)]  // undo the newer tweak first
+    public async Task TwoTweaksOnTheSameValue_UndoInAnyOrder_RestoresTheOriginal(bool olderFirst)
+    {
+        // Like "Disable Advertising ID" (one value) and "Telemetry - Disable" (that value and more).
+        const string key = @"SOFTWARE\WinVeloTest\Shared";
+        _registry.SetValue("HKLM", key, "Enabled", 1, "DWord");
+        var runner = Runner(_registry);
+        var advertising = SetTweak("test.advertising", key, "Enabled", 0);
+        var telemetry = SetTweak("test.telemetry", key, "Enabled", 0);
+        telemetry.Apply.Add(new ActionItem { Type = "Registry", Hive = "HKLM", Key = key, ValueName = "Other", ValueKind = "DWord", Operation = "Set", Data = JsonDocument.Parse("0").RootElement });
+        telemetry.Detect = new DetectStructure { Type = "Registry", Hive = "HKLM", Key = key, ValueName = "Other", MatchType = "Equals", ExpectedValue = JsonDocument.Parse("0").RootElement };
+
+        await runner.ApplyBatchAsync(new[] { advertising });
+        await Task.Delay(5);
+        var report = await runner.ApplyBatchAsync(new[] { telemetry });
+        Assert.Equal(TweakExecutionStatus.Applied, Assert.Single(report.Results).Status);
+
+        var first = olderFirst ? advertising : telemetry;
+        var second = olderFirst ? telemetry : advertising;
+
+        Assert.True((await runner.UndoTweakAsync(first)).Success);
+        Assert.Equal(0, _registry.GetValue("HKLM", key, "Enabled")); // the other tweak is still applied
+
+        Assert.True((await runner.UndoTweakAsync(second)).Success);
+        Assert.Equal(1, _registry.GetValue("HKLM", key, "Enabled")); // back to the true original
+    }
+
+    [Fact]
+    public async Task TwoTweaksCreatingTheSameValue_UndoOlderFirst_DeletesItAtTheEnd()
+    {
+        const string key = @"SOFTWARE\Policies\WinVeloTest\Shared";
+        var runner = Runner(_registry);
+        var a = SetTweak("test.a", key, "Off", 1);
+        var b = SetTweak("test.b", key, "Off", 1);
+
+        await runner.ApplyBatchAsync(new[] { a });
+        await Task.Delay(5);
+        _registry.DeleteValue("HKLM", key, "Off");
+        await runner.ApplyBatchAsync(new[] { b });
+
+        await runner.UndoTweakAsync(a);
+        Assert.True(_registry.ValueExists("HKLM", key, "Off"));
+
+        await runner.UndoTweakAsync(b);
+        Assert.False(_registry.ValueExists("HKLM", key, "Off"));
+    }
+
     /// <summary>A registry where one key behaves like a key protected by Tamper Protection.</summary>
     private sealed class BlockingRegistry : IRegistryService
     {

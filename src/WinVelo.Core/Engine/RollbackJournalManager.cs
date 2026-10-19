@@ -313,6 +313,54 @@ public sealed class RollbackJournalManager
         }
     }
 
+    /// <summary>
+    /// Copies the original state stored in <paramref name="from"/> into <paramref name="target"/> (a record of
+    /// another tweak on the same registry value or service) and saves it. Returns false when the target record
+    /// cannot be found any more.
+    /// </summary>
+    public bool InheritBaseline(JournalActionRecord target, JournalActionRecord from)
+    {
+        static bool Same(JournalActionRecord a, JournalActionRecord b) =>
+            a.TweakId == b.TweakId && a.ActionIndex == b.ActionIndex &&
+            a.TargetIdentifier == b.TargetIdentifier && a.AppliedAtUtc == b.AppliedAtUtc;
+
+        static void Copy(JournalActionRecord to, JournalActionRecord src)
+        {
+            to.ExistedBefore = src.ExistedBefore;
+            to.PreviousValueKind = src.PreviousValueKind;
+            to.PreviousData = src.PreviousData;
+            to.KeyCreated = to.KeyCreated || src.KeyCreated;
+        }
+
+        lock (_lock)
+        using (AcquireFileLock())
+        {
+            if (_currentSession != null)
+            {
+                var inMemory = _currentSession.Records.FirstOrDefault(r => Same(r, target));
+                if (inMemory != null)
+                {
+                    Copy(inMemory, from);
+                    FlushSessionUnsafe(_currentSession);
+                    return true;
+                }
+            }
+
+            foreach (string file in Directory.GetFiles(_journalDirectory, "*.json"))
+            {
+                RollbackJournalSession? session = TryReadSession(file);
+                var match = session?.Records.FirstOrDefault(r => Same(r, target));
+                if (session != null && match != null)
+                {
+                    Copy(match, from);
+                    FlushSessionUnsafe(session);
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
     public List<RollbackJournalSession> GetAllSessions()
     {
         lock (_lock)
