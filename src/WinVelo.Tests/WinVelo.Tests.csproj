@@ -28,6 +28,7 @@
     <ProjectReference Include="..\WinVelo.Cli\WinVelo.Cli.csproj" />
     <ProjectReference Include="..\WinVelo.Simulation\WinVelo.Simulation.csproj" />
     <ProjectReference Include="..\..\tools\PresetGenerator\PresetGenerator.csproj" />
+    <ProjectReference Include="..\..\tools\CatalogValidator\CatalogValidator.csproj" />
   </ItemGroup>
 
 </Project>

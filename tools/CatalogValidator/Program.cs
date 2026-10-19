@@ -132,6 +132,7 @@ public static class Program
                         ValidateExplanations(item, id, ref errorCount);
                         ValidateRegistryKeys(item, id, ref errorCount);
                         ValidateTags(item, id, ref errorCount);
+                        ValidateEvidenceRules(item, id, ref errorCount);
 
                         if (!result.IsValid)
                         {
@@ -189,6 +190,7 @@ public static class Program
                     ValidateExplanations(single, id, ref errorCount);
                     ValidateRegistryKeys(single, id, ref errorCount);
                     ValidateTags(single, id, ref errorCount);
+                    ValidateEvidenceRules(single, id, ref errorCount);
 
                     if (!result.IsValid)
                     {
@@ -713,6 +715,45 @@ public static class Program
                 Console.WriteLine($"  [FAIL] Tweak '{id}' has evidence='ui-equivalent' but missing or empty 'uiEquivalentLocation' (e.g. 'Settings › Personalization › Colors').");
                 Console.ResetColor();
             }
+        }
+    }
+
+    /// <summary>
+    /// - "anecdotal" evidence is only allowed in the Experimental category (hidden by default in the app);
+    /// - "documented" needs at least one https source;
+    /// - every entry in "source"/"sources" must be an absolute http(s) URL.
+    /// </summary>
+    public static void ValidateEvidenceRules(JsonNode item, string id, ref int errorCount)
+    {
+        string evidence = item["evidence"]?.ToString() ?? string.Empty;
+        string category = item["category"]?.ToString() ?? string.Empty;
+
+        if (evidence.Equals("anecdotal", StringComparison.OrdinalIgnoreCase) &&
+            !category.Equals("Experimental", StringComparison.OrdinalIgnoreCase))
+        {
+            errorCount++;
+            Console.WriteLine($"  [FAIL] Tweak '{id}' has anecdotal evidence but category '{category}'. Anecdotal tweaks must be in the Experimental category.");
+        }
+
+        var urls = new List<string>();
+        if (item["source"] is JsonValue sv && sv.TryGetValue(out string? single) && !string.IsNullOrWhiteSpace(single)) urls.Add(single);
+        if (item["source"] is JsonArray sa) urls.AddRange(sa.Select(n => n?.ToString() ?? string.Empty));
+        if (item["sources"] is JsonArray arr) urls.AddRange(arr.Select(n => n?.ToString() ?? string.Empty));
+
+        foreach (string url in urls)
+        {
+            if (!SafeUrl.IsWebUrl(url))
+            {
+                errorCount++;
+                Console.WriteLine($"  [FAIL] Tweak '{id}' has a source that is not an http(s) URL: '{url}'.");
+            }
+        }
+
+        if (evidence.Equals("documented", StringComparison.OrdinalIgnoreCase) &&
+            !urls.Any(u => u.StartsWith("https://", StringComparison.OrdinalIgnoreCase)))
+        {
+            errorCount++;
+            Console.WriteLine($"  [FAIL] Tweak '{id}' has evidence='documented' but no https source link.");
         }
     }
 
