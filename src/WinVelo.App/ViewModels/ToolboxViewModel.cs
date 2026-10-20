@@ -83,8 +83,10 @@ public sealed partial class ToolboxViewModel : ObservableObject
         IDnsService dnsService,
         IOperationRunner runner,
         IMemoryOptimizerService memoryOptimizer,
-        INetworkOptimizerService networkOptimizer)
+        INetworkOptimizerService networkOptimizer,
+        WinVelo.Modules.Power.IPowerPlanService? powerPlan = null)
     {
+        _powerPlan = powerPlan;
         _cleanerService = cleanerService;
         _startupService = startupService;
         _servicesService = servicesService;
@@ -232,6 +234,59 @@ public sealed partial class ToolboxViewModel : ObservableObject
     }
 
     private bool _isFixRunning;
+
+    // ---------- Power plan (WinUtil "Performance Plans") and O&O ShutUp10++ ----------
+    private readonly WinVelo.Modules.Power.IPowerPlanService? _powerPlan;
+
+    [ObservableProperty]
+    private string _powerPlanStatusText = LocalizationManager.T("Ultimate Performance keeps the CPU at full speed. It uses more power and is not meant for laptops on battery.");
+
+    [RelayCommand]
+    private async Task EnableUltimatePlanAsync() => await RunPowerPlanAsync(enable: true);
+
+    [RelayCommand]
+    private async Task DisableUltimatePlanAsync() => await RunPowerPlanAsync(enable: false);
+
+    private async Task RunPowerPlanAsync(bool enable)
+    {
+        if (_powerPlan == null || _isFixRunning) return;
+        if (enable)
+        {
+            var answer = System.Windows.MessageBox.Show(
+                LocalizationManager.T("Ultimate Performance keeps the CPU at full speed. It uses more power and is not meant for laptops on battery. Add and switch to it now?"),
+                LocalizationManager.T("Ultimate Performance"), System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Warning, System.Windows.MessageBoxResult.No);
+            if (answer != System.Windows.MessageBoxResult.Yes) return;
+        }
+
+        if (!WinVelo.App.Services.AppAdminGuard.EnsureAdmin("change the power plan"))
+        {
+            PowerPlanStatusText = LocalizationManager.T("Administrator privileges required to run fixes.");
+            return;
+        }
+
+        _isFixRunning = true;
+        try
+        {
+            var result = await Task.Run(() => enable ? _powerPlan.EnableUltimatePerformanceAsync() : _powerPlan.DisableUltimatePerformanceAsync());
+            PowerPlanStatusText = LocalizationManager.TranslateMessage(result.Message);
+        }
+        catch (Exception ex)
+        {
+            PowerPlanStatusText = LocalizationManager.T("Repair failed: {0}", ex.Message);
+        }
+        finally
+        {
+            _isFixRunning = false;
+        }
+    }
+
+    /// <summary>Opens O&amp;O's official page. Like WinVelo's other third-party tools, nothing is downloaded or run automatically.</summary>
+    [RelayCommand]
+    private void OpenOosu()
+    {
+        _fixService.OpenUrl("https://www.oo-software.com/en/shutup10");
+        PowerPlanStatusText = LocalizationManager.T("Opened the O&O ShutUp10++ page in your browser.");
+    }
 
     // Built-in Windows apps (AppX) selection. Filled by the Built-in apps tool.
     private readonly System.Collections.Generic.HashSet<string> _selectedAppx = new(StringComparer.OrdinalIgnoreCase);

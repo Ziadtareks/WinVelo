@@ -93,9 +93,9 @@ public sealed class SmokeTests : IDisposable
     public void EmbeddedCatalog_LoadsWithoutACatalogFolder()
     {
         var result = CatalogLoader.LoadTweaks(CatalogSource.EmbeddedOnly());
-        Assert.Equal(140, result.Items.Count);
+        Assert.Equal(CatalogCounts.Tweaks, result.Items.Count);
         Assert.Empty(result.Issues);
-        Assert.Equal(6, CatalogLoader.LoadPresets(CatalogSource.EmbeddedOnly()).Items.Count);
+        Assert.Equal(CatalogCounts.Presets, CatalogLoader.LoadPresets(CatalogSource.EmbeddedOnly()).Items.Count);
     }
 
     [Fact]
@@ -134,6 +134,22 @@ public sealed class SmokeTests : IDisposable
         }
 
         Assert.Equal(before, Snapshot(m));
+    }
+
+    [Theory]
+    [InlineData("essential.deletetempfiles")]
+    [InlineData("essential.diskcleanup")]
+    [InlineData("essential.restorepoint")]
+    public async Task OneTimeActions_RunAgain_InsteadOfBeingSkippedAsAlreadyActive(string id)
+    {
+        var m = NewMachine();
+        var tweak = Catalog().Single(t => t.Id == id);
+
+        var first = await m.Runner.ApplyBatchAsync(new[] { tweak });
+        var second = await m.Runner.ApplyBatchAsync(new[] { tweak });
+
+        Assert.Equal(TweakExecutionStatus.Applied, Assert.Single(first.Results).Status);
+        Assert.Equal(TweakExecutionStatus.Applied, Assert.Single(second.Results).Status);
     }
 
     [Fact]

@@ -56,7 +56,7 @@ public static class Program
         // (--self-test used to switch to real mode on its own; it now needs --real-mode like every other change.)
         bool isRealMode = args.Contains("--real-mode") || (isDetectAll && !isTestMode);
         bool isDryRun = args.Contains("--dry-run");
-        bool isRun = args.Contains("--run") || args.Contains("--apply") || args.Contains("--enable") || args.Contains("--disable") || args.Contains("--clean") || args.Contains("--dns") || args.Contains("--update-mode") || args.Contains("--fix") || args.Contains("--undo") || isSelfTest;
+        bool isRun = args.Contains("--run") || args.Contains("--apply") || args.Contains("--enable") || args.Contains("--disable") || args.Contains("--clean") || args.Contains("--dns") || args.Contains("--update-mode") || args.Contains("--fix") || args.Contains("--undo") || args.Contains("--power-plan") || isSelfTest;
 
         if (isRealMode)
         {
@@ -532,6 +532,29 @@ public static class Program
         }
 
         // 4. DNS: --dns <providerId>
+        int powerIdx = Array.FindIndex(args, a => string.Equals(a, "--power-plan", StringComparison.OrdinalIgnoreCase));
+        if (powerIdx >= 0)
+        {
+            string? which = powerIdx < args.Length - 1 ? args[powerIdx + 1] : null;
+            bool enable = string.Equals(which, "ultimate", StringComparison.OrdinalIgnoreCase);
+            bool disable = string.Equals(which, "default", StringComparison.OrdinalIgnoreCase);
+            if (!enable && !disable)
+            {
+                Console.WriteLine("[ERROR] Use --power-plan ultimate or --power-plan default.");
+                return 1;
+            }
+
+            if (isRealMode && !CheckConfirmationGate(args, enable ? "add and switch to the Ultimate Performance power plan (not for laptops)" : "switch back from the Ultimate Performance power plan"))
+            {
+                return 1;
+            }
+
+            var powerPlan = new WinVelo.Modules.Power.PowerPlanService(shell, Path.Combine(WinVeloStoragePaths.GetStorageRoot(!isRealMode), "powerplan.json"));
+            var result = enable ? await powerPlan.EnableUltimatePerformanceAsync() : await powerPlan.DisableUltimatePerformanceAsync();
+            Console.WriteLine(result.Success ? $"[OK] {result.Message}" : $"[ERROR] {result.Message}");
+            return result.Success ? 0 : 1;
+        }
+
         int dnsIdx = Array.FindIndex(args, a => string.Equals(a, "--dns", StringComparison.OrdinalIgnoreCase));
         if (dnsIdx >= 0 && dnsIdx < args.Length - 1)
         {
@@ -1465,6 +1488,7 @@ public static class Program
         Console.WriteLine("  winvelo-cli --feature <key> --disable    Disable an optional Windows feature");
         Console.WriteLine("  winvelo-cli --clean <category|all>       Clean safe temporary file categories");
         Console.WriteLine("  winvelo-cli --dns <id>                   Apply a DNS preset (e.g. dns.cloudflare.standard)");
+        Console.WriteLine("  winvelo-cli --power-plan ultimate|default  Add/switch to Ultimate Performance, or go back (not for laptops)");
         Console.WriteLine("  winvelo-cli --update-mode <mode>         Set update mode (Default, Security, DisableAll = automatic updates off; Windows Update keeps working)");
         Console.WriteLine("  winvelo-cli --fix <id>                   Execute a system maintenance fix");
         Console.WriteLine("  winvelo-cli --config <path> --run        Apply configuration profile (protected by journal)");

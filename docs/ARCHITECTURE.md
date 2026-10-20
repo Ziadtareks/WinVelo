@@ -106,7 +106,7 @@ C:\Dev\WinVelo\
 │   ├── Config\                  # Features, appx, and DNS presets
 │   ├── Presets\                 # Curated system profiles
 │   ├── schema\                  # tweak.schema.json validation schema
-│   ├── Tweaks\                  # 140 tweak definitions
+│   ├── Tweaks\                  # 142 tweak definitions
 │   ├── Localization\            # Arabic display text for tweaks and presets (ar.json)
 │   └── overrides.json           # Safety overrides & baseline exclusions
 ├── dist\                        # Build output of build\publish.ps1 / release.ps1 (not committed)

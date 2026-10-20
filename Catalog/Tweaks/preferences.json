@@ -1210,5 +1210,64 @@
     "relatedTweaks": [
       "advanced.display"
     ]
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "ui.settings.hide-home-page",
+    "origin": "WPFToggleHideSettingsHome",
+    "name": "Settings Home Page - Hide",
+    "description": "Hides the Home page of the Windows 11 Settings app, so Settings opens on System.",
+    "category": "ui",
+    "subcategory": "Customize Preferences",
+    "risk": "Low",
+    "impacts": [
+      "ui"
+    ],
+    "windows": {
+      "minBuild": 22621
+    },
+    "requiresReboot": false,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKCU",
+      "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
+      "valueName": "SettingsPageVisibility",
+      "matchType": "Equals",
+      "expectedValue": "hide:home"
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
+        "operation": "Set",
+        "valueName": "SettingsPageVisibility",
+        "valueKind": "String",
+        "data": "hide:home"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
+        "operation": "DeleteValue",
+        "valueName": "SettingsPageVisibility"
+      }
+    ],
+    "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/hidesettingshome",
+    "verifiedOnBuild": "not verified",
+    "evidence": "situational",
+    "whatItDoes": "Writes 'hide:home' to the Settings Page Visibility setting for the current user, the same value WinUtil writes when its Settings Home toggle is off.",
+    "sideEffects": "Settings opens on System instead of Home. Microsoft documents this setting as a machine-wide policy; WinUtil writes it per user, and WinVelo has not tested this per-user location. If 'Windows AI - Disable And Remove' already set the machine-wide setting, Windows may use that one instead.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-settings#pagevisibilitylist"
+    ],
+    "needsReview": true,
+    "tags": [
+      "ui"
+    ],
+    "presetRole": "preference"
   }
 ]

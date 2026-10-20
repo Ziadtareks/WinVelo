@@ -316,5 +316,11 @@
   "Tweaks_PresetMinimalTip": "Selects WinUtil's Minimal tweaks. Nothing runs until you review and apply.",
   "Tweaks_PresetAdvancedTip": "Selects WinUtil's Advanced tweaks, including High risk ones (OneDrive removal, Windows AI). Review carefully.",
   "Tweaks_SelectAppliedTip": "Selects every tweak that is already active on this PC.",
-  "Main_ImportConfigJson": "Import config (WinVelo or WinUtil)..."
+  "Main_ImportConfigJson": "Import config (WinVelo or WinUtil)...",
+  "Tools_PowerPlanAndPrivacyTools": "Power plan and privacy tools",
+  "Tools_UltimatePerformancePlan": "Ultimate Performance power plan",
+  "Tools_UltimatePerformanceNotForLaptops": "Not for laptops: uses more power. Disable goes back to your previous plan.",
+  "Tools_Enable": "Enable",
+  "Tools_Disable": "Disable",
+  "Tools_OosuOpensTheOfficialPage": "Opens the official O&O page. WinVelo does not download or run it for you."
 }

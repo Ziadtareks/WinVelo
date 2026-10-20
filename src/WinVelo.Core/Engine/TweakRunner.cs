@@ -134,8 +134,10 @@ public sealed class TweakRunner
                 continue;
             }
 
-            // Check if already active
-            bool isAlreadyActive = await _detector.IsTweakActiveAsync(tweak, useCache: false);
+            // Check if already active. One-time actions (Disk Cleanup, Temporary Files, Restore Point) always run:
+            // their detect value only records that they ran once, it does not mean there is nothing left to do.
+            bool isOneTimeAction = string.Equals(tweak.PresetRole, "action", StringComparison.OrdinalIgnoreCase);
+            bool isAlreadyActive = !isOneTimeAction && await _detector.IsTweakActiveAsync(tweak, useCache: false);
             if (isAlreadyActive)
             {
                 // Nothing is changed, but the current state is journaled. Undo then puts back exactly this state

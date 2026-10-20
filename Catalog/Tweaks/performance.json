@@ -287,6 +287,102 @@
   },
   {
     "schemaVersion": "1.0.0",
+    "id": "performance.gpu.disable-mpo-full",
+    "origin": "WPFMultiplaneOverlay:FullyDisabled",
+    "name": "Disable Multi-Plane Overlay Fully (MPO Workaround)",
+    "description": "Stronger form of the MPO workaround: sets OverlayTestMode=5 and DisableOverlays=1, like WinUtil's 'Fully Disabled' option. Only for flicker or black-screen problems that the normal MPO workaround does not fix.",
+    "category": "gaming",
+    "subcategory": "Gaming & GPU",
+    "risk": "Medium",
+    "evidence": "situational",
+    "sideEffects": "Same as the normal MPO workaround, and more: all overlay planes are turned off, which raises GPU power use and can lower performance in windowed games and video playback.",
+    "impacts": [
+      "gaming",
+      "performance"
+    ],
+    "windows": {
+      "minBuild": 19041
+    },
+    "requiresReboot": true,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "all": [
+        {
+          "type": "Registry",
+          "hive": "HKLM",
+          "key": "SOFTWARE\\Microsoft\\Windows\\Dwm",
+          "valueName": "OverlayTestMode",
+          "matchType": "Equals",
+          "expectedValue": 5
+        },
+        {
+          "type": "Registry",
+          "hive": "HKLM",
+          "key": "SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers",
+          "valueName": "DisableOverlays",
+          "matchType": "Equals",
+          "expectedValue": 1
+        }
+      ]
+    },
+    "apply": [
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\Windows\\Dwm",
+        "operation": "Set",
+        "valueName": "OverlayTestMode",
+        "valueKind": "DWord",
+        "data": 5
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers",
+        "operation": "Set",
+        "valueName": "DisableOverlays",
+        "valueKind": "DWord",
+        "data": 1
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SOFTWARE\\Microsoft\\Windows\\Dwm",
+        "operation": "DeleteValue",
+        "valueName": "OverlayTestMode"
+      },
+      {
+        "type": "Registry",
+        "hive": "HKLM",
+        "key": "SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers",
+        "operation": "DeleteValue",
+        "valueName": "DisableOverlays"
+      }
+    ],
+    "source": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/multiplaneoverlay",
+    "verifiedOnBuild": "not verified",
+    "whatItDoes": "Disables Multi-Plane Overlay with both the DWM test mode value and the graphics driver DisableOverlays value.",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows-hardware/drivers/display/multiplane-overlay-support"
+    ],
+    "needsReview": true,
+    "tags": [
+      "gaming",
+      "performance",
+      "ui"
+    ],
+    "presetRole": "fix",
+    "relatedTweaks": [
+      "performance.gpu.disable-mpo"
+    ],
+    "conflictsWith": [
+      "performance.gpu.disable-mpo"
+    ]
+  },
+  {
+    "schemaVersion": "1.0.0",
     "id": "performance.power.disable-throttling",
     "origin": "performance.power.disable-throttling",
     "name": "Disable Windows Power Throttling",

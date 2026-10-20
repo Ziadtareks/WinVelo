@@ -298,6 +298,12 @@ public sealed partial class UnifiedExecutionDialogViewModel : ObservableObject
                         }
                         else
                         {
+                            // One-time actions (Disk Cleanup, Temporary Files, Restore Point) can always run again.
+                            if (state == TweakState.Applied && string.Equals(item.Tweak.PresetRole, "action", StringComparison.OrdinalIgnoreCase))
+                            {
+                                state = TweakState.NotApplied;
+                            }
+
                             switch (state)
                             {
                                 case TweakState.Applied:

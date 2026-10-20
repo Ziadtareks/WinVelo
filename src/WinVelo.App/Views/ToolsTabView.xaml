@@ -584,6 +584,38 @@
                         </StackPanel>
                     </Border>
 
+                    <!-- Power plan (WinUtil "Performance Plans") and O&O ShutUp10++ -->
+                    <Border Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
+                            BorderThickness="1" CornerRadius="8" Padding="16" Margin="0,0,0,12">
+                        <StackPanel>
+                            <TextBlock Text="{loc:Tr Tools_PowerPlanAndPrivacyTools}" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,8" />
+                            <DockPanel LastChildFill="False" Margin="0,0,0,8">
+                                <StackPanel DockPanel.Dock="Left">
+                                    <TextBlock Text="{loc:Tr Tools_UltimatePerformancePlan}" FontWeight="SemiBold" FontSize="13" Foreground="{DynamicResource TextPrimaryBrush}" />
+                                    <TextBlock Text="{loc:Tr Tools_UltimatePerformanceNotForLaptops}" FontSize="11" Foreground="{DynamicResource CautionRedBrush}" />
+                                </StackPanel>
+                                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <Button AutomationProperties.AutomationId="Tools_UltimatePlanEnable" AutomationProperties.Name="Enable Ultimate Performance"
+                                            Content="{loc:Tr Tools_Enable}" Style="{DynamicResource ModernSecondaryBtn}" Margin="0,0,6,0"
+                                            Command="{Binding ToolboxVM.EnableUltimatePlanCommand}" />
+                                    <Button AutomationProperties.AutomationId="Tools_UltimatePlanDisable" AutomationProperties.Name="Disable Ultimate Performance"
+                                            Content="{loc:Tr Tools_Disable}" Style="{DynamicResource ModernSecondaryBtn}"
+                                            Command="{Binding ToolboxVM.DisableUltimatePlanCommand}" />
+                                </StackPanel>
+                            </DockPanel>
+                            <DockPanel LastChildFill="False" Margin="0,0,0,8">
+                                <StackPanel DockPanel.Dock="Left">
+                                    <TextBlock Text="O&amp;O ShutUp10++" FontWeight="SemiBold" FontSize="13" Foreground="{DynamicResource TextPrimaryBrush}" />
+                                    <TextBlock Text="{loc:Tr Tools_OosuOpensTheOfficialPage}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" />
+                                </StackPanel>
+                                <Button DockPanel.Dock="Right" AutomationProperties.AutomationId="Tools_Oosu" AutomationProperties.Name="O&amp;O ShutUp10++"
+                                        Content="{loc:Tr Tools_OpenPage}" Style="{DynamicResource ModernSecondaryBtn}"
+                                        Command="{Binding ToolboxVM.OpenOosuCommand}" VerticalAlignment="Center" />
+                            </DockPanel>
+                            <TextBlock Text="{Binding ToolboxVM.PowerPlanStatusText}" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" />
+                        </StackPanel>
+                    </Border>
+
                     <!-- Classic Windows panels (WinUtil's legacy control panel shortcuts) -->
                     <Border Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
                             BorderThickness="1" CornerRadius="8" Padding="16" Margin="0,0,0,12">
