@@ -151,6 +151,25 @@
                                   Margin="0,0,8,0" VerticalAlignment="Center"
                                   FontSize="12" Foreground="{DynamicResource TextMutedBrush}"
                                   ToolTip="{loc:Tr Tweaks_DisplayUnprovenCommunityTweaks}" />
+
+                        <!-- WinUtil presets: only select tweaks; nothing runs until the user reviews and applies -->
+                        <TextBlock Text="{loc:Tr Tweaks_Presets}" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" Margin="4,0,6,0" />
+                        <ui:Button AutomationProperties.AutomationId="PresetStandardButton" AutomationProperties.Name="Select Standard preset"
+                                   Content="{loc:Tr Tweaks_PresetStandard}" ToolTip="{loc:Tr Tweaks_PresetStandardTip}"
+                                   Command="{Binding ApplyPresetCommand}" CommandParameter="Standard"
+                                   Margin="0,0,4,0" VerticalAlignment="Center" Padding="10,5" FontSize="12" />
+                        <ui:Button AutomationProperties.AutomationId="PresetMinimalButton" AutomationProperties.Name="Select Minimal preset"
+                                   Content="{loc:Tr Tweaks_PresetMinimal}" ToolTip="{loc:Tr Tweaks_PresetMinimalTip}"
+                                   Command="{Binding ApplyPresetCommand}" CommandParameter="Minimal"
+                                   Margin="0,0,4,0" VerticalAlignment="Center" Padding="10,5" FontSize="12" />
+                        <ui:Button AutomationProperties.AutomationId="PresetAdvancedButton" AutomationProperties.Name="Select Advanced preset"
+                                   Content="{loc:Tr Tweaks_PresetAdvanced}" ToolTip="{loc:Tr Tweaks_PresetAdvancedTip}"
+                                   Command="{Binding ApplyPresetCommand}" CommandParameter="Advanced"
+                                   Margin="0,0,4,0" VerticalAlignment="Center" Padding="10,5" FontSize="12" />
+                        <ui:Button AutomationProperties.AutomationId="SelectAppliedButton" AutomationProperties.Name="Select applied tweaks"
+                                   Content="{loc:Tr Tweaks_SelectApplied}" ToolTip="{loc:Tr Tweaks_SelectAppliedTip}"
+                                   Command="{Binding ApplyPresetCommand}" CommandParameter="SelectApplied"
+                                   Margin="0,0,10,0" VerticalAlignment="Center" Padding="10,5" FontSize="12" />
                     </WrapPanel>
 
                     <!-- Right: Count -->

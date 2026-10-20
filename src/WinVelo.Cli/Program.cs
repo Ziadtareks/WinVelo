@@ -606,7 +606,7 @@ public static class Program
             Console.WriteLine($"[INFO] Config contains: {config.SelectedTweaks.Count} tweaks, {config.SelectedApps.Count} apps, {config.SelectedFeatures.Count} features, DNS: {config.SelectedDns ?? "Default"}, Updates: {config.UpdatesMode ?? "Default"}");
 
             var keySet = new HashSet<string>(config.SelectedTweaks, StringComparer.OrdinalIgnoreCase);
-            var targetTweaks = catalog.Where(t => keySet.Contains(t.Id) || (t.Origin != null && keySet.Contains(t.Origin))).ToList();
+            var targetTweaks = catalog.Where(t => TweakResolver.MatchesAny(t, keySet)).ToList();
 
             if (isDryRun || !isRun)
             {
@@ -1104,7 +1104,7 @@ public static class Program
         }
 
         var keySet = new HashSet<string>(matchedPreset.TweakIds, StringComparer.OrdinalIgnoreCase);
-        var targetTweaks = catalog.Where(t => keySet.Contains(t.Id)).ToList();
+        var targetTweaks = catalog.Where(t => TweakResolver.MatchesAny(t, keySet)).ToList();
         Console.WriteLine($"[INFO] Preset '{matchedPreset.Name}' ({matchedPreset.Id}) matched {targetTweaks.Count} of {matchedPreset.TweakIds.Count} configured tweaks.");
 
         if (isRun)

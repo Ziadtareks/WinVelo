@@ -32,6 +32,18 @@ public partial class MainWindow : FluentWindow
         };
     }
 
+    /// <summary>The options menu opens on a normal click, not only on right-click.</summary>
+    private void ConfigMenuButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement element && element.ContextMenu is { } menu)
+        {
+            menu.PlacementTarget = element;
+            menu.Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom;
+            menu.DataContext = DataContext;
+            menu.IsOpen = true;
+        }
+    }
+
     private void ApplySystemBackdrop()
     {
         try

@@ -405,6 +405,12 @@ public sealed partial class MainViewModel : ObservableObject
     public void OpenAboutDialog()
     {
         IsAboutDialogOpen = true;
+        System.Windows.MessageBox.Show(
+            LocalizationManager.T("WinVelo {0}\n\nA Windows tweak tool with undo for every change.\nLicense: MIT. Many tweaks come from WinUtil by Chris Titus Tech (MIT).\n\nhttps://github.com/Ziadtareks/WinVelo", WinVelo.Core.AppInfo.Version),
+            LocalizationManager.T("About WinVelo"),
+            System.Windows.MessageBoxButton.OK,
+            System.Windows.MessageBoxImage.Information);
+        IsAboutDialogOpen = false;
     }
 
     [RelayCommand]
@@ -413,16 +419,98 @@ public sealed partial class MainViewModel : ObservableObject
         IsAboutDialogOpen = false;
     }
 
+    /// <summary>The current selection on every tab, as a config file.</summary>
+    public WinVelo.Core.Profiles.WinVeloConfig BuildConfig() => new()
+    {
+        SchemaVersion = "1.1.0",
+        ExportedAtUtc = DateTime.UtcNow,
+        SelectedTweaks = TweaksVM.GetSelectedTweakIds(),
+        SelectedApps = InstallVM.GetSelectedAppKeys(),
+        SelectedFeatures = ConfigVM.GetSelectedFeatureKeys(),
+        SelectedAppx = ToolboxVM.GetSelectedAppxKeys()
+    };
+
+    /// <summary>Selects what a config names. Nothing is applied: the user reviews each tab and applies.</summary>
+    public void ApplyConfigSelection(WinVelo.Core.Profiles.WinVeloConfig config)
+    {
+        TweaksVM.SetSelectedTweakIds(config.SelectedTweaks);
+        InstallVM.SetSelectedAppKeys(config.SelectedApps);
+        ConfigVM.SetSelectedFeatureKeys(config.SelectedFeatures);
+        ToolboxVM.SetSelectedAppxKeys(config.SelectedAppx);
+    }
+
     [RelayCommand]
     public void ExportConfig()
     {
-        ConfigDialogText = System.Text.Json.JsonSerializer.Serialize(new
+        var config = BuildConfig();
+        ConfigDialogText = WinVelo.Core.Profiles.ConfigManager.ExportConfigJson(config);
+        if (config.SelectionCount == 0)
         {
-            Version = WinVelo.Core.AppInfo.Version,
-            ExportedAtUtc = DateTime.UtcNow,
-            SelectedTweaks = TweaksVM.GetSelectedTweakIds()
-        }, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
-        IsConfigDialogOpen = true;
+            System.Windows.MessageBox.Show(
+                LocalizationManager.T("Nothing is selected yet. Select tweaks, apps, features or built-in apps first, then export."),
+                LocalizationManager.T("Export config"), System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+            return;
+        }
+
+        var dialog = new Microsoft.Win32.SaveFileDialog
+        {
+            Title = LocalizationManager.T("Export config"),
+            Filter = "JSON (*.json)|*.json",
+            FileName = "winvelo-config.json",
+            InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)
+        };
+        if (dialog.ShowDialog() != true) return;
+
+        try
+        {
+            WinVelo.Core.Profiles.ConfigManager.SaveToFile(config, dialog.FileName);
+            System.Windows.MessageBox.Show(
+                LocalizationManager.T("Saved {0} tweak(s), {1} app(s), {2} feature(s) and {3} built-in app(s) to:\n{4}\n\nUse it on another PC with Options > Import config, or with: winvelo-cli --config \"file\" --real-mode --run",
+                    config.SelectedTweaks.Count, config.SelectedApps.Count, config.SelectedFeatures.Count, config.SelectedAppx.Count, dialog.FileName),
+                LocalizationManager.T("Export config"), System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+        }
+        catch (Exception ex) when (ex is System.IO.IOException or UnauthorizedAccessException)
+        {
+            System.Windows.MessageBox.Show(LocalizationManager.T("Could not save the file: {0}", ex.Message),
+                LocalizationManager.T("Export config"), System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+        }
+    }
+
+    [RelayCommand]
+    public void ImportConfig()
+    {
+        var dialog = new Microsoft.Win32.OpenFileDialog
+        {
+            Title = LocalizationManager.T("Import config"),
+            Filter = "JSON (*.json)|*.json|All files (*.*)|*.*",
+            InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)
+        };
+        if (dialog.ShowDialog() != true) return;
+
+        WinVelo.Core.Profiles.WinVeloConfig? config = null;
+        try
+        {
+            config = WinVelo.Core.Profiles.ConfigManager.LoadFromFile(dialog.FileName);
+        }
+        catch (Exception ex) when (ex is System.IO.IOException or UnauthorizedAccessException)
+        {
+            config = null;
+        }
+
+        if (config == null || config.SelectionCount == 0)
+        {
+            System.Windows.MessageBox.Show(
+                LocalizationManager.T("This file is not a WinVelo or WinUtil config, or it selects nothing. Nothing was changed."),
+                LocalizationManager.T("Import config"), System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
+            return;
+        }
+
+        ApplyConfigSelection(config);
+        SwitchTab("Tweaks");
+        System.Windows.MessageBox.Show(
+            LocalizationManager.T("Selected {0} tweak(s), {1} app(s), {2} feature(s) and {3} built-in app(s) from the file.\n\nNothing has been changed on this PC yet. Review each tab and press Apply there.",
+                TweaksVM.GetSelectedTweakIds().Count, InstallVM.GetSelectedAppKeys().Count, ConfigVM.GetSelectedFeatureKeys().Count, ToolboxVM.GetSelectedAppxKeys().Count),
+            LocalizationManager.T("Import config"), System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
     }
 
     [RelayCommand]
@@ -485,8 +573,10 @@ public sealed partial class MainViewModel : ObservableObject
 
         // Quick Actions
         _allPaletteItems.Add(new PaletteItem { Title = LocalizationManager.T("Undo All WinVelo Changes"), Subtitle = LocalizationManager.T("Revert all active changes recorded in the journal"), Category = LocalizationManager.T("Action"), ActionToExecute = () => _ = HistoryVM.UndoAllChangesAsync() });
-        _allPaletteItems.Add(new PaletteItem { Title = LocalizationManager.T("Standard Preset"), Subtitle = LocalizationManager.T("Select recommended desktop tweaks"), Category = LocalizationManager.T("Action"), ActionToExecute = () => TweaksVM.ApplyPreset(LocalizationManager.T("Standard")) });
-        _allPaletteItems.Add(new PaletteItem { Title = LocalizationManager.T("Minimal Preset"), Subtitle = LocalizationManager.T("Select essential telemetry reductions"), Category = LocalizationManager.T("Action"), ActionToExecute = () => TweaksVM.ApplyPreset(LocalizationManager.T("Minimal")) });
+        _allPaletteItems.Add(new PaletteItem { Title = LocalizationManager.T("Standard Preset"), Subtitle = LocalizationManager.T("Select recommended desktop tweaks"), Category = LocalizationManager.T("Action"), ActionToExecute = () => TweaksVM.ApplyPreset("Standard") });
+        _allPaletteItems.Add(new PaletteItem { Title = LocalizationManager.T("Minimal Preset"), Subtitle = LocalizationManager.T("Select essential telemetry reductions"), Category = LocalizationManager.T("Action"), ActionToExecute = () => TweaksVM.ApplyPreset("Minimal") });
+        _allPaletteItems.Add(new PaletteItem { Title = LocalizationManager.T("Advanced Preset"), Subtitle = LocalizationManager.T("Select WinUtil's Advanced tweaks (includes High risk ones)"), Category = LocalizationManager.T("Action"), ActionToExecute = () => TweaksVM.ApplyPreset("Advanced") });
+        _allPaletteItems.Add(new PaletteItem { Title = LocalizationManager.T("Select Applied Tweaks"), Subtitle = LocalizationManager.T("Select every tweak that is already active on this PC"), Category = LocalizationManager.T("Action"), ActionToExecute = () => TweaksVM.ApplyPreset("SelectApplied") });
         _allPaletteItems.Add(new PaletteItem { Title = LocalizationManager.T("Clear Selection"), Subtitle = LocalizationManager.T("Deselect all tweaks"), Category = LocalizationManager.T("Action"), ActionToExecute = () => TweaksVM.ClearSelection() });
         _allPaletteItems.Add(new PaletteItem { Title = LocalizationManager.T("Create Restore Point"), Subtitle = LocalizationManager.T("Create a Windows System Restore point"), Category = LocalizationManager.T("Action"), ActionToExecute = () => _ = TweaksVM.CreateRestorePointAsync() });
         _allPaletteItems.Add(new PaletteItem { Title = LocalizationManager.T("Re-Scan System"), Subtitle = LocalizationManager.T("Detect currently active tweaks on this PC"), Category = LocalizationManager.T("Action"), ActionToExecute = () => _ = TweaksVM.RescanSystemAsync() });

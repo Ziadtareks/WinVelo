@@ -199,18 +199,49 @@ public sealed partial class ToolboxViewModel : ObservableObject
     [RelayCommand]
     private async Task RunFixAsync(SystemFixDefinition fix)
     {
+        if (_isFixRunning)
+        {
+            FixStatusText = LocalizationManager.T("Another repair is still running. Please wait for it to finish.");
+            return;
+        }
+
         if (!WinVelo.App.Services.AppAdminGuard.EnsureAdmin("run system maintenance fixes"))
         {
             FixStatusText = LocalizationManager.T("Administrator privileges required to run fixes.");
             return;
         }
 
-        FixStatusText = LocalizationManager.T("Running repair: {0}...", fix.Title);
-        await Task.Yield();
-        var report = await Task.Run(async () => await _fixService.RunFixAsync(fix.Id, _runner));
-        FixStatusText = report.FailedCount == 0
-            ? LocalizationManager.T("Successfully completed: {0}.", fix.Title)
-            : LocalizationManager.T("Repair finished with notes: {0}.", report.Summary);
+        _isFixRunning = true;
+        try
+        {
+            FixStatusText = LocalizationManager.T("Running repair: {0}...", fix.Title);
+            await Task.Yield();
+            var report = await Task.Run(async () => await _fixService.RunFixAsync(fix.Id, _runner));
+            FixStatusText = report.FailedCount == 0
+                ? LocalizationManager.T("Successfully completed: {0}.", fix.Title)
+                : LocalizationManager.T("Repair finished with notes: {0}.", report.Summary);
+        }
+        catch (Exception ex)
+        {
+            FixStatusText = LocalizationManager.T("Repair failed: {0}", ex.Message);
+        }
+        finally
+        {
+            _isFixRunning = false;
+        }
+    }
+
+    private bool _isFixRunning;
+
+    // Built-in Windows apps (AppX) selection. Filled by the Built-in apps tool.
+    private readonly System.Collections.Generic.HashSet<string> _selectedAppx = new(StringComparer.OrdinalIgnoreCase);
+
+    public System.Collections.Generic.List<string> GetSelectedAppxKeys() => _selectedAppx.ToList();
+
+    public void SetSelectedAppxKeys(System.Collections.Generic.IEnumerable<string> keys)
+    {
+        _selectedAppx.Clear();
+        foreach (string key in keys) _selectedAppx.Add(key);
     }
 
     [RelayCommand]

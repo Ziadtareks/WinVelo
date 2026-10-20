@@ -100,10 +100,12 @@
                                AutomationProperties.Name="Options and Settings"
                                Icon="{ui:SymbolIcon Settings24}"
                                ToolTip="{loc:Tr Main_OptionsAbout}"
-                               Appearance="Transparent" Margin="0,0,4,0">
+                               Appearance="Transparent" Margin="0,0,4,0"
+                               Click="ConfigMenuButton_Click">
                         <ui:Button.ContextMenu>
                             <ContextMenu>
                                 <MenuItem Header="{loc:Tr Main_ExportConfigJson}" Command="{Binding ExportConfigCommand}" />
+                                <MenuItem Header="{loc:Tr Main_ImportConfigJson}" Command="{Binding ImportConfigCommand}" />
                                 <Separator />
                                 <MenuItem Header="{loc:Tr Main_AboutWinvelo}" Command="{Binding OpenAboutDialogCommand}" />
                             </ContextMenu>

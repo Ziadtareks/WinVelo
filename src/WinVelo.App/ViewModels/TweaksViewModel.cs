@@ -778,7 +778,8 @@ public sealed partial class TweaksViewModel : ObservableObject
                 bool matches = card.Title.Contains(q, StringComparison.OrdinalIgnoreCase) ||
                                card.Description.Contains(q, StringComparison.OrdinalIgnoreCase) ||
                                card.Id.Contains(q, StringComparison.OrdinalIgnoreCase) ||
-                               (card.Origin?.Contains(q, StringComparison.OrdinalIgnoreCase) ?? false);
+                               (card.Origin?.Contains(q, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                               (card.Tweak.Aliases?.Exists(a => a.Contains(q, StringComparison.OrdinalIgnoreCase)) ?? false);
                 if (!matches) continue;
             }
 
@@ -1016,9 +1017,9 @@ public sealed partial class TweaksViewModel : ObservableObject
         // Map preset names: "Standard" -> "recommended", "Minimal" -> "minimal"
         string mappedKey = presetName.ToLowerInvariant() switch
         {
-            "standard" => "recommended",
-            "minimal" => "minimal",
-            "advanced" => "advanced",
+            "standard" => "Standard",
+            "minimal" => "Minimal",
+            "advanced" => "Advanced",
             _ => presetName
         };
 
@@ -1040,15 +1041,17 @@ public sealed partial class TweaksViewModel : ObservableObject
                 continue;
             }
 
-            bool matches = (card.Origin != null && keySet.Contains(card.Origin)) ||
-                           keySet.Contains(card.Id);
+            bool matches = TweakResolver.MatchesAny(card.Tweak, keySet);
 
             card.IsSelected = matches;
             if (matches) matched++;
         }
 
         UpdateCounts();
-        StatusMessage = LocalizationManager.T("Preset '{0}' loaded ({1} tweaks selected).", presetName, matched);
+        int highRisk = _allTweaks.Count(c => c.IsSelected && string.Equals(c.Tweak.Risk, "High", StringComparison.OrdinalIgnoreCase));
+        StatusMessage = highRisk > 0
+            ? LocalizationManager.T("Preset '{0}' loaded ({1} tweaks selected, {2} of them High risk). Review the list before you apply.", presetName, matched, highRisk)
+            : LocalizationManager.T("Preset '{0}' loaded ({1} tweaks selected).", presetName, matched);
         AddLog("INFO", $"Applied preset '{presetName}' ({matched} tweaks selected).");
     }
 
@@ -1471,7 +1474,7 @@ public sealed partial class TweaksViewModel : ObservableObject
         var idSet = new HashSet<string>(ids, StringComparer.OrdinalIgnoreCase);
         foreach (var card in _allTweaks)
         {
-            card.IsSelected = idSet.Contains(card.Id) || (card.Origin != null && idSet.Contains(card.Origin));
+            card.IsSelected = TweakResolver.MatchesAny(card.Tweak, idSet);
         }
         UpdateCounts();
     }

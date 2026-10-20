@@ -99,12 +99,48 @@ public sealed partial class UpdatesViewModel : ObservableObject
         }
     }
 
+    /// <summary>Maps the Tools tab card names to update modes.</summary>
+    public static UpdateProfileMode? ParseCardMode(string? card) => card switch
+    {
+        "Default" => UpdateProfileMode.Default,
+        "Recommended" or "Security" => UpdateProfileMode.Security,
+        "Suspended" or "DisableAll" => UpdateProfileMode.DisableAll,
+        _ => null
+    };
+
+    /// <summary>Used by the three mode cards in the Tools tab. "Suspended" still needs the typed confirmation.</summary>
+    [RelayCommand]
+    private async Task ApplyModeAsync(string card)
+    {
+        if (ParseCardMode(card) is not { } mode) return;
+
+        if (mode == UpdateProfileMode.DisableAll)
+        {
+            string typed = TypedConfirmation;
+            SelectedMode = mode;
+            IsConfirmationRequired = true;
+            TypedConfirmation = typed;
+            UpdateApplyEnabled();
+            if (!IsApplyEnabled)
+            {
+                StatusMessage = LocalizationManager.T("Type \"I understand\" in the box to confirm turning off automatic updates.");
+                return;
+            }
+        }
+        else
+        {
+            SelectMode(mode);
+        }
+
+        await ApplySelectedModeAsync();
+    }
+
     private bool CanApplyMode() => IsApplyEnabled && !IsBusy;
 
     [RelayCommand(CanExecute = nameof(CanApplyMode))]
     private async Task ApplySelectedModeAsync()
     {
-        if (!IsApplyEnabled) return;
+        if (!IsApplyEnabled || IsBusy) return;
 
         if (!WinVelo.App.Services.AppAdminGuard.EnsureAdmin("modify Windows Update policies"))
         {

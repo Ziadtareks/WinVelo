@@ -302,5 +302,19 @@
   "Wizard_TurnOnSystemRestoreDrive": "Turn On System Restore (Drive C:\\)",
   "Wizard_WinveloIsBuiltOnTransparency": "WinVelo is built on transparency, safety, and strict verification.",
   "Apps_Cancel": "Cancel",
-  "Tools_StopCleanup": "Stop"
+  "Tools_StopCleanup": "Stop",
+  "Tools_TypeIUnderstandToConfirm": "Type \"I understand\" (or أفهم) to unlock this mode:",
+  "Tools_RemoteAccessAndSignIn": "Remote access and sign-in",
+  "Tools_AutologonOpensTheOfficialPage": "Opens the official Microsoft Sysinternals page. WinVelo does not download it for you.",
+  "Tools_OpenPage": "Open page",
+  "Tweaks_Presets": "Presets:",
+  "Tweaks_PresetStandard": "Standard",
+  "Tweaks_PresetMinimal": "Minimal",
+  "Tweaks_PresetAdvanced": "Advanced",
+  "Tweaks_SelectApplied": "Select applied",
+  "Tweaks_PresetStandardTip": "Selects WinUtil's Standard tweaks. Nothing runs until you review and apply.",
+  "Tweaks_PresetMinimalTip": "Selects WinUtil's Minimal tweaks. Nothing runs until you review and apply.",
+  "Tweaks_PresetAdvancedTip": "Selects WinUtil's Advanced tweaks, including High risk ones (OneDrive removal, Windows AI). Review carefully.",
+  "Tweaks_SelectAppliedTip": "Selects every tweak that is already active on this PC.",
+  "Main_ImportConfigJson": "Import config (WinVelo or WinUtil)..."
 }

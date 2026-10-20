@@ -318,6 +318,27 @@ public sealed partial class ConfigViewModel : ObservableObject
         }
     }
 
+    /// <summary>Tools tab entry point for OpenSSH: asks first, needs administrator rights.</summary>
+    [RelayCommand]
+    private async Task ConfigureOpenSshAsync()
+    {
+        var answer = System.Windows.MessageBox.Show(
+            LocalizationManager.T("This installs the Windows OpenSSH Server, starts the sshd service and sets it to start automatically. Other computers on your network can then try to sign in to this PC over SSH (port 22). Continue?"),
+            LocalizationManager.T("OpenSSH Server"),
+            System.Windows.MessageBoxButton.YesNo,
+            System.Windows.MessageBoxImage.Warning,
+            System.Windows.MessageBoxResult.No);
+        if (answer != System.Windows.MessageBoxResult.Yes) return;
+
+        if (!WinVelo.App.Services.AppAdminGuard.EnsureAdmin("configure OpenSSH Server"))
+        {
+            StatusMessage = LocalizationManager.T("Administrator privileges required to run fixes.");
+            return;
+        }
+
+        await ConfirmOpenSshAsync();
+    }
+
     [RelayCommand]
     private void CancelOpenSsh()
     {

@@ -526,6 +526,7 @@
                         </StackPanel>
                     </Border>
 
+                    <TextBlock Text="{Binding ToolboxVM.FixStatusText}" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,0,0,8" />
                     <ItemsControl ItemsSource="{Binding ToolboxVM.FixesList}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
@@ -556,6 +557,57 @@
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
+
+                    <!-- Remote access helpers (from WinUtil's Config tab) -->
+                    <Border Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
+                            BorderThickness="1" CornerRadius="8" Padding="16" Margin="0,4,0,12">
+                        <StackPanel>
+                            <TextBlock Text="{loc:Tr Tools_RemoteAccessAndSignIn}" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,8" />
+                            <DockPanel LastChildFill="False" Margin="0,0,0,8">
+                                <StackPanel DockPanel.Dock="Left">
+                                    <TextBlock Text="{loc:Tr Config_OpensshServer}" FontWeight="SemiBold" FontSize="13" Foreground="{DynamicResource TextPrimaryBrush}" />
+                                    <TextBlock Text="{loc:Tr Config_InstallsAndEnablesSshRemote}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" />
+                                </StackPanel>
+                                <Button DockPanel.Dock="Right" AutomationProperties.AutomationId="Tools_OpenSsh" AutomationProperties.Name="Configure OpenSSH"
+                                        Content="{loc:Tr Config_ConfigureOpenssh}" Style="{DynamicResource ModernSecondaryBtn}"
+                                        Command="{Binding ConfigVM.ConfigureOpenSshCommand}" VerticalAlignment="Center" />
+                            </DockPanel>
+                            <DockPanel LastChildFill="False">
+                                <StackPanel DockPanel.Dock="Left">
+                                    <TextBlock Text="{loc:Tr Config_AutologonSysinternals}" FontWeight="SemiBold" FontSize="13" Foreground="{DynamicResource TextPrimaryBrush}" />
+                                    <TextBlock Text="{loc:Tr Tools_AutologonOpensTheOfficialPage}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" />
+                                </StackPanel>
+                                <Button DockPanel.Dock="Right" AutomationProperties.AutomationId="Tools_AutoLogon" AutomationProperties.Name="AutoLogon (Sysinternals)"
+                                        Content="{loc:Tr Tools_OpenPage}" Style="{DynamicResource ModernSecondaryBtn}"
+                                        Command="{Binding ConfigVM.RunFixCommand}" CommandParameter="autologon" VerticalAlignment="Center" />
+                            </DockPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Classic Windows panels (WinUtil's legacy control panel shortcuts) -->
+                    <Border Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
+                            BorderThickness="1" CornerRadius="8" Padding="16" Margin="0,0,0,12">
+                        <StackPanel>
+                            <TextBlock Text="{loc:Tr Config_LegacyControlPanels14Shortcuts}" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" />
+                            <TextBlock Text="{loc:Tr Config_InstantAccessToClassicWindows}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,2,0,10" TextWrapping="Wrap" />
+                            <ItemsControl ItemsSource="{Binding ConfigVM.LegacyPanels}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <UniformGrid Columns="3" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Button AutomationProperties.AutomationId="{Binding Key, StringFormat='{}Panel_{0}'}" AutomationProperties.Name="{Binding Name}"
+                                                Content="{Binding Name}" Style="{DynamicResource ModernGhostBtn}" Margin="2" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
+                                                Command="{Binding DataContext.ConfigVM.LaunchPanelCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <TextBlock Text="{Binding ConfigVM.StatusMessage}" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                        </StackPanel>
+                    </Border>
                 </StackPanel>
             </Border>
 
@@ -621,12 +673,19 @@
                                 <TextBlock Text="{loc:Tr Tools_SuspendedManualOnly}" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource CautionRedBrush}" />
                                 <TextBlock Text="{loc:Tr Tools_PausesAutomaticChecksUpdatesOnly}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" Margin="0,2,0,10" />
                                 <TextBlock Text="{loc:Tr Tools_NoBackgroundUpdateScansOr}" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,4" />
-                                <TextBlock Text="{loc:Tr Tools_ServicingStackRemainsIntactAnd}" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,14" />
+                                <TextBlock Text="{loc:Tr Tools_ServicingStackRemainsIntactAnd}" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,8" />
+                                <TextBlock Text="{loc:Tr Tools_TypeIUnderstandToConfirm}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,0,0,4" />
+                                <TextBox AutomationProperties.Name="Type I understand to confirm"
+                                         Text="{Binding UpdatesVM.TypedConfirmation, UpdateSourceTrigger=PropertyChanged}"
+                                         Padding="8,4" Margin="0,0,0,10"
+                                         Background="{DynamicResource BgDeepBrush}" Foreground="{DynamicResource TextPrimaryBrush}"
+                                         BorderBrush="{DynamicResource BorderSubtleBrush}" />
                                 <Button Content="{loc:Tr Tools_ApplySuspended}" AutomationProperties.Name="Apply Suspended Update Mode" Style="{DynamicResource ModernSecondaryBtn}"
                                         Command="{Binding UpdatesVM.ApplyModeCommand}" CommandParameter="Suspended" HorizontalAlignment="Stretch" />
                             </StackPanel>
                         </Border>
                     </UniformGrid>
+                    <TextBlock Text="{Binding UpdatesVM.StatusMessage}" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" />
                 </StackPanel>
             </Border>
 
@@ -660,7 +719,8 @@
                         </DockPanel>
                     </Border>
 
-                    <ItemsControl ItemsSource="{Binding ConfigVM.Features}">
+                    <TextBlock Text="{Binding ConfigVM.StatusMessage}" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,0,0,8" />
+                    <ItemsControl ItemsSource="{Binding ConfigVM.FilteredFeatures}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <Border Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
@@ -678,7 +738,7 @@
                                         </StackPanel>
                                         <Border Grid.Column="2" CornerRadius="4" Padding="6,2" VerticalAlignment="Center"
                                                 Background="{DynamicResource StatusDefaultBgBrush}">
-                                            <TextBlock Text="{Binding Status}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" />
+                                            <TextBlock Text="{Binding Category, Converter={StaticResource Tr}}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" />
                                         </Border>
                                     </Grid>
                                 </Border>
