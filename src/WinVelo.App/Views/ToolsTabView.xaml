@@ -477,16 +477,17 @@
                                         </Grid.ColumnDefinitions>
                                         <StackPanel Grid.Column="0">
                                             <StackPanel Orientation="Horizontal" Margin="0,0,0,2">
-                                                <TextBlock Text="{Binding Name}" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,8,0" />
+                                                <TextBlock Text="{Binding Name, Converter={StaticResource Tr}}" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,8,0" />
                                                 <Border Background="#107C41" CornerRadius="4" Padding="6,1" VerticalAlignment="Center"
                                                         Visibility="{Binding IsActive, Converter={StaticResource BoolToVisConverter}}">
                                                     <TextBlock Text="{loc:Tr Tools_Active}" FontSize="10" Foreground="White" FontWeight="Bold" />
                                                 </Border>
                                             </StackPanel>
-                                            <TextBlock Text="{Binding Description}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" Margin="0,0,0,4" />
+                                            <TextBlock Text="{Binding Description, Converter={StaticResource Tr}}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" Margin="0,0,0,4" TextWrapping="Wrap" />
                                             <StackPanel Orientation="Horizontal">
                                                 <TextBlock Text="{Binding PrimaryDns, StringFormat={loc:Tr Tools_Primary0}}" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,14,0" />
                                                 <TextBlock Text="{Binding SecondaryDns, StringFormat={loc:Tr Tools_Secondary0}}" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,14,0" />
+                                                <TextBlock Text="{Binding PrimaryDns6, StringFormat='IPv6: {0}'}" FlowDirection="LeftToRight" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,14,0" />
                                                 <TextBlock Text="{Binding PingMs, StringFormat={loc:Tr Tools_Latency0Ms}}" FontSize="11" Foreground="{DynamicResource AccentPrimaryBrush}" FontWeight="SemiBold" />
                                             </StackPanel>
                                         </StackPanel>

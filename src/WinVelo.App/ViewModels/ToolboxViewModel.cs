@@ -355,7 +355,7 @@ public sealed partial class ToolboxViewModel : ObservableObject
     private async Task BenchmarkAllDnsAsync()
     {
         IsBenchmarkingDns = true;
-        DnsStatusText = LocalizationManager.T("Benchmarking top 5 DNS providers (3 pings each)...");
+        DnsStatusText = LocalizationManager.T("Measuring {0} DNS providers (3 probes each)...", DnsProviders.Count(p => p.Id != DnsService.DhcpId));
         await Task.Yield();
         try
         {
@@ -398,11 +398,12 @@ public sealed partial class ToolboxViewModel : ObservableObject
             return;
         }
 
-        var responsive = DnsProviders.Where(p => p.PingMs > 0).ToList();
+        // Only plain resolvers are picked automatically; filtering ones (ads, malware, adult) must be chosen by hand.
+        var responsive = DnsProviders.Where(p => p.IsNeutral && p.PingMs > 0).ToList();
         if (responsive.Count == 0)
         {
             await BenchmarkAllDnsAsync();
-            responsive = DnsProviders.Where(p => p.PingMs > 0).ToList();
+            responsive = DnsProviders.Where(p => p.IsNeutral && p.PingMs > 0).ToList();
         }
 
         var fastest = responsive.OrderBy(p => p.PingMs).FirstOrDefault();
@@ -498,9 +499,12 @@ public sealed partial class ToolboxViewModel : ObservableObject
             }
 
             var dnsList = _dnsService.GetProviders().ToList();
+            var current = await Task.Run(async () => await _dnsService.GetCurrentServersAsync());
+            var active = DnsService.MatchActive(dnsList, current);
             DnsProviders.Clear();
             foreach (var dns in dnsList)
             {
+                dns.IsActive = active != null ? ReferenceEquals(dns, active) : (current.Count == 0 && dns.Id == DnsService.DhcpId);
                 DnsProviders.Add(dns);
             }
 

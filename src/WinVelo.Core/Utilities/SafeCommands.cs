@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
 
@@ -31,6 +33,19 @@ public static partial class SafeCommands
         }
 
         return UpAdapters + $"Set-DnsClientServerAddress -ServerAddresses '{first}', '{CanonicalIp(secondary!)}'";
+    }
+
+    /// <summary>Sets all the given servers (IPv4 and IPv6 can be mixed; Windows sorts them per family).</summary>
+    /// <exception cref="ArgumentException">No address given, or an address is not a valid IPv4 or IPv6 address.</exception>
+    public static string SetDnsServers(IEnumerable<string> addresses)
+    {
+        var canonical = addresses.Where(a => !string.IsNullOrWhiteSpace(a)).Select(CanonicalIp).Distinct().ToList();
+        if (canonical.Count == 0)
+        {
+            throw new ArgumentException("At least one DNS server address is needed.", nameof(addresses));
+        }
+
+        return UpAdapters + "Set-DnsClientServerAddress -ServerAddresses " + string.Join(", ", canonical.Select(a => $"'{a}'"));
     }
 
     /// <exception cref="ArgumentException">The name is not a plain Windows optional feature name.</exception>

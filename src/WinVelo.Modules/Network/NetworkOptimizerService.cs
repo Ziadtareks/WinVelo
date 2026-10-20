@@ -19,6 +19,9 @@ public sealed class DnsBenchmarkResult
     public int AveragePingMs { get; set; } = -1;
     public bool IsFastest { get; set; }
     public bool IsActive { get; set; }
+
+    /// <summary>Plain resolver that filters nothing (only these are picked automatically).</summary>
+    public bool IsNeutral { get; init; }
 }
 
 public interface INetworkOptimizerService
@@ -42,106 +45,54 @@ public sealed class NetworkOptimizerService : INetworkOptimizerService
         _shell = shell;
     }
 
+    /// <summary>
+    /// Times every provider from Catalog/Config/dns.json (3 probes each, TCP port 53 like WinUtil, ping as fallback).
+    /// IsFastest marks the fastest NEUTRAL provider only, so "Apply fastest" never picks a filtering resolver.
+    /// </summary>
     public async Task<IReadOnlyList<DnsBenchmarkResult>> BenchmarkDnsProvidersAsync(CancellationToken cancellationToken = default)
     {
+        var dns = new DnsService(_shell);
+        var providers = dns.GetProviders()
+            .Where(p => p.Id != DnsService.DhcpId)
+            .Select(p => new DnsBenchmarkResult
+            {
+                Id = p.Id,
+                Name = p.Name,
+                PrimaryDns = p.PrimaryDns,
+                SecondaryDns = p.SecondaryDns,
+                Description = p.Description,
+                IsNeutral = p.IsNeutral
+            })
+            .ToList();
+
         if (WinVelo.Core.Safety.TestModeManager.IsTestMode)
         {
-            return new List<DnsBenchmarkResult>
+            // Simulation: no network traffic. Fixed, plausible numbers.
+            int fake = 12;
+            foreach (var p in providers) { p.AveragePingMs = fake; fake += 4; }
+        }
+        else
+        {
+            foreach (var p in providers)
             {
-                new() { Id = "cloudflare", Name = "Cloudflare DNS", PrimaryDns = "1.1.1.1", SecondaryDns = "1.0.0.1", Description = "Fastest global anycast network with zero logging.", AveragePingMs = 12, IsFastest = true },
-                new() { Id = "google", Name = "Google Public DNS", PrimaryDns = "8.8.8.8", SecondaryDns = "8.8.4.4", Description = "High-availability global DNS infrastructure.", AveragePingMs = 18 },
-                new() { Id = "quad9", Name = "Quad9 Security", PrimaryDns = "9.9.9.9", SecondaryDns = "149.112.112.112", Description = "Swiss-based privacy DNS blocking malicious domains.", AveragePingMs = 24 },
-                new() { Id = "opendns", Name = "OpenDNS (Cisco)", PrimaryDns = "208.67.222.222", SecondaryDns = "208.67.220.220", Description = "Enterprise-grade filtering with high uptime.", AveragePingMs = 28 },
-                new() { Id = "adguard", Name = "AdGuard DNS", PrimaryDns = "94.140.14.14", SecondaryDns = "94.140.15.15", Description = "Blocks advertising servers, trackers, and telemetry.", AveragePingMs = 32 }
-            };
+                if (cancellationToken.IsCancellationRequested) break;
+                int sum = 0, ok = 0;
+                for (int i = 0; i < 3 && !cancellationToken.IsCancellationRequested; i++)
+                {
+                    int ms = await dns.PingDnsAsync(p.PrimaryDns, cancellationToken);
+                    if (ms > 0) { sum += ms; ok++; }
+                }
+                p.AveragePingMs = ok > 0 ? (int)Math.Round((double)sum / ok) : -1;
+            }
         }
 
-        var providers = new List<DnsBenchmarkResult>
+        var fastest = providers.Where(p => p.IsNeutral && p.AveragePingMs > 0).OrderBy(p => p.AveragePingMs).FirstOrDefault();
+        if (fastest != null)
         {
-            new()
-            {
-                Id = "cloudflare",
-                Name = "Cloudflare DNS",
-                PrimaryDns = "1.1.1.1",
-                SecondaryDns = "1.0.0.1",
-                Description = "Fastest global anycast network with zero logging."
-            },
-            new()
-            {
-                Id = "google",
-                Name = "Google Public DNS",
-                PrimaryDns = "8.8.8.8",
-                SecondaryDns = "8.8.4.4",
-                Description = "High-availability global DNS infrastructure."
-            },
-            new()
-            {
-                Id = "quad9",
-                Name = "Quad9 Security",
-                PrimaryDns = "9.9.9.9",
-                SecondaryDns = "149.112.112.112",
-                Description = "Swiss-based privacy DNS blocking malicious domains."
-            },
-            new()
-            {
-                Id = "opendns",
-                Name = "OpenDNS (Cisco)",
-                PrimaryDns = "208.67.222.222",
-                SecondaryDns = "208.67.220.220",
-                Description = "Enterprise-grade filtering with high uptime."
-            },
-            new()
-            {
-                Id = "adguard",
-                Name = "AdGuard DNS",
-                PrimaryDns = "94.140.14.14",
-                SecondaryDns = "94.140.15.15",
-                Description = "Blocks advertising servers, trackers, and telemetry."
-            }
-        };
-
-        foreach (var p in providers)
-        {
-            if (cancellationToken.IsCancellationRequested) break;
-            p.AveragePingMs = await MeasureAveragePingAsync(p.PrimaryDns, 3, cancellationToken);
-        }
-
-        var responsive = providers.Where(p => p.AveragePingMs > 0).ToList();
-        if (responsive.Count > 0)
-        {
-            int minPing = responsive.Min(p => p.AveragePingMs);
-            var fastest = responsive.FirstOrDefault(p => p.AveragePingMs == minPing);
-            if (fastest != null)
-            {
-                fastest.IsFastest = true;
-            }
+            fastest.IsFastest = true;
         }
 
         return providers;
-    }
-
-    private static async Task<int> MeasureAveragePingAsync(string ip, int attempts, CancellationToken ct)
-    {
-        int sum = 0;
-        int successful = 0;
-
-        using var ping = new Ping();
-        for (int i = 0; i < attempts; i++)
-        {
-            if (ct.IsCancellationRequested) break;
-            try
-            {
-                var reply = await ping.SendPingAsync(ip, 800);
-                if (reply.Status == IPStatus.Success)
-                {
-                    sum += (int)reply.RoundtripTime;
-                    successful++;
-                }
-            }
-            catch { }
-        }
-
-        return successful > 0 ? (int)Math.Round((double)sum / successful) : -1;
     }
 
     public async Task<bool> ApplyDnsAsync(string primaryDns, string secondaryDns, CancellationToken cancellationToken = default)

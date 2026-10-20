@@ -561,17 +561,16 @@ public static class Program
             string dnsId = args[dnsIdx + 1];
             IDnsService dnsService = new DnsService(shell);
             var providers = dnsService.GetProviders();
-            var provider = providers.FirstOrDefault(p =>
-                string.Equals(p.Id, dnsId, StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(p.Name, dnsId, StringComparison.OrdinalIgnoreCase));
+            var provider = DnsService.Find(providers, dnsId);
 
             if (provider == null)
             {
                 Console.WriteLine($"[ERROR] DNS provider not found: {dnsId}");
+                Console.WriteLine("Available: " + string.Join(", ", providers.Select(p => $"{p.Id} ({p.UpstreamKey})")));
                 return 1;
             }
 
-            Console.WriteLine($"[EXECUTE] Setting DNS to {provider.Name} ({provider.PrimaryDns}, {provider.SecondaryDns})...");
+            Console.WriteLine($"[EXECUTE] Setting DNS to {provider.Name} ({string.Join(", ", provider.AllAddresses)})...");
             bool success = await dnsService.ApplyDnsAsync(provider);
             Console.WriteLine($"[RESULT] {(success ? "Success" : "Failed")}");
             return success ? 0 : 1;
