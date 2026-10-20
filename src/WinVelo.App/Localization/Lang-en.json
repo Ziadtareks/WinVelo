@@ -322,5 +322,14 @@
   "Tools_UltimatePerformanceNotForLaptops": "Not for laptops: uses more power. Disable goes back to your previous plan.",
   "Tools_Enable": "Enable",
   "Tools_Disable": "Disable",
-  "Tools_OosuOpensTheOfficialPage": "Opens the official O&O page. WinVelo does not download or run it for you."
+  "Tools_OosuOpensTheOfficialPage": "Opens the official O&O page. WinVelo does not download or run it for you.",
+  "Tools_BuiltInApps": "Built-in apps",
+  "Tools_BuiltInAppsDescription": "Remove or reinstall built-in Windows apps such as News, Weather, Teams and Xbox.",
+  "Tools_BuiltInAppsLong": "The same list as WinUtil. Apps are removed for all users and from the Windows image, so new accounts do not get them back. Check the red notes: some apps are used by Windows features. Everything can be reinstalled from this page.",
+  "Tools_SelectRecommended": "Select recommended",
+  "Tools_SelectInstalled": "Select installed",
+  "Tools_ClearSelection": "Clear",
+  "Tools_Refresh": "Refresh",
+  "Tools_RemoveSelected": "Remove selected",
+  "Tools_ReinstallSelected": "Reinstall selected"
 }

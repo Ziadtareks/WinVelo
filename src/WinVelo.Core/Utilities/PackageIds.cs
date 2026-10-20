@@ -13,8 +13,9 @@ public static partial class PackageIds
     [GeneratedRegex(@"^[A-Za-z0-9][A-Za-z0-9+_-]*(\.[A-Za-z0-9+_-]+)+$")]
     private static partial Regex WingetCommunityIdRegex();
 
-    // Microsoft Store product ids: 12 upper-case letters and digits (for example "9NKSQGP7F2NH").
-    [GeneratedRegex(@"^[0-9A-Z]{12}$")]
+    // Microsoft Store product ids: 12 upper-case letters and digits (for example "9NKSQGP7F2NH"),
+    // or "XP" plus 12 more for Store listings of desktop apps (for example "XP8BT8DW290MPQ").
+    [GeneratedRegex(@"^(?:[0-9A-Z]{12}|XP[0-9A-Z]{12})$")]
     private static partial Regex StoreIdRegex();
 
     // Chocolatey ids: lower/upper case letters, digits, '.', '-' and '_' (for example "notepadplusplus", "paint.net").

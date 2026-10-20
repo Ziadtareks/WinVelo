@@ -140,6 +140,9 @@ public partial class App : Application
                 services.AddSingleton<IMemoryOptimizerService, MemoryOptimizerService>();
                 services.AddSingleton<INetworkOptimizerService, NetworkOptimizerService>();
                 services.AddSingleton<ISmartAdvisorService, SmartAdvisorService>();
+                services.AddSingleton<WinVelo.Modules.Apps.IBuiltInAppsService>(sp => new WinVelo.Modules.Apps.BuiltInAppsService(
+                    sp.GetRequiredService<IShellService>(),
+                    System.IO.Path.Combine(WinVeloStoragePaths.GetStorageRoot(isTestMode), "removed-builtin-apps.jsonl")));
                 services.AddSingleton<WinVelo.Modules.Power.IPowerPlanService>(sp => new WinVelo.Modules.Power.PowerPlanService(
                     sp.GetRequiredService<IShellService>(),
                     System.IO.Path.Combine(WinVeloStoragePaths.GetStorageRoot(isTestMode), "powerplan.json")));

@@ -84,9 +84,11 @@ public sealed partial class ToolboxViewModel : ObservableObject
         IOperationRunner runner,
         IMemoryOptimizerService memoryOptimizer,
         INetworkOptimizerService networkOptimizer,
-        WinVelo.Modules.Power.IPowerPlanService? powerPlan = null)
+        WinVelo.Modules.Power.IPowerPlanService? powerPlan = null,
+        WinVelo.Modules.Apps.IBuiltInAppsService? builtInApps = null)
     {
         _powerPlan = powerPlan;
+        _builtInApps = builtInApps;
         _cleanerService = cleanerService;
         _startupService = startupService;
         _servicesService = servicesService;
@@ -288,15 +290,157 @@ public sealed partial class ToolboxViewModel : ObservableObject
         PowerPlanStatusText = LocalizationManager.T("Opened the O&O ShutUp10++ page in your browser.");
     }
 
-    // Built-in Windows apps (AppX) selection. Filled by the Built-in apps tool.
-    private readonly System.Collections.Generic.HashSet<string> _selectedAppx = new(StringComparer.OrdinalIgnoreCase);
+    // ---------- Built-in Windows apps (WinUtil's AppX removal) ----------
+    private readonly WinVelo.Modules.Apps.IBuiltInAppsService? _builtInApps;
+    private readonly System.Collections.Generic.HashSet<string> _pendingAppxSelection = new(StringComparer.OrdinalIgnoreCase);
+    private bool _builtInAppsLoaded;
+    private CancellationTokenSource? _appxCts;
 
-    public System.Collections.Generic.List<string> GetSelectedAppxKeys() => _selectedAppx.ToList();
+    public ObservableCollection<WinVelo.Modules.Apps.BuiltInApp> BuiltInApps { get; } = new();
 
+    [ObservableProperty]
+    private string _appxStatusText = LocalizationManager.T("Select built-in apps to remove. Nothing is removed until you confirm.");
+
+    [ObservableProperty]
+    private bool _isAppxBusy;
+
+    public System.Collections.Generic.List<string> GetSelectedAppxKeys() => _builtInAppsLoaded
+        ? BuiltInApps.Where(a => a.IsSelected).Select(a => a.Key).ToList()
+        : _pendingAppxSelection.ToList();
+
+    /// <summary>Selects built-in apps by WinUtil key (from an imported config). Nothing is removed.</summary>
     public void SetSelectedAppxKeys(System.Collections.Generic.IEnumerable<string> keys)
     {
-        _selectedAppx.Clear();
-        foreach (string key in keys) _selectedAppx.Add(key);
+        _pendingAppxSelection.Clear();
+        foreach (string key in keys) _pendingAppxSelection.Add(key);
+        EnsureBuiltInAppsListed();
+        foreach (var app in BuiltInApps) app.IsSelected = _pendingAppxSelection.Contains(app.Key) || _pendingAppxSelection.Contains(app.PackageId);
+    }
+
+    private void EnsureBuiltInAppsListed()
+    {
+        if (_builtInAppsLoaded || _builtInApps == null) return;
+        BuiltInApps.Clear();
+        foreach (var app in _builtInApps.LoadApps())
+        {
+            app.IsSelected = _pendingAppxSelection.Contains(app.Key) || _pendingAppxSelection.Contains(app.PackageId);
+            BuiltInApps.Add(app);
+        }
+        _builtInAppsLoaded = true;
+    }
+
+    /// <summary>Called when the Built-in apps tool opens: lists the apps and checks which are installed.</summary>
+    public async Task EnsureBuiltInAppsLoadedAsync()
+    {
+        EnsureBuiltInAppsListed();
+        await RefreshAppxAsync();
+    }
+
+    [RelayCommand]
+    private async Task RefreshAppxAsync()
+    {
+        if (_builtInApps == null || IsAppxBusy) return;
+        EnsureBuiltInAppsListed();
+        AppxStatusText = LocalizationManager.T("Checking which built-in apps are installed...");
+        var installed = await Task.Run(async () => await _builtInApps.GetInstalledPackagesAsync());
+        foreach (var app in BuiltInApps)
+        {
+            app.IsInstalled = installed?.Contains(app.PackageId);
+        }
+        AppxStatusText = installed == null
+            ? LocalizationManager.T("Could not check which apps are installed. You can still select and remove apps.")
+            : LocalizationManager.T("{0} of {1} built-in apps are installed.", BuiltInApps.Count(a => a.IsInstalled == true), BuiltInApps.Count);
+    }
+
+    [RelayCommand]
+    private void SelectRecommendedAppx()
+    {
+        EnsureBuiltInAppsListed();
+        foreach (var app in BuiltInApps) app.IsSelected = app.IsRecommended && app.IsInstalled != false;
+        AppxStatusText = LocalizationManager.T("Selected {0} apps that are safe to remove for almost everyone.", BuiltInApps.Count(a => a.IsSelected));
+    }
+
+    [RelayCommand]
+    private void SelectInstalledAppx()
+    {
+        EnsureBuiltInAppsListed();
+        foreach (var app in BuiltInApps) app.IsSelected = app.IsInstalled == true;
+        AppxStatusText = LocalizationManager.T("Selected {0} installed apps. Check the warnings before you remove them.", BuiltInApps.Count(a => a.IsSelected));
+    }
+
+    [RelayCommand]
+    private void ClearAppxSelection()
+    {
+        foreach (var app in BuiltInApps) app.IsSelected = false;
+        _pendingAppxSelection.Clear();
+    }
+
+    [RelayCommand]
+    private void CancelAppx() => _appxCts?.Cancel();
+
+    [RelayCommand]
+    private async Task RemoveSelectedAppxAsync() => await RunAppxAsync(remove: true);
+
+    [RelayCommand]
+    private async Task ReinstallSelectedAppxAsync() => await RunAppxAsync(remove: false);
+
+    private async Task RunAppxAsync(bool remove)
+    {
+        if (_builtInApps == null || IsAppxBusy) return;
+        var selected = BuiltInApps.Where(a => a.IsSelected).ToList();
+        if (selected.Count == 0)
+        {
+            AppxStatusText = LocalizationManager.T("No built-in apps are selected.");
+            return;
+        }
+
+        if (remove)
+        {
+            var lines = selected.Select(a => string.IsNullOrEmpty(a.Note)
+                ? "• " + a.Name
+                : "• " + a.Name + " (" + LocalizationManager.T(a.Risk) + "): " + LocalizationManager.T(a.Note));
+            var answer = System.Windows.MessageBox.Show(
+                LocalizationManager.T("Remove these {0} built-in apps for all users? They are also removed from the Windows image, so new user accounts do not get them.\n\n{1}\n\nYou can reinstall them later from this page.", selected.Count, string.Join("\n", lines)),
+                LocalizationManager.T("Remove built-in apps"), System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Warning, System.Windows.MessageBoxResult.No);
+            if (answer != System.Windows.MessageBoxResult.Yes) return;
+        }
+
+        if (!WinVelo.App.Services.AppAdminGuard.EnsureAdmin(remove ? "remove built-in apps" : "reinstall built-in apps"))
+        {
+            AppxStatusText = LocalizationManager.T("Administrator privileges required to run fixes.");
+            return;
+        }
+
+        IsAppxBusy = true;
+        _appxCts = new CancellationTokenSource();
+        try
+        {
+            AppxStatusText = remove
+                ? LocalizationManager.T("Removing {0} built-in apps...", selected.Count)
+                : LocalizationManager.T("Reinstalling {0} built-in apps...", selected.Count);
+            var token = _appxCts.Token;
+            var report = await Task.Run(() => remove
+                ? _builtInApps.RemoveAsync(selected, _runner, token)
+                : _builtInApps.ReinstallAsync(selected, _runner, token));
+            var failures = report.Results.Where(r => r.IsFailure).Select(r => LocalizationManager.TranslateMessage(r.Reason)).ToList();
+            AppxStatusText = failures.Count == 0
+                ? LocalizationManager.T("Done: {0} succeeded, {1} skipped.", report.SucceededCount, report.SkippedCount)
+                : LocalizationManager.T("Done: {0} succeeded, {1} failed.", report.SucceededCount, report.FailedCount) + "\n" + string.Join("\n", failures);
+            if (remove)
+            {
+                foreach (var app in selected.Where(a => a.IsInstalled == false)) app.IsSelected = false;
+            }
+        }
+        catch (Exception ex)
+        {
+            AppxStatusText = LocalizationManager.T("Repair failed: {0}", ex.Message);
+        }
+        finally
+        {
+            IsAppxBusy = false;
+            _appxCts.Dispose();
+            _appxCts = null;
+        }
     }
 
     [RelayCommand]

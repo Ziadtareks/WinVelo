@@ -56,7 +56,7 @@ public static class Program
         // (--self-test used to switch to real mode on its own; it now needs --real-mode like every other change.)
         bool isRealMode = args.Contains("--real-mode") || (isDetectAll && !isTestMode);
         bool isDryRun = args.Contains("--dry-run");
-        bool isRun = args.Contains("--run") || args.Contains("--apply") || args.Contains("--enable") || args.Contains("--disable") || args.Contains("--clean") || args.Contains("--dns") || args.Contains("--update-mode") || args.Contains("--fix") || args.Contains("--undo") || args.Contains("--power-plan") || isSelfTest;
+        bool isRun = args.Contains("--run") || args.Contains("--apply") || args.Contains("--enable") || args.Contains("--disable") || args.Contains("--clean") || args.Contains("--dns") || args.Contains("--update-mode") || args.Contains("--fix") || args.Contains("--undo") || args.Contains("--power-plan") || args.Contains("--builtin-apps") || isSelfTest;
 
         if (isRealMode)
         {
@@ -532,6 +532,60 @@ public static class Program
         }
 
         // 4. DNS: --dns <providerId>
+        int appxIdx = Array.FindIndex(args, a => string.Equals(a, "--builtin-apps", StringComparison.OrdinalIgnoreCase));
+        if (appxIdx >= 0)
+        {
+            var builtIn = new WinVelo.Modules.Apps.BuiltInAppsService(shell, Path.Combine(WinVeloStoragePaths.GetStorageRoot(!isRealMode), "removed-builtin-apps.jsonl"));
+            var all = builtIn.LoadApps();
+            string verb = appxIdx < args.Length - 1 ? args[appxIdx + 1].ToLowerInvariant() : "list";
+
+            if (verb == "list")
+            {
+                var installed = await builtIn.GetInstalledPackagesAsync();
+                foreach (var app in all)
+                {
+                    string state = installed == null ? "unknown" : installed.Contains(app.PackageId) ? "installed" : "not installed";
+                    Console.WriteLine($"  {app.Key,-48} {app.Name,-28} [{app.Risk}] {state}{(app.IsRecommended ? "  (recommended)" : "")}");
+                    if (!string.IsNullOrEmpty(app.Note)) Console.WriteLine($"      ! {app.Note}");
+                }
+                return 0;
+            }
+
+            if ((verb != "remove" && verb != "reinstall") || appxIdx >= args.Length - 2)
+            {
+                Console.WriteLine("[ERROR] Use: --builtin-apps list | remove <keys> | reinstall <keys>   (keys separated by commas, or 'recommended')");
+                return 1;
+            }
+
+            string list = args[appxIdx + 2];
+            var wanted = new HashSet<string>(list.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries), StringComparer.OrdinalIgnoreCase);
+            var chosen = all.Where(a => wanted.Contains(a.Key) || wanted.Contains(a.PackageId) || (wanted.Contains("recommended") && a.IsRecommended)).ToList();
+            var unknown = wanted.Where(w => !w.Equals("recommended", StringComparison.OrdinalIgnoreCase) && !all.Any(a => a.Key.Equals(w, StringComparison.OrdinalIgnoreCase) || a.PackageId.Equals(w, StringComparison.OrdinalIgnoreCase))).ToList();
+            if (unknown.Count > 0)
+            {
+                Console.WriteLine("[ERROR] Unknown built-in app(s): " + string.Join(", ", unknown) + ". Run --builtin-apps list.");
+                return 1;
+            }
+
+            foreach (var app in chosen.Where(a => !string.IsNullOrEmpty(a.Note)))
+            {
+                Console.WriteLine($"  ! {app.Name} [{app.Risk}]: {app.Note}");
+            }
+
+            if (isRealMode && !CheckConfirmationGate(args, $"{verb} {chosen.Count} built-in app(s) for all users: {string.Join(", ", chosen.Select(a => a.Name))}"))
+            {
+                return 1;
+            }
+
+            var report = verb == "remove" ? await builtIn.RemoveAsync(chosen, opRunner) : await builtIn.ReinstallAsync(chosen, opRunner);
+            foreach (var r in report.Results)
+            {
+                Console.WriteLine($"  [{r.DisplayStatus}] {r.Name}: {r.Reason}");
+            }
+            Console.WriteLine($"[RESULT] {report.Summary}");
+            return report.FailedCount == 0 ? 0 : 1;
+        }
+
         int powerIdx = Array.FindIndex(args, a => string.Equals(a, "--power-plan", StringComparison.OrdinalIgnoreCase));
         if (powerIdx >= 0)
         {
@@ -1488,6 +1542,9 @@ public static class Program
         Console.WriteLine("  winvelo-cli --clean <category|all>       Clean safe temporary file categories");
         Console.WriteLine("  winvelo-cli --dns <id>                   Apply a DNS preset (e.g. dns.cloudflare.standard)");
         Console.WriteLine("  winvelo-cli --power-plan ultimate|default  Add/switch to Ultimate Performance, or go back (not for laptops)");
+        Console.WriteLine("  winvelo-cli --builtin-apps list           List WinUtil's built-in Windows apps with risk notes");
+        Console.WriteLine("  winvelo-cli --builtin-apps remove <keys>  Remove built-in apps (comma-separated keys, or 'recommended')");
+        Console.WriteLine("  winvelo-cli --builtin-apps reinstall <keys>  Reinstall built-in apps");
         Console.WriteLine("  winvelo-cli --update-mode <mode>         Set update mode (Default, Security, DisableAll = automatic updates off; Windows Update keeps working)");
         Console.WriteLine("  winvelo-cli --fix <id>                   Execute a system maintenance fix");
         Console.WriteLine("  winvelo-cli --config <path> --run        Apply configuration profile (protected by journal)");

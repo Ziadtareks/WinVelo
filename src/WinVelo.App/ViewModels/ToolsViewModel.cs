@@ -75,8 +75,14 @@ public sealed partial class ToolsViewModel : ObservableObject
             "Updates" or "WindowsUpdates" or "UpdateMode" => "Updates",
             "Features" or "OptionalFeatures" => "Features",
             "RestorePoints" or "Restore" or "SystemRestore" => "RestorePoints",
+            "BuiltInApps" or "Appx" or "Debloat" => "BuiltInApps",
             _ => toolName
         };
+
+        if (ActiveTool == "BuiltInApps")
+        {
+            _ = ToolboxVM.EnsureBuiltInAppsLoadedAsync();
+        }
 
         if (ActiveTool == "RestorePoints")
         {

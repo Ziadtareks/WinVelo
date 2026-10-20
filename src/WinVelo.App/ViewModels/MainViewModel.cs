@@ -339,6 +339,11 @@ public sealed partial class MainViewModel : ObservableObject
                 ToolsVM.SelectTool("RestorePoints");
                 CurrentPage = ToolsVM;
                 break;
+            case "BuiltInApps":
+                ActiveTab = "Tools";
+                ToolsVM.SelectTool("BuiltInApps");
+                CurrentPage = ToolsVM;
+                break;
             default:
                 ActiveTab = "Home";
                 CurrentPage = DashboardVM;
@@ -561,6 +566,7 @@ public sealed partial class MainViewModel : ObservableObject
         _allPaletteItems.Add(new PaletteItem { Title = "Fixes & Repairs", Subtitle = "One-click repairs for Windows components and network", Category = "Tool", IconSymbol = "Wrench24", ActionToExecute = () => SwitchTab("Fixes") });
         _allPaletteItems.Add(new PaletteItem { Title = "Windows Updates Modes", Subtitle = "Configure Default, Recommended, or Suspended updates", Category = "Tool", IconSymbol = "ArrowSync24", ActionToExecute = () => SwitchTab("Updates") });
         _allPaletteItems.Add(new PaletteItem { Title = "Optional Features", Subtitle = "Enable or disable optional system components (WSL, Hyper-V)", Category = "Tool", IconSymbol = "AppsListDetail24", ActionToExecute = () => SwitchTab("Features") });
+        _allPaletteItems.Add(new PaletteItem { Title = "Built-in Apps", Subtitle = "Remove or reinstall built-in Windows apps (News, Weather, Xbox...)", Category = "Tool", IconSymbol = "Delete24", ActionToExecute = () => SwitchTab("BuiltInApps") });
         _allPaletteItems.Add(new PaletteItem { Title = "Restore Points", Subtitle = "Windows System Protection checkpoints", Category = "Tool", IconSymbol = "ShieldCheckmark24", ActionToExecute = () => SwitchTab("RestorePoints") });
 
         // Tweak Categories
