@@ -52,7 +52,7 @@ public sealed class CatalogSchemaTests
             }
         }
 
-        Assert.Equal(140, totalEvaluated);
+        Assert.Equal(141, totalEvaluated);
     }
 
     private static string FindFileUpwards(string startDir, string relativePath)

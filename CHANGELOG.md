@@ -10,6 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - *Settings → Updates*: a manual **Check for updates** button. It contacts GitHub only when clicked, shows the latest version, and links to the release page. It never downloads or installs an update automatically.
+- *Tools → Power Plan*: switch between Balanced and the hidden Ultimate Performance plan. Switching to Balanced restores the Windows default without deleting power schemes.
+- *Tools*: an official O&O ShutUp10++ link. WinVelo opens the vendor page only and never downloads or runs the binary.
+- `performance.system.storage-sense-disable`: port the missing WinUtil Storage Sense disable tweak. The catalog now has 141 tweaks.
+
+### Changed
+- Updated `docs/UPSTREAM.md` to the October 19, 2026 WinUtil audit (`7514faf`), with honest counts for ported tweaks, UI controls, and the curated 36-app catalog.
 
 ## [1.0.3] - 2026-10-19
 

@@ -13,8 +13,7 @@ public static class DeprecatedTweaks
     {
         ["pref.mouseacceleration"] = "gaming.input.disable-mouse-acceleration",
         ["WPFToggleMouseAcceleration"] = "gaming.input.disable-mouse-acceleration",
-        ["advanced.storage"] = "performance.system.storage-sense",
-        ["WPFTweaksStorage"] = "performance.system.storage-sense",
+        ["advanced.storage"] = "performance.system.storage-sense-disable",
         ["pref.taskbaralignment"] = "ui.taskbar.alignment-left",
         ["WPFToggleTaskbarAlignment"] = "ui.taskbar.alignment-left",
         ["pref.taskview"] = "ui.taskbar.disable-task-view-button",

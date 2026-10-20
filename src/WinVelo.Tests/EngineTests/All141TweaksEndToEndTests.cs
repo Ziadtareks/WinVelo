@@ -60,7 +60,7 @@ public sealed class All141TweaksEndToEndTests
     public async Task All141Tweaks_DetectApplyAndUndo_ZeroErrorsAndCleanTransitions()
     {
         var tweaks = LoadAllCatalogTweaks();
-        Assert.Equal(140, tweaks.Count);
+        Assert.Equal(141, tweaks.Count);
 
         string testJournalDir = Path.Combine(Path.GetTempPath(), "WinVeloTests_All141_" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(testJournalDir);
@@ -131,7 +131,7 @@ public sealed class All141TweaksEndToEndTests
     public async Task All141Tweaks_BatchApplyAndRollback_ZeroErrors()
     {
         var tweaks = LoadAllCatalogTweaks();
-        Assert.Equal(140, tweaks.Count);
+        Assert.Equal(141, tweaks.Count);
 
         string testJournalDir = Path.Combine(Path.GetTempPath(), "WinVeloTests_Batch141_" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(testJournalDir);
@@ -167,13 +167,13 @@ public sealed class All141TweaksEndToEndTests
 
             var runner = new TweakRunner(handlers, context, fakeRestore, detector);
 
-            // Execute all 140 tweaks together as a single batch
+            // Execute all 141 tweaks together as a single batch
             var report = await runner.ApplyBatchAsync(tweaks);
 
             // Verify: 0 failed tweaks
             var failures = string.Join("; ", report.Results.Where(r => r.Status == TweakExecutionStatus.Failed).Select(r => $"{r.TweakId}: {r.Message}"));
             Assert.True(report.FailedCount == 0, $"Failed tweaks: {failures}");
-            Assert.Equal(140, report.Results.Count);
+            Assert.Equal(141, report.Results.Count);
 
             // Every tweak is either Applied or Skipped (due to overlapping prerequisites)
             foreach (var res in report.Results)
