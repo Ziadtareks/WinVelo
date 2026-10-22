@@ -513,7 +513,7 @@ public sealed partial class TweaksViewModel : ObservableObject
         LoadCatalogTweaksFast();
 
         // Start non-blocking real-time detection scan in background
-        _ = Task.Run(() => ScanSystemStateAsync());
+        _ = ScanSystemStateAsync();
     }
 
     private void LoadPresets()
@@ -590,56 +590,39 @@ public sealed partial class TweaksViewModel : ObservableObject
 
     public async Task ScanSystemStateAsync(CancellationToken cancellationToken = default)
     {
+        if (IsScanning) return;
         IsScanning = true;
         ScanProgress = 0;
         ScanStatusText = LocalizationManager.T("Scanning system tweaks...");
-
-        await Task.Yield();
-        int count = _allTweaks.Count;
-
-        await Task.Run(async () =>
+        var cards = _allTweaks.ToArray();
+        int completed = 0;
+        var progress = new Progress<(TweakCardModel Card, TweakState State, int Done)>(update =>
         {
-            for (int i = 0; i < count; i++)
-            {
-                if (cancellationToken.IsCancellationRequested) break;
-
-                var card = _allTweaks[i];
-                try
-                {
-                    var state = await _tweakService.DetectTweakStateAsync(card.Tweak, cancellationToken);
-                    if (card.State != state)
-                    {
-                        Application.Current?.Dispatcher?.InvokeAsync(() =>
-                        {
-                            card.State = state;
-                        });
-                    }
-                }
-                catch { }
-
-                int currentIdx = i + 1;
-                int pct = (int)((currentIdx / (double)count) * 100);
-
-                if (currentIdx % 10 == 0 || currentIdx == count)
-                {
-                    Application.Current?.Dispatcher?.InvokeAsync(() =>
-                    {
-                        ScanProgress = pct;
-                        ScanStatusText = LocalizationManager.T("Scanning ({0}/{1}): {2}", currentIdx, count, card.Title);
-                        AppliedCount = _allTweaks.Count(t => t.IsActive);
-                    });
-                }
-            }
-        }, cancellationToken);
-
-        Application.Current?.Dispatcher?.InvokeAsync(() =>
-        {
-            IsScanning = false;
-            ScanProgress = 100;
-            AppliedCount = _allTweaks.Count(t => t.IsActive);
-            ScanStatusText = LocalizationManager.T("Scan complete. {0} applied on system.", AppliedCount);
-            AddLog("OK", $"System state detection finished. Currently applied: {AppliedCount}/{count} tweaks.");
+            update.Card.State = update.State;
+            ScanProgress = cards.Length == 0 ? 100 : Math.Max(ScanProgress, update.Done * 100 / cards.Length);
+            ScanStatusText = LocalizationManager.T("Scanning ({0}/{1}): {2}", update.Done, cards.Length, update.Card.Title);
         });
+        try
+        {
+            await Task.Run(() => Parallel.ForEachAsync(cards,
+                new ParallelOptions { MaxDegreeOfParallelism = 4, CancellationToken = cancellationToken },
+                async (card, token) =>
+                {
+                    TweakState state;
+                    try { state = await _tweakService.DetectTweakStateAsync(card.Tweak, token); }
+                    catch (OperationCanceledException) { throw; }
+                    catch { state = TweakState.Unknown; }
+                    ((IProgress<(TweakCardModel, TweakState, int)>)progress).Report((card, state, Interlocked.Increment(ref completed)));
+                }), cancellationToken);
+            // Progress callbacks were posted before this continuation on the same UI context.
+            AppliedCount = cards.Count(t => t.IsActive);
+            ScanProgress = 100;
+            ScanStatusText = LocalizationManager.T("Scan complete. {0} applied on system.", AppliedCount);
+            AddLog("OK", $"System state detection finished. Currently applied: {AppliedCount}/{cards.Length} tweaks.");
+        }
+        catch (OperationCanceledException) { ScanStatusText = LocalizationManager.T("Scan cancelled."); }
+        catch (Exception ex) { ScanStatusText = LocalizationManager.T("Scan error: {0}", ex.Message); }
+        finally { IsScanning = false; }
     }
 
     [ObservableProperty]
@@ -1370,7 +1353,7 @@ public sealed partial class TweaksViewModel : ObservableObject
     public async Task RescanSystemAsync()
     {
         AddLog("INFO", "Initiating manual system re-scan...");
-        await Task.Run(() => ScanSystemStateAsync());
+        await ScanSystemStateAsync();
     }
 
     [RelayCommand]

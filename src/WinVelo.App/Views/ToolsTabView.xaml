@@ -791,7 +791,8 @@
                                         <TextBlock Text="{Binding RestorePointCount, StringFormat={loc:Tr Tools_RestorePointsFound0}}"
                                                    FontWeight="Bold" FontSize="12" Foreground="{DynamicResource StatusAppliedFgBrush}" />
                                     </Border>
-                                    <TextBlock Text="{Binding RestoreStatusText}" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" />
+                                    <ProgressBar Height="3" IsIndeterminate="True" Margin="0,0,0,8" Visibility="{Binding IsRefreshingRestoreInfo, Converter={StaticResource BoolToVisConverter}}" />
+                            <TextBlock Text="{Binding RestoreStatusText}" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" />
                                 </StackPanel>
                             </DockPanel>
 

@@ -7,7 +7,7 @@
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <Company>WinVelo Team</Company>
     <Product>WinVelo</Product>
-    <Version>1.0.4</Version>
+    <Version>1.0.5</Version>
     <Authors>WinVelo Contributors</Authors>
     <RepositoryUrl>https://github.com/Ziadtareks/WinVelo</RepositoryUrl>
     <NeutralLanguage>en</NeutralLanguage>

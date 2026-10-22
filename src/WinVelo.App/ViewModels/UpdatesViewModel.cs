@@ -48,7 +48,7 @@ public sealed partial class UpdatesViewModel : ObservableObject
 
         _runner.OnLog += msg =>
         {
-            System.Windows.Application.Current?.Dispatcher?.Invoke(() =>
+            System.Windows.Application.Current?.Dispatcher?.InvokeAsync(() =>
             {
                 UpdateLogs.Add(msg);
                 if (UpdateLogs.Count > 100) UpdateLogs.RemoveAt(0);

@@ -841,12 +841,14 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
         await Task.Yield();
         try
         {
-            bool srEnabled = _restoreService.IsSystemRestoreEnabled();
-            var latestDate = _restoreService.GetLatestRestorePointDate();
-            var activeTweaks = _tweakService.GetActiveJournalTweaks();
-            var health = await _tweakService.CheckServicingHealthAsync();
-            bool rebootPending = _tweakService.IsRebootPending();
-            bool explorerPending = _tweakService.IsExplorerRestartPending();
+            var (srEnabled, latestDate, activeTweaks, health, rebootPending, explorerPending) = await Task.Run(async () =>
+            {
+                var enabled = _restoreService.IsSystemRestoreEnabled();
+                var latest = _restoreService.GetLatestRestorePointDate();
+                var active = _tweakService.GetActiveJournalTweaks();
+                var servicing = await _tweakService.CheckServicingHealthAsync();
+                return (enabled, latest, active, servicing, _tweakService.IsRebootPending(), _tweakService.IsExplorerRestartPending());
+            });
 
             void Apply()
             {

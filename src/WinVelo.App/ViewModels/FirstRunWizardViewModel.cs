@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -56,23 +57,30 @@ public sealed partial class FirstRunWizardViewModel : ObservableObject
         _restoreService = restoreService;
         _appSettings = appSettings;
 
-        RefreshRestoreState();
+        _ = RefreshRestoreStateAsync();
     }
 
     public void Reset()
     {
         CurrentStep = 1;
         UpdateStepMetadata();
-        RefreshRestoreState();
+        _ = RefreshRestoreStateAsync();
     }
 
-    public void RefreshRestoreState()
+    private bool _isRefreshingRestore;
+
+    public async Task RefreshRestoreStateAsync()
     {
+        if (_isRefreshingRestore) return;
+        _isRefreshingRestore = true;
         try
         {
-            IsSystemRestoreEnabled = _restoreService.IsSystemRestoreEnabled();
-            int count = _restoreService.GetRestorePointCount();
-            var latestDate = _restoreService.GetLatestRestorePointDate();
+            var (enabled, count, latestDate) = await Task.Run(() =>
+            {
+                var points = _restoreService.GetRestorePoints();
+                return (_restoreService.IsSystemRestoreEnabled(), points.Count, points.FirstOrDefault()?.CreationTime);
+            });
+            IsSystemRestoreEnabled = enabled;
 
             if (!IsSystemRestoreEnabled)
             {
@@ -95,6 +103,7 @@ public sealed partial class FirstRunWizardViewModel : ObservableObject
         {
             RestoreStatusMessage = LocalizationManager.T("System Restore status notice: {0}", ex.Message);
         }
+        finally { _isRefreshingRestore = false; }
     }
 
     [RelayCommand]
@@ -136,10 +145,13 @@ public sealed partial class FirstRunWizardViewModel : ObservableObject
 
         try
         {
-            int beforeCount = _restoreService.GetRestorePointCount();
-            var res = await Task.Run(() => _restoreService.CreateRestorePoint("WinVelo Setup Baseline"));
-            int afterCount = _restoreService.GetRestorePointCount();
-            var latestDate = _restoreService.GetLatestRestorePointDate();
+            var (beforeCount, res, afterCount, latestDate, enabled) = await Task.Run(() =>
+            {
+                int before = _restoreService.GetRestorePointCount();
+                var result = _restoreService.CreateRestorePoint("WinVelo Setup Baseline");
+                var points = _restoreService.GetRestorePoints();
+                return (before, result, points.Count, points.FirstOrDefault()?.CreationTime, _restoreService.IsSystemRestoreEnabled());
+            });
 
             if (res.Success || afterCount > beforeCount)
             {
@@ -158,7 +170,7 @@ public sealed partial class FirstRunWizardViewModel : ObservableObject
                 RestoreVerificationMessage = LocalizationManager.T("Notice: Restore point creation could not be verified ({0}). WinVelo's rollback journal will track all changes.", res.ErrorMessage ?? LocalizationManager.T("Standard Windows policy"));
             }
 
-            IsSystemRestoreEnabled = _restoreService.IsSystemRestoreEnabled();
+            IsSystemRestoreEnabled = enabled;
         }
         catch (Exception ex)
         {
@@ -230,7 +242,7 @@ public sealed partial class FirstRunWizardViewModel : ObservableObject
             case 2:
                 StepTitle = LocalizationManager.T("System Restore Protection");
                 StepDescription = LocalizationManager.T("Ensure your system can be rolled back to a clean baseline.");
-                RefreshRestoreState();
+                _ = RefreshRestoreStateAsync();
                 break;
             case 3:
                 StepTitle = LocalizationManager.T("Choose Your Experience");

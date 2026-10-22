@@ -298,7 +298,7 @@ public sealed partial class MainViewModel : ObservableObject
             case "History" or "Backups":
                 ActiveTab = "History";
                 CurrentPage = HistoryVM;
-                HistoryVM.RefreshHistory();
+                _ = HistoryVM.RefreshHistoryAsync();
                 break;
             case "Settings":
                 ActiveTab = "Settings";
@@ -551,7 +551,7 @@ public sealed partial class MainViewModel : ObservableObject
     {
         if (_tweakService == null) return;
 
-        var unfinished = _tweakService.GetUnfinishedSessions();
+        var unfinished = await Task.Run(() => _tweakService.GetUnfinishedSessions());
         if (unfinished.Count > 0)
         {
             _unfinishedSessions = unfinished.ToList();

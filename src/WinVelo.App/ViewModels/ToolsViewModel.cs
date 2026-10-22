@@ -67,7 +67,6 @@ public sealed partial class ToolsViewModel : ObservableObject
         _shell = shell;
         if (shell != null) AppxVM = new AppxViewModel(shell);
 
-        RefreshRestoreInfo();
     }
 
     [RelayCommand]
@@ -95,7 +94,7 @@ public sealed partial class ToolsViewModel : ObservableObject
 
         if (ActiveTool == "RestorePoints")
         {
-            RefreshRestoreInfo();
+            _ = RefreshRestoreInfoAsync();
         }
         if (ActiveTool == "Appx" && AppxVM != null) _ = AppxVM.RefreshAsync();
         if (ActiveTool == "Features") _ = ConfigVM.RefreshFeatureStatesAsync();
@@ -108,7 +107,10 @@ public sealed partial class ToolsViewModel : ObservableObject
         ActiveTool = "";
     }
 
-    public void RefreshRestoreInfo()
+    [ObservableProperty]
+    private bool _isRefreshingRestoreInfo;
+
+    public async Task RefreshRestoreInfoAsync()
     {
         if (_restoreService == null)
         {
@@ -118,10 +120,15 @@ public sealed partial class ToolsViewModel : ObservableObject
             return;
         }
 
+        if (IsRefreshingRestoreInfo) return;
+        IsRefreshingRestoreInfo = true;
         try
         {
-            IsRestoreEnabled = _restoreService.IsSystemRestoreEnabled();
-            RestorePointCount = _restoreService.GetRestorePointCount();
+            var info = await Task.Run(() => (
+                Enabled: _restoreService.IsSystemRestoreEnabled(),
+                Count: _restoreService.GetRestorePointCount()));
+            IsRestoreEnabled = info.Enabled;
+            RestorePointCount = info.Count;
             RestoreStatusText = IsRestoreEnabled
                 ? LocalizationManager.T("System Restore is enabled. {0} restore point(s) found.", RestorePointCount)
                 : LocalizationManager.T("System Protection is currently turned off in Windows.");
@@ -130,6 +137,7 @@ public sealed partial class ToolsViewModel : ObservableObject
         {
             RestoreStatusText = LocalizationManager.T("Unable to read restore points: {0}", ex.Message);
         }
+        finally { IsRefreshingRestoreInfo = false; }
     }
 
     [RelayCommand]
@@ -169,7 +177,7 @@ public sealed partial class ToolsViewModel : ObservableObject
                 RestoreStatusText = LocalizationManager.T("Failed to create restore point: {0}", result.ErrorMessage ?? LocalizationManager.T("Unknown error"));
             }
 
-            RefreshRestoreInfo();
+            await RefreshRestoreInfoAsync();
         }
         catch (Exception ex)
         {

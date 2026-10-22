@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.5] - 2026-10-23
+
+### Fixed
+- Keep navigation responsive while history, backup files, restore points and activity logs load in the background. Preserve the visible history until a complete refresh is available.
+- Remove blocking restore-point queries from startup, the setup wizard, profile refreshes and restore operations; show loading indicators for history and restore tools.
+- Coalesce repeated history, DNS and feature refresh requests while a request is already running.
+- Bound restore-point PowerShell queries, drain both output streams asynchronously and terminate timed-out process trees.
+- Read service status in the background after service changes, and post engine log updates without synchronously waiting for WPF.
+- Scan tweak state with up to four concurrent probes; prevent overlapping scans and reset scan controls on failure or cancellation.
+
 ## [Unreleased]
 
 ### Audit remediation

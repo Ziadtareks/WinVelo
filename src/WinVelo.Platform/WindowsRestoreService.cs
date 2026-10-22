@@ -19,98 +19,29 @@ public sealed class WindowsRestoreService : ISystemRestoreService
         }
     }
 
+    private static WinVelo.Core.Models.PowerShellResult Query(string script, int timeoutSeconds = 10)
+    {
+        EnsureNotTestMode();
+        return new WindowsShellService().ExecutePowerShellAsync(script, timeoutSeconds).GetAwaiter().GetResult();
+    }
+
     public bool IsSystemRestoreEnabled()
     {
         EnsureNotTestMode();
-        try
-        {
-            using var process = Process.Start(new ProcessStartInfo
-            {
-                FileName = "powershell.exe",
-                Arguments = "-NoProfile -NonInteractive -Command \"(Get-ComputerRestorePoint).Count\"",
-                CreateNoWindow = true,
-                UseShellExecute = false,
-                RedirectStandardOutput = true
-            });
-            process?.WaitForExit(5000);
-            return process?.ExitCode == 0;
-        }
-        catch
-        {
-            return false;
-        }
+        try { return Query("Get-ComputerRestorePoint -ErrorAction Stop | Out-Null").Success; }
+        catch { return false; }
     }
 
     public bool EnableSystemRestore(string drive = "C:\\")
     {
         EnsureNotTestMode();
-        try
-        {
-            using var process = Process.Start(new ProcessStartInfo
-            {
-                FileName = "powershell.exe",
-                Arguments = $"-NoProfile -NonInteractive -Command \"Enable-ComputerRestore -Drive '{drive}'\"",
-                CreateNoWindow = true,
-                UseShellExecute = false
-            });
-            process?.WaitForExit(15000);
-            return process?.ExitCode == 0;
-        }
-        catch
-        {
-            return false;
-        }
+        try { return Query($"Enable-ComputerRestore -Drive '{drive.Replace("'", "''")}'", 15).Success; }
+        catch { return false; }
     }
 
-    public int GetRestorePointCount()
-    {
-        EnsureNotTestMode();
-        try
-        {
-            using var process = Process.Start(new ProcessStartInfo
-            {
-                FileName = "powershell.exe",
-                Arguments = "-NoProfile -NonInteractive -Command \"@(Get-ComputerRestorePoint).Count\"",
-                CreateNoWindow = true,
-                UseShellExecute = false,
-                RedirectStandardOutput = true
-            });
-            string output = process?.StandardOutput.ReadToEnd()?.Trim() ?? "0";
-            process?.WaitForExit(5000);
-            return int.TryParse(output, out int c) ? c : 0;
-        }
-        catch
-        {
-            return 0;
-        }
-    }
+    public int GetRestorePointCount() => GetRestorePoints().Count;
 
-    public DateTime? GetLatestRestorePointDate()
-    {
-        EnsureNotTestMode();
-        try
-        {
-            using var process = Process.Start(new ProcessStartInfo
-            {
-                FileName = "powershell.exe",
-                Arguments = "-NoProfile -NonInteractive -Command \"(Get-ComputerRestorePoint | Sort-Object CreationTime -Descending | Select-Object -First 1).CreationTime\"",
-                CreateNoWindow = true,
-                UseShellExecute = false,
-                RedirectStandardOutput = true
-            });
-            string? output = process?.StandardOutput.ReadToEnd()?.Trim();
-            process?.WaitForExit(5000);
-            if (!string.IsNullOrEmpty(output) && DateTime.TryParse(output, out var dt))
-            {
-                return dt;
-            }
-            return null;
-        }
-        catch
-        {
-            return null;
-        }
-    }
+    public DateTime? GetLatestRestorePointDate() => GetRestorePoints().FirstOrDefault()?.CreationTime;
 
     public RestorePointResult CreateRestorePoint(string description)
     {
@@ -191,16 +122,9 @@ public sealed class WindowsRestoreService : ISystemRestoreService
         EnsureNotTestMode();
         try
         {
-            using var process = Process.Start(new ProcessStartInfo
-            {
-                FileName = "powershell.exe",
-                Arguments = "-NoProfile -NonInteractive -Command \"@(Get-ComputerRestorePoint | Select-Object SequenceNumber, Description, @{Name='CreationTimeString';Expression={$_.CreationTime.ToString('o')}}, RestorePointType) | ConvertTo-Json -Compress\"",
-                CreateNoWindow = true,
-                UseShellExecute = false,
-                RedirectStandardOutput = true
-            });
-            string output = process?.StandardOutput.ReadToEnd()?.Trim() ?? string.Empty;
-            process?.WaitForExit(5000);
+            var result = Query("@(Get-ComputerRestorePoint -ErrorAction Stop | Select-Object SequenceNumber, Description, @{Name='CreationTimeString';Expression={if ($_.CreationTime -is [datetime]) { $_.CreationTime.ToString('o') } else { [System.Management.ManagementDateTimeConverter]::ToDateTime($_.CreationTime).ToString('o') }}}, @{Name='RestorePointType';Expression={[string]$_.RestorePointType}}) | ConvertTo-Json -Compress");
+            if (!result.Success) return Array.Empty<RestorePointItem>();
+            string output = result.StdOut.Trim();
 
             if (string.IsNullOrWhiteSpace(output) || output == "null")
             {

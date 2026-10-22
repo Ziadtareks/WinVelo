@@ -93,13 +93,21 @@ public sealed partial class ToolboxViewModel : ObservableObject
         catch (Exception ex) { DnsStatusText = ex.Message; }
     }
 
-    public async Task RefreshDnsAdaptersAsync()
+    private Task? _dnsRefreshTask;
+    public Task RefreshDnsAdaptersAsync() => _dnsRefreshTask is { IsCompleted: false }
+        ? _dnsRefreshTask : _dnsRefreshTask = RefreshDnsAdaptersCoreAsync();
+
+    private async Task RefreshDnsAdaptersCoreAsync()
     {
-        var adapters = await _dnsService.GetAdaptersAsync();
-        int? selected = SelectedDnsAdapter?.Index;
-        DnsAdapters.Clear();
-        foreach (var adapter in adapters) DnsAdapters.Add(adapter);
-        SelectedDnsAdapter = DnsAdapters.FirstOrDefault(a => a.Index == selected) ?? DnsAdapters.FirstOrDefault(a => a.IsDefault) ?? DnsAdapters.FirstOrDefault();
+        try
+        {
+            var adapters = await _dnsService.GetAdaptersAsync();
+            int? selected = SelectedDnsAdapter?.Index;
+            DnsAdapters.Clear();
+            foreach (var adapter in adapters) DnsAdapters.Add(adapter);
+            SelectedDnsAdapter = DnsAdapters.FirstOrDefault(a => a.Index == selected) ?? DnsAdapters.FirstOrDefault(a => a.IsDefault) ?? DnsAdapters.FirstOrDefault();
+        }
+        catch (Exception ex) { DnsStatusText = LocalizationManager.T("Unable to read network adapters: {0}", ex.Message); }
     }
 
     public ToolboxViewModel(
@@ -230,7 +238,7 @@ public sealed partial class ToolboxViewModel : ObservableObject
         if (!WinVelo.App.Services.AppAdminGuard.EnsureAdmin("change Windows services")) return;
         bool ok = await Task.Run(() => _servicesService.ToggleServiceStateAsync(service.ServiceName, start));
         Status = ok ? "Service updated." : "Service change failed or is protected.";
-        var actual = _servicesService.GetServices().FirstOrDefault(s => s.ServiceName == service.ServiceName);
+        var actual = await Task.Run(() => _servicesService.GetServices().FirstOrDefault(s => s.ServiceName == service.ServiceName));
         if (actual != null) { service.Status = actual.Status; service.StartupType = actual.StartupType; }
     }
     [RelayCommand]
@@ -239,7 +247,7 @@ public sealed partial class ToolboxViewModel : ObservableObject
         if (!WinVelo.App.Services.AppAdminGuard.EnsureAdmin("change service startup settings")) return;
         bool ok = await Task.Run(() => _servicesService.SetStartupTypeAsync(service.ServiceName, service.StartupType));
         Status = ok ? "Service startup updated." : "Service change failed or is protected.";
-        var actual = _servicesService.GetServices().FirstOrDefault(s => s.ServiceName == service.ServiceName);
+        var actual = await Task.Run(() => _servicesService.GetServices().FirstOrDefault(s => s.ServiceName == service.ServiceName));
         if (actual != null) service.StartupType = actual.StartupType;
     }
 

@@ -77,7 +77,7 @@ public sealed partial class ConfigViewModel : ObservableObject
 
         _runner.OnLog += msg =>
         {
-            System.Windows.Application.Current?.Dispatcher?.Invoke(() =>
+            System.Windows.Application.Current?.Dispatcher?.InvokeAsync(() =>
             {
                 ConfigLogs.Add(msg);
                 if (ConfigLogs.Count > 150) ConfigLogs.RemoveAt(0);
@@ -139,8 +139,16 @@ public sealed partial class ConfigViewModel : ObservableObject
         SelectedFeaturesCount = _allFeatures.Count(f => f.IsSelected);
     }
 
+    private Task? _featureRefreshTask;
     [RelayCommand]
-    public async Task RefreshFeatureStatesAsync() => await _featureService.RefreshStatusAsync(_allFeatures);
+    public Task RefreshFeatureStatesAsync() => _featureRefreshTask is { IsCompleted: false }
+        ? _featureRefreshTask : _featureRefreshTask = RefreshFeatureStatesCoreAsync();
+
+    private async Task RefreshFeatureStatesCoreAsync()
+    {
+        try { await _featureService.RefreshStatusAsync(_allFeatures); }
+        catch (Exception ex) { StatusMessage = LocalizationManager.T("Unable to refresh features: {0}", ex.Message); }
+    }
 
     private bool CanExecuteAction() => !IsBusy;
 

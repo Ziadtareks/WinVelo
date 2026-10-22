@@ -52,6 +52,7 @@
                 <TextBlock Text="{loc:Tr History_HistoryRollbackJournal}" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" />
                 <TextBlock Text="{loc:Tr History_TrackEveryModificationMadeBy}"
                            FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,4,0,0" />
+                <ProgressBar Height="3" IsIndeterminate="True" Margin="0,8,0,0" Visibility="{Binding IsLoadingHistory, Converter={StaticResource BoolToVisConverter}}" />
             </StackPanel>
 
             <WrapPanel Orientation="Horizontal" VerticalAlignment="Center">

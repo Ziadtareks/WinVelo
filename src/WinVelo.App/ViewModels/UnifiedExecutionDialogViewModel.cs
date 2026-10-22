@@ -281,7 +281,7 @@ public sealed partial class UnifiedExecutionDialogViewModel : ObservableObject
                     var state = _tweakService != null
                         ? await _tweakService.DetectTweakStateAsync(item.Tweak)
                         : TweakState.NotApplied;
-                    System.Windows.Application.Current?.Dispatcher?.Invoke(() =>
+                    System.Windows.Application.Current?.Dispatcher?.InvokeAsync(() =>
                     {
                         if (isUndo)
                         {
@@ -336,7 +336,7 @@ public sealed partial class UnifiedExecutionDialogViewModel : ObservableObject
                 catch { }
             }
 
-            System.Windows.Application.Current?.Dispatcher?.Invoke(() =>
+            System.Windows.Application.Current?.Dispatcher?.InvokeAsync(() =>
             {
                 IsPreviewLoading = false;
                 UpdateSummary();

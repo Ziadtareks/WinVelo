@@ -125,7 +125,7 @@ public sealed partial class HistoryViewModel : ObservableObject
 
         _runner.OnLog += msg =>
         {
-            Application.Current?.Dispatcher?.Invoke(() =>
+            Application.Current?.Dispatcher?.InvokeAsync(() =>
             {
                 ActivityLogs.Insert(0, new LogEntryItem
                 {
@@ -137,8 +137,7 @@ public sealed partial class HistoryViewModel : ObservableObject
             });
         };
 
-        RefreshHistory();
-        LoadActivityLogs();
+        if (Application.Current == null) RefreshHistory();
     }
 
     [RelayCommand]
@@ -148,15 +147,12 @@ public sealed partial class HistoryViewModel : ObservableObject
         IsActivityLogView = string.Equals(view, "ActivityLog", StringComparison.OrdinalIgnoreCase);
         if (IsActivityLogView)
         {
-            LoadActivityLogs();
+            _ = LoadActivityLogsAsync();
         }
     }
 
     [RelayCommand]
-    public void RefreshActivityLogs()
-    {
-        LoadActivityLogs();
-    }
+    public Task RefreshActivityLogsAsync() => LoadActivityLogsAsync();
 
     [RelayCommand]
     public void ClearActivityLogs()
@@ -164,165 +160,181 @@ public sealed partial class HistoryViewModel : ObservableObject
         ActivityLogs.Clear();
     }
 
-    public void LoadActivityLogs()
+    public async Task LoadActivityLogsAsync()
     {
         ActivityLogs.Clear();
         try
         {
-            string logsDir = WinVeloStoragePaths.GetLogsDirectory(TestModeManager.IsTestMode);
-            if (Directory.Exists(logsDir))
+            var recent = await Task.Run(() =>
             {
-                var latestLog = Directory.GetFiles(logsDir, "*.log")
-                    .OrderByDescending(File.GetLastWriteTimeUtc)
-                    .FirstOrDefault();
+                string logsDir = WinVeloStoragePaths.GetLogsDirectory(TestModeManager.IsTestMode);
+                string? latestLog = Directory.Exists(logsDir)
+                    ? Directory.GetFiles(logsDir, "*.log").OrderByDescending(File.GetLastWriteTimeUtc).FirstOrDefault()
+                    : null;
+                return latestLog == null ? Array.Empty<string>() : File.ReadLines(latestLog).TakeLast(100).Reverse().ToArray();
+            });
+            foreach (var line in recent)
+            {
+                if (string.IsNullOrWhiteSpace(line)) continue;
+                string level = "INFO";
+                if (line.Contains("[ERR]") || line.Contains("ERROR")) level = "ERR";
+                else if (line.Contains("[WARN]")) level = "WARN";
+                else if (line.Contains("[OK]")) level = "OK";
 
-                if (latestLog != null)
+                ActivityLogs.Add(new LogEntryItem
                 {
-                    var lines = File.ReadAllLines(latestLog);
-                    var recent = lines.TakeLast(100).Reverse();
-                    foreach (var line in recent)
-                    {
-                        if (string.IsNullOrWhiteSpace(line)) continue;
-                        string level = "INFO";
-                        if (line.Contains("[ERR]") || line.Contains("ERROR")) level = "ERR";
-                        else if (line.Contains("[WARN]")) level = "WARN";
-                        else if (line.Contains("[OK]")) level = "OK";
-
-                        ActivityLogs.Add(new LogEntryItem
-                        {
-                            Timestamp = DateTime.Now.ToString("HH:mm:ss"),
-                            Level = level,
-                            Message = line
-                        });
-                    }
-                }
+                    Timestamp = DateTime.Now.ToString("HH:mm:ss"),
+                    Level = level,
+                    Message = line
+                });
             }
         }
         catch { }
     }
 
-    [RelayCommand]
-    public void RefreshHistory()
+    private sealed record HistoryData(
+        List<HistorySessionCardModel> Sessions, List<HistorySessionCardModel> LegacySessions,
+        List<RestorePointItem> RestorePoints, List<BackupSnapshotInfo> Snapshots, bool RestoreEnabled);
+
+    private HistoryData ReadHistoryData()
     {
+        var sessions = new List<HistorySessionCardModel>();
+        var legacySessions = new List<HistorySessionCardModel>();
+        var restorePoints = new List<RestorePointItem>();
+        var snapshots = new List<BackupSnapshotInfo>();
+        bool restoreEnabled = false;
+        if (_tweakService == null) return new(sessions, legacySessions, restorePoints, snapshots, false);
+        var catalog = _tweakService.LoadCatalog().Concat(_tweakService.GetActiveJournalTweaks()).GroupBy(t => t.Id, StringComparer.OrdinalIgnoreCase).Select(g => g.First()).ToList();
+        var tweakDict = catalog.ToDictionary(t => t.Id, t => t.Name, StringComparer.OrdinalIgnoreCase);
+
+        var rawSessions = _tweakService.GetAllSessions()
+            .OrderByDescending(s => s.StartedAtUtc)
+            .ToList();
+
+        foreach (var s in rawSessions)
+        {
+            string trigger = LocalizationManager.T("Manual");
+            if (s.SessionId.StartsWith("cli", StringComparison.OrdinalIgnoreCase) ||
+                s.SessionId.Contains("_cli", StringComparison.OrdinalIgnoreCase))
+            {
+                trigger = "CLI";
+            }
+            else if (s.Records.Any(r => r.TweakId.Contains("gaming", StringComparison.OrdinalIgnoreCase)))
+            {
+                trigger = LocalizationManager.T("Preset (Gaming)");
+            }
+            else if (s.Records.Any(r => r.TweakId.Contains("privacy", StringComparison.OrdinalIgnoreCase)))
+            {
+                trigger = LocalizationManager.T("Preset (Privacy)");
+            }
+            else if (s.Records.Any(r => r.TweakId.Contains("recommended", StringComparison.OrdinalIgnoreCase)))
+            {
+                trigger = LocalizationManager.T("Preset (Recommended)");
+            }
+
+            var tweakGroups = s.Records
+                .GroupBy(r => r.TweakId)
+                .Select(g => new HistoryTweakItemModel
+                {
+                    TweakId = g.Key,
+                    TweakName = tweakDict.TryGetValue(g.Key, out var name) ? LocalizationManager.T(name) : LocalizationManager.T(ModuleJournal.DisplayName(g.Key)),
+                    ActionCount = g.Count(),
+                    IsReverted = g.All(r => r.IsReverted),
+                    Records = g.ToList()
+                })
+                .ToList();
+
+            bool isLegacy = !TestModeManager.IsTestMode && s.IsLegacy;
+
+            var card = new HistorySessionCardModel
+            {
+                SessionId = s.SessionId,
+                StartedAtUtc = s.StartedAtUtc,
+                IsCompleted = s.IsCompleted,
+                TriggerSource = trigger,
+                Mode = s.Mode ?? (isLegacy ? "legacy" : (TestModeManager.IsTestMode ? "test" : "real")),
+                AppVersion = s.AppVersion,
+                IsLegacy = isLegacy,
+                Records = s.Records.ToList(),
+                Tweaks = tweakGroups
+            };
+
+            if (isLegacy)
+            {
+                legacySessions.Add(card);
+            }
+            else
+            {
+                sessions.Add(card);
+            }
+        }
+
+        if (_restoreService != null)
+        {
+            restoreEnabled = _restoreService.IsSystemRestoreEnabled();
+
+            var points = _restoreService.GetRestorePoints();
+            foreach (var p in points)
+            {
+                restorePoints.Add(p);
+            }
+        }
+
+        var backups = _tweakService.BackupManager?.GetAvailableBackups() ?? Array.Empty<BackupSnapshotInfo>();
+        foreach (var b in backups)
+        {
+            snapshots.Add(b);
+        }
+
+        return new(sessions, legacySessions, restorePoints, snapshots, restoreEnabled);
+    }
+
+    private void ApplyHistoryData(HistoryData data)
+    {
+        string? selectedId = SelectedSession?.SessionId;
         Sessions.Clear();
         LegacySessions.Clear();
         RestorePoints.Clear();
         Snapshots.Clear();
+        foreach (var item in data.Sessions) Sessions.Add(item);
+        foreach (var item in data.LegacySessions) LegacySessions.Add(item);
+        foreach (var item in data.RestorePoints) RestorePoints.Add(item);
+        foreach (var item in data.Snapshots) Snapshots.Add(item);
+        SelectedSession = Sessions.FirstOrDefault(s => s.SessionId == selectedId) ?? Sessions.FirstOrDefault();
+        SelectedSnapshot = Snapshots.FirstOrDefault();
+        IsRestoreEnabled = data.RestoreEnabled;
+        RestorePointCount = RestorePoints.Count;
+        OnPropertyChanged(nameof(HasLegacySessions));
+        StatusMessage = LocalizationManager.T("Loaded {0} active journal session(s)", Sessions.Count) +
+            (LegacySessions.Count > 0 ? LocalizationManager.T(" and {0} legacy session(s)", LegacySessions.Count) : "") +
+            LocalizationManager.T(" ({0} restore point(s)).", RestorePoints.Count);
+    }
 
-        if (_tweakService == null)
+    // Synchronous compatibility for non-UI consumers. WPF must always use the async path.
+    public void RefreshHistory()
+    {
+        if (Application.Current?.Dispatcher.CheckAccess() == true)
         {
-            StatusMessage = LocalizationManager.T("Tweak engine not available.");
+            _ = RefreshHistoryAsync();
             return;
         }
+        try { ApplyHistoryData(ReadHistoryData()); }
+        catch (Exception ex) { StatusMessage = LocalizationManager.T("Failed to load history: {0}", ex.Message); }
+    }
 
-        try
-        {
-            var catalog = _tweakService.LoadCatalog().Concat(_tweakService.GetActiveJournalTweaks()).GroupBy(t => t.Id, StringComparer.OrdinalIgnoreCase).Select(g => g.First()).ToList();
-            var tweakDict = catalog.ToDictionary(t => t.Id, t => t.Name, StringComparer.OrdinalIgnoreCase);
+    private Task? _historyRefreshTask;
+    [ObservableProperty] private bool _isLoadingHistory;
 
-            var rawSessions = _tweakService.GetAllSessions()
-                .OrderByDescending(s => s.StartedAtUtc)
-                .ToList();
+    [RelayCommand]
+    public Task RefreshHistoryAsync() => _historyRefreshTask is { IsCompleted: false }
+        ? _historyRefreshTask : _historyRefreshTask = RefreshHistoryCoreAsync();
 
-            foreach (var s in rawSessions)
-            {
-                string trigger = LocalizationManager.T("Manual");
-                if (s.SessionId.StartsWith("cli", StringComparison.OrdinalIgnoreCase) ||
-                    s.SessionId.Contains("_cli", StringComparison.OrdinalIgnoreCase))
-                {
-                    trigger = "CLI";
-                }
-                else if (s.Records.Any(r => r.TweakId.Contains("gaming", StringComparison.OrdinalIgnoreCase)))
-                {
-                    trigger = LocalizationManager.T("Preset (Gaming)");
-                }
-                else if (s.Records.Any(r => r.TweakId.Contains("privacy", StringComparison.OrdinalIgnoreCase)))
-                {
-                    trigger = LocalizationManager.T("Preset (Privacy)");
-                }
-                else if (s.Records.Any(r => r.TweakId.Contains("recommended", StringComparison.OrdinalIgnoreCase)))
-                {
-                    trigger = LocalizationManager.T("Preset (Recommended)");
-                }
-
-                var tweakGroups = s.Records
-                    .GroupBy(r => r.TweakId)
-                    .Select(g => new HistoryTweakItemModel
-                    {
-                        TweakId = g.Key,
-                        TweakName = tweakDict.TryGetValue(g.Key, out var name) ? LocalizationManager.T(name) : LocalizationManager.T(ModuleJournal.DisplayName(g.Key)),
-                        ActionCount = g.Count(),
-                        IsReverted = g.All(r => r.IsReverted),
-                        Records = g.ToList()
-                    })
-                    .ToList();
-
-                bool isLegacy = !TestModeManager.IsTestMode && s.IsLegacy;
-
-                var card = new HistorySessionCardModel
-                {
-                    SessionId = s.SessionId,
-                    StartedAtUtc = s.StartedAtUtc,
-                    IsCompleted = s.IsCompleted,
-                    TriggerSource = trigger,
-                    Mode = s.Mode ?? (isLegacy ? "legacy" : (TestModeManager.IsTestMode ? "test" : "real")),
-                    AppVersion = s.AppVersion,
-                    IsLegacy = isLegacy,
-                    Records = s.Records.ToList(),
-                    Tweaks = tweakGroups
-                };
-
-                if (isLegacy)
-                {
-                    LegacySessions.Add(card);
-                }
-                else
-                {
-                    Sessions.Add(card);
-                }
-            }
-
-            if (Sessions.Count > 0)
-            {
-                SelectedSession = Sessions[0];
-            }
-            else
-            {
-                SelectedSession = null;
-            }
-
-            OnPropertyChanged(nameof(HasLegacySessions));
-
-            if (_restoreService != null)
-            {
-                IsRestoreEnabled = _restoreService.IsSystemRestoreEnabled();
-                RestorePointCount = _restoreService.GetRestorePointCount();
-                var points = _restoreService.GetRestorePoints();
-                foreach (var p in points)
-                {
-                    RestorePoints.Add(p);
-                }
-            }
-
-            var backups = _tweakService.BackupManager?.GetAvailableBackups() ?? Array.Empty<BackupSnapshotInfo>();
-            foreach (var b in backups)
-            {
-                Snapshots.Add(b);
-            }
-
-            if (Snapshots.Count > 0)
-            {
-                SelectedSnapshot = Snapshots[0];
-            }
-
-            StatusMessage = LocalizationManager.T("Loaded {0} active journal session(s)", Sessions.Count) +
-                            (LegacySessions.Count > 0 ? LocalizationManager.T(" and {0} legacy session(s)", LegacySessions.Count) : "") +
-                            LocalizationManager.T(" ({0} restore point(s)).", RestorePoints.Count);
-        }
-        catch (Exception ex)
-        {
-            StatusMessage = LocalizationManager.T("Failed to load history: {0}", ex.Message);
-        }
+    private async Task RefreshHistoryCoreAsync()
+    {
+        IsLoadingHistory = true;
+        try { ApplyHistoryData(await Task.Run(ReadHistoryData)); }
+        catch (Exception ex) { StatusMessage = LocalizationManager.T("Failed to load history: {0}", ex.Message); }
+        finally { IsLoadingHistory = false; }
     }
 
     [RelayCommand]
@@ -392,7 +404,7 @@ public sealed partial class HistoryViewModel : ObservableObject
                         }).ToList()
                     };
                     _executionDialog.ShowResult(confirmedTweaks, report, healthReport, isUndo: true);
-                    RefreshHistory();
+                    await RefreshHistoryAsync();
                 });
             return;
         }
@@ -416,7 +428,7 @@ public sealed partial class HistoryViewModel : ObservableObject
                 ? LocalizationManager.T("Session {0} reverted successfully.", session.SessionId)
                 : LocalizationManager.T("Session undo partially failed: {0}", result.Message ?? LocalizationManager.T("Some actions could not be reverted"));
 
-            RefreshHistory();
+            await RefreshHistoryAsync();
         }
         catch (Exception ex)
         {
@@ -475,7 +487,7 @@ public sealed partial class HistoryViewModel : ObservableObject
                 onConfirmed: async (confirmedTweaks) =>
                 {
                     await _executionDialog.ExecuteAndShowResultAsync(confirmedTweaks, isUndo: true);
-                    RefreshHistory();
+                    await RefreshHistoryAsync();
                 });
             return;
         }
@@ -491,7 +503,7 @@ public sealed partial class HistoryViewModel : ObservableObject
                 ? LocalizationManager.T("Tweak '{0}' reverted successfully.", tweak.Name)
                 : LocalizationManager.T("Undo failed for '{0}': {1}", tweak.Name, report.Summary);
 
-            RefreshHistory();
+            await RefreshHistoryAsync();
         }
         catch (Exception ex)
         {
@@ -537,7 +549,7 @@ public sealed partial class HistoryViewModel : ObservableObject
                 onConfirmed: async (confirmedTweaks) =>
                 {
                     await _executionDialog.ExecuteAndShowResultAsync(confirmedTweaks, isUndo: true);
-                    RefreshHistory();
+                    await RefreshHistoryAsync();
                 });
             return;
         }
@@ -553,7 +565,7 @@ public sealed partial class HistoryViewModel : ObservableObject
                 ? LocalizationManager.T("Successfully reverted all {0} WinVelo tweaks.", activeTweaks.Count)
                 : LocalizationManager.T("Reverted with warnings: {0}", report.Summary);
 
-            RefreshHistory();
+            await RefreshHistoryAsync();
         }
         catch (Exception ex)
         {
@@ -644,10 +656,11 @@ public sealed partial class HistoryViewModel : ObservableObject
                     ? LocalizationManager.T("Windows throttled restore point creation (24h limit). Existing point preserved.")
                     : LocalizationManager.T("Failed to create restore point: {0}", result.ErrorMessage ?? LocalizationManager.T("Unknown error")));
 
-            IsRestoreEnabled = _restoreService.IsSystemRestoreEnabled();
-            RestorePointCount = _restoreService.GetRestorePointCount();
+            var info = await Task.Run(() => (Enabled: _restoreService.IsSystemRestoreEnabled(), Points: _restoreService.GetRestorePoints()));
+            IsRestoreEnabled = info.Enabled;
+            RestorePointCount = info.Points.Count;
             RestorePoints.Clear();
-            foreach (var p in _restoreService.GetRestorePoints())
+            foreach (var p in info.Points)
             {
                 RestorePoints.Add(p);
             }
@@ -699,7 +712,7 @@ public sealed partial class HistoryViewModel : ObservableObject
                 ? LocalizationManager.T("Backup snapshot {0} restored successfully.", snapshot.Id)
                 : LocalizationManager.T("Failed to restore backup snapshot.");
 
-            RefreshHistory();
+            await RefreshHistoryAsync();
         }
         catch (Exception ex)
         {
