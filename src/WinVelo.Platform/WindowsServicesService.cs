@@ -61,7 +61,11 @@ public sealed class WindowsServicesService : ISystemServicesService
     public void StopService(string serviceName)
     {
         if (GetState(serviceName) == "Stopped") return;
-        Checked("net.exe", 90, "stop", serviceName, "/y");
+        // Stop-Service refuses running dependents unless -Force is explicitly requested.
+        // Do not stop unjournaled dependent services through net stop /y.
+        string name = serviceName.Replace("'", "''");
+        var result = _shell.ExecutePowerShellAsync($"$service=Get-Service -Name '{name}' -ErrorAction Stop | Where-Object {{ $_.ServiceName -eq '{name}' }}; if(-not $service){{throw 'Service not found.'}}; Stop-Service -InputObject $service -ErrorAction Stop", 90).GetAwaiter().GetResult();
+        WindowsCommand.RequireSuccess(result, "Stop service " + serviceName);
         if (GetState(serviceName) != "Stopped") throw new InvalidOperationException("Service did not stop: " + serviceName);
     }
 }
