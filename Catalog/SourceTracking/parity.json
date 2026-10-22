@@ -1,0 +1,818 @@
+{
+  "repository": "ChrisTitusTech/winutil",
+  "commit": "2f0bdc8fca52e1ebe31a8d98216428061d3f8956",
+  "tweaks": [
+    {
+      "key": "WPFTweaksActivity",
+      "status": "mapped",
+      "localIds": [
+        "essential.activity"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFTweaksHiber",
+      "status": "mapped",
+      "localIds": [
+        "essential.hiber"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFTweaksWidget",
+      "status": "mapped",
+      "localIds": [
+        "essential.widget"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFTweaksRevertStartMenu",
+      "status": "mapped",
+      "localIds": [
+        "essential.revertstartmenu"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFTweaksDisableStoreSearch",
+      "status": "mapped",
+      "localIds": [
+        "essential.disablestoresearch"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFTweaksLocation",
+      "status": "mapped",
+      "localIds": [
+        "essential.location"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFTweaksServices",
+      "status": "mapped",
+      "localIds": [
+        "essential.services"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFTweaksSvcHostSplitting",
+      "status": "mapped",
+      "localIds": [
+        "advanced.svchost-splitting"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFTweaksBraveDebloat",
+      "status": "mapped",
+      "localIds": [
+        "advanced.bravedebloat"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFTweaksDisableWarningForUnsignedRdp",
+      "status": "mapped",
+      "localIds": [
+        "advanced.disablewarningforunsignedrdp"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFTweaksEdgeDebloat",
+      "status": "mapped",
+      "localIds": [
+        "advanced.edgedebloat"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFTweaksConsumerFeatures",
+      "status": "mapped",
+      "localIds": [
+        "essential.consumerfeatures"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFTweaksTelemetry",
+      "status": "mapped",
+      "localIds": [
+        "essential.telemetry"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFTweaksDeliveryOptimization",
+      "status": "mapped",
+      "localIds": [
+        "performance.network.delivery-optimization-simple"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFTweaksRemoveEdge",
+      "status": "mapped",
+      "localIds": [
+        "advanced.removeedge"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFTweaksDisableBitLocker",
+      "status": "mapped",
+      "localIds": [
+        "advanced.disablebitlocker"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFTweaksUTC",
+      "status": "mapped",
+      "localIds": [
+        "advanced.utc"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFTweaksRemoveOneDrive",
+      "status": "mapped",
+      "localIds": [
+        "advanced.removeonedrive"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFTweaksRemoveHomeAndGallery",
+      "status": "mapped",
+      "localIds": [
+        "advanced.removehomeandgallery"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFTweaksDisplay",
+      "status": "mapped",
+      "localIds": [
+        "advanced.display"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFTweaksReservedStorage",
+      "status": "mapped",
+      "localIds": [
+        "advanced.reservedstorage"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFTweaksRestorePoint",
+      "status": "mapped",
+      "localIds": [
+        "essential.restorepoint"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFTweaksEndTaskOnTaskbar",
+      "status": "mapped",
+      "localIds": [
+        "ui.taskbar.end-task-right-click"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFTweaksStorage",
+      "status": "mapped",
+      "localIds": [
+        "performance.system.storage-sense-disable"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFTweaksWindowsAI",
+      "status": "mapped",
+      "localIds": [
+        "advanced.windowsai"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFTweaksWPBT",
+      "status": "mapped",
+      "localIds": [
+        "essential.wpbt"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFTweaksPreventDeviceMetadataFromNetwork",
+      "status": "mapped",
+      "localIds": [
+        "essential.preventdevicemetadatafromnetwork"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFTweaksRazerBlock",
+      "status": "mapped",
+      "localIds": [
+        "advanced.razerblock"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFTweaksLogiBlock",
+      "status": "mapped",
+      "localIds": [
+        "advanced.logiblock"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFTweaksDisableNotifications",
+      "status": "mapped",
+      "localIds": [
+        "advanced.disablenotifications"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFTweaksBlockAdobeNet",
+      "status": "excluded",
+      "localIds": [],
+      "reason": "Not implemented; retained as an explicit parity gap for review."
+    },
+    {
+      "key": "WPFTweaksRightClickMenu",
+      "status": "mapped",
+      "localIds": [
+        "ui.explorer.classic-context-menu"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFTweaksDiskCleanup",
+      "status": "mapped",
+      "localIds": [
+        "essential.diskcleanup"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFTweaksDeleteTempFiles",
+      "status": "mapped",
+      "localIds": [
+        "essential.deletetempfiles"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFTweaksIPv46",
+      "status": "mapped",
+      "localIds": [
+        "advanced.ipv46"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFTweaksTeredo",
+      "status": "mapped",
+      "localIds": [
+        "advanced.teredo"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFTweaksDisableIPv6",
+      "status": "mapped",
+      "localIds": [
+        "advanced.disableipv6"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFTweaksDisableBGapps",
+      "status": "mapped",
+      "localIds": [
+        "advanced.disablebgapps"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFTweaksDisableExplorerAutoDiscovery",
+      "status": "mapped",
+      "localIds": [
+        "essential.disableexplorerautodiscovery"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFToggleDetailedBSoD",
+      "status": "mapped",
+      "localIds": [
+        "pref.detailedbsod"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFToggleBatteryPercentage",
+      "status": "mapped",
+      "localIds": [
+        "pref.batterypercentage"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFToggleDarkMode",
+      "status": "mapped",
+      "localIds": [
+        "pref.darkmode"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFToggleShowExt",
+      "status": "mapped",
+      "localIds": [
+        "ui.explorer.show-file-extensions"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFToggleHiddenFiles",
+      "status": "mapped",
+      "localIds": [
+        "ui.explorer.show-hidden-files"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFToggleVerboseLogon",
+      "status": "mapped",
+      "localIds": [
+        "pref.verboselogon"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFToggleNewOutlook",
+      "status": "mapped",
+      "localIds": [
+        "pref.newoutlook"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFToggleScrollbars",
+      "status": "mapped",
+      "localIds": [
+        "pref.scrollbars"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFMultiplaneOverlay",
+      "status": "mapped",
+      "localIds": [
+        "performance.gpu.disable-mpo"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFToggleMouseAcceleration",
+      "status": "mapped",
+      "localIds": [
+        "gaming.input.disable-mouse-acceleration"
+      ],
+      "reason": "Upstream toggle mapped to explicit local enable/disable choices."
+    },
+    {
+      "key": "WPFToggleNumLock",
+      "status": "mapped",
+      "localIds": [
+        "pref.numlock"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFToggleWindowSnapping",
+      "status": "mapped",
+      "localIds": [
+        "pref.windowsnapping"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFToggleStandbyFix",
+      "status": "mapped",
+      "localIds": [
+        "pref.standbyfix"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFToggleS3Sleep",
+      "status": "mapped",
+      "localIds": [
+        "pref.s3sleep"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFToggleHideSettingsHome",
+      "status": "excluded",
+      "localIds": [],
+      "reason": "Not implemented; retained as an explicit parity gap for review."
+    },
+    {
+      "key": "WPFToggleBingSearch",
+      "status": "mapped",
+      "localIds": [
+        "pref.bingsearch"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFToggleLoginBlur",
+      "status": "mapped",
+      "localIds": [
+        "pref.loginblur"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFToggleDisableLockscreen",
+      "status": "mapped",
+      "localIds": [
+        "pref.disablelockscreen"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFToggleStartMenuRecommendations",
+      "status": "mapped",
+      "localIds": [
+        "pref.startmenurecommendations"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFToggleStickyKeys",
+      "status": "mapped",
+      "localIds": [
+        "pref.stickykeys"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFToggleTaskbarAlignment",
+      "status": "mapped",
+      "localIds": [
+        "ui.taskbar.alignment-left"
+      ],
+      "reason": "Upstream toggle mapped to explicit local enable/disable choices."
+    },
+    {
+      "key": "WPFToggleTaskbarSearch",
+      "status": "mapped",
+      "localIds": [
+        "pref.taskbarsearch"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFToggleTaskView",
+      "status": "mapped",
+      "localIds": [
+        "advanced.display",
+        "ui.taskbar.disable-task-view-button"
+      ],
+      "reason": "Upstream toggle mapped to explicit local enable/disable choices."
+    },
+    {
+      "key": "WPFToggleGameMode",
+      "status": "mapped",
+      "localIds": [
+        "gaming.mode.enable"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFToggleLongPaths",
+      "status": "mapped",
+      "localIds": [
+        "ui.system.enable-long-paths"
+      ],
+      "reason": "Curated implementation; actions can differ from upstream."
+    },
+    {
+      "key": "WPFOOSUbutton",
+      "status": "module",
+      "localIds": [],
+      "reason": "Official O&O link"
+    },
+    {
+      "key": "WPFchangedns",
+      "status": "module",
+      "localIds": [],
+      "reason": "DNS"
+    },
+    {
+      "key": "WPFAddUltPerf",
+      "status": "module",
+      "localIds": [],
+      "reason": "PowerPlan"
+    },
+    {
+      "key": "WPFRemoveUltPerf",
+      "status": "module",
+      "localIds": [],
+      "reason": "PowerPlan"
+    }
+  ],
+  "applications": [
+    "7zip.7zip",
+    "9NKSQGP7F2NH",
+    "9NT1R1C2HH7J",
+    "Ablaze.Floorp",
+    "Adobe.Acrobat.Reader.64-bit",
+    "AdrienAllard.FileConverter",
+    "AgileBits.1Password",
+    "AIMP.AIMP",
+    "Amazon.Corretto.21.JDK",
+    "Amazon.Corretto.25.JDK",
+    "Amazon.Corretto.8.JDK",
+    "amir1376.ABDownloadManager",
+    "angryziber.AngryIPScanner",
+    "Anthropic.Claude",
+    "Anthropic.ClaudeCode",
+    "AntibodySoftware.WizTree",
+    "AnyDesk.AnyDesk",
+    "Anysphere.Cursor",
+    "Apple.iTunes",
+    "astral-sh.uv",
+    "Audacity.Audacity",
+    "AutoHotkey.AutoHotkey",
+    "Automattic.Simplenote",
+    "Betterbird.Betterbird",
+    "BitSum.ProcessLasso",
+    "Bitwarden.Bitwarden",
+    "BlenderFoundation.Blender",
+    "Blizzard.BattleNet",
+    "Blur009.BlurAutoClicker",
+    "Brave.Brave",
+    "Bruno.Bruno",
+    "calibre.calibre",
+    "Cemu.Cemu",
+    "CharlesMilette.TranslucentTB",
+    "ChatterinoTeam.Chatterino",
+    "Cloudflare.Warp",
+    "clsid2.mpc-hc",
+    "CodecGuide.K-LiteCodecPack.Standard",
+    "CodingWondersSoftware.DISMTools.Stable",
+    "CPUID.CPU-Z",
+    "CPUID.HWMonitor",
+    "CrystalDewWorld.CrystalDiskInfo",
+    "CrystalDewWorld.CrystalDiskMark",
+    "Cyanfish.NAPS2",
+    "Deskflow.Deskflow",
+    "Devolutions.UniGetUI",
+    "DigitalScholar.Zotero",
+    "Discord.Discord",
+    "Docker.DockerDesktop",
+    "dotPDN.PaintDotNet",
+    "Dropbox.Dropbox",
+    "DuongDieuPhap.ImageGlass",
+    "ElectronicArts.EADesktop",
+    "Element.Element",
+    "eloston.ungoogled-chromium",
+    "ente-io.auth-desktop",
+    "EpicGames.EpicGamesLauncher",
+    "ES-DE.EmulationStation-DE",
+    "Famatech.AdvancedIPScanner",
+    "File-New-Project.EarTrumpet",
+    "FilesCommunity.Files",
+    "Fleex255.PolicyPlus",
+    "flux.flux",
+    "Foxit.FoxitReader",
+    "geeksoftwareGmbH.PDF24Creator",
+    "gerardog.gsudo",
+    "GermanCoding.SyncTrayzor",
+    "Ghisler.TotalCommander",
+    "GIMP.GIMP.3",
+    "Giorgiotani.Peazip",
+    "Git.Git",
+    "GitExtensionsTeam.GitExtensions",
+    "GitHub.cli",
+    "GitHub.GitHubDesktop",
+    "GlavSoft.TightVNC",
+    "GlennDelahoy.SnappyDriverInstallerOrigin",
+    "glzr-io.glazewm",
+    "GOG.Galaxy",
+    "GoLang.Go",
+    "Google.Chrome",
+    "Google.GoogleDrive",
+    "Guru3D.Afterburner",
+    "HandBrake.HandBrake",
+    "Hashicorp.Vagrant",
+    "Henry++.simplewall",
+    "HeroicGamesLauncher.HeroicGamesLauncher",
+    "Hibbiki.Chromium",
+    "Hugo.Hugo.Extended",
+    "ImputNet.Helium",
+    "Insecure.Nmap",
+    "IrfanSkiljan.IrfanView",
+    "ItchIo.Itch",
+    "JAMSoftware.TreeSize.Free",
+    "JanDeDobbeleer.OhMyPosh",
+    "Jellyfin.JellyfinMediaPlayer",
+    "Jellyfin.Server",
+    "JesseDuffield.lazygit",
+    "JetBrains.Toolbox",
+    "Joplin.Joplin",
+    "KDE.Okular",
+    "KeePassXCTeam.KeePassXC",
+    "Kitware.CMake",
+    "Klocman.BulkCrapUninstaller",
+    "LibreWolf.LibreWolf",
+    "LizardByte.Sunshine",
+    "LocalSend.LocalSend",
+    "M2Team.NanaZip",
+    "Maxon.CinebenchR23",
+    "MHNexus.HxD",
+    "Microsoft.DotNet.DesktopRuntime.10",
+    "Microsoft.DotNet.DesktopRuntime.6",
+    "Microsoft.DotNet.DesktopRuntime.8",
+    "Microsoft.DotNet.DesktopRuntime.9",
+    "Microsoft.Edge",
+    "Microsoft.NuGet",
+    "Microsoft.OneDrive",
+    "Microsoft.PowerShell",
+    "Microsoft.PowerToys",
+    "Microsoft.Sysinternals.Autoruns",
+    "Microsoft.Sysinternals.ProcessExplorer",
+    "Microsoft.Sysinternals.ProcessMonitor",
+    "Microsoft.Sysinternals.PsTools",
+    "Microsoft.Sysinternals.RDCMan",
+    "Microsoft.Sysinternals.TCPView",
+    "Microsoft.Teams",
+    "Microsoft.VCRedist.2015+.x64",
+    "Microsoft.VCRedist.2015+.x86",
+    "Microsoft.VisualStudio.2022.Community",
+    "Microsoft.VisualStudio.Community",
+    "Microsoft.VisualStudioCode",
+    "Microsoft.WindowsTerminal",
+    "MiniTool.PartitionWizard.Free",
+    "Modrinth.ModrinthApp",
+    "MoonlightGameStreamingProject.Moonlight",
+    "Mozilla.Firefox",
+    "Mozilla.Firefox.ESR",
+    "Mozilla.Thunderbird",
+    "mpc-qt.mpc-qt",
+    "MullvadVPN.MullvadBrowser",
+    "MullvadVPN.MullvadVPN",
+    "Neovim.Neovim",
+    "Netbird.Netbird",
+    "Nextcloud.NextcloudDesktop",
+    "Nilesoft.Shell",
+    "Nlitesoft.NTLite",
+    "nomacs.nomacs",
+    "Notepad++.Notepad++",
+    "Nvidia.GeForceNow",
+    "Obsidian.Obsidian",
+    "OBSProject.OBSStudio",
+    "ONLYOFFICE.DesktopEditors",
+    "OPAutoClicker.OPAutoClicker",
+    "OpenAI.Codex",
+    "OpenJS.NodeJS",
+    "OpenJS.NodeJS.LTS",
+    "OpenRGB.OpenRGB",
+    "OpenVPNTechnologies.OpenVPNConnect",
+    "OpenWhisperSystems.Signal",
+    "Oracle.VirtualBox",
+    "Overwolf.CurseForge",
+    "Parsec.Parsec",
+    "pbek.QOwnNotes",
+    "PDFgear.PDFgear",
+    "PDFsam.PDFsam",
+    "PeterPawlowski.foobar2000",
+    "Playnite.Playnite",
+    "Plex.Plex",
+    "Plex.PlexMediaServer",
+    "pnpm.pnpm",
+    "Postman.Postman",
+    "PrismLauncher.PrismLauncher",
+    "Proton.ProtonAuthenticator",
+    "Proton.ProtonDrive",
+    "Proton.ProtonMail",
+    "Proton.ProtonPass",
+    "Proton.ProtonVPN",
+    "PuTTY.PuTTY",
+    "Python.Python.3.14",
+    "qBittorrent.qBittorrent",
+    "Rakuten.Viber",
+    "RARLab.WinRAR",
+    "rcmaehl.MSEdgeRedirect",
+    "REALiX.HWiNFO",
+    "RevoUninstaller.RevoUninstaller",
+    "rjpcomputing.luaforwindows",
+    "Roblox.Roblox",
+    "RubyInstallerTeam.Ruby.4.0",
+    "Rufus.Rufus",
+    "Rustlang.Rust.MSVC",
+    "Schniz.fnm",
+    "ShareX.ShareX",
+    "shinchiro.mpv",
+    "SlackTechnologies.Slack",
+    "SpikeHD.Dorion",
+    "SST.opencode",
+    "Starship.Starship",
+    "StartIsBack.StartAllBack",
+    "SublimeHQ.SublimeText.4",
+    "SumatraPDF.SumatraPDF",
+    "sylikc.JPEGView",
+    "Syncthing.Syncthing",
+    "Tailscale.Tailscale",
+    "TeamSpeakSystems.TeamSpeakClient",
+    "TeamSpeakSystems.TeamSpeakClient.Beta.6",
+    "TeamViewer.TeamViewer",
+    "TechPowerUp.GPU-Z",
+    "TechPowerUp.NVCleanstall",
+    "Telegram.TelegramDesktop",
+    "TheDocumentFoundation.LibreOffice",
+    "Tonec.InternetDownloadManager",
+    "TorProject.TorBrowser",
+    "Tox.qTox",
+    "TrackerSoftware.PDF-XChangeEditor",
+    "Ubisoft.Connect",
+    "Unity.UnityHub",
+    "Valve.Steam",
+    "Vencord.Vesktop",
+    "Ventoy.Ventoy",
+    "VideoLAN.VLC",
+    "VirtualDesktop.Streamer",
+    "Vivaldi.Vivaldi",
+    "voidtools.Everything",
+    "VSCodium.VSCodium",
+    "Wagnardsoft.DisplayDriverUninstaller",
+    "Waterfox.Waterfox",
+    "WerWolv.ImHex",
+    "WhirlwindFX.SignalRgb",
+    "WinSCP.WinSCP",
+    "WinsiderSS.SystemInformer",
+    "WireGuard.WireGuard",
+    "WiresharkFoundation.Wireshark",
+    "WiseCleaner.WiseProgramUninstaller",
+    "XBMCFoundation.Kodi",
+    "xM4ddy.OFGB",
+    "Xournal++.Xournal++",
+    "Yarn.Yarn",
+    "ZedIndustries.Zed",
+    "Zen-Team.Zen-Browser",
+    "Zoom.Zoom"
+  ],
+  "curatedApplicationAliases": {
+    "chrome": "Google.Chrome",
+    "brave": "Brave.Brave",
+    "firefox": "Mozilla.Firefox",
+    "edge": "Microsoft.Edge",
+    "discord": "Discord.Discord",
+    "telegram": "Telegram.TelegramDesktop",
+    "whatsapp": "9NKSQGP7F2NH",
+    "zoom": "Zoom.Zoom",
+    "vlc": "VideoLAN.VLC",
+    "spotify": "Spotify.Spotify",
+    "obs": "OBSProject.OBSStudio",
+    "handbrake": "HandBrake.HandBrake",
+    "audacity": "Audacity.Audacity",
+    "paintnet": "dotPDN.PaintDotNet",
+    "sharex": "ShareX.ShareX",
+    "7zip": "7zip.7zip",
+    "winrar": "RARLab.WinRAR",
+    "powertoys": "Microsoft.PowerToys",
+    "everything": "voidtools.Everything",
+    "wiztree": "AntibodySoftware.WizTree",
+    "qbittorrent": "qBittorrent.qBittorrent",
+    "anydesk": "AnyDesk.AnyDesk",
+    "bitwarden": "Bitwarden.Bitwarden",
+    "bleachbit": "BleachBit.BleachBit",
+    "rufus": "Rufus.Rufus",
+    "steam": "Valve.Steam",
+    "epicgames": "EpicGames.EpicGamesLauncher",
+    "goggalaxy": "GOG.Galaxy",
+    "battlenet": "Blizzard.BattleNet",
+    "vscode": "Microsoft.VisualStudioCode",
+    "notepadplusplus": "Notepad++.Notepad++",
+    "git": "Git.Git",
+    "terminal": "Microsoft.WindowsTerminal",
+    "python": "Python.Python.3.12",
+    "nodejs": "OpenJS.NodeJS.LTS",
+    "githubdesktop": "GitHub.GitHubDesktop"
+  }
+}

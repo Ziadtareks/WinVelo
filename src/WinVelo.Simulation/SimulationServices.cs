@@ -376,6 +376,7 @@ public sealed class FakeRestoreService : ISystemRestoreService
 
 public sealed class FakeShellService : IShellService
 {
+    public bool SupportsSystemQueries => false;
     public bool ExplorerRestarted { get; private set; }
     public bool EnvironmentRefreshed { get; private set; }
     public List<string> ExecutedScripts { get; } = new();

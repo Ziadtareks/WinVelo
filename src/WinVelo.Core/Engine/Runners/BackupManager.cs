@@ -6,6 +6,8 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using WinVelo.Core.Interfaces;
 using WinVelo.Core.Models;
+using WinVelo.Core.Engine.Handlers;
+using WinVelo.Core.Safety;
 
 namespace WinVelo.Core.Engine.Runners;
 
@@ -55,9 +57,7 @@ public sealed class BackupManager
         _registry = registry;
         _services = services;
         _restoreService = restoreService;
-        _backupsRoot = customBackupsDir ?? Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "WinVelo", "Backups");
+        _backupsRoot = customBackupsDir ?? WinVeloStoragePaths.GetRegistryBackupDirectory(TestModeManager.IsTestMode);
     }
 
     public string BackupsRootDirectory => _backupsRoot;
@@ -65,7 +65,7 @@ public sealed class BackupManager
     public Task<string> CreateSnapshotAsync(IEnumerable<TweakDefinition> tweaks, string? description = null)
     {
         Directory.CreateDirectory(_backupsRoot);
-        string folderName = DateTime.Now.ToString("yyyy-MM-dd_HHmmss");
+        string folderName = DateTime.Now.ToString("yyyy-MM-dd_HHmmss_") + Guid.NewGuid().ToString("N")[..8];
         string backupDir = Path.Combine(_backupsRoot, folderName);
         Directory.CreateDirectory(backupDir);
 
@@ -95,8 +95,7 @@ public sealed class BackupManager
                         touchedKeys.Add((action.Hive, action.Key));
 
                         bool keyExisted = _registry.KeyExists(action.Hive, action.Key);
-                        bool valExisted = !string.IsNullOrEmpty(action.ValueName) &&
-                                          _registry.ValueExists(action.Hive, action.Key, action.ValueName);
+                        bool valExisted = keyExisted && _registry.ValueExists(action.Hive, action.Key, action.ValueName ?? string.Empty);
                         object? curData = valExisted ? _registry.GetValue(action.Hive, action.Key, action.ValueName!) : null;
                         string? curKind = valExisted ? _registry.GetValueKind(action.Hive, action.Key, action.ValueName!) : null;
 
@@ -211,12 +210,13 @@ public sealed class BackupManager
             if (meta == null) return false;
 
             onProgress?.Invoke($"Restoring backup snapshot {meta.Id} ({meta.Items.Count} items)...");
+            bool succeeded = true;
 
             // 1. Restore registry items
             foreach (var item in meta.Items.Where(i => i.Type == "Registry"))
             {
                 string[] parts = item.Target.Split('\\', 2);
-                if (parts.Length < 2) continue;
+                if (parts.Length < 2) { succeeded = false; continue; }
                 string hive = parts[0];
                 string key = parts[1];
 
@@ -224,21 +224,26 @@ public sealed class BackupManager
                 {
                     if (!item.Existed)
                     {
-                        if (!string.IsNullOrEmpty(item.ValueName) && _registry.ValueExists(hive, key, item.ValueName))
+                        if (_registry.ValueExists(hive, key, item.ValueName ?? string.Empty))
                         {
-                            _registry.DeleteValue(hive, key, item.ValueName);
+                            _registry.DeleteValue(hive, key, item.ValueName ?? string.Empty);
                             onProgress?.Invoke($"[OK] Removed created value {hive}\\{key}\\{item.ValueName}");
                         }
                     }
-                    else if (item.Data != null && !string.IsNullOrEmpty(item.ValueName))
+                    else if (item.Data != null)
                     {
                         if (!_registry.KeyExists(hive, key)) _registry.CreateKey(hive, key);
-                        _registry.SetValue(hive, key, item.ValueName, item.Data, item.ValueKind ?? "DWord");
+                        string? serialized = item.Data is JsonElement json
+                            ? json.ValueKind == JsonValueKind.String ? json.GetString() : json.GetRawText()
+                            : RegistryActionHandler.SerializeData(item.Data);
+                        object data = RegistryActionHandler.DeserializeData(serialized, item.ValueKind ?? "DWord");
+                        _registry.SetValue(hive, key, item.ValueName ?? string.Empty, data, item.ValueKind ?? "DWord");
                         onProgress?.Invoke($"[OK] Restored {hive}\\{key}\\{item.ValueName} = {item.Data}");
                     }
                 }
                 catch (Exception ex)
                 {
+                    succeeded = false;
                     onProgress?.Invoke($"[WARN] Could not restore {item.Target}: {ex.Message}");
                 }
             }
@@ -251,17 +256,21 @@ public sealed class BackupManager
                     try
                     {
                         _services.SetStartupType(item.Target, item.ValueKind);
+                        string? state = item.Data is JsonElement json ? json.GetString() : item.Data?.ToString();
+                        if (state == "Running") _services.StartService(item.Target);
+                        else if (state == "Stopped") _services.StopService(item.Target);
                         onProgress?.Invoke($"[OK] Restored service {item.Target} startup to {item.ValueKind}");
                     }
                     catch (Exception ex)
                     {
+                        succeeded = false;
                         onProgress?.Invoke($"[WARN] Could not restore service {item.Target}: {ex.Message}");
                     }
                 }
             }
 
-            onProgress?.Invoke($"[OK] Snapshot {meta.Id} restored successfully.");
-            return true;
+            onProgress?.Invoke(succeeded ? $"[OK] Snapshot {meta.Id} restored successfully." : $"[WARN] Snapshot {meta.Id} was only partially restored.");
+            return succeeded;
         });
     }
 }

@@ -25,6 +25,10 @@ public sealed class JournalActionRecord
     [JsonPropertyName("previousData")]
     public string? PreviousData { get; set; }
 
+    // Captured before execution so session/crash recovery uses the same undo plan as single-tweak undo.
+    [JsonPropertyName("undoActions")]
+    public List<ActionItem>? UndoActions { get; set; }
+
     [JsonPropertyName("keyCreated")]
     public bool KeyCreated { get; set; }
 

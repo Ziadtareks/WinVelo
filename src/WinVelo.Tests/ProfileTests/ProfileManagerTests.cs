@@ -104,9 +104,9 @@ public class ProfileManagerTests
 
         string regContent = ProfileManager.ExportProfileToReg(profile, tweaks);
         Assert.Contains("Windows Registry Editor Version 5.00", regContent);
-        Assert.Contains(@"[HKCU\Software\TestCompany\App]", regContent);
+        Assert.Contains(@"[HKEY_CURRENT_USER\Software\TestCompany\App]", regContent);
         Assert.Contains("\"FeatureEnabled\"=dword:00000001", regContent);
-        Assert.Contains(@"[HKLM\Software\Policies\Microsoft\Windows\DataCollection]", regContent);
+        Assert.Contains(@"[HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\DataCollection]", regContent);
         Assert.Contains("\"OldSetting\"=-", regContent);
     }
 

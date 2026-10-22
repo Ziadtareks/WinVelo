@@ -23,9 +23,9 @@ public sealed class StartupService : IStartupService
     private const string ApprovedRun32Key = @"Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run32";
     private const string ApprovedFolderKey = @"Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\StartupFolder";
 
-    public StartupService(IRegistryService registry)
+    public StartupService(IRegistryService registry, WinVelo.Core.Engine.RollbackJournalManager? journal = null)
     {
-        _registry = registry;
+        _registry = WinVelo.Core.Engine.ModuleJournal.Registry(registry, journal, "tools.startup");
     }
 
     public Task<List<StartupAppItem>> GetStartupEntriesAsync()

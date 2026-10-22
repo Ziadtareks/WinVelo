@@ -44,14 +44,16 @@ public sealed class TaskActionHandler : IActionHandler
             ActionType = "ScheduledTask",
             TargetIdentifier = targetId,
             ExistedBefore = true,
-            PreviousValueKind = "TaskState",
-            PreviousData = isBaseline ? wasEnabled.ToString() : existingBaseline!.PreviousData,
+            PreviousValueKind = action.Operation == "Delete" ? "TaskXml" : "TaskState",
+            PreviousData = action.Operation == "Delete" ? context.Tasks.ExportTaskDefinition(path, action.TaskName) : isBaseline ? wasEnabled.ToString() : existingBaseline!.PreviousData,
             IsBaseline = isBaseline,
             AppliedAtUtc = DateTime.UtcNow
         };
 
         if (!context.IsDryRun && !context.IsUndoOperation)
         {
+            if (action.Operation == "Delete" && string.IsNullOrWhiteSpace(journalRecord.PreviousData))
+                return Task.FromResult(ActionResult.Fail("Cannot delete a task without backing up its definition."));
             context.Journal.RecordActionWriteAhead(journalRecord);
         }
 
@@ -78,7 +80,7 @@ public sealed class TaskActionHandler : IActionHandler
             {
                 return Task.FromResult(new ActionResult
                 {
-                    Success = true,
+                    Success = false,
                     Message = $"[WARN] Task '{path}\\{action.TaskName}' action failed: {ex.Message} (skipped)"
                 });
             }
@@ -98,11 +100,17 @@ public sealed class TaskActionHandler : IActionHandler
         string taskPath = string.Join('\\', parts[..^1]);
         if (string.IsNullOrEmpty(taskPath)) taskPath = "\\";
 
+        if (record.PreviousValueKind == "TaskXml" && !string.IsNullOrWhiteSpace(record.PreviousData))
+        {
+            try { context.Tasks.RegisterTaskDefinition(taskPath, taskName, record.PreviousData); return Task.FromResult(ActionResult.Ok()); }
+            catch (Exception ex) { return Task.FromResult(ActionResult.Fail("Task restore failed: " + ex.Message)); }
+        }
+
         if (!context.Tasks.TaskExists(taskPath, taskName))
         {
             return Task.FromResult(new ActionResult
             {
-                Success = true,
+                Success = false,
                 Message = $"Task '{taskPath}\\{taskName}' not present during rollback (skipped)."
             });
         }
@@ -120,7 +128,7 @@ public sealed class TaskActionHandler : IActionHandler
                 context.Tasks.DisableTask(taskPath, taskName);
             }
         }
-        catch { }
+        catch (Exception ex) { return Task.FromResult(ActionResult.Fail("Task rollback failed: " + ex.Message)); }
 
         return Task.FromResult(new ActionResult { Success = true });
     }

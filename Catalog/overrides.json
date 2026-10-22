@@ -22,7 +22,7 @@
       "documentation": "docs/UPSTREAM.md"
     },
     "WPFRemoveUltPerf": {
-      "reason": "Handled as a native Power Plan tool in the Tools tab; switching back to Balanced restores the default plan. WinVelo does not delete power schemes.",
+      "reason": "Handled by the native Power Plan tool, which removes only the plan created with WinVelo's stable managed GUID and restores Balanced when needed.",
       "documentation": "docs/UPSTREAM.md"
     }
   },
@@ -30,28 +30,41 @@
     "WPFTweaksDisableBitLocker": {
       "category": "z__Advanced Tweaks - CAUTION",
       "risk": "High",
-      "impacts": ["security"],
+      "impacts": [
+        "security"
+      ],
       "warning": "Disabling BitLocker removes disk encryption and leaves drive data completely unprotected against unauthorized physical access.",
       "excludeFromPresets": true
     },
     "WPFTweaksRemoveEdge": {
       "risk": "High",
-      "impacts": ["ui", "performance"],
+      "impacts": [
+        "ui",
+        "performance"
+      ],
       "warning": "Removes Microsoft Edge from the system. Some Windows components, widgets, or web-authentication dialogs may be affected."
     },
     "WPFTweaksRemoveOneDrive": {
       "risk": "High",
-      "impacts": ["storage", "performance"],
+      "impacts": [
+        "storage",
+        "performance"
+      ],
       "warning": "Completely uninstalls OneDrive and stops file synchronization. Ensure all cloud documents are backed up locally."
     },
     "WPFTweaksWindowsAI": {
       "risk": "High",
-      "impacts": ["privacy", "performance"],
+      "impacts": [
+        "privacy",
+        "performance"
+      ],
       "warning": "Removes and disables Windows AI, Recall, and Copilot packages system-wide."
     },
     "WPFTweaksDisableIPv6": {
       "risk": "High",
-      "impacts": ["network"],
+      "impacts": [
+        "network"
+      ],
       "warning": "Disables IPv6 on all network adapters. Some modern networks and services requiring IPv6 may lose connectivity."
     }
   },

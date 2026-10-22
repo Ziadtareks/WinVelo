@@ -22,8 +22,8 @@ public sealed class PowerPlanServiceTests
         string script = Assert.Single(shell.ExecutedScripts);
         Assert.Contains("e9a42b02-d5df-448d-aa00-03f14749eb61", script);
         Assert.Contains("if (-not ($list -match [regex]::Escape($guid)))", script);
-        Assert.Contains("-duplicatescheme $guid", script);
-        Assert.Contains("$guid = $match.Value", script);
+        Assert.Contains("-duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61 " + TweakService.ManagedPowerPlanId, script);
+        Assert.Contains(TweakService.ManagedPowerPlanId, script);
         Assert.Contains("/setactive $guid", script);
         Assert.Contains("$LASTEXITCODE", script);
     }

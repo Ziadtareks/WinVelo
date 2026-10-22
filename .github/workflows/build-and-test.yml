@@ -73,7 +73,7 @@ jobs:
           if-no-files-found: ignore
 
   smoke:
-    # Replaces manual VM testing for releases. Builds the real portable package and checks it on Windows.
+    # Builds the portable package and checks simulated behavior. Real-mode VM validation is still required.
     # Everything runs in test/simulation mode: no step touches the runner's registry, services or tasks.
     name: Windows smoke tests (portable package, simulation only)
     runs-on: windows-latest
@@ -141,9 +141,10 @@ jobs:
             if ($out -notmatch [regex]::Escape('TEST/SIMULATION ACTIVE')) { throw 'The CLI did not run in simulation mode.' }
             if ($expect -and $out -notmatch [regex]::Escape($expect)) { throw "Expected '$expect' in the output of: $($cliArgs -join ' ')" }
           }
-          Run @('--list') 'Loaded 140 tweak(s)'
+          $tweakCount = @(Get-ChildItem Catalog/Tweaks/*.json | ForEach-Object { Get-Content $_ -Raw | ConvertFrom-Json } | ForEach-Object { $_ }).Count
+          Run @('--list') "Loaded $tweakCount tweak(s)"
           Run @('--info', 'ui.explorer.show-file-extensions') 'TWEAK INFORMATION'
-          Run @('--detect-all', '--test-mode') 'Scanning host machine state for all 140 tweaks'
+          Run @('--detect-all', '--test-mode') "Scanning host machine state for all $tweakCount tweaks"
           Run @('--preset', 'privacy', '--dry-run') 'DRY RUN PREVIEW'
           Run @('--tweak', 'ui.explorer.show-file-extensions', '--apply', '--yes') 'Applied 1 of 1'
           Run @('--tweak', 'ui.explorer.show-file-extensions', '--undo', '--yes') 'Restored 1 of 1'

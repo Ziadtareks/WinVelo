@@ -4,6 +4,7 @@
              xmlns:loc="clr-namespace:WinVelo.App.Localization"
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              xmlns:vm="clr-namespace:WinVelo.App.ViewModels"
+             xmlns:views="clr-namespace:WinVelo.App.Views"
              AutomationProperties.AutomationId="ToolsTabView"
              AutomationProperties.Name="System Tools and Utilities">
 
@@ -21,6 +22,7 @@
                     <TextBlock Text="{loc:Tr Tools_IntegratedWindowsMaintenanceServiceContr}"
                                FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,20" />
 
+                    <Button AutomationProperties.Name="{loc:Tr Tools_Appx}" Content="{loc:Tr Tools_Appx}" Command="{Binding SelectToolCommand}" CommandParameter="Appx" Style="{DynamicResource ModernSecondaryBtn}" HorizontalAlignment="Left" Margin="6,0,0,12" />
                     <!-- Grid of 9 Tool Tiles -->
                     <UniformGrid Columns="3" Margin="0,0,0,16">
                         <!-- 1. Startup Apps -->
@@ -372,14 +374,17 @@
                         </StackPanel>
                     </Border>
 
+                    <TextBlock Text="{Binding ToolboxVM.Status}" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,8"/>
                     <ItemsControl ItemsSource="{Binding ToolboxVM.ServicesList}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <Border Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
                                         BorderThickness="1" CornerRadius="6" Padding="14,10" Margin="0,0,0,6">
                                     <Grid>
+                                        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
                                             <ColumnDefinition Width="Auto" />
                                             <ColumnDefinition Width="10" />
                                             <ColumnDefinition Width="Auto" />
@@ -394,6 +399,12 @@
                                         <Border Grid.Column="3" Background="{DynamicResource StatusDefaultBgBrush}" CornerRadius="4" Padding="6,2" VerticalAlignment="Center">
                                             <TextBlock Text="{Binding StartupType, StringFormat={loc:Tr Tools_Startup0}}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" />
                                         </Border>
+                                        <StackPanel Grid.Row="1" Grid.ColumnSpan="5" Orientation="Horizontal" Margin="0,8,0,0">
+                                            <ComboBox AutomationProperties.Name="{loc:Tr Tools_ServiceStartup}" ItemsSource="{Binding StartupTypes}" SelectedItem="{Binding StartupType}" MinWidth="120"/>
+                                            <Button AutomationProperties.Name="{loc:Tr Tools_ApplyStartup}" Content="{loc:Tr Tools_ApplyStartup}" Command="{Binding DataContext.ToolboxVM.SetServiceStartupCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Margin="8,0" Style="{DynamicResource ModernSecondaryBtn}"/>
+                                            <Button AutomationProperties.Name="{loc:Tr Tools_StartService}" Content="{loc:Tr Tools_StartService}" Command="{Binding DataContext.ToolboxVM.StartServiceCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Style="{DynamicResource ModernSecondaryBtn}"/>
+                                            <Button AutomationProperties.Name="{loc:Tr Tools_StopService}" Content="{loc:Tr Tools_StopService}" Command="{Binding DataContext.ToolboxVM.StopServiceCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Margin="8,0" Style="{DynamicResource ModernSecondaryBtn}"/>
+                                        </StackPanel>
                                     </Grid>
                                 </Border>
                             </DataTemplate>
@@ -496,6 +507,12 @@
                         </DockPanel>
                     </Border>
 
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                        <TextBlock Text="{loc:Tr Tools_NetworkAdapter}" VerticalAlignment="Center" Margin="0,0,10,0" />
+                        <ComboBox ItemsSource="{Binding ToolboxVM.DnsAdapters}" DisplayMemberPath="Name"
+                                  SelectedItem="{Binding ToolboxVM.SelectedDnsAdapter}" MinWidth="220" AutomationProperties.Name="DNS network adapter" />
+                        <CheckBox AutomationProperties.Name="{loc:Tr Tools_UseDoh}" Content="{loc:Tr Tools_UseDoh}" IsChecked="{Binding ToolboxVM.UseDnsOverHttps}" Margin="16,0,0,0" VerticalAlignment="Center" />
+                    </StackPanel>
                     <!-- Nagle's Algorithm Toggle -->
                     <Border Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
                             BorderThickness="1" CornerRadius="6" Padding="14,10" Margin="0,0,0,12">
@@ -537,7 +554,7 @@
                                                 <TextBlock Text="{Binding PingMs, StringFormat={loc:Tr Tools_Latency0Ms}}" FontSize="11" Foreground="{DynamicResource AccentPrimaryBrush}" FontWeight="SemiBold" />
                                             </StackPanel>
                                         </StackPanel>
-                                        <Button Grid.Column="1" Content="{loc:Tr Tools_Ping}" AutomationProperties.Name="{Binding Name, StringFormat='Ping {0}'}" Style="{DynamicResource ModernGhostBtn}" VerticalAlignment="Center"
+                                        <Button Grid.Column="1" Content="{loc:Tr Tools_TestDns}" AutomationProperties.Name="{Binding Name, StringFormat='Ping {0}'}" Style="{DynamicResource ModernGhostBtn}" VerticalAlignment="Center"
                                                 Command="{Binding DataContext.ToolboxVM.TestDnsLatencyCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                 CommandParameter="{Binding}" />
                                         <Button Grid.Column="3" Content="{loc:Tr Tools_Apply}" AutomationProperties.Name="{Binding Name, StringFormat='Apply {0} DNS'}" Style="{DynamicResource ModernSecondaryBtn}" VerticalAlignment="Center"
@@ -573,6 +590,8 @@
                         </StackPanel>
                     </Border>
 
+                    <Button AutomationProperties.Name="{loc:Tr Tools_AdditionalConfiguration}" Content="{loc:Tr Tools_AdditionalConfiguration}" Command="{Binding SelectToolCommand}" CommandParameter="Configuration"
+                            AutomationProperties.AutomationId="Tool_Configuration" Style="{DynamicResource ModernSecondaryBtn}" Margin="0,0,0,12" HorizontalAlignment="Left" />
                     <ItemsControl ItemsSource="{Binding ToolboxVM.FixesList}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
@@ -674,9 +693,20 @@
                             </StackPanel>
                         </Border>
                     </UniformGrid>
+                    <StackPanel Visibility="{Binding UpdatesVM.IsConfirmationRequired, Converter={StaticResource BoolToVisConverter}}" Margin="0,8,0,8">
+                        <TextBlock Text="{loc:Tr Tools_TypeConfirmation}" TextWrapping="Wrap" />
+                        <TextBox Text="{Binding UpdatesVM.TypedConfirmation, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="Update mode confirmation" Width="300" HorizontalAlignment="Left" />
+                    </StackPanel>
+                    <TextBlock Text="{Binding UpdatesVM.StatusMessage}" TextWrapping="Wrap" />
                 </StackPanel>
             </Border>
 
+            <Border>
+                <Border.Style><Style TargetType="Border"><Setter Property="Visibility" Value="Collapsed" />
+                    <Style.Triggers><DataTrigger Binding="{Binding ActiveTool}" Value="Configuration"><Setter Property="Visibility" Value="Visible" /></DataTrigger></Style.Triggers>
+                </Style></Border.Style>
+                <views:ConfigTabView DataContext="{Binding ConfigVM}" />
+            </Border>
             <!-- ==================== 7. OPTIONAL FEATURES ==================== -->
             <Border>
                 <Border.Style>
@@ -707,7 +737,7 @@
                         </DockPanel>
                     </Border>
 
-                    <ItemsControl ItemsSource="{Binding ConfigVM.Features}">
+                    <ItemsControl ItemsSource="{Binding ConfigVM.FilteredFeatures}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <Border Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
@@ -725,7 +755,7 @@
                                         </StackPanel>
                                         <Border Grid.Column="2" CornerRadius="4" Padding="6,2" VerticalAlignment="Center"
                                                 Background="{DynamicResource StatusDefaultBgBrush}">
-                                            <TextBlock Text="{Binding Status}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" />
+                                            <TextBlock Text="{Binding Status, Converter={StaticResource Tr}}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" />
                                         </Border>
                                     </Grid>
                                 </Border>
@@ -823,6 +853,7 @@
                                 <Button Content="{loc:Tr Tools_EnableUltimatePerformance}" AutomationProperties.Name="Enable Ultimate Performance power plan"
                                         Style="{DynamicResource ModernPrimaryBtn}" HorizontalAlignment="Left" Padding="12,5"
                                         Command="{Binding ApplyPowerPlanCommand}" CommandParameter="Ultimate Performance" />
+                                <Button AutomationProperties.Name="{loc:Tr Tools_RemoveManagedPlan}" Content="{loc:Tr Tools_RemoveManagedPlan}" Command="{Binding ApplyPowerPlanCommand}" CommandParameter="Remove Ultimate Performance" Style="{DynamicResource ModernSecondaryBtn}" Margin="0,8,0,0"/>
                             </StackPanel>
                         </Border>
                     </UniformGrid>
@@ -832,6 +863,19 @@
                         <TextBlock Text="{Binding PowerPlanStatusText}" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" />
                     </Border>
                     <TextBlock Text="{loc:Tr Tools_PowerPlanNote}" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap" />
+                </StackPanel>
+            </Border>
+            <Border>
+                <Border.Style><Style TargetType="Border"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><DataTrigger Binding="{Binding ActiveTool}" Value="Appx"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers></Style></Border.Style>
+                <StackPanel DataContext="{Binding AppxVM}">
+                    <TextBlock Text="{loc:Tr Tools_Appx}" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                    <TextBlock Text="{loc:Tr Tools_AppxWarning}" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,8"/>
+                    <CheckBox AutomationProperties.Name="{loc:Tr Tools_ConfirmAppx}" Content="{loc:Tr Tools_ConfirmAppx}" IsChecked="{Binding ConfirmRemoval}" Margin="0,8"/>
+                    <StackPanel Orientation="Horizontal"><Button AutomationProperties.Name="{loc:Tr Tools_RemoveSelected}" Content="{loc:Tr Tools_RemoveSelected}" Command="{Binding RemoveSelectedCommand}" Style="{DynamicResource ModernSecondaryBtn}"/><Button AutomationProperties.Name="{loc:Tr Tools_Refresh}" Content="{loc:Tr Tools_Refresh}" Command="{Binding RefreshCommand}" Margin="8,0" Style="{DynamicResource ModernSecondaryBtn}"/></StackPanel>
+                    <TextBlock Text="{Binding Status}" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,8"/>
+                    <ItemsControl ItemsSource="{Binding Packages}"><ItemsControl.ItemTemplate><DataTemplate>
+                        <DockPanel Margin="0,6"><Button AutomationProperties.Name="{loc:Tr Tools_Store}" DockPanel.Dock="Right" Content="{loc:Tr Tools_Store}" Command="{Binding DataContext.OpenStoreCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" Style="{DynamicResource ModernSecondaryBtn}"/><TextBlock DockPanel.Dock="Right" Text="{Binding Status, Converter={StaticResource Tr}}" Foreground="{DynamicResource TextSecondaryBrush}" Margin="10,0"/><CheckBox AutomationProperties.Name="{Binding Name}" Content="{Binding Name}" IsChecked="{Binding IsSelected}"/></DockPanel>
+                    </DataTemplate></ItemsControl.ItemTemplate></ItemsControl>
                 </StackPanel>
             </Border>
         </StackPanel>

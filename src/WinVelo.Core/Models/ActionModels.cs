@@ -67,6 +67,12 @@ public sealed class ActionItem
 
     [JsonPropertyName("timeoutSeconds")]
     public int? TimeoutSeconds { get; set; }
+
+    [JsonPropertyName("captureRegistryState")]
+    public bool CaptureRegistryState { get; set; }
+
+    [JsonPropertyName("captureUndoScript")]
+    public string? CaptureUndoScript { get; set; }
 }
 
 public sealed class DetectRule

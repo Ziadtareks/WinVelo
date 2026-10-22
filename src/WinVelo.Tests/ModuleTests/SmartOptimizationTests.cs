@@ -42,10 +42,10 @@ public sealed class SmartOptimizationTests
         var results = await service.BenchmarkDnsProvidersAsync();
 
         Assert.NotNull(results);
-        Assert.Equal(5, results.Count);
-        Assert.Contains(results, r => r.Id == "cloudflare");
-        Assert.Contains(results, r => r.Id == "google");
-        Assert.Contains(results, r => r.Id == "quad9");
+        Assert.Equal(2, results.Count);
+        Assert.Contains(results, r => r.Id == "dns.cloudflare.standard");
+        Assert.Contains(results, r => r.Id == "dns.google.public");
+        Assert.DoesNotContain(results, r => r.Id.Contains("quad9"));
 
         // Exactly one or at least one is flagged as fastest if responsive
         if (results.Any(r => r.AveragePingMs > 0))

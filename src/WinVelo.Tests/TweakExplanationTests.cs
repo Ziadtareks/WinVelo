@@ -45,7 +45,7 @@ public sealed class TweakExplanationTests
     public void AllTweaks_HaveWhatItDoes_WithSufficientExplanation()
     {
         var tweaks = LoadAllTweaks();
-        Assert.Equal(141, tweaks.Count);
+        Assert.Equal(142, tweaks.Count);
 
         foreach (var t in tweaks)
         {
@@ -60,7 +60,7 @@ public sealed class TweakExplanationTests
     public void AllTweaks_HaveValidSources_WithAtLeastOneHttpUrl()
     {
         var tweaks = LoadAllTweaks();
-        Assert.Equal(141, tweaks.Count);
+        Assert.Equal(142, tweaks.Count);
 
         foreach (var t in tweaks)
         {
@@ -113,7 +113,7 @@ public sealed class TweakExplanationTests
     {
         var tweaks = LoadAllTweaks();
         var needsReview = tweaks.Where(t => t.NeedsReview).ToList();
-        Assert.Equal(4, needsReview.Count);
+        Assert.Equal(5, needsReview.Count);
 
         string presetsDir = Path.Combine(GetRepoRoot(), "Catalog", "Presets");
         var presetFiles = Directory.GetFiles(presetsDir, "*.json");
@@ -253,7 +253,7 @@ public sealed class TweakExplanationTests
     public void AllTweaks_RegistryValueNamesAndNumbersInExplanations_MatchCatalogActions()
     {
         var tweaks = LoadAllTweaks();
-        Assert.Equal(141, tweaks.Count);
+        Assert.Equal(142, tweaks.Count);
 
         // Gather all registry value names across the entire catalog
         var allValNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);

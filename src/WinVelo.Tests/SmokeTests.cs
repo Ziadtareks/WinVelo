@@ -93,7 +93,7 @@ public sealed class SmokeTests : IDisposable
     public void EmbeddedCatalog_LoadsWithoutACatalogFolder()
     {
         var result = CatalogLoader.LoadTweaks(CatalogSource.EmbeddedOnly());
-        Assert.Equal(141, result.Items.Count);
+        Assert.Equal(142, result.Items.Count);
         Assert.Empty(result.Issues);
         Assert.Equal(6, CatalogLoader.LoadPresets(CatalogSource.EmbeddedOnly()).Items.Count);
     }

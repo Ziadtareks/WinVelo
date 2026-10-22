@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using System.Text.Json;
 using WinVelo.Core.Models;
 using WinVelo.Core.Safety;
 
@@ -26,6 +27,28 @@ public sealed class PowerShellActionHandler : IActionHandler
 
 
         string targetId = $"powershell://{tweakId}/{actionIndex}";
+        var undo = context.PendingScriptUndo;
+        if (action.CaptureRegistryState)
+        {
+            if (string.IsNullOrWhiteSpace(action.Hive) || string.IsNullOrWhiteSpace(action.Key) || action.ValueName == null)
+                return ActionResult.Fail("Registry capture target is missing.");
+            bool existed = context.Registry.ValueExists(action.Hive, action.Key, action.ValueName);
+            undo = new List<ActionItem> { new() { Type="Registry", Hive=action.Hive, Key=action.Key, ValueName=action.ValueName,
+                Operation=existed ? "Set" : "DeleteValue", ValueKind=existed ? context.Registry.GetValueKind(action.Hive,action.Key,action.ValueName) : null,
+                Data=existed ? JsonSerializer.SerializeToElement(context.Registry.GetValue(action.Hive,action.Key,action.ValueName)) : null } };
+        }
+        if (!context.IsDryRun && context.Shell.SupportsSystemQueries && !string.IsNullOrWhiteSpace(action.CaptureUndoScript))
+        {
+            var capture = await context.Shell.ExecutePowerShellAsync(action.CaptureUndoScript, 30, context.CancellationToken);
+            if (!capture.Success) return ActionResult.Fail("Could not capture script baseline: " + capture.StdErr);
+            try
+            {
+                var scripts = JsonSerializer.Deserialize<List<string>>(capture.StdOut);
+                if (scripts == null || scripts.Count == 0) return ActionResult.Fail("Script baseline was empty.");
+                undo = scripts.Select(script => new ActionItem { Type = "PowerShell", Operation = "Execute", Script = script, TimeoutSeconds = action.TimeoutSeconds ?? 60 }).ToList();
+            }
+            catch (JsonException) { return ActionResult.Fail("Script baseline was not valid JSON."); }
+        }
 
         var journalRecord = new JournalActionRecord
         {
@@ -35,6 +58,7 @@ public sealed class PowerShellActionHandler : IActionHandler
             TargetIdentifier = targetId,
             ExistedBefore = false,
             PreviousData = null,
+            UndoActions = undo,
             IsBaseline = true,
             AppliedAtUtc = DateTime.UtcNow
         };
@@ -49,7 +73,7 @@ public sealed class PowerShellActionHandler : IActionHandler
             try
             {
                 int timeout = action.TimeoutSeconds.HasValue && action.TimeoutSeconds.Value > 0 ? action.TimeoutSeconds.Value : 60;
-                PowerShellResult result = await context.Shell.ExecutePowerShellAsync(action.Script, timeout);
+                PowerShellResult result = await context.Shell.ExecutePowerShellAsync(action.Script, timeout, context.IsUndoOperation ? CancellationToken.None : context.CancellationToken);
                 if (!result.Success)
                 {
                     string errorDetail = result.TimedOut
@@ -98,26 +122,38 @@ public sealed class PowerShellActionHandler : IActionHandler
             return new ActionResult { Success = true, Message = "Dry run: PowerShell undo simulated." };
         }
 
-        if (!string.IsNullOrWhiteSpace(record.PreviousData))
+        var undoActions = record.UndoActions;
+        if (undoActions == null && !string.IsNullOrWhiteSpace(record.PreviousData))
+            undoActions = new List<ActionItem> { new() { Type = "PowerShell", Operation = "Execute", Script = record.PreviousData, TimeoutSeconds = 60 } };
+
+        if (undoActions is { Count: > 0 })
         {
             try
             {
-                PowerShellResult result = await context.Shell.ExecutePowerShellAsync(record.PreviousData, 60);
-                if (!result.Success)
+                foreach (var action in undoActions)
                 {
-                    string errorDetail = result.TimedOut
-                        ? "Undo script timed out."
-                        : !string.IsNullOrWhiteSpace(result.StdErr)
-                            ? result.StdErr.Trim()
-                            : $"Exited with code {result.ExitCode}";
-                    return new ActionResult { Success = false, Message = $"PowerShell undo failed: {errorDetail}" };
-                }
+                    if (action.Type is "Registry" or "Policy")
+                    {
+                        var restore = await new RegistryActionHandler().ExecuteAsync(action, record.TweakId, record.ActionIndex, context);
+                        if (!restore.Success) return restore;
+                        continue;
+                    }
+                    string? blocked = ServicingGuard.CheckAction(action);
+                    if (blocked != null) return ActionResult.Fail("Blocked rollback: " + blocked);
+                    if (string.IsNullOrWhiteSpace(action.Script)) return ActionResult.Fail("Rollback script is empty.");
+                    PowerShellResult result = await context.Shell.ExecutePowerShellAsync(action.Script, action.TimeoutSeconds ?? 60);
+                    if (!result.Success)
+                    {
+                        string errorDetail = result.TimedOut
+                            ? "Undo script timed out."
+                            : !string.IsNullOrWhiteSpace(result.StdErr)
+                                ? result.StdErr.Trim()
+                                : $"Exited with code {result.ExitCode}";
+                        return new ActionResult { Success = false, Message = $"PowerShell undo failed: {errorDetail}" };
+                    }
 
-                return new ActionResult
-                {
-                    Success = true,
-                    Message = !string.IsNullOrWhiteSpace(result.StdOut) ? result.StdOut.Trim() : "PowerShell undo completed successfully."
-                };
+                }
+                return ActionResult.Ok("PowerShell undo completed successfully.");
             }
             catch (Exception ex)
             {
@@ -125,7 +161,7 @@ public sealed class PowerShellActionHandler : IActionHandler
             }
         }
 
-        return new ActionResult { Success = true, Message = "No rollback script specified for PowerShell action." };
+        return ActionResult.Fail("This script has no recorded rollback plan. Its effects have not been restored.");
     }
 
     public ActionPreview Preview(ActionItem action, ExecutionContext context)

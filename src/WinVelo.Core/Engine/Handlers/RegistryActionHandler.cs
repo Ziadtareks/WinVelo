@@ -249,7 +249,7 @@ public sealed class RegistryActionHandler : IActionHandler, IStateCaptureHandler
         };
     }
 
-    private static string? SerializeData(object? data)
+    public static string? SerializeData(object? data)
     {
         if (data == null) return null;
         if (data is byte[] bytes) return Convert.ToBase64String(bytes);
@@ -278,7 +278,7 @@ public sealed class RegistryActionHandler : IActionHandler, IStateCaptureHandler
         };
     }
 
-    private static object DeserializeData(string? data, string kind)
+    public static object DeserializeData(string? data, string kind)
     {
         if (data == null) return 0;
 

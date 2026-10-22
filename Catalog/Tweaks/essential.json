@@ -214,7 +214,7 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "Get-Process *Widget* -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue\n      Get-AppxPackage Microsoft.WidgetsPlatformRuntime -AllUsers -ErrorAction SilentlyContinue | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue\n      Get-AppxPackage MicrosoftWindows.Client.WebExperience -AllUsers -ErrorAction SilentlyContinue | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue",
+        "script": "Get-Process *Widget* -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue\n      Get-AppxPackage Microsoft.WidgetsPlatformRuntime -AllUsers -ErrorAction SilentlyContinue | Remove-AppxPackage -AllUsers -ErrorAction Stop\n      Get-AppxPackage MicrosoftWindows.Client.WebExperience -AllUsers -ErrorAction SilentlyContinue | Remove-AppxPackage -AllUsers -ErrorAction Stop",
         "timeoutSeconds": 60
       },
       {
@@ -258,7 +258,8 @@
       "performance"
     ],
     "presetRole": "optimization",
-    "effectNote": "Windows 11 only. Windows 10 News and Interests is not affected."
+    "effectNote": "Windows 11 only. Windows 10 News and Interests is not affected.",
+    "verifyScript": "[bool](-not @(Get-AppxPackage -AllUsers -ErrorAction Stop | Where-Object Name -in @('Microsoft.WidgetsPlatformRuntime','MicrosoftWindows.Client.WebExperience')).Count)"
   },
   {
     "schemaVersion": "1.0.0",
@@ -511,7 +512,7 @@
     "id": "essential.services",
     "origin": "WPFTweaksServices",
     "name": "Services - Disable or Set to Manual",
-    "description": "Disables Offline Files, telemetry and Internet Connection Sharing services, sets Maps and Storage services to Manual, and raises SvcHostSplitThresholdInKB to the installed RAM to reduce svchost.exe processes. Restart required.",
+    "description": "Disables Offline Files, telemetry and Internet Connection Sharing services and sets Maps and Storage services to Manual. Does not change service-host splitting.",
     "category": "performance",
     "subcategory": "Essential Tweaks",
     "risk": "High",
@@ -558,12 +559,6 @@
         "operation": "SetStartup",
         "serviceName": "SharedAccess",
         "startupType": "Disabled"
-      },
-      {
-        "type": "PowerShell",
-        "operation": "Execute",
-        "script": "$Memory = (Get-CimInstance Win32_PhysicalMemory | Measure-Object Capacity -Sum).Sum / 1KB\n      Set-ItemProperty -Path \"HKLM:\\SYSTEM\\CurrentControlSet\\Control\" -Name SvcHostSplitThresholdInKB -Value $Memory",
-        "timeoutSeconds": 60
       }
     ],
     "undo": [
@@ -596,18 +591,12 @@
         "operation": "SetStartup",
         "serviceName": "SharedAccess",
         "startupType": "Manual"
-      },
-      {
-        "type": "PowerShell",
-        "operation": "Execute",
-        "script": "Set-ItemProperty -Path \"HKLM:\\SYSTEM\\CurrentControlSet\\Control\" -Name SvcHostSplitThresholdInKB -Value 3670016 -Type DWord",
-        "timeoutSeconds": 60
       }
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/services",
     "verifiedOnBuild": "26100",
     "evidence": "situational",
-    "whatItDoes": "Sets background services (CscService to Disabled, DiagTrack to Disabled, MapsBroker to Manual, StorSvc to Manual, SharedAccess to Disabled) and configures SvcHostSplitThresholdInKB to match physical memory.",
+    "whatItDoes": "Disables CscService, DiagTrack and SharedAccess and sets MapsBroker and StorSvc to Manual. Service-host splitting is a separate advanced setting.",
     "sideEffects": "Disables Mobile Hotspot and Internet Connection Sharing (SharedAccess), disables Offline Files sync (CscService), and may delay offline map updates (MapsBroker).",
     "sources": [
       "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/services",
@@ -836,8 +825,37 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "# Disable Defender Auto Sample Submission\n      if (Get-Command Set-MpPreference -ErrorAction SilentlyContinue) {\n          Set-MpPreference -SubmitSamplesConsent 2 -ErrorAction SilentlyContinue\n      }\n\n      # Disable (Connected User Experiences and Telemetry) Service\n      if (Get-Service -Name diagtrack -ErrorAction SilentlyContinue) {\n          Set-Service -Name diagtrack -StartupType Disabled -ErrorAction SilentlyContinue\n      }\n\n      # Disable (Windows Error Reporting Service)\n      if (Get-Service -Name WerSvc -ErrorAction SilentlyContinue) {\n          Set-Service -Name WerSvc -StartupType Disabled -ErrorAction SilentlyContinue\n      }\n\n      # Disable PowerShell 7 telemetry\n      [Environment]::SetEnvironmentVariable('POWERSHELL_TELEMETRY_OPTOUT', '1', 'Machine')\n\n      Remove-ItemProperty -Path \"HKCU:\\Software\\Microsoft\\Siuf\\Rules\" -Name PeriodInNanoSeconds -ErrorAction SilentlyContinue",
-        "timeoutSeconds": 60
+        "script": "if (Get-Command Set-MpPreference -ErrorAction SilentlyContinue) { Set-MpPreference -SubmitSamplesConsent 2 -ErrorAction Stop }",
+        "timeoutSeconds": 60,
+        "captureUndoScript": "$value = (Get-MpPreference -ErrorAction Stop).SubmitSamplesConsent; if ($value -notin 0,1,2,3) { throw 'Unknown Defender sample policy.' }; ConvertTo-Json -InputObject @('Set-MpPreference -SubmitSamplesConsent ' + [int]$value + ' -ErrorAction Stop') -Compress"
+      },
+      {
+        "type": "Service",
+        "operation": "SetStartup",
+        "serviceName": "DiagTrack",
+        "startupType": "Disabled"
+      },
+      {
+        "type": "Service",
+        "operation": "SetStartup",
+        "serviceName": "WerSvc",
+        "startupType": "Disabled"
+      },
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKLM",
+        "key": "SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment",
+        "valueName": "POWERSHELL_TELEMETRY_OPTOUT",
+        "valueKind": "String",
+        "data": "1"
+      },
+      {
+        "type": "Registry",
+        "operation": "DeleteValue",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Siuf\\Rules",
+        "valueName": "PeriodInNanoSeconds"
       }
     ],
     "undo": [
@@ -928,8 +946,34 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "# Enable Defender Auto Sample Submission\n      if (Get-Command Set-MpPreference -ErrorAction SilentlyContinue) {\n          Set-MpPreference -SubmitSamplesConsent 1 -ErrorAction SilentlyContinue\n      }\n\n      # Enable (Connected User Experiences and Telemetry) Service\n      if (Get-Service -Name diagtrack -ErrorAction SilentlyContinue) {\n          Set-Service -Name diagtrack -StartupType Automatic -ErrorAction SilentlyContinue\n      }\n\n      # Enable (Windows Error Reporting Service)\n      if (Get-Service -Name WerSvc -ErrorAction SilentlyContinue) {\n          Set-Service -Name WerSvc -StartupType Manual -ErrorAction SilentlyContinue\n      }\n\n      # Enable PowerShell 7 telemetry\n      [Environment]::SetEnvironmentVariable('POWERSHELL_TELEMETRY_OPTOUT', '', 'Machine')",
+        "script": "if (Get-Command Set-MpPreference -ErrorAction SilentlyContinue) { Set-MpPreference -SubmitSamplesConsent 1 -ErrorAction Stop }",
         "timeoutSeconds": 60
+      },
+      {
+        "type": "Service",
+        "operation": "SetStartup",
+        "serviceName": "DiagTrack",
+        "startupType": "Automatic"
+      },
+      {
+        "type": "Service",
+        "operation": "SetStartup",
+        "serviceName": "WerSvc",
+        "startupType": "Manual"
+      },
+      {
+        "type": "Registry",
+        "operation": "DeleteValue",
+        "hive": "HKLM",
+        "key": "SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment",
+        "valueName": "POWERSHELL_TELEMETRY_OPTOUT"
+      },
+      {
+        "type": "Registry",
+        "operation": "DeleteValue",
+        "hive": "HKCU",
+        "key": "Software\\Microsoft\\Siuf\\Rules",
+        "valueName": "PeriodInNanoSeconds"
       }
     ],
     "source": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/telemetry",
@@ -949,7 +993,8 @@
       "privacy"
     ],
     "presetRole": "optimization",
-    "effectNote": "On Home and Pro the lowest diagnostic level is Required; AllowTelemetry 0 is treated as 1."
+    "effectNote": "On Home and Pro the lowest diagnostic level is Required; AllowTelemetry 0 is treated as 1.",
+    "verifyScript": "if (Get-Command Get-MpPreference -ErrorAction SilentlyContinue) { [bool]((Get-MpPreference -ErrorAction Stop).SubmitSamplesConsent -eq 2) } else { $true }"
   },
   {
     "schemaVersion": "1.0.0",
@@ -959,7 +1004,7 @@
     "description": "Creates a System Restore point now (turning on System Restore for the system drive if needed) and removes the 24-hour limit between restore points.",
     "category": "system",
     "subcategory": "Essential Tweaks",
-    "risk": "Low",
+    "risk": "High",
     "impacts": [
       "ui"
     ],
@@ -989,7 +1034,7 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "Enable-ComputerRestore -Drive \"$Env:SystemDrive\\\" -ErrorAction SilentlyContinue\nCheckpoint-Computer -Description \"WinVelo restore point\" -RestorePointType MODIFY_SETTINGS",
+        "script": "Enable-ComputerRestore -Drive \"$Env:SystemDrive\\\" -ErrorAction Stop\nCheckpoint-Computer -Description \"WinVelo restore point\" -RestorePointType MODIFY_SETTINGS",
         "timeoutSeconds": 300
       }
     ],
@@ -1016,7 +1061,10 @@
     "tags": [
       "performance"
     ],
-    "presetRole": "action"
+    "presetRole": "action",
+    "reversible": false,
+    "irreversibleReason": "The created restore point and enabled System Protection are retained. Undo can restore registry policy but does not remove snapshots or disable protection.",
+    "warnings": "Creates a restore point and enables System Protection. These recovery artifacts are retained when registry policy is undone; use Tools > Restore Points for ordinary checkpoint creation."
   },
   {
     "schemaVersion": "1.0.0",
@@ -1212,7 +1260,7 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "Start-Process -FilePath \"$Env:SystemRoot\\System32\\cleanmgr.exe\" -ArgumentList '/sagerun:1' -Wait\nDism.exe /online /Cleanup-Image /StartComponentCleanup /ResetBase\nif ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 3010) { throw \"Dism failed with exit code $LASTEXITCODE\" }",
+        "script": "Start-Process -FilePath \"$Env:SystemRoot\\System32\\cleanmgr.exe\" -ArgumentList '/sagerun:1' -Wait\nDism.exe /online /Cleanup-Image /StartComponentCleanup /ResetBase\nif ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 3010) { throw \"Dism failed with exit code $LASTEXITCODE\" }\n$global:LASTEXITCODE = 0 # Accepted native success/restart codes were checked above.",
         "timeoutSeconds": 1800
       }
     ],
@@ -1370,8 +1418,9 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "$bags = \"HKCU:\\Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\Bags\"\n      $bagMRU = \"HKCU:\\Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\BagMRU\"\n      Remove-Item -Path $bags -Recurse -Force -ErrorAction SilentlyContinue\n      Remove-Item -Path $bagMRU -Recurse -Force -ErrorAction SilentlyContinue\n      $allFolders = \"HKCU:\\Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\Bags\\AllFolders\\Shell\"\n      if (!(Test-Path $allFolders)) {\n        New-Item -Path $allFolders -Force -ErrorAction SilentlyContinue | Out-Null\n      }",
-        "timeoutSeconds": 60
+        "script": "$bags = \"HKCU:\\Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\Bags\"\n      $bagMRU = \"HKCU:\\Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\BagMRU\"\n      if(Test-Path -LiteralPath $bags){Remove-Item -LiteralPath $bags -Recurse -Force -ErrorAction Stop}\n      if(Test-Path -LiteralPath $bagMRU){Remove-Item -LiteralPath $bagMRU -Recurse -Force -ErrorAction Stop}\n      $allFolders = \"HKCU:\\Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\Bags\\AllFolders\\Shell\"\n      if (!(Test-Path $allFolders)) {\n        New-Item -Path $allFolders -Force -ErrorAction Stop | Out-Null\n      }",
+        "timeoutSeconds": 60,
+        "captureUndoScript": "$undo=@()\nforeach($leaf in @('Bags','BagMRU')) {\n  $sub='Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\'+$leaf\n  $path='Registry::HKEY_CURRENT_USER\\'+$sub\n  $remove=\"if(Test-Path -LiteralPath '\"+$path+\"'){Remove-Item -LiteralPath '\"+$path+\"' -Recurse -Force -ErrorAction Stop}; \"\n  if(Test-Path -LiteralPath $path) {\n    $file=[IO.Path]::GetTempFileName()\n    try {\n      & reg.exe export ('HKCU\\'+$sub) $file /y | Out-Null\n      if($LASTEXITCODE -ne 0){throw 'Could not capture Explorer folder preferences.'}\n      $encoded=[Convert]::ToBase64String([IO.File]::ReadAllBytes($file))\n      $undo += $remove + '$file=[IO.Path]::GetTempFileName(); try { [IO.File]::WriteAllBytes($file,[Convert]::FromBase64String(' + \"'\"+$encoded+\"'\" + ')); & reg.exe import $file | Out-Null; if($LASTEXITCODE -ne 0){throw \"Registry restore failed.\"} } finally {Remove-Item -LiteralPath $file -Force -ErrorAction Stop}'\n    } finally {Remove-Item -LiteralPath $file -Force -ErrorAction Stop}\n  } else { $undo += $remove }\n}\nConvertTo-Json -InputObject @($undo) -Compress"
       },
       {
         "type": "Registry",
@@ -1412,6 +1461,7 @@
       "performance",
       "ui"
     ],
-    "presetRole": "optimization"
+    "presetRole": "optimization",
+    "verifyScript": "[bool]((-not (Test-Path -LiteralPath \"HKCU:\\Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\BagMRU\")) -and ((Get-ItemProperty -LiteralPath \"HKCU:\\Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\Bags\\AllFolders\\Shell\" -Name FolderType -ErrorAction Stop).FolderType -eq \"NotSpecified\"))"
   }
 ]

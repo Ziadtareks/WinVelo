@@ -67,6 +67,18 @@ public sealed class CleanerService : ICleanerService
     {
         List<CleanerCategoryScan> results = new();
 
+        if (WinVelo.Core.Safety.TestModeManager.IsTestMode)
+        {
+            return Task.FromResult(WhitelistedLocations.Select(kvp => new CleanerCategoryScan
+            {
+                Id = kvp.Key,
+                Name = kvp.Value.Name,
+                PathDescription = kvp.Value.PathEnv,
+                FileCount = 0,
+                TotalBytes = 0
+            }).ToList());
+        }
+
         foreach (var kvp in WhitelistedLocations)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -110,6 +122,7 @@ public sealed class CleanerService : ICleanerService
     public async Task<CleanerCleanResult> CleanCategoriesAsync(IEnumerable<string> categoryIds, CancellationToken cancellationToken = default)
     {
         var result = new CleanerCleanResult();
+        if (WinVelo.Core.Safety.TestModeManager.IsTestMode) return result;
         HashSet<string> selected = new(categoryIds, StringComparer.OrdinalIgnoreCase);
 
         // Check if Windows Update cache is being cleaned - stop wuauserv and bits first

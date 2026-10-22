@@ -180,6 +180,26 @@ public sealed class CatalogPowerShellSyntaxTests
             }
         }
 
+        foreach (string file in tweakFiles)
+        {
+            using var doc = JsonDocument.Parse(File.ReadAllText(file));
+            foreach (var tweak in doc.RootElement.EnumerateArray())
+            {
+                string id = tweak.GetProperty("id").GetString()!;
+                if (tweak.TryGetProperty("verifyScript", out var verify)) scripts.Add(new(id + "/verify", file, verify.GetString()!));
+                foreach (var action in tweak.GetProperty("apply").EnumerateArray())
+                    if (action.TryGetProperty("captureUndoScript", out var capture)) scripts.Add(new(id + "/capture", file, capture.GetString()!));
+            }
+        }
+        string featuresPath = Path.Combine(Path.GetDirectoryName(tweaksDir)!, "Config", "feature.json");
+        using (var features = JsonDocument.Parse(File.ReadAllText(featuresPath)))
+            foreach (var feature in features.RootElement.EnumerateObject())
+                foreach (var property in feature.Value.EnumerateObject())
+                {
+                    if (property.Name is "InvokeScript" or "UndoScript")
+                        foreach (var item in property.Value.EnumerateArray()) scripts.Add(new(feature.Name + "/" + property.Name, featuresPath, item.GetString()!));
+                    else if (property.Name is "DetectScript" or "CaptureUndoScript") scripts.Add(new(feature.Name + "/" + property.Name, featuresPath, property.Value.GetString()!));
+                }
         return scripts;
     }
 

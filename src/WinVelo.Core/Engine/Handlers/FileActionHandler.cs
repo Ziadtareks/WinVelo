@@ -22,7 +22,7 @@ public sealed class FileActionHandler : IActionHandler
             return Task.FromResult(new ActionResult { Success = false, Message = $"Security violation: Root '{action.AllowedRoot}' is not in the safe allow-list." });
         }
 
-        if (context.IsDryRun)
+        if (context.IsDryRun || WinVelo.Core.Safety.TestModeManager.IsTestMode)
         {
             return Task.FromResult(new ActionResult { Success = true });
         }

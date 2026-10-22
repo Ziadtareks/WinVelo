@@ -43,10 +43,10 @@ public sealed class UpdateModeService : IUpdateModeService
     public UpdateModeService(
         IRegistryService registry,
         ISystemServicesService services,
-        ITaskSchedulerService tasks)
+        ITaskSchedulerService tasks, WinVelo.Core.Engine.RollbackJournalManager? journal = null)
     {
-        _registry = registry;
-        _services = services;
+        _registry = WinVelo.Core.Engine.ModuleJournal.Registry(registry, journal, "tools.updates");
+        _services = WinVelo.Core.Engine.ModuleJournal.Services(services, journal, "tools.updates");
         _tasks = tasks;
     }
 

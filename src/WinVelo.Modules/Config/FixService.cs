@@ -15,6 +15,7 @@ public sealed class SystemFixDefinition
     public required string Category { get; init; }
     public string Severity { get; init; } = "Common";
     public required string Script { get; init; }
+    public int TimeoutSeconds { get; init; } = 300;
 }
 
 public sealed class LegacyAppletDefinition
@@ -54,7 +55,7 @@ public sealed class FixService : IFixService
                 Description = "Clears the local DNS cache to resolve domain name resolution errors and connection drops.",
                 Category = "Network",
                 Severity = "Common",
-                Script = "ipconfig /flushdns; Clear-DnsClientCache"
+                Script = "ipconfig /flushdns; if ($LASTEXITCODE -ne 0) { throw 'DNS flush failed.' }; Clear-DnsClientCache"
             },
             new()
             {
@@ -63,7 +64,7 @@ public sealed class FixService : IFixService
                 Description = "Restores network adapter sockets and TCP/IP protocol configurations back to clean defaults.",
                 Category = "Network",
                 Severity = "Advanced",
-                Script = "netsh winsock reset; netsh int ip reset; ipconfig /flushdns"
+                Script = "netsh winsock reset; if ($LASTEXITCODE -ne 0) { throw 'Winsock reset failed.' }; netsh int ip reset; if ($LASTEXITCODE -ne 0) { throw 'IP reset failed.' }; ipconfig /flushdns; if ($LASTEXITCODE -ne 0) { throw 'DNS flush failed.' }"
             },
             new()
             {
@@ -72,7 +73,7 @@ public sealed class FixService : IFixService
                 Description = "Stops update services, cleans downloaded update files, and restarts services to fix stuck downloads.",
                 Category = "Windows Update",
                 Severity = "Maintenance",
-                Script = "Stop-Service -Name wuauserv, bits, cryptsvc -Force -ErrorAction SilentlyContinue; Remove-Item -Path \"$env:WINDIR\\SoftwareDistribution\\Download\\*\" -Recurse -Force -ErrorAction SilentlyContinue; Start-Service -Name wuauserv, bits, cryptsvc"
+                Script = "$names=@('wuauserv','bits','cryptsvc'); $running=@($names | Where-Object { (Get-Service $_ -ErrorAction Stop).Status -eq 'Running' }); try { Stop-Service -Name $names -Force -ErrorAction Stop; $folder=Join-Path $env:WINDIR 'SoftwareDistribution\\Download'; if(Test-Path -LiteralPath $folder){Get-ChildItem -LiteralPath $folder -Force -ErrorAction Stop | Remove-Item -Recurse -Force -ErrorAction Stop} } finally { foreach($name in $running){Start-Service -Name $name -ErrorAction Stop} }"
             },
             new()
             {
@@ -81,7 +82,8 @@ public sealed class FixService : IFixService
                 Description = "Scans system files for corruption and repairs missing or damaged system components.",
                 Category = "System",
                 Severity = "Advanced",
-                Script = "sfc /scannow; DISM /Online /Cleanup-Image /RestoreHealth"
+                Script = "DISM /Online /Cleanup-Image /RestoreHealth; if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 3010) { throw 'DISM repair failed.' }; sfc /scannow; if ($LASTEXITCODE -ne 0) { throw 'SFC reported a failure. Review its output.' }",
+                TimeoutSeconds = 3600
             },
             new()
             {
@@ -99,7 +101,7 @@ public sealed class FixService : IFixService
                 Description = "Configures Windows Time to synchronize against pool.ntp.org and updates the clock immediately.",
                 Category = "System",
                 Severity = "Common",
-                Script = "w32tm /config /syncfromflags:manual /manualpeerlist:pool.ntp.org; w32tm /config /update; Restart-Service w32time; w32tm /resync"
+                Script = "w32tm /config /syncfromflags:manual /manualpeerlist:pool.ntp.org; if ($LASTEXITCODE -ne 0) { throw 'NTP configuration failed.' }; w32tm /config /update; if ($LASTEXITCODE -ne 0) { throw 'Time service update failed.' }; Restart-Service w32time; w32tm /resync; if ($LASTEXITCODE -ne 0) { throw 'Time synchronization failed.' }"
             },
             new()
             {
@@ -164,7 +166,7 @@ public sealed class FixService : IFixService
         {
             return await runner.RunAsync<SystemFixDefinition>(
                 $"Execute Fix ({fixId})",
-                Array.Empty<SystemFixDefinition>(),
+                new[] { new SystemFixDefinition { Id = fixId, Title = fixId, Description = "Unknown fix", Category = "Unknown", Script = "" } },
                 (item, ct) => Task.FromResult(new OperationItemResult
                 {
                     Id = fixId,
@@ -180,7 +182,7 @@ public sealed class FixService : IFixService
             new[] { targetFix },
             async (fix, ct) =>
             {
-                var res = await _shell.ExecutePowerShellAsync(fix.Script, 300);
+                var res = await _shell.ExecutePowerShellAsync(fix.Script, fix.TimeoutSeconds, ct);
                 bool success = res.Success;
                 string reason = success
                     ? "Fix executed successfully."
