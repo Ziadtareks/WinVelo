@@ -118,7 +118,7 @@ public sealed class MemoryOptimizerService : IMemoryOptimizerService
         return Task.Run(() =>
         {
             var beforeStatus = new MEMORYSTATUSEX();
-            GlobalMemoryStatusEx(beforeStatus);
+            if (!GlobalMemoryStatusEx(beforeStatus)) throw new InvalidOperationException("Could not read memory usage.");
 
             ulong beforeAvail = beforeStatus.ullAvailPhys;
             ulong totalPhys = beforeStatus.ullTotalPhys;
@@ -183,7 +183,7 @@ public sealed class MemoryOptimizerService : IMemoryOptimizerService
 
             // 4. Measure After
             var afterStatus = new MEMORYSTATUSEX();
-            GlobalMemoryStatusEx(afterStatus);
+            if (!GlobalMemoryStatusEx(afterStatus)) throw new InvalidOperationException("Could not read memory usage after the operation.");
 
             ulong afterAvail = afterStatus.ullAvailPhys;
             double afterUsedGb = Math.Max(0.1, (totalPhys - afterAvail) / (1024.0 * 1024 * 1024));
@@ -196,7 +196,7 @@ public sealed class MemoryOptimizerService : IMemoryOptimizerService
             }
             else
             {
-                bytesFreed = Math.Max(128L * 1024 * 1024, estimatedWorkingSetFreed);
+                bytesFreed = 0;
             }
 
             string formatted = FormatBytes(bytesFreed);
@@ -206,9 +206,9 @@ public sealed class MemoryOptimizerService : IMemoryOptimizerService
                 BytesFreed = bytesFreed,
                 FormattedFreed = formatted,
                 UsedRamBeforeGb = Math.Round(beforeUsedGb, 1),
-                UsedRamAfterGb = Math.Round(Math.Min(beforeUsedGb, afterUsedGb), 1),
+                UsedRamAfterGb = Math.Round(afterUsedGb, 1),
                 LoadPercentBefore = beforeLoad,
-                LoadPercentAfter = Math.Min(beforeLoad, afterLoad),
+                LoadPercentAfter = afterLoad,
                 ProcessesTrimmedCount = trimmedCount
             };
         }, cancellationToken);

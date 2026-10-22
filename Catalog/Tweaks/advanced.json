@@ -677,7 +677,7 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "winget install Microsoft.Edge --source winget --accept-package-agreements --accept-source-agreements\n      if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 3010 -and $LASTEXITCODE -ne -1978335135 -and $LASTEXITCODE -ne -1978335189) { throw \"winget failed with exit code $LASTEXITCODE\" }",
+        "script": "winget install Microsoft.Edge --source winget --accept-package-agreements --accept-source-agreements\n      if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 3010 -and $LASTEXITCODE -ne -1978335135 -and $LASTEXITCODE -ne -1978335189) { throw \"winget failed with exit code $LASTEXITCODE\" }\n$global:LASTEXITCODE = 0 # Accepted native success/restart codes were checked above.",
         "timeoutSeconds": 600
       },
       {
@@ -704,7 +704,8 @@
       "apps"
     ],
     "presetRole": "optimization",
-    "effectNote": "Windows Update or EdgeUpdate may reinstall Edge later. WebView2 is not removed."
+    "effectNote": "Windows Update or EdgeUpdate may reinstall Edge later. WebView2 is not removed.",
+    "verifyScript": "[bool](-not (Test-Path -Path \"${env:ProgramFiles(x86)}\\Microsoft\\Edge\\Application\\msedge.exe\") -and -not (Test-Path -Path \"$env:ProgramFiles\\Microsoft\\Edge\\Application\\msedge.exe\"))"
   },
   {
     "schemaVersion": "1.0.0",
@@ -772,7 +773,10 @@
       "performance"
     ],
     "presetRole": "optimization",
-    "effectNote": "Decryption continues in the background. Turning the tweak off does not re-encrypt the drive; turn BitLocker or Device encryption back on in Settings."
+    "effectNote": "Decryption continues in the background. Turning the tweak off does not re-encrypt the drive; turn BitLocker or Device encryption back on in Settings.",
+    "reversible": false,
+    "irreversibleReason": "Starts drive decryption. Undo restores the automatic-encryption policy only and does not re-encrypt the drive.",
+    "verifyScript": "[bool]((Get-BitLockerVolume -MountPoint $env:SystemDrive -ErrorAction Stop).VolumeStatus -eq 'FullyDecrypted')"
   },
   {
     "schemaVersion": "1.0.0",
@@ -882,7 +886,7 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "winget install Microsoft.OneDrive --source winget --accept-package-agreements --accept-source-agreements\n      if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 3010 -and $LASTEXITCODE -ne -1978335135 -and $LASTEXITCODE -ne -1978335189) { throw \"winget failed with exit code $LASTEXITCODE\" }",
+        "script": "winget install Microsoft.OneDrive --source winget --accept-package-agreements --accept-source-agreements\n      if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 3010 -and $LASTEXITCODE -ne -1978335135 -and $LASTEXITCODE -ne -1978335189) { throw \"winget failed with exit code $LASTEXITCODE\" }\n$global:LASTEXITCODE = 0 # Accepted native success/restart codes were checked above.",
         "timeoutSeconds": 600
       },
       {
@@ -910,7 +914,8 @@
       "performance",
       "privacy"
     ],
-    "presetRole": "optimization"
+    "presetRole": "optimization",
+    "verifyScript": "[bool](-not (Test-Path -LiteralPath \"$env:LOCALAPPDATA\\Microsoft\\OneDrive\\OneDrive.exe\") -and -not (Test-Path -LiteralPath \"$env:ProgramFiles\\Microsoft OneDrive\\OneDrive.exe\"))"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1146,7 +1151,11 @@
         "type": "PowerShell",
         "operation": "Execute",
         "script": "Set-ItemProperty -Path \"HKCU:\\Control Panel\\Desktop\" -Name \"UserPreferencesMask\" -Type Binary -Value ([byte[]](144,18,3,128,16,0,0,0))",
-        "timeoutSeconds": 60
+        "timeoutSeconds": 60,
+        "captureRegistryState": true,
+        "hive": "HKCU",
+        "key": "Control Panel\\Desktop",
+        "valueName": "UserPreferencesMask"
       }
     ],
     "undo": [
@@ -1286,7 +1295,8 @@
       "performance",
       "ui"
     ],
-    "presetRole": "preference"
+    "presetRole": "preference",
+    "verifyScript": "[bool](([BitConverter]::ToString((Get-ItemProperty -LiteralPath \"HKCU:\\Control Panel\\Desktop\" -Name UserPreferencesMask -ErrorAction Stop).UserPreferencesMask)) -eq \"90-12-03-80-10-00-00-00\")"
   },
   {
     "schemaVersion": "1.0.0",
@@ -1317,7 +1327,7 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "DISM /Online /Set-ReservedStorageState /State:Disabled\n      if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 3010) { throw \"DISM failed with exit code $LASTEXITCODE\" }",
+        "script": "DISM /Online /Set-ReservedStorageState /State:Disabled\n      if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 3010) { throw \"DISM failed with exit code $LASTEXITCODE\" }\n$global:LASTEXITCODE = 0 # Accepted native success/restart codes were checked above.",
         "timeoutSeconds": 60
       },
       {
@@ -1334,7 +1344,7 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "DISM /Online /Set-ReservedStorageState /State:Enabled\n      if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 3010) { throw \"DISM failed with exit code $LASTEXITCODE\" }",
+        "script": "DISM /Online /Set-ReservedStorageState /State:Enabled\n      if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 3010) { throw \"DISM failed with exit code $LASTEXITCODE\" }\n$global:LASTEXITCODE = 0 # Accepted native success/restart codes were checked above.",
         "timeoutSeconds": 60
       },
       {
@@ -1410,7 +1420,7 @@
       {
         "type": "PowerShell",
         "operation": "Execute",
-        "script": "$AppxPackage = Get-AppxPackage MicrosoftWindows.Client.CoreAI -ErrorAction SilentlyContinue\n      $Appx = if ($AppxPackage) { $AppxPackage.PackageFullName } else { $null }\n\n      $user = Get-LocalUser $Env:UserName -ErrorAction SilentlyContinue\n      if ($user -and $Appx) {\n          $Sid = $user.Sid.Value\n          New-Item \"HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Appx\\AppxAllUserStore\\EndOfLife\\$Sid\\$Appx\" -Force -ErrorAction SilentlyContinue | Out-Null\n      }\n\n      Get-AppxPackage -AllUsers \"*Copilot*\" -ErrorAction SilentlyContinue | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue\n      if (Get-Command winget -ErrorAction SilentlyContinue) {\n          $ErrorActionPreference = 'Continue'\n          winget uninstall -e --name \"Copilot\" --silent --force --accept-source-agreements | Out-Null\n          $code = $LASTEXITCODE\n          $ErrorActionPreference = 'Stop'\n          if ($code -ne 0 -and $code -ne 3010 -and $code -ne -1978335135 -and $code -ne -1978335189 -and $code -ne -1978335212) { throw \"winget failed with exit code $code\" }\n      }\n      Get-AppxPackage -AllUsers Microsoft.MicrosoftOfficeHub -ErrorAction SilentlyContinue | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue\n\n      if ($Appx) {\n          Remove-AppxPackage $Appx -ErrorAction SilentlyContinue\n      }\n\n      if (Get-Service -Name WSAIFabricSvc -ErrorAction SilentlyContinue) {\n          Set-Service -Name WSAIFabricSvc -StartupType Disabled -ErrorAction SilentlyContinue\n      }\n      Disable-WindowsOptionalFeature -FeatureName Recall -Online -NoRestart -ErrorAction SilentlyContinue\n\n      Write-Host \"Windows AI Disabled\"",
+        "script": "$AppxPackage = Get-AppxPackage MicrosoftWindows.Client.CoreAI -ErrorAction SilentlyContinue\n      $Appx = if ($AppxPackage) { $AppxPackage.PackageFullName } else { $null }\n\n      $user = Get-LocalUser $Env:UserName -ErrorAction SilentlyContinue\n      if ($user -and $Appx) {\n          $Sid = $user.Sid.Value\n          New-Item \"HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Appx\\AppxAllUserStore\\EndOfLife\\$Sid\\$Appx\" -Force -ErrorAction SilentlyContinue | Out-Null\n      }\n\n      Get-AppxPackage -AllUsers \"*Copilot*\" -ErrorAction SilentlyContinue | Remove-AppxPackage -AllUsers -ErrorAction Stop\n      if (Get-Command winget -ErrorAction SilentlyContinue) {\n          $ErrorActionPreference = 'Continue'\n          winget uninstall -e --name \"Copilot\" --silent --force --accept-source-agreements | Out-Null\n          $code = $LASTEXITCODE\n          $ErrorActionPreference = 'Stop'\n          if ($code -ne 0 -and $code -ne 3010 -and $code -ne -1978335135 -and $code -ne -1978335189 -and $code -ne -1978335212) { throw \"winget failed with exit code $code\" }\n      }\n      Get-AppxPackage -AllUsers Microsoft.MicrosoftOfficeHub -ErrorAction SilentlyContinue | Remove-AppxPackage -AllUsers -ErrorAction Stop\n\n      if ($Appx) {\n          Remove-AppxPackage $Appx -ErrorAction Stop\n      }\n\n      if (Get-Service -Name WSAIFabricSvc -ErrorAction SilentlyContinue) {\n          Set-Service -Name WSAIFabricSvc -StartupType Disabled -ErrorAction Stop\n      }\n      $recall = Get-WindowsOptionalFeature -FeatureName Recall -Online -ErrorAction SilentlyContinue\n      if ($recall) { Disable-WindowsOptionalFeature -FeatureName Recall -Online -NoRestart -ErrorAction Stop | Out-Null }\n\n      Write-Host \"Windows AI Disabled\"\n$global:LASTEXITCODE = 0 # Accepted native success/restart codes were checked above.",
         "timeoutSeconds": 300
       }
     ],
@@ -1448,7 +1458,8 @@
       "ui"
     ],
     "presetRole": "optimization",
-    "effectNote": "Recall, CoreAI and the AI components page exist only on Windows 11 24H2 and later."
+    "effectNote": "Recall, CoreAI and the AI components page exist only on Windows 11 24H2 and later.",
+    "verifyScript": "$packages = @(Get-AppxPackage -AllUsers -ErrorAction Stop | Where-Object { $_.Name -like '*Copilot*' -or $_.Name -eq 'MicrosoftWindows.Client.CoreAI' -or $_.Name -eq 'Microsoft.MicrosoftOfficeHub' }); $svc = Get-Service WSAIFabricSvc -ErrorAction SilentlyContinue; $recall = Get-WindowsOptionalFeature -Online -FeatureName Recall -ErrorAction SilentlyContinue; [bool]($packages.Count -eq 0 -and (-not $svc -or $svc.StartType -eq 'Disabled') -and (-not $recall -or $recall.State -eq 'Disabled'))"
   },
   {
     "schemaVersion": "1.0.0",
@@ -2006,5 +2017,69 @@
       "gaming"
     ],
     "presetRole": "optimization"
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "advanced.svchost-splitting",
+    "origin": "WPFTweaksSvcHostSplitting",
+    "name": "svchost.exe Splitting - Disable",
+    "description": "Sets the service-host split threshold to installed physical memory. Use only for a specific low-memory workload; restart Windows afterward.",
+    "category": "performance",
+    "subcategory": "z__Advanced Tweaks - CAUTION",
+    "risk": "High",
+    "impacts": [
+      "performance"
+    ],
+    "tags": [
+      "performance"
+    ],
+    "windows": {
+      "minBuild": 19041
+    },
+    "requiresReboot": true,
+    "requiresExplorerRestart": false,
+    "detect": {
+      "type": "Registry",
+      "hive": "HKLM",
+      "key": "SYSTEM\\CurrentControlSet\\Control",
+      "valueName": "SvcHostSplitThresholdInKB",
+      "matchType": "NotEquals",
+      "expectedValue": 3670016
+    },
+    "apply": [
+      {
+        "type": "PowerShell",
+        "operation": "Execute",
+        "script": "$memory = [uint32]((Get-CimInstance Win32_PhysicalMemory | Measure-Object Capacity -Sum).Sum / 1KB)\nSet-ItemProperty -LiteralPath \"HKLM:\\SYSTEM\\CurrentControlSet\\Control\" -Name SvcHostSplitThresholdInKB -Value $memory -Type DWord -ErrorAction Stop",
+        "timeoutSeconds": 60,
+        "captureRegistryState": true,
+        "hive": "HKLM",
+        "key": "SYSTEM\\CurrentControlSet\\Control",
+        "valueName": "SvcHostSplitThresholdInKB"
+      }
+    ],
+    "undo": [
+      {
+        "type": "Registry",
+        "operation": "Set",
+        "hive": "HKLM",
+        "key": "SYSTEM\\CurrentControlSet\\Control",
+        "valueName": "SvcHostSplitThresholdInKB",
+        "valueKind": "DWord",
+        "data": 3670016
+      }
+    ],
+    "verifyScript": "$expected = [uint32]((Get-CimInstance Win32_PhysicalMemory | Measure-Object Capacity -Sum).Sum / 1KB); [bool]((Get-ItemProperty -LiteralPath \"HKLM:\\SYSTEM\\CurrentControlSet\\Control\" -Name SvcHostSplitThresholdInKB -ErrorAction Stop).SvcHostSplitThresholdInKB -eq $expected)",
+    "source": "https://github.com/ChrisTitusTech/winutil/blob/2f0bdc8fca52e1ebe31a8d98216428061d3f8956/config/tweaks.json",
+    "sources": [
+      "https://learn.microsoft.com/en-us/windows/application-management/svchost-service-refactoring"
+    ],
+    "verifiedOnBuild": "pending VM verification",
+    "evidence": "situational",
+    "needsReview": true,
+    "presetRole": "advanced",
+    "whatItDoes": "Groups Windows services in fewer service-host processes by raising the split threshold. The original threshold is captured before execution and restored from the journal.",
+    "sideEffects": "Reduces service isolation and can interfere with Xbox services. Not a general performance improvement.",
+    "warnings": "Changes service isolation. A restart is required. Test the workload before keeping this setting."
   }
 ]

@@ -20,6 +20,13 @@
     "verifiedOnBuild"
   ],
   "properties": {
+    "verifyScript": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scriptStateDerived": {
+      "type": "boolean"
+    },
     "schemaVersion": {
       "type": "string",
       "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
@@ -44,19 +51,48 @@
     },
     "category": {
       "type": "string",
-      "enum": ["privacy", "ai", "performance", "gaming", "ui", "network", "system", "updates", "preferences", "Preferences", "experimental", "Experimental"]
+      "enum": [
+        "privacy",
+        "ai",
+        "performance",
+        "gaming",
+        "ui",
+        "network",
+        "system",
+        "updates",
+        "preferences",
+        "Preferences",
+        "experimental",
+        "Experimental"
+      ]
     },
-    "subcategory": { "type": "string" },
+    "subcategory": {
+      "type": "string"
+    },
     "risk": {
       "type": "string",
-      "enum": ["Safe", "Low", "Medium", "High"]
+      "enum": [
+        "Safe",
+        "Low",
+        "Medium",
+        "High"
+      ]
     },
     "impacts": {
       "type": "array",
       "minItems": 1,
       "items": {
         "type": "string",
-        "enum": ["privacy", "performance", "ui", "gaming", "network", "security", "battery", "storage"]
+        "enum": [
+          "privacy",
+          "performance",
+          "ui",
+          "gaming",
+          "network",
+          "security",
+          "battery",
+          "storage"
+        ]
       }
     },
     "tags": {
@@ -64,74 +100,132 @@
       "minItems": 1,
       "items": {
         "type": "string",
-        "enum": ["gaming", "privacy", "ai", "ui", "performance", "network", "updates", "apps"]
+        "enum": [
+          "gaming",
+          "privacy",
+          "ai",
+          "ui",
+          "performance",
+          "network",
+          "updates",
+          "apps"
+        ]
       }
     },
     "presets": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "dependsOn": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "conflictsWith": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "aliases": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "relatedTweaks": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "oppositeOf": {
-      "type": ["string", "array"],
-      "items": { "type": "string" }
+      "type": [
+        "string",
+        "array"
+      ],
+      "items": {
+        "type": "string"
+      }
     },
     "windows": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["minBuild"],
+      "required": [
+        "minBuild"
+      ],
       "properties": {
-        "minBuild": { "type": "integer" },
-        "maxBuild": { "type": ["integer", "null"] },
+        "minBuild": {
+          "type": "integer"
+        },
+        "maxBuild": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
         "editions": {
           "type": "array",
           "items": {
             "type": "string",
-            "enum": ["Home", "Pro", "Enterprise", "Education", "IoTEnterprise", "Server"]
+            "enum": [
+              "Home",
+              "Pro",
+              "Enterprise",
+              "Education",
+              "IoTEnterprise",
+              "Server"
+            ]
           }
         }
       }
     },
-    "requiresReboot": { "type": "boolean" },
-    "requiresExplorerRestart": { "type": "boolean" },
-    "detect": { "$ref": "#/definitions/detectStructure" },
+    "requiresReboot": {
+      "type": "boolean"
+    },
+    "requiresExplorerRestart": {
+      "type": "boolean"
+    },
+    "detect": {
+      "$ref": "#/definitions/detectStructure"
+    },
     "apply": {
       "type": "array",
       "minItems": 1,
-      "items": { "$ref": "#/definitions/actionItem" }
+      "items": {
+        "$ref": "#/definitions/actionItem"
+      }
     },
     "undo": {
       "type": "array",
       "minItems": 1,
       "description": "Static fallback if the rollback journal is missing.",
-      "items": { "$ref": "#/definitions/actionItem" }
+      "items": {
+        "$ref": "#/definitions/actionItem"
+      }
     },
     "source": {
       "oneOf": [
-        { "type": "string", "format": "uri" },
+        {
+          "type": "string",
+          "format": "uri"
+        },
         {
           "type": "array",
           "minItems": 1,
-          "items": { "type": "string", "format": "uri" }
+          "items": {
+            "type": "string",
+            "format": "uri"
+          }
         }
       ]
     },
-    "verifiedOnBuild": { "type": "string" },
+    "verifiedOnBuild": {
+      "type": "string"
+    },
     "warnings": {
       "type": "string"
     },
@@ -148,7 +242,12 @@
     },
     "evidence": {
       "type": "string",
-      "enum": ["documented", "situational", "anecdotal", "ui-equivalent"]
+      "enum": [
+        "documented",
+        "situational",
+        "anecdotal",
+        "ui-equivalent"
+      ]
     },
     "uiEquivalentLocation": {
       "type": "string",
@@ -162,14 +261,22 @@
     },
     "sources": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "sourceQuote": {
       "type": "string"
     },
     "presetRole": {
       "type": "string",
-      "enum": ["optimization", "preference", "fix", "action", "advanced"],
+      "enum": [
+        "optimization",
+        "preference",
+        "fix",
+        "action",
+        "advanced"
+      ],
       "description": "Whether generated presets may include this tweak. Only \"optimization\" tweaks are eligible."
     }
   },
@@ -177,73 +284,113 @@
     {
       "if": {
         "properties": {
-          "evidence": { "const": "ui-equivalent" }
+          "evidence": {
+            "const": "ui-equivalent"
+          }
         },
-        "required": ["evidence"]
+        "required": [
+          "evidence"
+        ]
       },
       "then": {
-        "required": ["uiEquivalentLocation"]
+        "required": [
+          "uiEquivalentLocation"
+        ]
       }
     },
     {
       "if": {
         "properties": {
-          "reversible": { "const": false }
+          "reversible": {
+            "const": false
+          }
         },
-        "required": ["reversible"]
+        "required": [
+          "reversible"
+        ]
       },
       "then": {
-        "required": ["irreversibleReason"]
+        "required": [
+          "irreversibleReason"
+        ]
       }
     },
     {
       "if": {
         "properties": {
-          "risk": { "enum": ["Low", "Medium", "High"] }
+          "risk": {
+            "enum": [
+              "Low",
+              "Medium",
+              "High"
+            ]
+          }
         },
-        "required": ["risk"]
+        "required": [
+          "risk"
+        ]
       },
       "then": {
-        "required": ["whatItDoes", "sideEffects", "sources"]
+        "required": [
+          "whatItDoes",
+          "sideEffects",
+          "sources"
+        ]
       }
     },
     {
       "if": {
         "properties": {
-          "evidence": { "const": "documented" }
+          "evidence": {
+            "const": "documented"
+          }
         },
-        "required": ["evidence"]
+        "required": [
+          "evidence"
+        ]
       },
       "then": {
-        "required": ["sourceQuote"]
+        "required": [
+          "sourceQuote"
+        ]
       }
     }
   ],
   "definitions": {
     "detectStructure": {
       "oneOf": [
-        { "$ref": "#/definitions/singleDetectRule" },
+        {
+          "$ref": "#/definitions/singleDetectRule"
+        },
         {
           "type": "object",
           "additionalProperties": false,
-          "required": ["all"],
+          "required": [
+            "all"
+          ],
           "properties": {
             "all": {
               "type": "array",
               "minItems": 1,
-              "items": { "$ref": "#/definitions/singleDetectRule" }
+              "items": {
+                "$ref": "#/definitions/singleDetectRule"
+              }
             }
           }
         },
         {
           "type": "object",
           "additionalProperties": false,
-          "required": ["any"],
+          "required": [
+            "any"
+          ],
           "properties": {
             "any": {
               "type": "array",
               "minItems": 1,
-              "items": { "$ref": "#/definitions/singleDetectRule" }
+              "items": {
+                "$ref": "#/definitions/singleDetectRule"
+              }
             }
           }
         }
@@ -254,56 +401,143 @@
         {
           "type": "object",
           "additionalProperties": false,
-          "required": ["type", "hive", "key", "matchType"],
+          "required": [
+            "type",
+            "hive",
+            "key",
+            "matchType"
+          ],
           "properties": {
-            "type": { "const": "Registry" },
-            "hive": { "type": "string", "enum": ["HKCU", "HKLM", "HKCR", "HKU"] },
-            "key": { "type": "string" },
-            "valueName": { "type": "string" },
-            "matchType": { "type": "string", "enum": ["Equals", "NotEquals", "Exists", "NotExists", "BitsAllSet", "BitsAnySet", "BitsClear"] },
+            "type": {
+              "const": "Registry"
+            },
+            "hive": {
+              "type": "string",
+              "enum": [
+                "HKCU",
+                "HKLM",
+                "HKCR",
+                "HKU"
+              ]
+            },
+            "key": {
+              "type": "string"
+            },
+            "valueName": {
+              "type": "string"
+            },
+            "matchType": {
+              "type": "string",
+              "enum": [
+                "Equals",
+                "NotEquals",
+                "Exists",
+                "NotExists",
+                "BitsAllSet",
+                "BitsAnySet",
+                "BitsClear"
+              ]
+            },
             "expectedValue": {}
           }
         },
         {
           "type": "object",
           "additionalProperties": false,
-          "required": ["type", "serviceName"],
+          "required": [
+            "type",
+            "serviceName"
+          ],
           "properties": {
-            "type": { "const": "Service" },
-            "serviceName": { "type": "string" },
-            "expectedStartup": { "type": "string", "enum": ["Automatic", "Manual", "Disabled"] },
-            "expectedState": { "type": "string", "enum": ["Running", "Stopped"] }
+            "type": {
+              "const": "Service"
+            },
+            "serviceName": {
+              "type": "string"
+            },
+            "expectedStartup": {
+              "type": "string",
+              "enum": [
+                "Automatic",
+                "Manual",
+                "Disabled"
+              ]
+            },
+            "expectedState": {
+              "type": "string",
+              "enum": [
+                "Running",
+                "Stopped"
+              ]
+            }
           }
         },
         {
           "type": "object",
           "additionalProperties": false,
-          "required": ["type", "taskPath", "taskName", "expectedState"],
+          "required": [
+            "type",
+            "taskPath",
+            "taskName",
+            "expectedState"
+          ],
           "properties": {
-            "type": { "const": "ScheduledTask" },
-            "taskPath": { "type": "string" },
-            "taskName": { "type": "string" },
-            "expectedState": { "type": "string", "enum": ["Enabled", "Disabled"] }
+            "type": {
+              "const": "ScheduledTask"
+            },
+            "taskPath": {
+              "type": "string"
+            },
+            "taskName": {
+              "type": "string"
+            },
+            "expectedState": {
+              "type": "string",
+              "enum": [
+                "Enabled",
+                "Disabled"
+              ]
+            }
           }
         },
         {
           "type": "object",
           "additionalProperties": false,
-          "required": ["type", "packagePattern", "expectedInstalled"],
+          "required": [
+            "type",
+            "packagePattern",
+            "expectedInstalled"
+          ],
           "properties": {
-            "type": { "const": "Appx" },
-            "packagePattern": { "type": "string" },
-            "expectedInstalled": { "type": "boolean" }
+            "type": {
+              "const": "Appx"
+            },
+            "packagePattern": {
+              "type": "string"
+            },
+            "expectedInstalled": {
+              "type": "boolean"
+            }
           }
         },
         {
           "type": "object",
           "additionalProperties": false,
-          "required": ["type", "featureName", "expectedEnabled"],
+          "required": [
+            "type",
+            "featureName",
+            "expectedEnabled"
+          ],
           "properties": {
-            "type": { "const": "OptionalFeature" },
-            "featureName": { "type": "string" },
-            "expectedEnabled": { "type": "boolean" }
+            "type": {
+              "const": "OptionalFeature"
+            },
+            "featureName": {
+              "type": "string"
+            },
+            "expectedEnabled": {
+              "type": "boolean"
+            }
           }
         }
       ]
@@ -313,86 +547,224 @@
         {
           "type": "object",
           "additionalProperties": false,
-          "required": ["type", "hive", "key", "operation"],
+          "required": [
+            "type",
+            "hive",
+            "key",
+            "operation"
+          ],
           "properties": {
-            "type": { "enum": ["Registry", "Policy"] },
-            "hive": { "type": "string", "enum": ["HKCU", "HKLM", "HKCR", "HKU"] },
-            "key": { "type": "string" },
-            "operation": { "type": "string", "enum": ["Set", "DeleteValue", "DeleteKey"] },
-            "valueName": { "type": "string" },
+            "type": {
+              "enum": [
+                "Registry",
+                "Policy"
+              ]
+            },
+            "hive": {
+              "type": "string",
+              "enum": [
+                "HKCU",
+                "HKLM",
+                "HKCR",
+                "HKU"
+              ]
+            },
+            "key": {
+              "type": "string"
+            },
+            "operation": {
+              "type": "string",
+              "enum": [
+                "Set",
+                "DeleteValue",
+                "DeleteKey"
+              ]
+            },
+            "valueName": {
+              "type": "string"
+            },
             "valueKind": {
               "type": "string",
-              "enum": ["DWord", "QWord", "String", "ExpandString", "MultiString", "Binary"]
+              "enum": [
+                "DWord",
+                "QWord",
+                "String",
+                "ExpandString",
+                "MultiString",
+                "Binary"
+              ]
             },
             "data": {}
           },
           "if": {
-            "properties": { "operation": { "const": "Set" } }
+            "properties": {
+              "operation": {
+                "const": "Set"
+              }
+            }
           },
           "then": {
-            "required": ["valueName", "valueKind", "data"]
+            "required": [
+              "valueName",
+              "valueKind",
+              "data"
+            ]
           }
         },
         {
           "type": "object",
           "additionalProperties": false,
-          "required": ["type", "serviceName", "operation"],
+          "required": [
+            "type",
+            "serviceName",
+            "operation"
+          ],
           "properties": {
-            "type": { "const": "Service" },
-            "serviceName": { "type": "string" },
-            "operation": { "type": "string", "enum": ["SetStartup", "Start", "Stop"] },
-            "startupType": { "type": "string", "enum": ["Automatic", "Manual", "Disabled"] }
+            "type": {
+              "const": "Service"
+            },
+            "serviceName": {
+              "type": "string"
+            },
+            "operation": {
+              "type": "string",
+              "enum": [
+                "SetStartup",
+                "Start",
+                "Stop"
+              ]
+            },
+            "startupType": {
+              "type": "string",
+              "enum": [
+                "Automatic",
+                "Manual",
+                "Disabled"
+              ]
+            }
           }
         },
         {
           "type": "object",
           "additionalProperties": false,
-          "required": ["type", "taskPath", "taskName", "operation"],
+          "required": [
+            "type",
+            "taskPath",
+            "taskName",
+            "operation"
+          ],
           "properties": {
-            "type": { "const": "ScheduledTask" },
-            "taskPath": { "type": "string" },
-            "taskName": { "type": "string" },
-            "operation": { "type": "string", "enum": ["Enable", "Disable", "Delete"] }
+            "type": {
+              "const": "ScheduledTask"
+            },
+            "taskPath": {
+              "type": "string"
+            },
+            "taskName": {
+              "type": "string"
+            },
+            "operation": {
+              "type": "string",
+              "enum": [
+                "Enable",
+                "Disable",
+                "Delete"
+              ]
+            }
           }
         },
         {
           "type": "object",
           "additionalProperties": false,
-          "required": ["type", "packagePattern", "operation"],
+          "required": [
+            "type",
+            "packagePattern",
+            "operation"
+          ],
           "properties": {
-            "type": { "const": "Appx" },
-            "packagePattern": { "type": "string" },
-            "allUsers": { "type": "boolean" },
-            "operation": { "type": "string", "enum": ["Remove", "Restore"] }
+            "type": {
+              "const": "Appx"
+            },
+            "packagePattern": {
+              "type": "string"
+            },
+            "allUsers": {
+              "type": "boolean"
+            },
+            "operation": {
+              "type": "string",
+              "enum": [
+                "Remove",
+                "Restore"
+              ]
+            }
           }
         },
         {
           "type": "object",
           "additionalProperties": false,
-          "required": ["type", "featureName", "operation"],
+          "required": [
+            "type",
+            "featureName",
+            "operation"
+          ],
           "properties": {
-            "type": { "const": "OptionalFeature" },
-            "featureName": { "type": "string" },
-            "operation": { "type": "string", "enum": ["Enable", "Disable"] }
+            "type": {
+              "const": "OptionalFeature"
+            },
+            "featureName": {
+              "type": "string"
+            },
+            "operation": {
+              "type": "string",
+              "enum": [
+                "Enable",
+                "Disable"
+              ]
+            }
           }
         },
         {
           "type": "object",
           "additionalProperties": false,
-          "required": ["type", "operation", "arguments"],
+          "required": [
+            "type",
+            "operation",
+            "arguments"
+          ],
           "properties": {
-            "type": { "const": "PowerCfg" },
-            "operation": { "type": "string", "enum": ["SetActivePlan", "SetSetting", "DuplicateScheme"] },
-            "arguments": { "type": "string" }
+            "type": {
+              "const": "PowerCfg"
+            },
+            "operation": {
+              "type": "string",
+              "enum": [
+                "SetActivePlan",
+                "SetSetting",
+                "DuplicateScheme"
+              ]
+            },
+            "arguments": {
+              "type": "string"
+            }
           }
         },
         {
           "type": "object",
           "additionalProperties": false,
-          "required": ["type", "pathPattern", "allowedRoot", "operation"],
+          "required": [
+            "type",
+            "pathPattern",
+            "allowedRoot",
+            "operation"
+          ],
           "properties": {
-            "type": { "const": "File" },
-            "pathPattern": { "type": "string" },
+            "type": {
+              "const": "File"
+            },
+            "pathPattern": {
+              "type": "string"
+            },
             "allowedRoot": {
               "type": "string",
               "enum": [
@@ -402,26 +774,69 @@
                 "%WINDIR%\\SoftwareDistribution\\Download"
               ]
             },
-            "operation": { "type": "string", "enum": ["DeleteFiles", "EmptyFolder"] },
+            "operation": {
+              "type": "string",
+              "enum": [
+                "DeleteFiles",
+                "EmptyFolder"
+              ]
+            },
             "stopServicesBefore": {
               "type": "array",
-              "items": { "type": "string" }
+              "items": {
+                "type": "string"
+              }
             },
             "startServicesAfter": {
               "type": "array",
-              "items": { "type": "string" }
+              "items": {
+                "type": "string"
+              }
             }
           }
         },
         {
           "type": "object",
           "additionalProperties": false,
-          "required": ["type", "script", "timeoutSeconds", "operation"],
+          "required": [
+            "type",
+            "script",
+            "timeoutSeconds",
+            "operation"
+          ],
           "properties": {
-            "type": { "const": "PowerShell" },
-            "script": { "type": "string" },
-            "timeoutSeconds": { "type": "integer", "minimum": 1, "maximum": 3600 },
-            "operation": { "type": "string", "enum": ["Execute"] }
+            "type": {
+              "const": "PowerShell"
+            },
+            "script": {
+              "type": "string"
+            },
+            "timeoutSeconds": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 3600
+            },
+            "operation": {
+              "type": "string",
+              "enum": [
+                "Execute"
+              ]
+            },
+            "captureRegistryState": {
+              "type": "boolean"
+            },
+            "captureUndoScript": {
+              "type": "string"
+            },
+            "hive": {
+              "type": "string"
+            },
+            "key": {
+              "type": "string"
+            },
+            "valueName": {
+              "type": "string"
+            }
           }
         }
       ]

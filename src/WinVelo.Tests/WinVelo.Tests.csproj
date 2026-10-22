@@ -29,6 +29,7 @@
     <ProjectReference Include="..\WinVelo.Simulation\WinVelo.Simulation.csproj" />
     <ProjectReference Include="..\..\tools\PresetGenerator\PresetGenerator.csproj" />
     <ProjectReference Include="..\..\tools\CatalogValidator\CatalogValidator.csproj" />
+    <ProjectReference Include="..\..\tools\UpstreamImporter\UpstreamImporter.csproj" />
   </ItemGroup>
 
   <!-- Journal files written by WinVelo 1.0.1 and by Tweakora (no "mode" field), used by SmokeTests. -->

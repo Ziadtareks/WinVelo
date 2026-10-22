@@ -30,6 +30,12 @@ public sealed class WinVeloConfig
     [JsonPropertyName("selectedDns")]
     public string? SelectedDns { get; set; }
 
+    [JsonPropertyName("dnsAdapterIndex")]
+    public int? DnsAdapterIndex { get; set; }
+
+    [JsonPropertyName("useDnsOverHttps")]
+    public bool UseDnsOverHttps { get; set; }
+
     [JsonPropertyName("updatesMode")]
     public string? UpdatesMode { get; set; }
 }
@@ -39,6 +45,7 @@ public static class ConfigManager
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         WriteIndented = true,
+        PropertyNameCaseInsensitive = true,
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
     };
@@ -54,7 +61,11 @@ public static class ConfigManager
     {
         try
         {
-            return JsonSerializer.Deserialize<WinVeloConfig>(json, JsonOptions);
+            var config = JsonSerializer.Deserialize<WinVeloConfig>(json, JsonOptions);
+            if (config == null) return null;
+            config.SelectedTweaks ??= new(); config.SelectedApps ??= new(); config.SelectedFeatures ??= new(); config.StagedToggles ??= new();
+            if (config.SelectedTweaks.Concat(config.SelectedApps).Concat(config.SelectedFeatures).Any(string.IsNullOrWhiteSpace)) return null;
+            return config;
         }
         catch
         {

@@ -1,3 +1,4 @@
+using WinVelo.Modules.Apps;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -241,7 +242,7 @@ public static class Program
             new PowerShellActionHandler()
         };
 
-        StateDetector detector = new(registry, services, tasks);
+        StateDetector detector = new(registry, services, tasks, shell);
         DryRunEngine dryRun = new(handlers, context);
         TweakRunner runner = new(handlers, context, restore, detector);
         IOperationRunner opRunner = new OperationRunner();
@@ -488,7 +489,7 @@ public static class Program
         if (featureIdx >= 0 && featureIdx < args.Length - 1)
         {
             string featureKey = args[featureIdx + 1];
-            IFeatureService featureService = new FeatureService(shell);
+            IFeatureService featureService = new FeatureService(shell, journal);
             var features = featureService.LoadFeatures();
             var targetFeature = features.FirstOrDefault(f => string.Equals(f.Key, featureKey, StringComparison.OrdinalIgnoreCase));
 
@@ -536,7 +537,7 @@ public static class Program
         if (dnsIdx >= 0 && dnsIdx < args.Length - 1)
         {
             string dnsId = args[dnsIdx + 1];
-            IDnsService dnsService = new DnsService(shell);
+            IDnsService dnsService = new DnsService(shell, journal);
             var providers = dnsService.GetProviders();
             var provider = providers.FirstOrDefault(p =>
                 string.Equals(p.Id, dnsId, StringComparison.OrdinalIgnoreCase) ||
@@ -559,13 +560,13 @@ public static class Program
         if (updateIdx >= 0 && updateIdx < args.Length - 1)
         {
             string modeStr = args[updateIdx + 1];
-            if (!Enum.TryParse<UpdateProfileMode>(modeStr, true, out var mode))
+            if (!Enum.TryParse<UpdateProfileMode>(modeStr, true, out var mode) || !Enum.IsDefined(mode))
             {
                 Console.WriteLine($"[ERROR] Invalid update mode: {modeStr}. Choose Default, Security, or DisableAll.");
                 return 1;
             }
 
-            IUpdateModeService updateService = new UpdateModeService(registry, services, tasks);
+            IUpdateModeService updateService = new UpdateModeService(registry, services, tasks, journal);
             Console.WriteLine($"[EXECUTE] Applying update mode: {mode}...");
             var report = await updateService.ApplyModeAsync(mode, opRunner);
             Console.WriteLine($"[RESULT] {report.Summary}");
@@ -605,8 +606,17 @@ public static class Program
 
             Console.WriteLine($"[INFO] Config contains: {config.SelectedTweaks.Count} tweaks, {config.SelectedApps.Count} apps, {config.SelectedFeatures.Count} features, DNS: {config.SelectedDns ?? "Default"}, Updates: {config.UpdatesMode ?? "Default"}");
 
-            var keySet = new HashSet<string>(config.SelectedTweaks, StringComparer.OrdinalIgnoreCase);
-            var targetTweaks = catalog.Where(t => keySet.Contains(t.Id) || (t.Origin != null && keySet.Contains(t.Origin))).ToList();
+            var appService = new AppInstallService(shell);
+            var featureService = new FeatureService(shell, journal);
+            var dnsService = new DnsService(shell, journal);
+            var plan = ConfigurationPlan.Resolve(config, catalog, appService.LoadApplications(), featureService.LoadFeatures(), dnsService.GetProviders());
+            if (plan.Errors.Count > 0)
+            {
+                foreach (var error in plan.Errors) Console.WriteLine("[ERROR] " + error);
+                return 1;
+            }
+            var targetTweaks = plan.ApplyTweaks;
+            Console.WriteLine($"[PLAN] Apply {targetTweaks.Count}, undo {plan.UndoTweaks.Count}, install {plan.Apps.Count}, enable features {plan.Features.Count}, DNS {plan.Dns?.Name ?? "unchanged"}, updates {plan.Updates?.ToString() ?? "unchanged"}");
 
             if (isDryRun || !isRun)
             {
@@ -648,9 +658,41 @@ public static class Program
                         Console.WriteLine($"[Failed] {res.TweakId}: {res.Message ?? "Execution failed."}");
                     }
                 }
+                int failures = report.FailedCount;
+                if (failures == 0)
+                {
+                    foreach (var tweak in plan.UndoTweaks)
+                    {
+                        var undo = await runner.UndoTweakAsync(tweak);
+                        Console.WriteLine($"[UNDO] {tweak.Id}: {undo.Message}");
+                        if (!undo.Success) failures++;
+                    }
+                    if (plan.Apps.Count > 0)
+                    {
+                        var apps = await appService.InstallAppsAsync(plan.Apps, "WinGet", opRunner);
+                        Console.WriteLine("[APPS] " + apps.Summary); failures += apps.FailedCount;
+                    }
+                    if (plan.Features.Count > 0)
+                    {
+                        var features = await featureService.EnableFeaturesAsync(plan.Features, opRunner);
+                        Console.WriteLine("[FEATURES] " + features.Summary); failures += features.FailedCount;
+                    }
+                    if (plan.Dns != null)
+                    {
+                        bool ok = config.DnsAdapterIndex is int index
+                            ? await dnsService.ApplyDnsAsync(plan.Dns, index, config.UseDnsOverHttps)
+                            : await dnsService.ApplyDnsAsync(plan.Dns);
+                        Console.WriteLine("[DNS] " + (ok ? "Applied" : "Failed")); if (!ok) failures++;
+                    }
+                    if (plan.Updates is UpdateProfileMode mode)
+                    {
+                        var updates = await new UpdateModeService(registry, services, tasks, journal).ApplyModeAsync(mode, opRunner);
+                        Console.WriteLine("[UPDATES] " + updates.Summary); failures += updates.FailedCount;
+                    }
+                }
                 FinishShellChanges(AppliedTweaks(targetTweaks, report), context);
-                Console.WriteLine($"Applied {report.AppliedCount} of {report.TotalRequested} — {report.FailedCount} failed");
-                return report.FailedCount == 0 ? 0 : 1;
+                Console.WriteLine($"Configuration completed with {failures} failure(s).");
+                return failures == 0 ? 0 : 1;
             }
         }
 

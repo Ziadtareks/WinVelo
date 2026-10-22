@@ -15,17 +15,19 @@ public sealed class StateDetector
     private readonly IRegistryService _registry;
     private readonly ISystemServicesService _services;
     private readonly ITaskSchedulerService _tasks;
+    private readonly IShellService? _shell;
     private readonly ConcurrentDictionary<string, (TweakState State, DateTime CheckedAt)> _cache = new();
     private readonly TimeSpan _cacheDuration = TimeSpan.FromSeconds(5);
 
     public StateDetector(
         IRegistryService registry,
         ISystemServicesService services,
-        ITaskSchedulerService tasks)
+        ITaskSchedulerService tasks, IShellService? shell = null)
     {
         _registry = registry;
         _services = services;
         _tasks = tasks;
+        _shell = shell;
     }
 
     public void InvalidateCache(string? tweakId = null)
@@ -50,12 +52,24 @@ public sealed class StateDetector
             }
         }
 
-        return Task.Run(() =>
+        return Task.Run(async () =>
         {
             TweakState state = TweakState.Unknown;
             try
             {
                 state = EvaluateTweakState(tweak);
+                bool hasScripts = tweak.Apply.Any(a => a.Type.Equals("PowerShell", StringComparison.OrdinalIgnoreCase) || a.Type.Equals("Script", StringComparison.OrdinalIgnoreCase));
+                if (hasScripts && !tweak.ScriptStateDerived && state is TweakState.Applied or TweakState.Unknown)
+                {
+                    bool? verified = null;
+                    if (_shell != null && !string.IsNullOrWhiteSpace(tweak.VerifyScript))
+                    {
+                        var result = await _shell.ExecutePowerShellAsync(tweak.VerifyScript, 30);
+                        if (result.Success && bool.TryParse(result.StdOut.Trim(), out bool value)) verified = value;
+                    }
+                    state = verified == true ? (state == TweakState.Unknown ? TweakState.Applied : state)
+                        : state == TweakState.Applied ? TweakState.Partial : verified == false ? TweakState.NotApplied : TweakState.Unknown;
+                }
             }
             catch
             {
@@ -196,7 +210,7 @@ public sealed class StateDetector
 
         if (string.Equals(op, "CreateKey", StringComparison.OrdinalIgnoreCase))
         {
-            return !_registry.KeyExists(hive, key);
+            return _registry.KeyExists(hive, key);
         }
 
         // Default operation is "Set"

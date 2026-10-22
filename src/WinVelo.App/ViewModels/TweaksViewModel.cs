@@ -1108,7 +1108,7 @@ public sealed partial class TweaksViewModel : ObservableObject
                         {
                             if (succeededIds.Contains(card.Id) || succeededIds.Contains(card.Tweak.Id) || (card.Tweak.Origin != null && succeededIds.Contains(card.Tweak.Origin)))
                             {
-                                card.IsActive = true;
+                                card.State = await _tweakService.DetectTweakStateAsync(card.Tweak);
                             }
                         }
                         UpdateCounts();
@@ -1213,11 +1213,11 @@ public sealed partial class TweaksViewModel : ObservableObject
             {
                 if (succeededIds.Contains(card.Id) || succeededIds.Contains(card.Tweak.Id) || (card.Tweak.Origin != null && succeededIds.Contains(card.Tweak.Origin)))
                 {
-                    card.IsActive = true;
+                    card.State = await _tweakService.DetectTweakStateAsync(card.Tweak);
                 }
                 else
                 {
-                    card.IsActive = false;
+                    card.State = await _tweakService.DetectTweakStateAsync(card.Tweak);
                 }
             }
 
@@ -1327,7 +1327,7 @@ public sealed partial class TweaksViewModel : ObservableObject
             {
                 if (restoredIds.Contains(card.Id) || restoredIds.Contains(card.Tweak.Id) || (card.Tweak.Origin != null && restoredIds.Contains(card.Tweak.Origin)))
                 {
-                    card.IsActive = false;
+                    card.State = await _tweakService.DetectTweakStateAsync(card.Tweak);
                 }
             }
 

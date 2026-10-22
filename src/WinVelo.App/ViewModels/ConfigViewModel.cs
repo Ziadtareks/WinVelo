@@ -94,6 +94,7 @@ public sealed partial class ConfigViewModel : ObservableObject
         foreach (var f in features)
         {
             _allFeatures.Add(f);
+            f.PropertyChanged += (_, args) => { if (args.PropertyName == nameof(FeatureDefinition.IsSelected)) UpdateSelectedCount(); };
         }
 
         LegacyPanels.Clear();
@@ -137,6 +138,9 @@ public sealed partial class ConfigViewModel : ObservableObject
     {
         SelectedFeaturesCount = _allFeatures.Count(f => f.IsSelected);
     }
+
+    [RelayCommand]
+    public async Task RefreshFeatureStatesAsync() => await _featureService.RefreshStatusAsync(_allFeatures);
 
     private bool CanExecuteAction() => !IsBusy;
 
@@ -301,6 +305,7 @@ public sealed partial class ConfigViewModel : ObservableObject
     private async Task ConfirmOpenSshAsync()
     {
         IsOpenSshConfirmOpen = false;
+        if (!WinVelo.App.Services.AppAdminGuard.EnsureAdmin("configure OpenSSH Server")) return;
         IsBusy = true;
         try
         {

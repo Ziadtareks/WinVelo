@@ -14,23 +14,17 @@ public sealed class UpstreamPortComparisonTests
     public void UpstreamTweaks_AllPortedOrExplicitlyDocumentedInUpstreamMd()
     {
         string baseDir = AppContext.BaseDirectory;
-        string upstreamDir = FindDirectoryUpwards(baseDir, Path.Combine("upstream", "winutil", "config"));
         string tweaksDir = FindDirectoryUpwards(baseDir, Path.Combine("Catalog", "Tweaks"));
         string upstreamDocPath = FindFileUpwards(baseDir, Path.Combine("docs", "UPSTREAM.md"));
-
-        // upstream/ is a local, git-ignored copy of WinUtil used only when syncing the catalog.
-        // On a fresh clone (or CI) it does not exist, so there is nothing to compare against.
-        if (!Directory.Exists(upstreamDir)) return;
-        Assert.True(Directory.Exists(tweaksDir), $"tweaks dir not found at {tweaksDir}");
-        Assert.True(File.Exists(upstreamDocPath), $"docs/UPSTREAM.md not found at {upstreamDocPath}");
-
+        Assert.True(Directory.Exists(tweaksDir));
+        Assert.True(File.Exists(upstreamDocPath));
         string upstreamDoc = File.ReadAllText(upstreamDocPath);
-
-        // Load upstream tweaks
-        string upstreamTweaksPath = Path.Combine(upstreamDir, "tweaks.json");
-        Assert.True(File.Exists(upstreamTweaksPath), $"upstream tweaks.json missing");
-        string rawUpstreamJson = File.ReadAllText(upstreamTweaksPath);
-        using var upstreamDocJson = JsonDocument.Parse(rawUpstreamJson);
+        string manifestPath = FindFileUpwards(baseDir, Path.Combine("Catalog", "SourceTracking", "parity.json"));
+        Assert.True(File.Exists(manifestPath), "Pinned upstream parity manifest must be checked in.");
+        using var manifest = JsonDocument.Parse(File.ReadAllText(manifestPath));
+        Assert.Equal("2f0bdc8fca52e1ebe31a8d98216428061d3f8956", manifest.RootElement.GetProperty("commit").GetString());
+        var entries = manifest.RootElement.GetProperty("tweaks").EnumerateArray().ToList();
+        Assert.Equal(68, entries.Count);
 
         // Load our catalog tweaks
         List<TweakDefinition> ourTweaks = new();
@@ -52,10 +46,11 @@ public sealed class UpstreamPortComparisonTests
 
         List<string> unportedAndUndocumented = new();
 
-        foreach (var prop in upstreamDocJson.RootElement.EnumerateObject())
+        foreach (var prop in entries)
         {
-            string key = prop.Name;
-            bool isPorted = ourOrigins.Contains(key) || ourIds.Contains(key) || ourAliases.Contains(key) || DeprecatedTweaks.IsDeprecated(key);
+            string key = prop.GetProperty("key").GetString()!;
+            foreach (var local in prop.GetProperty("localIds").EnumerateArray()) Assert.Contains(local.GetString()!, ourIds);
+            bool isPorted = prop.GetProperty("status").GetString() == "mapped" || ourOrigins.Contains(key) || ourIds.Contains(key) || ourAliases.Contains(key) || DeprecatedTweaks.IsDeprecated(key);
             bool isDocumented = upstreamDoc.Contains(key, StringComparison.OrdinalIgnoreCase);
 
             if (!isPorted && !isDocumented)

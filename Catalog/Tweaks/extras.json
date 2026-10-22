@@ -638,7 +638,8 @@
     "aliases": [
       "performance.input.raw-mouse"
     ],
-    "presetRole": "optimization"
+    "presetRole": "optimization",
+    "scriptStateDerived": true
   },
   {
     "schemaVersion": "1.0.0",
@@ -1062,7 +1063,8 @@
     ],
     "needsReview": false,
     "uiEquivalentLocation": "Control Panel › System › Advanced system settings › Performance › Animate windows when minimizing and maximizing",
-    "presetRole": "optimization"
+    "presetRole": "optimization",
+    "scriptStateDerived": true
   },
   {
     "schemaVersion": "1.0.0",

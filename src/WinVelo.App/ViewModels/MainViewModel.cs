@@ -327,7 +327,12 @@ public sealed partial class MainViewModel : ObservableObject
                 ToolsVM.SelectTool("DNS");
                 CurrentPage = ToolsVM;
                 break;
-            case "Config" or "Fixes":
+            case "Config":
+                ActiveTab = "Tools";
+                ToolsVM.SelectTool("Configuration");
+                CurrentPage = ToolsVM;
+                break;
+            case "Fixes":
                 ActiveTab = "Tools";
                 ToolsVM.SelectTool("Fixes");
                 CurrentPage = ToolsVM;
@@ -424,12 +429,17 @@ public sealed partial class MainViewModel : ObservableObject
     [RelayCommand]
     public void ExportConfig()
     {
-        ConfigDialogText = System.Text.Json.JsonSerializer.Serialize(new
+        ConfigDialogText = WinVelo.Core.Profiles.ConfigManager.ExportConfigJson(new WinVelo.Core.Profiles.WinVeloConfig
         {
-            Version = WinVelo.Core.AppInfo.Version,
             ExportedAtUtc = DateTime.UtcNow,
-            SelectedTweaks = TweaksVM.GetSelectedTweakIds()
-        }, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+            SelectedTweaks = TweaksVM.GetSelectedTweakIds(),
+            SelectedApps = InstallVM.GetSelectedAppKeys(),
+            SelectedFeatures = ConfigVM.GetSelectedFeatureKeys(),
+            SelectedDns = ToolsVM.ToolboxVM.DnsProviders.FirstOrDefault(p => p.IsActive)?.Id,
+            DnsAdapterIndex = ToolsVM.ToolboxVM.DnsProviders.Any(p => p.IsActive) ? ToolsVM.ToolboxVM.SelectedDnsAdapter?.Index : null,
+            UseDnsOverHttps = ToolsVM.ToolboxVM.DnsProviders.Any(p => p.IsActive) && ToolsVM.ToolboxVM.UseDnsOverHttps,
+            UpdatesMode = ToolsVM.UpdatesVM.GetSelectedModeString()
+        });
         IsConfigDialogOpen = true;
     }
 

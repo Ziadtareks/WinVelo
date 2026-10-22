@@ -1,4 +1,4 @@
-using System.Diagnostics;
+using System.Xml.Linq;
 using WinVelo.Core.Interfaces;
 using WinVelo.Core.Safety;
 
@@ -6,100 +6,58 @@ namespace WinVelo.Platform;
 
 public sealed class WindowsTaskSchedulerService : ITaskSchedulerService
 {
-    public WindowsTaskSchedulerService()
-    {
-        EnsureNotTestMode();
-    }
-
+    private readonly IShellService _shell;
+    public WindowsTaskSchedulerService() { EnsureNotTestMode(); _shell = new WindowsShellService(); }
     private static void EnsureNotTestMode()
     {
-        if (TestModeManager.IsTestMode)
-        {
-            throw new InvalidOperationException("Real platform class operation blocked in TEST MODE.");
-        }
+        if (TestModeManager.IsTestMode) throw new InvalidOperationException("Real platform class operation blocked in TEST MODE.");
     }
-
-    private static string CombineTaskPath(string path, string taskName)
+    private static string FullName(string path, string name) => "\\" + string.Join('\\', new[] { path.Trim('\\').Replace('/', '\\'), name }.Where(s => s.Length > 0));
+    private string Checked(params string[] args)
     {
-        string p = path.Trim('\\').Replace('/', '\\');
-        return string.IsNullOrEmpty(p) ? $"\\{taskName}" : $"\\{p}\\{taskName}";
+        EnsureNotTestMode();
+        return WindowsCommand.RequireSuccess(WindowsCommand.Run(_shell, "schtasks.exe", 30, args), "schtasks " + string.Join(' ', args));
     }
-
     public bool TaskExists(string path, string taskName)
     {
+        // COM distinguishes missing tasks from access denied without parsing translated console messages.
         EnsureNotTestMode();
-        string full = CombineTaskPath(path, taskName);
-        using var process = Process.Start(new ProcessStartInfo
+        Type type = Type.GetTypeFromProgID("Schedule.Service") ?? throw new InvalidOperationException("Task Scheduler is unavailable.");
+        dynamic service = Activator.CreateInstance(type)!;
+        object? folder = null;
+        try
         {
-            FileName = "schtasks.exe",
-            Arguments = $"/query /tn \"{full}\"",
-            CreateNoWindow = true,
-            UseShellExecute = false,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true
-        });
-        process?.WaitForExit(3000);
-        return process?.ExitCode == 0;
+            service.Connect();
+            folder = service.GetFolder("\\");
+            try { object task = ((dynamic)folder).GetTask(FullName(path, taskName)); System.Runtime.InteropServices.Marshal.FinalReleaseComObject(task); return true; }
+            catch (System.Runtime.InteropServices.COMException ex) when (ex.HResult == unchecked((int)0x80070002) || ex.HResult == unchecked((int)0x80070003)) { return false; }
+        }
+        finally
+        {
+            if (folder != null) System.Runtime.InteropServices.Marshal.FinalReleaseComObject(folder);
+            System.Runtime.InteropServices.Marshal.FinalReleaseComObject(service);
+        }
     }
-
+    public string? ExportTaskDefinition(string path, string taskName) => Checked("/query", "/tn", FullName(path, taskName), "/xml");
     public bool IsTaskEnabled(string path, string taskName)
     {
-        EnsureNotTestMode();
-        string full = CombineTaskPath(path, taskName);
-        using var process = Process.Start(new ProcessStartInfo
-        {
-            FileName = "schtasks.exe",
-            Arguments = $"/query /tn \"{full}\" /v /fo list",
-            CreateNoWindow = true,
-            UseShellExecute = false,
-            RedirectStandardOutput = true
-        });
-        string output = process?.StandardOutput.ReadToEnd() ?? "";
-        process?.WaitForExit(3000);
-
-        return !output.Contains("Status: Disabled", StringComparison.OrdinalIgnoreCase) &&
-               !output.Contains("Scheduled Task State: Disabled", StringComparison.OrdinalIgnoreCase);
+        var doc = XDocument.Parse(ExportTaskDefinition(path, taskName)!);
+        XNamespace ns = doc.Root!.Name.Namespace;
+        return !string.Equals(doc.Root.Element(ns + "Settings")?.Element(ns + "Enabled")?.Value, "false", StringComparison.OrdinalIgnoreCase);
     }
-
-    public void EnableTask(string path, string taskName)
+    public void EnableTask(string path, string taskName) => SetEnabled(path, taskName, true);
+    public void DisableTask(string path, string taskName) => SetEnabled(path, taskName, false);
+    private void SetEnabled(string path, string name, bool enabled)
+    {
+        Checked("/change", "/tn", FullName(path, name), enabled ? "/enable" : "/disable");
+        if (IsTaskEnabled(path, name) != enabled) throw new InvalidOperationException("Task state was not changed: " + name);
+    }
+    public void DeleteTask(string path, string taskName) => Checked("/delete", "/tn", FullName(path, taskName), "/f");
+    public void RegisterTaskDefinition(string path, string taskName, string xml)
     {
         EnsureNotTestMode();
-        string full = CombineTaskPath(path, taskName);
-        using var process = Process.Start(new ProcessStartInfo
-        {
-            FileName = "schtasks.exe",
-            Arguments = $"/change /tn \"{full}\" /enable",
-            CreateNoWindow = true,
-            UseShellExecute = false
-        });
-        process?.WaitForExit(5000);
-    }
-
-    public void DisableTask(string path, string taskName)
-    {
-        EnsureNotTestMode();
-        string full = CombineTaskPath(path, taskName);
-        using var process = Process.Start(new ProcessStartInfo
-        {
-            FileName = "schtasks.exe",
-            Arguments = $"/change /tn \"{full}\" /disable",
-            CreateNoWindow = true,
-            UseShellExecute = false
-        });
-        process?.WaitForExit(5000);
-    }
-
-    public void DeleteTask(string path, string taskName)
-    {
-        EnsureNotTestMode();
-        string full = CombineTaskPath(path, taskName);
-        using var process = Process.Start(new ProcessStartInfo
-        {
-            FileName = "schtasks.exe",
-            Arguments = $"/delete /tn \"{full}\" /f",
-            CreateNoWindow = true,
-            UseShellExecute = false
-        });
-        process?.WaitForExit(5000);
+        string file = Path.GetTempFileName();
+        try { File.WriteAllText(file, xml, System.Text.Encoding.Unicode); Checked("/create", "/tn", FullName(path, taskName), "/xml", file, "/f"); }
+        finally { File.Delete(file); }
     }
 }

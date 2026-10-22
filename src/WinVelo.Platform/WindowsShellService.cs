@@ -78,16 +78,20 @@ public sealed class WindowsShellService : IShellService
         catch { }
     }
 
-    public async Task<PowerShellResult> ExecutePowerShellAsync(string script, int timeoutSeconds = 60)
+    public Task<PowerShellResult> ExecutePowerShellAsync(string script, int timeoutSeconds = 60)
+        => ExecutePowerShellAsync(script, timeoutSeconds, CancellationToken.None);
+
+    public async Task<PowerShellResult> ExecutePowerShellAsync(string script, int timeoutSeconds, CancellationToken cancellationToken)
     {
         EnsureNotTestMode();
 
         int effectiveTimeout = timeoutSeconds <= 0 ? 60 : Math.Min(timeoutSeconds, 3600);
 
         string wrappedScript =
-            "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';\r\n" +
+            "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue'; $global:LASTEXITCODE = 0;\r\n" +
             "try {\r\n" +
             script + "\r\n" +
+            "if ($global:LASTEXITCODE -ne 0) { throw \"Native command failed with exit code $global:LASTEXITCODE\" }\r\n" +
             "} catch {\r\n" +
             "    [Console]::Error.WriteLine($_)\r\n" +
             "    exit 1\r\n" +
@@ -100,7 +104,7 @@ public sealed class WindowsShellService : IShellService
             "powershell.exe",
             new[] { "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-EncodedCommand", encodedCommand },
             effectiveTimeout,
-            CancellationToken.None,
+            cancellationToken,
             outputEncoding: null);
     }
 

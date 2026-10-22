@@ -74,6 +74,33 @@ public sealed partial class ToolboxViewModel : ObservableObject
     public ObservableCollection<WindowsServiceInfo> ServicesList { get; } = new();
     public ObservableCollection<SystemFixDefinition> FixesList { get; } = new();
     public ObservableCollection<DnsProviderDefinition> DnsProviders { get; } = new();
+    public ObservableCollection<DnsAdapter> DnsAdapters { get; } = new();
+    [ObservableProperty] private DnsAdapter? _selectedDnsAdapter;
+    [ObservableProperty] private bool _useDnsOverHttps;
+
+    partial void OnSelectedDnsAdapterChanged(DnsAdapter? value)
+    {
+        foreach (var provider in DnsProviders) provider.IsActive = false;
+        if (value != null) _ = RefreshActiveDnsAsync(value.Index);
+    }
+    private async Task RefreshActiveDnsAsync(int index)
+    {
+        try
+        {
+            string? id = await _dnsService.GetCurrentProviderIdAsync(index);
+            if (SelectedDnsAdapter?.Index == index) foreach (var provider in DnsProviders) provider.IsActive = provider.Id == id;
+        }
+        catch (Exception ex) { DnsStatusText = ex.Message; }
+    }
+
+    public async Task RefreshDnsAdaptersAsync()
+    {
+        var adapters = await _dnsService.GetAdaptersAsync();
+        int? selected = SelectedDnsAdapter?.Index;
+        DnsAdapters.Clear();
+        foreach (var adapter in adapters) DnsAdapters.Add(adapter);
+        SelectedDnsAdapter = DnsAdapters.FirstOrDefault(a => a.Index == selected) ?? DnsAdapters.FirstOrDefault(a => a.IsDefault) ?? DnsAdapters.FirstOrDefault();
+    }
 
     public ToolboxViewModel(
         ICleanerService cleanerService,
@@ -196,6 +223,26 @@ public sealed partial class ToolboxViewModel : ObservableObject
         }
     }
 
+    [RelayCommand] private Task StartServiceAsync(WindowsServiceInfo service) => ChangeServiceAsync(service, true);
+    [RelayCommand] private Task StopServiceAsync(WindowsServiceInfo service) => ChangeServiceAsync(service, false);
+    private async Task ChangeServiceAsync(WindowsServiceInfo service, bool start)
+    {
+        if (!WinVelo.App.Services.AppAdminGuard.EnsureAdmin("change Windows services")) return;
+        bool ok = await Task.Run(() => _servicesService.ToggleServiceStateAsync(service.ServiceName, start));
+        Status = ok ? "Service updated." : "Service change failed or is protected.";
+        var actual = _servicesService.GetServices().FirstOrDefault(s => s.ServiceName == service.ServiceName);
+        if (actual != null) { service.Status = actual.Status; service.StartupType = actual.StartupType; }
+    }
+    [RelayCommand]
+    private async Task SetServiceStartupAsync(WindowsServiceInfo service)
+    {
+        if (!WinVelo.App.Services.AppAdminGuard.EnsureAdmin("change service startup settings")) return;
+        bool ok = await Task.Run(() => _servicesService.SetStartupTypeAsync(service.ServiceName, service.StartupType));
+        Status = ok ? "Service startup updated." : "Service change failed or is protected.";
+        var actual = _servicesService.GetServices().FirstOrDefault(s => s.ServiceName == service.ServiceName);
+        if (actual != null) service.StartupType = actual.StartupType;
+    }
+
     [RelayCommand]
     private async Task RunFixAsync(SystemFixDefinition fix)
     {
@@ -222,21 +269,18 @@ public sealed partial class ToolboxViewModel : ObservableObject
             return;
         }
 
+        if (SelectedDnsAdapter == null) await RefreshDnsAdaptersAsync();
+        if (SelectedDnsAdapter == null) { DnsStatusText = LocalizationManager.T("Select a network adapter."); return; }
+        int adapterIndex = SelectedDnsAdapter.Index;
         DnsStatusText = LocalizationManager.T("Applying {0} ({1})...", provider.Name, provider.PrimaryDns);
         await Task.Yield();
-        bool ok = await Task.Run(async () => await _dnsService.ApplyDnsAsync(provider));
-        if (ok)
+        try
         {
-            foreach (var p in DnsProviders)
-            {
-                p.IsActive = (p.Id == provider.Id);
-            }
-            DnsStatusText = LocalizationManager.T("Applied {0} successfully.", provider.Name);
+            bool ok = await Task.Run(async () => await _dnsService.ApplyDnsAsync(provider, adapterIndex, UseDnsOverHttps));
+            await RefreshActiveDnsAsync(adapterIndex);
+            DnsStatusText = ok ? LocalizationManager.T("Applied {0} successfully.", provider.Name) : LocalizationManager.T("Failed to apply {0}.", provider.Name);
         }
-        else
-        {
-            DnsStatusText = LocalizationManager.T("Failed to apply {0}.", provider.Name);
-        }
+        catch (Exception ex) { DnsStatusText = ex.Message; }
     }
 
     [RelayCommand]
@@ -269,7 +313,7 @@ public sealed partial class ToolboxViewModel : ObservableObject
     private async Task BenchmarkAllDnsAsync()
     {
         IsBenchmarkingDns = true;
-        DnsStatusText = LocalizationManager.T("Benchmarking top 5 DNS providers (3 pings each)...");
+        DnsStatusText = LocalizationManager.T("Benchmarking eligible DNS providers (3 queries each)...");
         await Task.Yield();
         try
         {
@@ -312,11 +356,11 @@ public sealed partial class ToolboxViewModel : ObservableObject
             return;
         }
 
-        var responsive = DnsProviders.Where(p => p.PingMs > 0).ToList();
+        var responsive = DnsProviders.Where(p => p.PingMs >= 0 && p.BenchmarkEligible).ToList();
         if (responsive.Count == 0)
         {
             await BenchmarkAllDnsAsync();
-            responsive = DnsProviders.Where(p => p.PingMs > 0).ToList();
+            responsive = DnsProviders.Where(p => p.PingMs >= 0 && p.BenchmarkEligible).ToList();
         }
 
         var fastest = responsive.OrderBy(p => p.PingMs).FirstOrDefault();
@@ -339,21 +383,8 @@ public sealed partial class ToolboxViewModel : ObservableObject
             return;
         }
 
-        DnsStatusText = LocalizationManager.T("Resetting network adapters to Automatic (DHCP) DNS...");
-        await Task.Yield();
-        bool ok = await Task.Run(async () => await _networkOptimizer.ResetDnsToDhcpAsync());
-        if (ok)
-        {
-            foreach (var p in DnsProviders)
-            {
-                p.IsActive = (p.PrimaryDns == "DHCP");
-            }
-            DnsStatusText = LocalizationManager.T("Successfully reset network adapters to Automatic (DHCP) DNS.");
-        }
-        else
-        {
-            DnsStatusText = LocalizationManager.T("Failed to reset DNS. Ensure network adapter is active.");
-        }
+        var automatic = _dnsService.GetProviders().First(p => p.PrimaryDns == "DHCP");
+        await ApplyDnsAsync(automatic);
     }
 
     [RelayCommand]

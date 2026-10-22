@@ -17,6 +17,7 @@ public sealed partial class ToolsViewModel : ObservableObject
     private readonly ITweakService? _tweakService;
     private readonly IShellService? _shell;
 
+    public AppxViewModel? AppxVM { get; }
     public StartupViewModel StartupVM { get; }
     public UpdatesViewModel UpdatesVM { get; }
     public ConfigViewModel ConfigVM { get; }
@@ -64,6 +65,7 @@ public sealed partial class ToolsViewModel : ObservableObject
         _restoreService = restoreService;
         _tweakService = tweakService;
         _shell = shell;
+        if (shell != null) AppxVM = new AppxViewModel(shell);
 
         RefreshRestoreInfo();
     }
@@ -95,6 +97,9 @@ public sealed partial class ToolsViewModel : ObservableObject
         {
             RefreshRestoreInfo();
         }
+        if (ActiveTool == "Appx" && AppxVM != null) _ = AppxVM.RefreshAsync();
+        if (ActiveTool == "Features") _ = ConfigVM.RefreshFeatureStatesAsync();
+        if (ActiveTool == "DNS") _ = ToolboxVM.RefreshDnsAdaptersAsync();
     }
 
     [RelayCommand]
@@ -179,6 +184,7 @@ public sealed partial class ToolsViewModel : ObservableObject
     [RelayCommand]
     public async Task ApplyPowerPlanAsync(string? plan)
     {
+        if (!AppAdminGuard.EnsureAdmin("change the power plan")) return;
         if (string.IsNullOrWhiteSpace(plan))
         {
             return;

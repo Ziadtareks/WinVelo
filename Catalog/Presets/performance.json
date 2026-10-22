@@ -44,6 +44,10 @@
       "reason": "Advanced tuning — apply it individually after reading the details"
     },
     {
+      "id": "advanced.svchost-splitting",
+      "reason": "High risk — enable individually from Tweaks"
+    },
+    {
       "id": "essential.deletetempfiles",
       "reason": "High risk — enable individually from Tweaks"
     },
@@ -57,7 +61,7 @@
     },
     {
       "id": "essential.restorepoint",
-      "reason": "One-time action — run it from Tweaks when you need it"
+      "reason": "High risk — enable individually from Tweaks"
     },
     {
       "id": "essential.services",

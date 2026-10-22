@@ -6,6 +6,8 @@ namespace WinVelo.Core.Engine;
 
 public sealed class RollbackJournalManager
 {
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, SemaphoreSlim> OperationGates = new(StringComparer.OrdinalIgnoreCase);
+    public SemaphoreSlim OperationGate { get; }
     private static readonly JsonSerializerOptions WriteOptions = new() { WriteIndented = true };
 
     private readonly string _journalDirectory;
@@ -17,6 +19,7 @@ public sealed class RollbackJournalManager
     public RollbackJournalManager(string journalDirectory)
     {
         _journalDirectory = journalDirectory;
+        OperationGate = OperationGates.GetOrAdd(Path.TrimEndingDirectorySeparator(Path.GetFullPath(journalDirectory)), _ => new SemaphoreSlim(1, 1));
         Directory.CreateDirectory(_journalDirectory);
         _fileMutex = CreateFileMutex(_journalDirectory);
     }
@@ -39,100 +42,100 @@ public sealed class RollbackJournalManager
     public RollbackJournalSession StartSession(string? mode = null, string? appVersion = null)
     {
         lock (_lock)
-        using (AcquireFileLock())
-        {
-            mode ??= TestModeManager.IsTestMode ? "test" : "real";
-            appVersion ??= AppInfo.Version;
-
-            _currentSession = new RollbackJournalSession
+            using (AcquireFileLock())
             {
-                SessionId = DateTime.UtcNow.ToString("yyyyMMdd_HHmmss_") + Guid.NewGuid().ToString("N")[..8],
-                StartedAtUtc = DateTime.UtcNow,
-                IsCompleted = false,
-                Mode = mode,
-                AppVersion = appVersion
-            };
+                mode ??= TestModeManager.IsTestMode ? "test" : "real";
+                appVersion ??= AppInfo.Version;
 
-            FlushSessionUnsafe(_currentSession);
-            return _currentSession;
-        }
+                _currentSession = new RollbackJournalSession
+                {
+                    SessionId = DateTime.UtcNow.ToString("yyyyMMdd_HHmmss_") + Guid.NewGuid().ToString("N")[..8],
+                    StartedAtUtc = DateTime.UtcNow,
+                    IsCompleted = false,
+                    Mode = mode,
+                    AppVersion = appVersion
+                };
+
+                FlushSessionUnsafe(_currentSession);
+                return _currentSession;
+            }
     }
 
     public void RecordActionWriteAhead(JournalActionRecord record)
     {
         lock (_lock)
-        using (AcquireFileLock())
-        {
-            if (_currentSession == null)
+            using (AcquireFileLock())
             {
-                StartSession();
-            }
+                if (_currentSession == null)
+                {
+                    StartSession();
+                }
 
-            // Check if baseline already exists for this target in any previous session or current session
-            bool hasExistingBaseline = FindExistingBaselineRecord(record.TweakId, record.TargetIdentifier) != null;
-            if (hasExistingBaseline)
-            {
-                record.IsBaseline = false;
-            }
+                // Check if baseline already exists for this target in any previous session or current session
+                bool hasExistingBaseline = FindExistingBaselineRecord(record.TweakId, record.TargetIdentifier) != null;
+                if (hasExistingBaseline)
+                {
+                    record.IsBaseline = false;
+                }
 
-            _currentSession!.Records.Add(record);
-            FlushSessionUnsafe(_currentSession);
-        }
+                _currentSession!.Records.Add(record);
+                FlushSessionUnsafe(_currentSession);
+            }
     }
 
     public void CompleteSession()
     {
         lock (_lock)
-        using (AcquireFileLock())
-        {
-            if (_currentSession != null)
+            using (AcquireFileLock())
             {
-                _currentSession.IsCompleted = true;
-                FlushSessionUnsafe(_currentSession);
+                if (_currentSession != null)
+                {
+                    _currentSession.IsCompleted = true;
+                    FlushSessionUnsafe(_currentSession);
+                }
             }
-        }
     }
 
     public void CompleteSession(RollbackJournalSession session)
     {
         lock (_lock)
-        using (AcquireFileLock())
-        {
-            session.IsCompleted = true;
-            FlushSessionUnsafe(session);
-            if (_currentSession != null && _currentSession.SessionId == session.SessionId)
+            using (AcquireFileLock())
             {
-                _currentSession.IsCompleted = true;
+                session.IsCompleted = true;
+                FlushSessionUnsafe(session);
+                if (_currentSession != null && _currentSession.SessionId == session.SessionId)
+                {
+                    _currentSession.IsCompleted = true;
+                }
             }
-        }
     }
 
     public void CompleteSession(string sessionId)
     {
         lock (_lock)
-        using (AcquireFileLock())
-        {
-            if (_currentSession != null && _currentSession.SessionId == sessionId)
+            using (AcquireFileLock())
             {
-                _currentSession.IsCompleted = true;
-                FlushSessionUnsafe(_currentSession);
-            }
-
-            string filePath = SessionPath(sessionId);
-            if (File.Exists(filePath))
-            {
-                try
+                if (_currentSession != null && _currentSession.SessionId == sessionId)
                 {
-                    RollbackJournalSession? session = TryReadSession(filePath);
-                    if (session != null)
-                    {
-                        session.IsCompleted = true;
-                        FlushSessionUnsafe(session);
-                    }
+                    _currentSession.IsCompleted = true;
+                    FlushSessionUnsafe(_currentSession);
                 }
-                catch { }
+
+                string filePath = SessionPath(sessionId);
+                if (File.Exists(filePath))
+                {
+                    try
+                    {
+                        RollbackJournalSession? session = TryReadSession(filePath);
+                        if (session != null)
+                        {
+                            session.IsCompleted = true;
+                            FlushSessionUnsafe(session);
+                        }
+                    }
+                    catch { }
+                }
             }
-        }
     }
 
     public bool HasActiveSession
@@ -140,43 +143,43 @@ public sealed class RollbackJournalManager
         get
         {
             lock (_lock)
-            using (AcquireFileLock())
-            {
-                return _currentSession != null && !_currentSession.IsCompleted;
-            }
+                using (AcquireFileLock())
+                {
+                    return _currentSession != null && !_currentSession.IsCompleted;
+                }
         }
     }
 
     public List<RollbackJournalSession> GetUnfinishedSessions()
     {
         lock (_lock)
-        using (AcquireFileLock())
-        {
-            List<RollbackJournalSession> unfinished = new();
-            string[] files = Directory.GetFiles(_journalDirectory, "*.json");
-            foreach (string file in files)
+            using (AcquireFileLock())
             {
-                try
+                List<RollbackJournalSession> unfinished = new();
+                string[] files = Directory.GetFiles(_journalDirectory, "*.json");
+                foreach (string file in files)
                 {
-                    RollbackJournalSession? session = TryReadSession(file);
-                    if (session != null && !session.IsCompleted && session.Records.Count > 0)
+                    try
                     {
-                        // In real mode, exclude sessions without a marker (legacy sessions)
-                        if (!TestModeManager.IsTestMode && session.IsLegacy)
+                        RollbackJournalSession? session = TryReadSession(file);
+                        if (session != null && !session.IsCompleted && session.Records.Count > 0)
                         {
-                            continue;
-                        }
+                            // In real mode, exclude sessions without a marker (legacy sessions)
+                            if (!TestModeManager.IsTestMode && session.IsLegacy)
+                            {
+                                continue;
+                            }
 
-                        unfinished.Add(session);
+                            unfinished.Add(session);
+                        }
+                    }
+                    catch
+                    {
+                        // Ignore corrupted files in listing
                     }
                 }
-                catch
-                {
-                    // Ignore corrupted files in listing
-                }
+                return unfinished;
             }
-            return unfinished;
-        }
     }
 
     public JournalActionRecord? FindExistingBaselineRecord(string tweakId, string targetIdentifier)
@@ -221,96 +224,97 @@ public sealed class RollbackJournalManager
     public void MarkTweakRecordsReverted(string tweakId)
     {
         lock (_lock)
-        using (AcquireFileLock())
-        {
-            if (_currentSession != null)
+            using (AcquireFileLock())
             {
-                bool modified = false;
-                foreach (var r in _currentSession.Records.Where(r => r.TweakId == tweakId && !r.IsReverted))
+                if (_currentSession != null)
                 {
-                    r.IsReverted = true;
-                    r.RevertedAtUtc = DateTime.UtcNow;
-                    modified = true;
-                }
-                if (modified) FlushSessionUnsafe(_currentSession);
-            }
-
-            string[] files = Directory.GetFiles(_journalDirectory, "*.json");
-            foreach (string file in files)
-            {
-                try
-                {
-                    RollbackJournalSession? session = TryReadSession(file);
-                    if (session != null)
-                    {
-                        bool modified = false;
-                        foreach (var r in session.Records.Where(r => r.TweakId == tweakId && !r.IsReverted))
-                        {
-                            r.IsReverted = true;
-                            r.RevertedAtUtc = DateTime.UtcNow;
-                            modified = true;
-                        }
-                        if (modified)
-                        {
-                            FlushSessionUnsafe(session);
-                        }
-                    }
-                }
-                catch { }
-            }
-        }
-    }
-
-    public void MarkRecordsReverted(IEnumerable<JournalActionRecord> records)
-    {
-        var targetSet = new HashSet<JournalActionRecord>(records);
-        if (targetSet.Count == 0) return;
-
-        lock (_lock)
-        using (AcquireFileLock())
-        {
-            if (_currentSession != null)
-            {
-                bool modified = false;
-                foreach (var r in _currentSession.Records)
-                {
-                    if (targetSet.Contains(r) && !r.IsReverted)
+                    bool modified = false;
+                    foreach (var r in _currentSession.Records.Where(r => r.TweakId == tweakId && !r.IsReverted))
                     {
                         r.IsReverted = true;
                         r.RevertedAtUtc = DateTime.UtcNow;
                         modified = true;
                     }
+                    if (modified) FlushSessionUnsafe(_currentSession);
                 }
-                if (modified) FlushSessionUnsafe(_currentSession);
-            }
 
-            string[] files = Directory.GetFiles(_journalDirectory, "*.json");
-            foreach (string file in files)
-            {
-                try
+                string[] files = Directory.GetFiles(_journalDirectory, "*.json");
+                foreach (string file in files)
                 {
-                    RollbackJournalSession? session = TryReadSession(file);
-                    if (session != null)
+                    try
                     {
-                        bool modified = false;
-                        foreach (var r in session.Records)
+                        RollbackJournalSession? session = TryReadSession(file);
+                        if (session != null)
                         {
-                            if (targetSet.Any(t => t.TweakId == r.TweakId && t.ActionIndex == r.ActionIndex && t.TargetIdentifier == r.TargetIdentifier) && !r.IsReverted)
+                            bool modified = false;
+                            foreach (var r in session.Records.Where(r => r.TweakId == tweakId && !r.IsReverted))
                             {
                                 r.IsReverted = true;
                                 r.RevertedAtUtc = DateTime.UtcNow;
                                 modified = true;
                             }
-                        }
-                        if (modified)
-                        {
-                            FlushSessionUnsafe(session);
+                            if (modified)
+                            {
+                                FlushSessionUnsafe(session);
+                            }
                         }
                     }
+                    catch { }
                 }
-                catch { }
             }
-        }
+    }
+
+    public void MarkRecordsReverted(IEnumerable<JournalActionRecord> records)
+    {
+        static bool SameRecord(JournalActionRecord a, JournalActionRecord b) => a.TweakId == b.TweakId && a.ActionIndex == b.ActionIndex && a.TargetIdentifier == b.TargetIdentifier && a.AppliedAtUtc == b.AppliedAtUtc;
+        var targetSet = new HashSet<JournalActionRecord>(records);
+        if (targetSet.Count == 0) return;
+
+        lock (_lock)
+            using (AcquireFileLock())
+            {
+                if (_currentSession != null)
+                {
+                    bool modified = false;
+                    foreach (var r in _currentSession.Records)
+                    {
+                        if (targetSet.Any(t => SameRecord(t, r)) && !r.IsReverted)
+                        {
+                            r.IsReverted = true;
+                            r.RevertedAtUtc = DateTime.UtcNow;
+                            modified = true;
+                        }
+                    }
+                    if (modified) FlushSessionUnsafe(_currentSession);
+                }
+
+                string[] files = Directory.GetFiles(_journalDirectory, "*.json");
+                foreach (string file in files)
+                {
+                    try
+                    {
+                        RollbackJournalSession? session = TryReadSession(file);
+                        if (session != null)
+                        {
+                            bool modified = false;
+                            foreach (var r in session.Records)
+                            {
+                                if (targetSet.Any(t => SameRecord(t, r)) && !r.IsReverted)
+                                {
+                                    r.IsReverted = true;
+                                    r.RevertedAtUtc = DateTime.UtcNow;
+                                    modified = true;
+                                }
+                            }
+                            if (modified)
+                            {
+                                FlushSessionUnsafe(session);
+                            }
+                        }
+                    }
+                    catch { }
+                }
+            }
     }
 
     /// <summary>
@@ -333,61 +337,61 @@ public sealed class RollbackJournalManager
         }
 
         lock (_lock)
-        using (AcquireFileLock())
-        {
-            if (_currentSession != null)
+            using (AcquireFileLock())
             {
-                var inMemory = _currentSession.Records.FirstOrDefault(r => Same(r, target));
-                if (inMemory != null)
+                if (_currentSession != null)
                 {
-                    Copy(inMemory, from);
-                    FlushSessionUnsafe(_currentSession);
-                    return true;
+                    var inMemory = _currentSession.Records.FirstOrDefault(r => Same(r, target));
+                    if (inMemory != null)
+                    {
+                        Copy(inMemory, from);
+                        FlushSessionUnsafe(_currentSession);
+                        return true;
+                    }
                 }
-            }
 
-            foreach (string file in Directory.GetFiles(_journalDirectory, "*.json"))
-            {
-                RollbackJournalSession? session = TryReadSession(file);
-                var match = session?.Records.FirstOrDefault(r => Same(r, target));
-                if (session != null && match != null)
+                foreach (string file in Directory.GetFiles(_journalDirectory, "*.json"))
                 {
-                    Copy(match, from);
-                    FlushSessionUnsafe(session);
-                    return true;
+                    RollbackJournalSession? session = TryReadSession(file);
+                    var match = session?.Records.FirstOrDefault(r => Same(r, target));
+                    if (session != null && match != null)
+                    {
+                        Copy(match, from);
+                        FlushSessionUnsafe(session);
+                        return true;
+                    }
                 }
+                return false;
             }
-            return false;
-        }
     }
 
     public List<RollbackJournalSession> GetAllSessions()
     {
         lock (_lock)
-        using (AcquireFileLock())
-        {
-            List<RollbackJournalSession> sessions = new();
-            string[] files = Directory.GetFiles(_journalDirectory, "*.json")
-                .OrderByDescending(f => f)
-                .ToArray();
-
-            foreach (string file in files)
+            using (AcquireFileLock())
             {
-                try
+                List<RollbackJournalSession> sessions = new();
+                string[] files = Directory.GetFiles(_journalDirectory, "*.json")
+                    .OrderByDescending(f => f)
+                    .ToArray();
+
+                foreach (string file in files)
                 {
-                    RollbackJournalSession? session = TryReadSession(file);
-                    if (session != null)
+                    try
                     {
-                        sessions.Add(session);
+                        RollbackJournalSession? session = TryReadSession(file);
+                        if (session != null)
+                        {
+                            sessions.Add(session);
+                        }
+                    }
+                    catch
+                    {
+                        // Ignore
                     }
                 }
-                catch
-                {
-                    // Ignore
-                }
+                return sessions;
             }
-            return sessions;
-        }
     }
 
     /// <summary>

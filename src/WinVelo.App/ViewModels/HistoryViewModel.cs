@@ -1,3 +1,4 @@
+using WinVelo.Core.Engine;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -216,7 +217,7 @@ public sealed partial class HistoryViewModel : ObservableObject
 
         try
         {
-            var catalog = _tweakService.LoadCatalog();
+            var catalog = _tweakService.LoadCatalog().Concat(_tweakService.GetActiveJournalTweaks()).GroupBy(t => t.Id, StringComparer.OrdinalIgnoreCase).Select(g => g.First()).ToList();
             var tweakDict = catalog.ToDictionary(t => t.Id, t => t.Name, StringComparer.OrdinalIgnoreCase);
 
             var rawSessions = _tweakService.GetAllSessions()
@@ -249,7 +250,7 @@ public sealed partial class HistoryViewModel : ObservableObject
                     .Select(g => new HistoryTweakItemModel
                     {
                         TweakId = g.Key,
-                        TweakName = tweakDict.TryGetValue(g.Key, out var name) ? name : g.Key,
+                        TweakName = tweakDict.TryGetValue(g.Key, out var name) ? LocalizationManager.T(name) : LocalizationManager.T(ModuleJournal.DisplayName(g.Key)),
                         ActionCount = g.Count(),
                         IsReverted = g.All(r => r.IsReverted),
                         Records = g.ToList()
@@ -352,7 +353,7 @@ public sealed partial class HistoryViewModel : ObservableObject
             return;
         }
 
-        var catalog = _tweakService.LoadCatalog();
+        var catalog = _tweakService.LoadCatalog().Concat(_tweakService.GetActiveJournalTweaks()).GroupBy(t => t.Id, StringComparer.OrdinalIgnoreCase).Select(g => g.First()).ToList();
         var tweakIds = session.Records.Select(r => r.TweakId).Where(id => !string.IsNullOrEmpty(id)).Distinct();
         var sessionTweaks = catalog.Where(t => tweakIds.Contains(t.Id, StringComparer.OrdinalIgnoreCase)).ToList();
 
@@ -365,14 +366,15 @@ public sealed partial class HistoryViewModel : ObservableObject
                 confirmText: LocalizationManager.T("Confirm & Revert Session"),
                 tweaks: sessionTweaks,
                 isUndo: true,
-                onConfirmed: async (_) =>
+                onConfirmed: async (confirmedTweaks) =>
                 {
+                    var confirmedIds = confirmedTweaks.Select(t => t.Id).ToHashSet(StringComparer.OrdinalIgnoreCase);
                     var underlying = new RollbackJournalSession
                     {
                         SessionId = session.SessionId,
                         StartedAtUtc = session.StartedAtUtc,
                         IsCompleted = session.IsCompleted,
-                        Records = session.Records.ToList()
+                        Records = session.Records.Where(r => confirmedIds.Contains(r.TweakId)).ToList()
                     };
                     var result = await _tweakService.RollbackSessionAsync(underlying);
                     var healthReport = await _tweakService.CheckServicingHealthAsync();
@@ -381,7 +383,7 @@ public sealed partial class HistoryViewModel : ObservableObject
                         Title = LocalizationManager.T("Undo Session {0}", session.SessionId),
                         StartTime = DateTime.UtcNow,
                         EndTime = DateTime.UtcNow,
-                        Results = sessionTweaks.Select(t => new OperationItemResult
+                        Results = confirmedTweaks.Select(t => new OperationItemResult
                         {
                             Id = t.Id,
                             Name = t.Name,
@@ -389,7 +391,7 @@ public sealed partial class HistoryViewModel : ObservableObject
                             Reason = result.Message
                         }).ToList()
                     };
-                    _executionDialog.ShowResult(sessionTweaks, report, healthReport, isUndo: true);
+                    _executionDialog.ShowResult(confirmedTweaks, report, healthReport, isUndo: true);
                     RefreshHistory();
                 });
             return;
@@ -443,7 +445,7 @@ public sealed partial class HistoryViewModel : ObservableObject
             return;
         }
 
-        var catalog = _tweakService.LoadCatalog();
+        var catalog = _tweakService.LoadCatalog().Concat(_tweakService.GetActiveJournalTweaks()).GroupBy(t => t.Id, StringComparer.OrdinalIgnoreCase).Select(g => g.First()).ToList();
         var tweak = catalog.FirstOrDefault(t =>
             string.Equals(t.Id, tweakId, StringComparison.OrdinalIgnoreCase) ||
             string.Equals(t.Origin, tweakId, StringComparison.OrdinalIgnoreCase) ||

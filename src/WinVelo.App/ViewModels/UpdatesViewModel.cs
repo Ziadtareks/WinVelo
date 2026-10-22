@@ -119,6 +119,11 @@ public sealed partial class UpdatesViewModel : ObservableObject
         {
             StatusMessage = LocalizationManager.T("Applying {0} updates profile...", SelectedMode);
             var report = await Task.Run(async () => await _updatesService.ApplyModeAsync(SelectedMode, _runner));
+            if (report.FailedCount > 0)
+            {
+                StatusMessage = report.Summary;
+                return;
+            }
             ActiveMode = SelectedMode;
             ActiveModeTitle = SelectedMode switch
             {
@@ -141,6 +146,21 @@ public sealed partial class UpdatesViewModel : ObservableObject
     }
 
     public string GetSelectedModeString() => SelectedMode.ToString();
+
+    [RelayCommand]
+    public async Task ApplyModeAsync(string? mode)
+    {
+        if (IsBusy) return;
+        var selected = mode switch
+        {
+            "Recommended" => UpdateProfileMode.Security,
+            "Suspended" => UpdateProfileMode.DisableAll,
+            "Default" => UpdateProfileMode.Default,
+            _ => SelectedMode
+        };
+        if (SelectedMode != selected) SelectMode(selected);
+        await ApplySelectedModeAsync();
+    }
 
     public void SetSelectedModeString(string modeStr)
     {

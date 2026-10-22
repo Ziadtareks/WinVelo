@@ -173,6 +173,13 @@ public sealed class TweakDefinition
     [JsonPropertyName("needsReview")]
     public bool NeedsReview { get; set; }
 
+    [JsonPropertyName("verifyScript")]
+    public string? VerifyScript { get; set; }
+
+    // Only for refresh scripts whose persistent state is fully described by the structured actions.
+    [JsonPropertyName("scriptStateDerived")]
+    public bool ScriptStateDerived { get; set; }
+
     [JsonPropertyName("evidence")]
     public string Evidence { get; set; } = "documented";
 

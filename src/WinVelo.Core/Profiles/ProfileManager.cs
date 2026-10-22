@@ -125,34 +125,14 @@ public sealed class ProfileManager
 
         foreach (var tweakId in profile.TweakIds)
         {
-            if (!tweakLookup.TryGetValue(tweakId, out var tweak)) continue;
-
-            sb.AppendLine($"; Tweak: {tweak.Name}");
+            if (!tweakLookup.TryGetValue(tweakId, out var tweak)) { sb.AppendLine("; Missing tweak: " + tweakId); continue; }
+            sb.AppendLine("; Tweak: " + tweak.Name.Replace("\r", " ").Replace("\n", " "));
             foreach (var action in tweak.Apply)
             {
-                if (string.Equals(action.Type, "Registry", StringComparison.OrdinalIgnoreCase) ||
-                    string.Equals(action.Type, "Policy", StringComparison.OrdinalIgnoreCase))
-                {
-                    string fullKey = $"[{action.Hive}\\{action.Key}]";
-                    sb.AppendLine(fullKey);
-
-                    if (string.Equals(action.Operation, "Set", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrEmpty(action.ValueName))
-                    {
-                        string valType = action.ValueKind?.ToLowerInvariant() switch
-                        {
-                            "dword" => $"dword:{(action.Data.HasValue && action.Data.Value.ValueKind == JsonValueKind.Number ? action.Data.Value.GetInt32() : (int.TryParse(action.Data?.ToString(), out var i) ? i : 0)):x8}",
-                            "string" => $"\"{action.Data?.ToString()?.Replace("\\", "\\\\").Replace("\"", "\\\"")}\"",
-                            "qword" => $"hex(b):{(action.Data.HasValue && action.Data.Value.ValueKind == JsonValueKind.Number ? action.Data.Value.GetInt64().ToString("x16") : "0000000000000000")}",
-                            _ => $"\"{action.Data}\""
-                        };
-                        sb.AppendLine($"\"{action.ValueName}\"={valType}");
-                    }
-                    else if (string.Equals(action.Operation, "DeleteValue", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrEmpty(action.ValueName))
-                    {
-                        sb.AppendLine($"\"{action.ValueName}\"=-");
-                    }
-                    sb.AppendLine();
-                }
+                if (action.Type.Equals("Registry", StringComparison.OrdinalIgnoreCase) || action.Type.Equals("Policy", StringComparison.OrdinalIgnoreCase))
+                    sb.AppendLine(RegistryExport.Format(action));
+                else sb.AppendLine("; Omitted " + action.Type + " action. Apply the JSON configuration with WinVelo CLI for the complete operation.");
+                sb.AppendLine();
             }
         }
 
@@ -166,9 +146,10 @@ public sealed class ProfileManager
         sb.AppendLine($"# WinVelo Unattended PowerShell Setup: {profile.Name}");
         sb.AppendLine($"# Generated: {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} UTC");
         sb.AppendLine("# Run with Administrator privileges");
+        sb.AppendLine("# Registry-only export. Use WinVelo CLI --config for service, script, task and module actions.");
         sb.AppendLine("# =========================================================");
         sb.AppendLine();
-        sb.AppendLine("Write-Host 'Applying WinVelo Profile: " + profile.Name + "...' -ForegroundColor Cyan");
+        sb.AppendLine("Write-Host 'Applying WinVelo Profile: " + profile.Name.Replace("'", "''") + "...' -ForegroundColor Cyan");
         sb.AppendLine();
 
         var tweakLookup = tweaks.ToDictionary(t => t.Id, StringComparer.OrdinalIgnoreCase);
@@ -209,7 +190,7 @@ public sealed class ProfileManager
             sb.AppendLine();
         }
 
-        sb.AppendLine("Write-Host 'Profile successfully applied!' -ForegroundColor Green");
+        sb.AppendLine("Write-Host 'Registry portion applied. See the header for omitted action types.' -ForegroundColor Green");
         return sb.ToString();
     }
 }

@@ -12,6 +12,8 @@ public sealed class ExecutionContext
     public required RollbackJournalManager Journal { get; set; }
     public bool IsDryRun { get; init; }
     public bool IsUndoOperation { get; set; }
+    public List<ActionItem>? PendingScriptUndo { get; set; }
+    public CancellationToken CancellationToken { get; set; }
     public string BackupDirectory { get; init; } = string.Empty;
 }
 

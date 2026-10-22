@@ -212,4 +212,31 @@ public sealed class HistoryPageTests : IDisposable
         Assert.Contains("test_export_session", vm.ExportedLogContent);
         Assert.Contains("Dark Mode", vm.ExportedLogContent);
     }
+    [Fact]
+    public async Task ToolboxChange_IndividualUndoIsAvailableFromHistory()
+    {
+        var (vm, svc, _, dialog) = CreateFixture(); var journal = new RollbackJournalManager(_testJournalDir);
+        await ModuleJournal.RunScriptAsync(new FakeShellService(), journal, "tools.power-plan", "apply", [ModuleJournal.UndoScript("restore")]);
+        vm.RefreshHistory();
+        await vm.UndoTweakAsync("tools.power-plan");
+        Assert.Single(dialog.PreviewItems); Assert.Equal("tools.power-plan", dialog.PreviewItems[0].Id);
+        await dialog.ConfirmPreviewAsync();
+        Assert.All(svc.GetAllSessions().SelectMany(session => session.Records), record => Assert.True(record.IsReverted));
+    }
+    [Fact]
+    public async Task SessionPreview_UndoesOnlySelectedOperationsAndPreservesOtherRecords()
+    {
+        var (vm, svc, _, dialog) = CreateFixture(); var journal = new RollbackJournalManager(_testJournalDir); journal.StartSession();
+        foreach (string id in new[] { "tools.power-plan", "tools.openssh" })
+            journal.RecordActionWriteAhead(new() { TweakId = id, ActionType = "PowerShell", TargetIdentifier = "powershell://" + id, UndoActions = [ModuleJournal.UndoScript("restore " + id)] });
+        journal.CompleteSession(); vm.RefreshHistory();
+        await vm.UndoSessionAsync(vm.Sessions.Single());
+        Assert.Equal(2, dialog.PreviewItems.Count);
+        dialog.PreviewItems.Single(item => item.Id == "tools.power-plan").IsSelected = false;
+        await dialog.ConfirmPreviewAsync();
+        var session = Assert.Single(svc.GetAllSessions()); Assert.Equal("test", session.Mode); Assert.Equal(2, session.Records.Count);
+        Assert.False(session.Records.Single(record => record.TweakId == "tools.power-plan").IsReverted);
+        Assert.True(session.Records.Single(record => record.TweakId == "tools.openssh").IsReverted);
+    }
+
 }

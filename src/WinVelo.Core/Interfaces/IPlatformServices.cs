@@ -34,6 +34,8 @@ public interface ITaskSchedulerService
     void EnableTask(string path, string taskName);
     void DisableTask(string path, string taskName);
     void DeleteTask(string path, string taskName);
+    string? ExportTaskDefinition(string path, string taskName) => null;
+    void RegisterTaskDefinition(string path, string taskName, string xml) => throw new NotSupportedException("Restoring task definitions is not supported by this provider.");
 }
 
 public sealed class RestorePointResult
@@ -65,9 +67,15 @@ public interface ISystemRestoreService
 
 public interface IShellService
 {
+    bool SupportsSystemQueries => true;
     void RestartExplorer();
     void RefreshShellEnvironment();
     Task<PowerShellResult> ExecutePowerShellAsync(string script, int timeoutSeconds = 60);
+    Task<PowerShellResult> ExecutePowerShellAsync(string script, int timeoutSeconds, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        return ExecutePowerShellAsync(script, timeoutSeconds);
+    }
 
     /// <summary>
     /// Runs a program with each argument passed separately (no shell, no command string), so values such as

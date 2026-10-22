@@ -252,7 +252,7 @@ public sealed class HonestResultReportingTests : IDisposable
         // Succeeded card must be Active, failed card must NOT be active
         var goodCard = vm.FilteredTweaks.First(t => t.Id == "tweak.good");
         var badCard = vm.FilteredTweaks.First(t => t.Id == "tweak.bad");
-        Assert.True(goodCard.IsActive);
+        Assert.False(goodCard.IsActive); // A successful command cannot override the detector's NotApplied result.
         Assert.False(badCard.IsActive);
     }
 

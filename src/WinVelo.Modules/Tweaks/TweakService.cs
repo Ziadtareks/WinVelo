@@ -110,7 +110,7 @@ public sealed class TweakService : ITweakService
             BackupDirectory = WinVeloStoragePaths.GetRegistryBackupDirectory(TestModeManager.IsTestMode)
         };
 
-        _detector = new StateDetector(_registry, _services, _tasks);
+        _detector = new StateDetector(_registry, _services, _tasks, _shell);
         _runner = new TweakRunner(_handlers, context, _restore, _detector);
         _dryRun = new DryRunEngine(_handlers, context);
     }
@@ -209,9 +209,9 @@ public sealed class TweakService : ITweakService
                 result.Add(new TweakDefinition
                 {
                     Id = id,
-                    Name = id,
-                    Category = "Custom",
-                    Risk = "Safe"
+                    Name = ModuleJournal.DisplayName(id),
+                    Category = "Tools",
+                    Risk = "Medium"
                 });
             }
         }
@@ -263,6 +263,10 @@ public sealed class TweakService : ITweakService
         IOperationRunner runner,
         CancellationToken cancellationToken = default)
     {
+        var conflicts = TweakPlanValidator.FindConflicts(tweaks);
+        if (conflicts.Count > 0)
+            return await runner.RunAsync("Apply Tweaks", tweaks, (tweak, ct) => Task.FromResult(new OperationItemResult
+            { Id = tweak.Id, Name = tweak.Name, Status = OperationItemStatus.Failed, Reason = string.Join("; ", conflicts) }), cancellationToken);
         try
         {
             await _backupManager.CreateSnapshotAsync(tweaks, "Automatic pre-tweak snapshot");
@@ -272,13 +276,16 @@ public sealed class TweakService : ITweakService
             System.Diagnostics.Debug.WriteLine($"[WARN] Could not create automatic backup snapshot before tweak application: {ex.Message}");
         }
 
+        Task<BatchExecutionReport>? batchTask = null;
         var report = await runner.RunAsync(
             "Apply Tweaks",
             tweaks,
             async (tweak, ct) =>
             {
-                var batchReport = await _runner.ApplyBatchAsync(new[] { tweak }, cancellationToken: ct);
-                var itemResult = batchReport.Results.FirstOrDefault();
+                BatchExecutionReport batchReport;
+                try { batchReport = await (batchTask ??= _runner.ApplyBatchAsync(tweaks, cancellationToken: cancellationToken)); }
+                catch (OperationCanceledException) { return new OperationItemResult { Id = tweak.Id, Name = tweak.Name, Status = OperationItemStatus.Skipped, Reason = "Operation cancelled." }; }
+                var itemResult = batchReport.Results.FirstOrDefault(r => r.TweakId.Equals(tweak.Id, StringComparison.OrdinalIgnoreCase));
 
                 OperationItemStatus status = itemResult?.Status switch
                 {
@@ -297,7 +304,7 @@ public sealed class TweakService : ITweakService
                     Reason = itemResult?.Message ?? (status == OperationItemStatus.Applied ? "Applied successfully." : "Execution failed.")
                 };
             },
-            cancellationToken);
+            CancellationToken.None);
 
         _ = WindowsSettingNotifier.NotifySettingsChangedForKeysAsync(tweaks.SelectMany(t => t.Apply.Concat(t.Undo)).Select(a => a.Key ?? string.Empty));
         RestartExplorerIfNeeded(tweaks, report);
@@ -364,47 +371,47 @@ public sealed class TweakService : ITweakService
         });
     }
 
+    public const string ManagedPowerPlanId = "266bcd4c-fb39-4d09-bcda-8fa0dc0bd6a3";
     public async Task<bool> SetPerformancePlanAsync(string planName)
     {
-        if (string.Equals(planName, "Ultimate Performance", StringComparison.OrdinalIgnoreCase))
+        bool ultimate = string.Equals(planName, "Ultimate Performance", StringComparison.OrdinalIgnoreCase);
+        bool remove = string.Equals(planName, "Remove Ultimate Performance", StringComparison.OrdinalIgnoreCase);
+        if (!ultimate && !remove && !string.Equals(planName, "Balanced", StringComparison.OrdinalIgnoreCase)) return false;
+        const string source = "e9a42b02-d5df-448d-aa00-03f14749eb61";
+        const string balanced = "381b4222-f694-41f0-9685-ff5bb260df2e";
+        string previous = balanced;
+        bool existed = false;
+        if (_shell.SupportsSystemQueries)
         {
-            string script =
-                "$guid = 'e9a42b02-d5df-448d-aa00-03f14749eb61'; " +
-                "$list = powercfg /list; " +
-                "if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; " +
-                "if (-not ($list -match [regex]::Escape($guid))) { " +
-                "$created = powercfg -duplicatescheme $guid; " +
-                "if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; " +
-                "$match = [regex]::Match(($created -join \"`n\"), '[0-9a-fA-F-]{36}'); " +
-                "if ($match.Success) { $guid = $match.Value } }; " +
-                "powercfg /setactive $guid; " +
-                "exit $LASTEXITCODE";
-            var res = await _shell.ExecutePowerShellAsync(script, 30);
-            return res.Success;
+            var capture = await _shell.ExecutePowerShellAsync("$active=powercfg /getactivescheme; if($LASTEXITCODE -ne 0){throw 'Cannot read active power plan.'}; $list=powercfg /list; if($LASTEXITCODE -ne 0){throw 'Cannot list power plans.'}; [pscustomobject]@{Active=([regex]::Match(($active -join ''),'[0-9a-fA-F-]{36}')).Value; List=($list -join \"`n\")} | ConvertTo-Json -Compress", 30);
+            if (!capture.Success) return false;
+            try
+            {
+                using var doc = System.Text.Json.JsonDocument.Parse(capture.StdOut);
+                if (!Guid.TryParse(doc.RootElement.GetProperty("Active").GetString(), out var guid)) return false;
+                previous = guid.ToString();
+                existed = (doc.RootElement.GetProperty("List").GetString() ?? "").Contains(ManagedPowerPlanId, StringComparison.OrdinalIgnoreCase);
+            }
+            catch (System.Text.Json.JsonException) { return false; }
         }
-        else
-        {
-            string script = "powercfg /setactive 381b4222-f694-41f0-9685-ff5bb260df2e; exit $LASTEXITCODE";
-            var res = await _shell.ExecutePowerShellAsync(script, 30);
-            return res.Success;
-        }
-    }
-
-    public async Task<bool> SetDnsAsync(string primary, string secondary)
-    {
+        string duplicate = $"powercfg -duplicatescheme {source} {ManagedPowerPlanId}; if($LASTEXITCODE -ne 0){{throw 'Cannot create the WinVelo power plan.'}}; ";
         string script;
-        try
-        {
-            script = SafeCommands.SetDnsServers(primary, secondary);
-        }
-        catch (ArgumentException)
-        {
-            return false;
-        }
+        if (ultimate)
+            script = $"$guid='{ManagedPowerPlanId}'; $list=powercfg /list; if($LASTEXITCODE -ne 0){{throw 'Cannot list power plans.'}}; if (-not ($list -match [regex]::Escape($guid))) {{ {duplicate} }}; powercfg /setactive $guid; exit $LASTEXITCODE";
+        else if (remove)
+            script = $"$active=powercfg /getactivescheme; if($LASTEXITCODE -ne 0){{throw 'Cannot read active plan.'}}; if($active -match '{ManagedPowerPlanId}'){{powercfg /setactive {balanced}; if($LASTEXITCODE -ne 0){{throw 'Cannot switch to Balanced.'}}}}; $list=powercfg /list; if($LASTEXITCODE -ne 0){{throw 'Cannot list plans.'}}; if($list -match '{ManagedPowerPlanId}'){{powercfg /delete {ManagedPowerPlanId}; if($LASTEXITCODE -ne 0){{throw 'Cannot delete WinVelo plan.'}}}}";
+        else script = $"powercfg /setactive {balanced}; exit $LASTEXITCODE";
 
-        var res = await _shell.ExecutePowerShellAsync(script, 30);
-        return res.Success;
+        string undo = existed ? $"$list=powercfg /list; if($LASTEXITCODE -ne 0){{throw 'Cannot list plans.'}}; if($list -notmatch '{ManagedPowerPlanId}'){{ {duplicate} }}; " : "";
+        undo += $"powercfg /setactive {previous}; if($LASTEXITCODE -ne 0){{throw 'Cannot restore the previous power plan.'}}; ";
+        if (!existed) undo += $"$list=powercfg /list; if($LASTEXITCODE -ne 0){{throw 'Cannot list plans.'}}; if($list -match '{ManagedPowerPlanId}'){{powercfg /delete {ManagedPowerPlanId}; if($LASTEXITCODE -ne 0){{throw 'Cannot remove the created plan.'}}}}";
+        var result = await ModuleJournal.RunScriptAsync(_shell, _journal, "tools.power-plan", script, new[] { ModuleJournal.UndoScript(undo) }, 30);
+        return result.Success;
     }
+
+    public Task<bool> SetDnsAsync(string primary, string secondary)
+        => new WinVelo.Modules.Network.DnsService(_shell, _journal).ApplyDnsAsync(new WinVelo.Modules.Network.DnsProviderDefinition
+        { Id = "custom", Name = "Custom DNS", Description = "Custom DNS", PrimaryDns = primary, SecondaryDns = secondary });
 
     public bool IsRebootPending()
     {

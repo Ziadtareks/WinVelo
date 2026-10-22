@@ -22,5 +22,5 @@ public sealed class PowerShellResult
     /// <summary>
     /// True only if the process exited with code 0 and did not time out.
     /// </summary>
-    public bool Success => !TimedOut && ExitCode == 0;
+    public bool Success => !TimedOut && !Cancelled && !FailedToStart && ExitCode == 0;
 }

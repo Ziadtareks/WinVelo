@@ -8,11 +8,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Audit remediation
+- Persist script rollback plans across restarts; retain failed undo records for retry; serialize journal operations; reject conflicting tweak selections before writes.
+- Check native service/task failures, back up deleted scheduled-task XML, restore typed/default registry snapshot values, and block file deletion in simulation.
+- Verify script-backed state where a probe exists; do not infer script success from a registry marker or force GUI cards to Applied.
+- Repair Features binding/notifications and script-only disable actions. Capture optional-feature baselines, support cancellation and longer servicing timeouts, expose OpenSSH/AutoLogon/classic panels, and journal toolbox changes.
+- Complete configuration profile sections in CLI (apps, features, staged apply/undo, DNS and update mode) with preflight validation and shared GUI/CLI JSON names.
+- Load all DNS providers with IPv6, selected-adapter changes, opt-in DoH and actual DNS-query benchmarking. Filter automatic provider selection to eligible unfiltered choices.
+- Add current-user Appx selection/removal with explicit data-loss confirmation and Store links; expose service controls and managed power-plan removal.
+- Expand apps to 242 entries, separate the high-risk svchost tweak (142 total), mark BitLocker irreversible and capture Defender consent before changing it.
+- Stage upstream imports in a fresh proposal directory; pin 68 upstream keys in an unconditional parity manifest. Keep remaining exclusions and VM-validation limits explicit.
+- Remove fabricated minimum memory savings from real-mode reporting; fix registry export hive names, default values and QWORD byte ordering, and disclose omitted non-registry actions.
+
 ### Added
 - *Settings → Updates*: a manual **Check for updates** button. It contacts GitHub only when clicked, shows the latest version, and links to the release page. It never downloads or installs an update automatically.
-- *Tools → Power Plan*: switch between Balanced and the hidden Ultimate Performance plan. Switching to Balanced restores the Windows default without deleting power schemes.
+- *Tools → Power Plan*: switch between Balanced and the hidden Ultimate Performance plan. A separate remove command deletes only the WinVelo managed plan.
 - *Tools*: an official O&O ShutUp10++ link. WinVelo opens the vendor page only and never downloads or runs the binary.
-- `performance.system.storage-sense-disable`: port the missing WinUtil Storage Sense disable tweak. The catalog now has 141 tweaks.
+- `performance.system.storage-sense-disable`: port the missing WinUtil Storage Sense disable tweak. The catalog now has 142 tweaks.
 
 ### Changed
 - Updated `docs/UPSTREAM.md` to the October 19, 2026 WinUtil audit (`7514faf`), with honest counts for ported tweaks, UI controls, and the curated 36-app catalog.

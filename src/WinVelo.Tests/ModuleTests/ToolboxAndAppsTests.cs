@@ -135,7 +135,7 @@ public class ToolboxAndAppsTests
         Assert.True(applied);
 
         int dhcpPing = await service.PingDnsAsync("DHCP");
-        Assert.Equal(0, dhcpPing);
+        Assert.Equal(-1, dhcpPing);
     }
 
     [Fact]
