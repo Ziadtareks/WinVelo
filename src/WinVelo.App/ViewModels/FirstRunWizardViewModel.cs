@@ -67,12 +67,13 @@ public sealed partial class FirstRunWizardViewModel : ObservableObject
         _ = RefreshRestoreStateAsync();
     }
 
-    private bool _isRefreshingRestore;
+    private Task? _restoreRefreshTask;
 
-    public async Task RefreshRestoreStateAsync()
+    public Task RefreshRestoreStateAsync() => _restoreRefreshTask is { IsCompleted: false }
+        ? _restoreRefreshTask : _restoreRefreshTask = RefreshRestoreStateCoreAsync();
+
+    private async Task RefreshRestoreStateCoreAsync()
     {
-        if (_isRefreshingRestore) return;
-        _isRefreshingRestore = true;
         try
         {
             var (enabled, count, latestDate) = await Task.Run(() =>
@@ -103,7 +104,6 @@ public sealed partial class FirstRunWizardViewModel : ObservableObject
         {
             RestoreStatusMessage = LocalizationManager.T("System Restore status notice: {0}", ex.Message);
         }
-        finally { _isRefreshingRestore = false; }
     }
 
     [RelayCommand]

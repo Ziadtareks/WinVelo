@@ -138,7 +138,7 @@ public sealed class TweakRunner
         if (!_context.IsDryRun)
         {
             progress?.Report("Verifying System Protection & Restore Point...");
-            bool canProceed = await EnsureSystemRestorePointAsync(onRestorePointPromptAsync);
+            bool canProceed = await EnsureSystemRestorePointAsync(onRestorePointPromptAsync, progress);
             if (!canProceed)
             {
                 foreach (var t in tweakList)
@@ -224,6 +224,7 @@ public sealed class TweakRunner
             for (int i = 0; i < tweak.Apply.Count; i++)
             {
                 ActionItem action = tweak.Apply[i];
+                progress?.Report($"Applying {tweak.Name}: action {i + 1}/{tweak.Apply.Count} ({action.Type})...");
                 IActionHandler? handler = _handlers.FirstOrDefault(h => h.CanHandle(action.Type));
 
                 if (handler == null)
@@ -550,7 +551,7 @@ public sealed class TweakRunner
         return _context.Journal.InheritBaseline(nextNewer, record);
     }
 
-    private async Task<bool> EnsureSystemRestorePointAsync(Func<string, Task<bool>>? onRestorePointPromptAsync)
+    private async Task<bool> EnsureSystemRestorePointAsync(Func<string, Task<bool>>? onRestorePointPromptAsync, IProgress<string>? progress)
     {
         if (!_restoreService.IsSystemRestoreEnabled())
         {
@@ -562,6 +563,7 @@ public sealed class TweakRunner
         }
 
         int countBefore = _restoreService.GetRestorePointCount();
+        progress?.Report("Creating a Windows restore point (this can take several minutes)...");
         RestorePointResult createResult = _restoreService.CreateRestorePoint($"WinVelo Session {DateTime.Now:yyyy-MM-dd HH:mm}");
 
         int countAfter = _restoreService.GetRestorePointCount();

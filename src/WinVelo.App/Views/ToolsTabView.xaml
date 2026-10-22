@@ -313,6 +313,9 @@
                                 <TextBlock Text="{loc:Tr Tools_ReviewAppsThatLaunchAutomatically}"
                                            Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,2,0,0" />
                             </StackPanel>
+                            <Button DockPanel.Dock="Right" Content="↻" AutomationProperties.Name="Refresh startup applications"
+                                    AutomationProperties.AutomationId="RefreshStartupButton" Command="{Binding StartupVM.RefreshCommand}"
+                                    Style="{DynamicResource ModernSecondaryBtn}" Margin="8,0,0,0" />
                             <Button DockPanel.Dock="Right" Content="{loc:Tr Startup_OptimizeStartupApps}"
                                     AutomationProperties.Name="Optimize Startup Apps"
                                     Style="{DynamicResource ModernPrimaryBtn}"
@@ -320,7 +323,9 @@
                         </DockPanel>
                     </Border>
 
-                    <ItemsControl ItemsSource="{Binding StartupVM.FilteredItems}">
+                    <ProgressBar Height="3" IsIndeterminate="True" Margin="0,0,0,8" Visibility="{Binding StartupVM.IsLoading, Converter={StaticResource BoolToVisConverter}}" />
+                    <TextBlock Text="{Binding StartupVM.StatusMessage}" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,8" TextWrapping="Wrap" />
+                    <ItemsControl ItemsSource="{Binding StartupVM.FilteredApps}" IsEnabled="{Binding StartupVM.IsReady}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <Border Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
@@ -339,10 +344,12 @@
                                         <Border Grid.Column="1" Background="{DynamicResource StatusDefaultBgBrush}" CornerRadius="4" Padding="6,2" VerticalAlignment="Center">
                                             <TextBlock Text="{Binding Impact, Converter={StaticResource Tr}, StringFormat={loc:Tr Tools_Impact0}}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" />
                                         </Border>
-                                        <CheckBox Grid.Column="3" IsChecked="{Binding IsEnabled, Mode=TwoWay}"
+                                        <CheckBox Grid.Column="3" IsChecked="{Binding IsEnabled, Mode=OneWay}"
                                                   AutomationProperties.Name="{Binding Name, StringFormat='Toggle startup for {0}'}"
+                                                  AutomationProperties.AutomationId="{Binding Name, StringFormat='StartupToggle_{0}'}"
+                                                  IsEnabled="{Binding IsNotToggling}"
                                                   Style="{DynamicResource ModernCheckBox}"
-                                                  Command="{Binding DataContext.StartupVM.ToggleStartupItemCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                  Command="{Binding DataContext.StartupVM.ToggleAppCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                   CommandParameter="{Binding}" VerticalAlignment="Center" />
                                     </Grid>
                                 </Border>

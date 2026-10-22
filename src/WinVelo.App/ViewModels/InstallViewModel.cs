@@ -72,7 +72,7 @@ public sealed partial class InstallViewModel : ObservableObject
 
         _runner.OnLog += msg =>
         {
-            System.Windows.Application.Current?.Dispatcher?.Invoke(() =>
+            System.Windows.Application.Current?.Dispatcher?.InvokeAsync(() =>
             {
                 OperationLogs.Add(msg);
                 if (OperationLogs.Count > 200) OperationLogs.RemoveAt(0);
@@ -81,7 +81,7 @@ public sealed partial class InstallViewModel : ObservableObject
 
         _runner.OnProgress += (status, percent) =>
         {
-            System.Windows.Application.Current?.Dispatcher?.Invoke(() =>
+            System.Windows.Application.Current?.Dispatcher?.InvokeAsync(() =>
             {
                 StatusMessage = status;
                 ProgressPercent = percent;
@@ -168,7 +168,7 @@ public sealed partial class InstallViewModel : ObservableObject
                     var icon = WinVelo.App.Services.AppIconExtractor.ExtractIcon(exe);
                     if (icon != null)
                     {
-                        System.Windows.Application.Current?.Dispatcher?.Invoke(() =>
+                        System.Windows.Application.Current?.Dispatcher?.InvokeAsync(() =>
                         {
                             app.IconImage = icon;
                         });

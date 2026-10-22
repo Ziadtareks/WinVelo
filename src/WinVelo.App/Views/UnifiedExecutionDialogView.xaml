@@ -319,6 +319,7 @@
                     <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
                         <ui:Button Content="{loc:Tr Preview_Done}" Appearance="Primary"
                                    AutomationProperties.Name="Done and Close Results"
+                                   AutomationProperties.AutomationId="ResultCloseButton"
                                    Command="{Binding CloseResultCommand}" />
                     </StackPanel>
                 </Grid>

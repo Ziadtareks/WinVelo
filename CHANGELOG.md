@@ -6,6 +6,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.6] - 2026-10-23
+
+### Fixed
+- Prevent a reproducible UI synchronization-context deadlock in native command and PowerShell execution, including the health check after Apply.
+- Move servicing checks and repairs off the UI thread and remove blocking WPF calls from shared operation notifications.
+- Show Startup apps using the correct collection and command bindings, prevent double inversion of checkbox state, and expose a refresh action and loading status.
+- Share in-flight Startup and setup-wizard refresh tasks; disable Startup toggles during loading or an outstanding change.
+- Disable preview confirmation until state detection completes, await preview updates and ignore work from cancelled or replaced previews.
+- Forward live restore-point and tweak-action phases to the activity display and persistent operation log.
+- Add regression coverage for the deadlock, timeouts, Startup bindings, Apply completion, and persisted Startup toggles in simulation.
+- Supply missing Arabic messages for feature/network refresh failures and scan cancellation.
+
 ## [1.0.5] - 2026-10-23
 
 ### Fixed

@@ -146,10 +146,12 @@ public static class ServicingProtectionHelper
         return false;
     }
 
-    public static async Task<ServicingHealthReport> CheckServicingHealthAsync(ISystemServicesService services, IRegistryService registry)
+    public static Task<ServicingHealthReport> CheckServicingHealthAsync(ISystemServicesService services, IRegistryService registry)
+        => Task.Run(() => CheckServicingHealth(services, registry));
+
+    private static ServicingHealthReport CheckServicingHealth(ISystemServicesService services, IRegistryService registry)
     {
         var report = new ServicingHealthReport();
-        await Task.Yield();
 
         // 1. Check all protected services
         foreach (var svcName in ServicingProtectionConstants.ProtectedServices)
@@ -262,10 +264,12 @@ public static class ServicingProtectionHelper
         return report;
     }
 
-    public static async Task<List<string>> RestoreServicingComponentsAsync(ISystemServicesService services, IRegistryService registry)
+    public static Task<List<string>> RestoreServicingComponentsAsync(ISystemServicesService services, IRegistryService registry)
+        => Task.Run(() => RestoreServicingComponents(services, registry));
+
+    private static List<string> RestoreServicingComponents(ISystemServicesService services, IRegistryService registry)
     {
         var restored = new List<string>();
-        await Task.Yield();
 
         foreach (var svcName in ServicingProtectionConstants.ProtectedServices)
         {

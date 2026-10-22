@@ -220,6 +220,7 @@ public sealed class HistoryPageTests : IDisposable
         vm.RefreshHistory();
         await vm.UndoTweakAsync("tools.power-plan");
         Assert.Single(dialog.PreviewItems); Assert.Equal("tools.power-plan", dialog.PreviewItems[0].Id);
+        await dialog.PreviewLoadTask;
         await dialog.ConfirmPreviewAsync();
         Assert.All(svc.GetAllSessions().SelectMany(session => session.Records), record => Assert.True(record.IsReverted));
     }
@@ -232,7 +233,9 @@ public sealed class HistoryPageTests : IDisposable
         journal.CompleteSession(); vm.RefreshHistory();
         await vm.UndoSessionAsync(vm.Sessions.Single());
         Assert.Equal(2, dialog.PreviewItems.Count);
+        await dialog.PreviewLoadTask;
         dialog.PreviewItems.Single(item => item.Id == "tools.power-plan").IsSelected = false;
+        await dialog.PreviewLoadTask;
         await dialog.ConfirmPreviewAsync();
         var session = Assert.Single(svc.GetAllSessions()); Assert.Equal("test", session.Mode); Assert.Equal(2, session.Records.Count);
         Assert.False(session.Records.Single(record => record.TweakId == "tools.power-plan").IsReverted);

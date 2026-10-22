@@ -57,6 +57,7 @@ public sealed class FirstRunWizardTests
         restore.IsEnabled = false;
 
         wizard.NextStep(); // Go to Step 2
+        await wizard.RefreshRestoreStateAsync();
         Assert.Equal(2, wizard.CurrentStep);
         Assert.False(wizard.IsSystemRestoreEnabled);
         Assert.Contains("turned OFF", wizard.RestoreStatusMessage);

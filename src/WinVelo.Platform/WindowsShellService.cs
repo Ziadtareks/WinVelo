@@ -105,7 +105,7 @@ public sealed class WindowsShellService : IShellService
             new[] { "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-EncodedCommand", encodedCommand },
             effectiveTimeout,
             cancellationToken,
-            outputEncoding: null);
+            outputEncoding: null).ConfigureAwait(false);
     }
 
     public Task<PowerShellResult> RunProcessAsync(string fileName, IReadOnlyList<string> arguments, int timeoutSeconds = 60, CancellationToken cancellationToken = default)
@@ -168,9 +168,9 @@ public sealed class WindowsShellService : IShellService
 
         try
         {
-            await process.WaitForExitAsync(cts.Token);
-            string stdout = await stdoutTask;
-            string stderr = await stderrTask;
+            await process.WaitForExitAsync(cts.Token).ConfigureAwait(false);
+            string stdout = await stdoutTask.ConfigureAwait(false);
+            string stderr = await stderrTask.ConfigureAwait(false);
             stopwatch.Stop();
 
             return new PowerShellResult
@@ -197,8 +197,8 @@ public sealed class WindowsShellService : IShellService
             string stderr = string.Empty;
             try
             {
-                if (stdoutTask.IsCompleted) stdout = await stdoutTask;
-                if (stderrTask.IsCompleted) stderr = await stderrTask;
+                if (stdoutTask.IsCompleted) stdout = await stdoutTask.ConfigureAwait(false);
+                if (stderrTask.IsCompleted) stderr = await stderrTask.ConfigureAwait(false);
             }
             catch
             {

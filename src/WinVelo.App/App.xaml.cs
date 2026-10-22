@@ -127,7 +127,12 @@ public partial class App : Application
                 string journalDir = WinVeloStoragePaths.GetJournalDirectory(isTestMode);
                 services.AddSingleton(new RollbackJournalManager(journalDir));
                 services.AddSingleton<IActivityTracker, ActivityTracker>();
-                services.AddSingleton<IOperationRunner, OperationRunner>();
+                services.AddSingleton<IOperationRunner>(provider =>
+                {
+                    var runner = new OperationRunner(provider.GetRequiredService<IActivityTracker>());
+                    runner.OnLog += message => Log.Information("{OperationMessage}", message);
+                    return runner;
+                });
 
                 // Domain Feature Services
                 services.AddSingleton<ICleanerService, CleanerService>();

@@ -96,6 +96,7 @@ public sealed partial class ToolsViewModel : ObservableObject
         {
             _ = RefreshRestoreInfoAsync();
         }
+        if (ActiveTool == "Startup") _ = StartupVM.RefreshAsync();
         if (ActiveTool == "Appx" && AppxVM != null) _ = AppxVM.RefreshAsync();
         if (ActiveTool == "Features") _ = ConfigVM.RefreshFeatureStatesAsync();
         if (ActiveTool == "DNS") _ = ToolboxVM.RefreshDnsAdaptersAsync();

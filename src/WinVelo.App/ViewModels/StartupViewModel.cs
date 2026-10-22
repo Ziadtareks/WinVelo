@@ -60,7 +60,10 @@ public sealed partial class StartupViewModel : ObservableObject
     }
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsReady))]
     private bool _isLoading;
+
+    public bool IsReady => !IsLoading;
 
     [ObservableProperty]
     private bool _isOptimizing;
@@ -75,7 +78,7 @@ public sealed partial class StartupViewModel : ObservableObject
     {
         _startupService = startupService;
         _activityTracker = activityTracker;
-        _ = LoadStartupAppsAsync();
+        _ = RefreshAsync();
     }
 
     partial void OnSearchTextChanged(string value)
@@ -92,11 +95,12 @@ public sealed partial class StartupViewModel : ObservableObject
 
     private bool _isRefreshingStates;
 
+    private Task? _startupLoadTask;
     [RelayCommand]
-    public async Task RefreshAsync()
-    {
-        await LoadStartupAppsAsync();
-    }
+    public Task RefreshAsync() => GetOrStartLoad(false);
+
+    private Task GetOrStartLoad(bool silent) => _startupLoadTask is { IsCompleted: false }
+        ? _startupLoadTask : _startupLoadTask = LoadStartupAppsAsync(silent);
 
     /// <summary>
     /// Backward-compatibility method alias for tests and direct callers.
@@ -220,7 +224,7 @@ public sealed partial class StartupViewModel : ObservableObject
 
     public async Task RefreshStatesSilentAsync()
     {
-        await LoadStartupAppsAsync(silent: true);
+        await GetOrStartLoad(true);
     }
 
     private async Task LoadStartupAppsAsync(bool silent = false)
@@ -229,9 +233,9 @@ public sealed partial class StartupViewModel : ObservableObject
         _isRefreshingStates = true;
         try
         {
+            IsLoading = true;
             if (!silent)
             {
-                IsLoading = true;
                 StatusMessage = LocalizationManager.T("Scanning startup programs across 5 Windows locations...");
             }
 
@@ -291,10 +295,7 @@ public sealed partial class StartupViewModel : ObservableObject
         finally
         {
             _isRefreshingStates = false;
-            if (!silent)
-            {
-                IsLoading = false;
-            }
+            IsLoading = false;
             _loadLock.Release();
         }
     }

@@ -258,6 +258,11 @@ public sealed class TweakService : ITweakService
         return Task.FromResult(sw.ToString());
     }
 
+    private sealed class BatchProgress(Action<string> report) : IProgress<string>
+    {
+        public void Report(string value) => report(value);
+    }
+
     public async Task<OperationExecutionReport> ApplyTweaksAsync(
         IReadOnlyList<TweakDefinition> tweaks,
         IOperationRunner runner,
@@ -283,7 +288,7 @@ public sealed class TweakService : ITweakService
             async (tweak, ct) =>
             {
                 BatchExecutionReport batchReport;
-                try { batchReport = await (batchTask ??= _runner.ApplyBatchAsync(tweaks, cancellationToken: cancellationToken)); }
+                try { batchReport = await (batchTask ??= _runner.ApplyBatchAsync(tweaks, progress: new BatchProgress(runner.ReportStatus), cancellationToken: cancellationToken)); }
                 catch (OperationCanceledException) { return new OperationItemResult { Id = tweak.Id, Name = tweak.Name, Status = OperationItemStatus.Skipped, Reason = "Operation cancelled." }; }
                 var itemResult = batchReport.Results.FirstOrDefault(r => r.TweakId.Equals(tweak.Id, StringComparison.OrdinalIgnoreCase));
 

@@ -63,6 +63,7 @@ public interface IOperationRunner
 {
     event Action<string>? OnLog;
     event Action<string, int>? OnProgress;
+    void ReportStatus(string status) { }
     Task<OperationExecutionReport> RunAsync<T>(
         string operationTitle,
         IReadOnlyList<T> items,
@@ -80,6 +81,12 @@ public sealed class OperationRunner : IOperationRunner
     public OperationRunner(IActivityTracker? activityTracker = null)
     {
         _activityTracker = activityTracker;
+    }
+
+    public void ReportStatus(string status)
+    {
+        _activityTracker?.UpdateAction(status);
+        OnLog?.Invoke("[STEP] " + status);
     }
 
     public async Task<OperationExecutionReport> RunAsync<T>(

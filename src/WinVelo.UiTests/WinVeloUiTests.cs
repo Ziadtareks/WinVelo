@@ -142,7 +142,8 @@ public sealed partial class WinVeloUiTests
     private static (Application App, UIA3Automation Automation, Window Window) LaunchAppInTestMode()
     {
         string solutionDir = FindSolutionRoot();
-        string exePath = Path.Combine(solutionDir, "src", "WinVelo.App", "bin", "Debug", "net10.0-windows", "WinVelo.exe");
+        string exePath = Environment.GetEnvironmentVariable("WINVELO_UI_TEST_EXE") ??
+            Path.Combine(solutionDir, "src", "WinVelo.App", "bin", "Debug", "net10.0-windows", "WinVelo.exe");
         if (!File.Exists(exePath))
         {
             exePath = Path.Combine(solutionDir, "src", "WinVelo.App", "bin", "Debug", "net10.0-windows", "WinVelo.App.exe");
@@ -160,12 +161,11 @@ public sealed partial class WinVeloUiTests
         var automation = new UIA3Automation();
         var window = Retry.WhileNull(() =>
         {
-            var topWindows = app.GetAllTopLevelWindows(automation);
-            return topWindows.FirstOrDefault(w =>
-                (!string.IsNullOrEmpty(w.Title) && w.Title.Contains("WinVelo")) ||
-                w.AutomationId == "WinVeloMainWindow")
-                ?? topWindows.FirstOrDefault(w => w.FindAllDescendants().Length > 5);
-        }, TimeSpan.FromSeconds(25)).Result;
+            // Target only the process launched by this test; desktop-wide enumeration can
+            // wait on an unrelated hung/elevated application owned by the user.
+            IntPtr handle = app.MainWindowHandle;
+            return handle == IntPtr.Zero ? null : automation.FromHandle(handle).AsWindow();
+        }, TimeSpan.FromSeconds(25), ignoreException: true).Result;
         Assert.NotNull(window);
         window.Focus();
         try
@@ -534,7 +534,8 @@ public sealed partial class WinVeloUiTests
     public void Test_08_FirstRunWizard_ModalAndKeyboardNavigation()
     {
         string solutionDir = FindSolutionRoot();
-        string exePath = Path.Combine(solutionDir, "src", "WinVelo.App", "bin", "Debug", "net10.0-windows", "WinVelo.exe");
+        string exePath = Environment.GetEnvironmentVariable("WINVELO_UI_TEST_EXE") ??
+            Path.Combine(solutionDir, "src", "WinVelo.App", "bin", "Debug", "net10.0-windows", "WinVelo.exe");
         if (!File.Exists(exePath))
         {
             exePath = Path.Combine(solutionDir, "src", "WinVelo.App", "bin", "Debug", "net10.0-windows", "WinVelo.App.exe");

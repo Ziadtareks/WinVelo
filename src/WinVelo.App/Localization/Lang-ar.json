@@ -905,5 +905,8 @@
   "Network packet settings": "إعدادات حزم الشبكة",
   "OpenSSH server": "خادم OpenSSH",
   "Power plan": "خطة الطاقة",
-  "Windows feature": "ميزة ويندوز"
+  "Windows feature": "ميزة ويندوز",
+  "Unable to refresh features: {0}": "تعذّر تحديث حالة الميزات: {0}",
+  "Unable to read network adapters: {0}": "تعذّرت قراءة محوّلات الشبكة: {0}",
+  "Scan cancelled.": "تم إلغاء الفحص."
 }

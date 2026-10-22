@@ -87,6 +87,7 @@ public sealed partial class UnifiedExecutionDialogViewModel : ObservableObject
     private string _previewConfirmText = LocalizationManager.T("Confirm & Apply");
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(ConfirmPreviewCommand))]
     private bool _isPreviewLoading;
 
     [ObservableProperty]
@@ -121,6 +122,7 @@ public sealed partial class UnifiedExecutionDialogViewModel : ObservableObject
     public ObservableCollection<PreviewSubcategoryGroup> ItemGroups { get; } = new();
     public ObservableCollection<ExcludedPreviewItemModel> ExcludedItems { get; } = new();
 
+    private int _previewGeneration;
     private Func<List<TweakDefinition>, Task>? _onConfirmedCallback;
     private Action? _onCancelledCallback;
 
@@ -159,6 +161,7 @@ public sealed partial class UnifiedExecutionDialogViewModel : ObservableObject
 
     public void UpdateSummary()
     {
+        ConfirmPreviewCommand.NotifyCanExecuteChanged();
         int toApply = PreviewItems.Count(i => i.IsSelected && (!i.IsAlreadyApplied || IsUndo));
         int alreadyApplied = PreviewItems.Count(i => i.IsAlreadyApplied && !IsUndo);
         int needRestart = PreviewItems.Count(i => i.IsSelected && (!i.IsAlreadyApplied || IsUndo) && (i.RequiresReboot || i.RequiresExplorerRestart));
@@ -184,6 +187,7 @@ public sealed partial class UnifiedExecutionDialogViewModel : ObservableObject
         Action? onCancelled = null,
         IReadOnlyList<ExcludedPresetTweak>? excludedTweaks = null)
     {
+        int generation = System.Threading.Interlocked.Increment(ref _previewGeneration);
         PreviewTitle = title;
         PreviewDescription = description;
         PreviewNotice = notice;
@@ -272,17 +276,19 @@ public sealed partial class UnifiedExecutionDialogViewModel : ObservableObject
 
         UpdateSummary();
 
-        _ = Task.Run(async () =>
+        PreviewLoadTask = Task.Run(async () =>
         {
             foreach (var item in previewList)
             {
+                if (generation != System.Threading.Volatile.Read(ref _previewGeneration)) return;
                 try
                 {
                     var state = _tweakService != null
                         ? await _tweakService.DetectTweakStateAsync(item.Tweak)
                         : TweakState.NotApplied;
-                    System.Windows.Application.Current?.Dispatcher?.InvokeAsync(() =>
+                    await OnUiAsync(() =>
                     {
+                        if (generation != _previewGeneration || !IsPreviewOpen) return;
                         if (isUndo)
                         {
                             item.StateText = state switch
@@ -336,17 +342,30 @@ public sealed partial class UnifiedExecutionDialogViewModel : ObservableObject
                 catch { }
             }
 
-            System.Windows.Application.Current?.Dispatcher?.InvokeAsync(() =>
+            await OnUiAsync(() =>
             {
+                if (generation != _previewGeneration) return;
                 IsPreviewLoading = false;
                 UpdateSummary();
             });
         });
     }
 
-    [RelayCommand]
+    public Task PreviewLoadTask { get; private set; } = Task.CompletedTask;
+
+    private static Task OnUiAsync(Action action)
+    {
+        var dispatcher = System.Windows.Application.Current?.Dispatcher;
+        if (dispatcher == null || dispatcher.CheckAccess()) { action(); return Task.CompletedTask; }
+        return dispatcher.InvokeAsync(action).Task;
+    }
+
+    private bool CanConfirmPreview() => !IsPreviewLoading && PreviewItems.Any(i => i.IsSelected && (!i.IsAlreadyApplied || IsUndo));
+
+    [RelayCommand(CanExecute = nameof(CanConfirmPreview))]
     public async Task ConfirmPreviewAsync()
     {
+        if (!CanConfirmPreview()) return;
         IsPreviewOpen = false;
 
         var selected = PreviewItems
@@ -372,6 +391,7 @@ public sealed partial class UnifiedExecutionDialogViewModel : ObservableObject
     [RelayCommand]
     public void CancelPreview()
     {
+        System.Threading.Interlocked.Increment(ref _previewGeneration);
         IsPreviewOpen = false;
         _onCancelledCallback?.Invoke();
     }

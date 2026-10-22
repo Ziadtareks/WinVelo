@@ -58,6 +58,7 @@ public partial class StartupAppItem : ObservableObject
     public string IconBorder => HasIconImage ? "#2F3642" : "Transparent";
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsNotToggling))]
     private bool _isToggling = false;
 
     public bool IsNotToggling => !IsToggling;
