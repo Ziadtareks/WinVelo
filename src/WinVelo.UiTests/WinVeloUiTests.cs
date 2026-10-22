@@ -87,9 +87,30 @@ public sealed partial class WinVeloUiTests
         }
     }
 
+    private delegate bool EnumWindowCallback(IntPtr handle, IntPtr parameter);
+    [DllImport("user32.dll")]
+    private static extern bool EnumWindows(EnumWindowCallback callback, IntPtr parameter);
+    [DllImport("user32.dll")]
+    private static extern uint GetWindowThreadProcessId(IntPtr handle, out uint processId);
+    [DllImport("user32.dll")]
+    private static extern bool IsWindowVisible(IntPtr handle);
+
+    private static Window[] GetTargetWindows(Application app, UIA3Automation automation)
+    {
+        var handles = new System.Collections.Generic.List<IntPtr>();
+        EnumWindows((handle, _) =>
+        {
+            GetWindowThreadProcessId(handle, out uint processId);
+            if (processId == app.ProcessId && IsWindowVisible(handle)) handles.Add(handle);
+            return true;
+        }, IntPtr.Zero);
+        Assert.NotEmpty(handles);
+        return handles.Select(handle => automation.FromHandle(handle).AsWindow()).ToArray();
+    }
+
     private static void AssertNoErrorDialogs(Application app, UIA3Automation automation)
     {
-        var windows = app.GetAllTopLevelWindows(automation);
+        var windows = GetTargetWindows(app, automation);
         foreach (var win in windows)
         {
             string title = win.Title ?? string.Empty;
