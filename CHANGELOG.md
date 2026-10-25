@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Keep a no-argument CLI console open with an interactive prompt; preserve it after invalid commands. Add `--interactive`, read-only `--dns-status`, `--adapter` and `--doh` options.
 - Add DNS protocol/DoH/rollback, CLI validation/dry-run and GUI DNS regression coverage.
 - Preserve Startup row containers and focus after toggles; make accessibility toggles execute the same command as a click. Exclude desktop.ini from Startup apps and keep simulated Startup folder entries separate from the host's files.
+- Require explicit opt-in for visible desktop tests, enable them only in the isolated CI UI job, and retain a second guard at app launch. Test screenshot capture never falls back to unrelated desktop windows.
 
 ## [1.0.6] - 2026-10-23
 

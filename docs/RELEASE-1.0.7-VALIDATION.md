@@ -22,6 +22,8 @@ The final broad local GUI run was interrupted at the user's request because visi
 
 Visible tests now require `WINVELO_ALLOW_DESKTOP_UI_TESTS=1`. Both test discovery and the app-launch helper enforce this opt-in. The default guard was checked locally: all 12 runtime GUI cases were skipped and no app window was launched. The isolated GitHub Windows UI job explicitly enables them and uploads its TRX results. Its outcome must be checked independently; configuration alone does not establish a passing remote run.
 
+Remote CI was explicitly dispatched on 2026-10-25 after pushing the fixes. GitHub rejected it with HTTP 422: `Actions has been disabled for this user.` No remote UI pass is claimed; enabling repository workflows alone did not remove this account-level restriction.
+
 For unattended local verification, run:
 
 ```powershell
