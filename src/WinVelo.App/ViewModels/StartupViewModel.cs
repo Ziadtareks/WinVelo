@@ -110,6 +110,7 @@ public sealed partial class StartupViewModel : ObservableObject
     [RelayCommand]
     public async Task ToggleAppAsync(StartupAppItem item)
     {
+        Log.Information("Startup toggle requested for {Name}; Refreshing={Refreshing}; Busy={Busy}", item?.Name, _isRefreshingStates, item?.IsToggling);
         if (item == null || _isRefreshingStates || item.IsToggling) return;
 
         if (!AppAdminGuard.EnsureAdmin("modify startup applications"))
@@ -314,7 +315,7 @@ public sealed partial class StartupViewModel : ObservableObject
 
     private void ApplyFilter()
     {
-        FilteredApps.Clear();
+        var desired = new List<StartupAppItem>();
         string q = (SearchText ?? string.Empty).Trim().ToLowerInvariant();
 
         foreach (var app in AllApps)
@@ -343,7 +344,18 @@ public sealed partial class StartupViewModel : ObservableObject
                 if (!searchMatch) continue;
             }
 
-            FilteredApps.Add(app);
+            desired.Add(app);
+        }
+
+        // Preserve unchanged row containers, keyboard focus and automation peers.
+        // Clearing the entire list after every toggle discarded the focused row.
+        for (int index = FilteredApps.Count - 1; index >= 0; index--)
+            if (!desired.Contains(FilteredApps[index])) FilteredApps.RemoveAt(index);
+        for (int index = 0; index < desired.Count; index++)
+        {
+            int current = FilteredApps.IndexOf(desired[index]);
+            if (current < 0) FilteredApps.Insert(index, desired[index]);
+            else if (current != index) FilteredApps.Move(current, index);
         }
     }
 }

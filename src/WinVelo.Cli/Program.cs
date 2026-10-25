@@ -40,6 +40,21 @@ public static class Program
 {
     public static async Task<int> Main(string[] args)
     {
+        try
+        {
+            args = CliHost.Normalize(args);
+            if (args.Contains("--interactive") || args.Length == 0 && !Console.IsInputRedirected)
+                return await CliHost.RunInteractiveAsync(Console.In, Console.Out, Main);
+            var previousCatalog = CatalogSource.Default;
+            try { return await RunCommandAsync(args); }
+            finally { CatalogSource.SetDefault(previousCatalog); }
+        }
+        catch (OperationCanceledException) { Console.Error.WriteLine("[CANCELLED] Operation cancelled."); return 130; }
+        catch (Exception ex) { Console.Error.WriteLine("[ERROR] " + ex.Message); return 1; }
+    }
+
+    private static async Task<int> RunCommandAsync(string[] args)
+    {
         Console.WriteLine("========================================");
         Console.WriteLine($"         WinVelo CLI {WinVelo.Core.AppInfo.DisplayVersion}".PadRight(40));
         Console.WriteLine("========================================");
@@ -55,9 +70,10 @@ public static class Program
         bool isDetectAll = args.Contains("--detect-all");
         // Only --real-mode changes the real system. --detect-all only reads, so it inspects the real PC by default.
         // (--self-test used to switch to real mode on its own; it now needs --real-mode like every other change.)
-        bool isRealMode = args.Contains("--real-mode") || (isDetectAll && !isTestMode);
+        bool isReadOnlyQuery = isDetectAll || args.Contains("--dns-status");
+        bool isRealMode = args.Contains("--real-mode") || (isReadOnlyQuery && !isTestMode);
         bool isDryRun = args.Contains("--dry-run");
-        bool isRun = args.Contains("--run") || args.Contains("--apply") || args.Contains("--enable") || args.Contains("--disable") || args.Contains("--clean") || args.Contains("--dns") || args.Contains("--update-mode") || args.Contains("--fix") || args.Contains("--undo") || isSelfTest;
+        bool isRun = !isDryRun && (args.Contains("--run") || args.Contains("--apply") || args.Contains("--enable") || args.Contains("--disable") || args.Contains("--clean") || args.Contains("--dns") || args.Contains("--update-mode") || args.Contains("--fix") || args.Contains("--undo") || isSelfTest);
 
         if (isRealMode)
         {
@@ -66,7 +82,7 @@ public static class Program
             Console.WriteLine("[MODE] REAL-MODE ACTIVE — Operating directly against host OS.");
 
             // Strict Elevation Check: Only required for modifying operations
-            if (!isDetectAll && !AdminPrivilegeHelper.IsRunningAsAdministrator())
+            if (!isReadOnlyQuery && !isDryRun && !AdminPrivilegeHelper.IsRunningAsAdministrator())
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("\n[ERROR] Administrator privileges are required to run WinVelo CLI in real-mode.");
@@ -183,6 +199,28 @@ public static class Program
             shell = new FakeShellService();
         }
 
+        if (args.Contains("--dns-status"))
+        {
+            var dns = new DnsService(shell);
+            var adapters = await dns.GetAdaptersAsync();
+            int arg = Array.IndexOf(args, "--adapter");
+            if (arg >= 0) adapters = adapters.Where(a => a.Index == int.Parse(args[arg + 1])).ToArray();
+            if (adapters.Count == 0) { Console.Error.WriteLine("[ERROR] No matching active network adapter."); return 1; }
+            foreach (var adapter in adapters)
+            {
+                if (isTestMode) Console.WriteLine($"[DNS] Adapter {adapter.Index}: simulated DNS state.");
+                else
+                {
+                    var state = await dns.ReadAdapterStateAsync(adapter.Index);
+                    string? provider = await dns.GetCurrentProviderIdAsync(adapter.Index);
+                    Console.WriteLine($"[DNS] Adapter {adapter.Index}; IPv4 enabled={state.IPv4Enabled}; IPv6 enabled={state.IPv6Enabled}; Provider={provider ?? "custom/unknown"}");
+                    Console.WriteLine("IPv4: " + string.Join(", ", state.IPv4Servers));
+                    Console.WriteLine("IPv6: " + string.Join(", ", state.IPv6Servers));
+                }
+            }
+            return 0;
+        }
+
         AppDataMigrator.Migrate();
 
         int diagIdx = Array.FindIndex(args, a => string.Equals(a, "--diagnostics", StringComparison.OrdinalIgnoreCase) || a.StartsWith("--diagnostics=", StringComparison.OrdinalIgnoreCase));
@@ -263,6 +301,13 @@ public static class Program
             Console.ResetColor();
             return 1;
         }
+
+        if (isDryRun && recoverMode != null)
+        {
+            Console.WriteLine("[DRY RUN] Would recover unfinished sessions using: " + recoverMode);
+            return 0;
+        }
+        if (isDryRun) unfinishedSessions.Clear();
 
         if (unfinishedSessions.Count > 0)
         {
@@ -368,7 +413,7 @@ public static class Program
         // ---------------------------------------------------------------------
         if (args.Contains("--health-check"))
         {
-            return await ExecuteHealthCheckAsync(services, registry, args.Contains("--restore"));
+            return await ExecuteHealthCheckAsync(services, registry, args.Contains("--restore") && !isDryRun);
         }
 
         // ---------------------------------------------------------------------
@@ -420,6 +465,13 @@ public static class Program
                 Console.WriteLine($"[ERROR] None of the specified tweaks were found in catalog.");
                 Console.WriteLine($"Applied 0 of {totalRequested} — {missingCount} failed");
                 return 1;
+            }
+
+            if (isDryRun)
+            {
+                Console.WriteLine("[DRY RUN] No changes made. " + (args.Contains("--undo") ? "Would undo: " : "Would apply: ") + string.Join(", ", targetTweaks.Select(t => t.Id)));
+                foreach (var preview in dryRun.GeneratePreview(targetTweaks)) Console.WriteLine($"[PLAN] {preview.TweakId}: {preview.Actions.Count} actions");
+                return missingCount == 0 ? 0 : 1;
             }
 
             if (args.Contains("--undo"))
@@ -500,6 +552,7 @@ public static class Program
             }
 
             bool isDisable = args.Contains("--disable");
+            if (isDryRun) { Console.WriteLine($"[DRY RUN] Would {(isDisable ? "disable" : "enable")} feature {targetFeature.Key}. No changes made."); return 0; }
             if (isDisable)
             {
                 Console.WriteLine($"[EXECUTE] Disabling feature: {targetFeature.Key} ({targetFeature.Name})...");
@@ -526,6 +579,9 @@ public static class Program
                 ? new[] { "UserTemp", "WindowsTemp", "UpdateCache", "CrashDumps" }
                 : new[] { category };
 
+            string[] allowedCategories = { "UserTemp", "WindowsTemp", "UpdateCache", "CrashDumps" };
+            if (cats.Any(c => !allowedCategories.Contains(c, StringComparer.OrdinalIgnoreCase))) { Console.Error.WriteLine("[ERROR] Unknown cleanup category."); return 1; }
+            if (isDryRun) { Console.WriteLine("[DRY RUN] Would clean: " + string.Join(", ", cats) + ". No changes made."); return 0; }
             Console.WriteLine($"[EXECUTE] Cleaning categories: {string.Join(", ", cats)}...");
             var cleanResult = await cleanerService.CleanCategoriesAsync(cats);
             Console.WriteLine($"[RESULT] {cleanResult.FormattedSummary}");
@@ -537,7 +593,7 @@ public static class Program
         if (dnsIdx >= 0 && dnsIdx < args.Length - 1)
         {
             string dnsId = args[dnsIdx + 1];
-            IDnsService dnsService = new DnsService(shell, journal);
+            var dnsService = new DnsService(shell, journal);
             var providers = dnsService.GetProviders();
             var provider = providers.FirstOrDefault(p =>
                 string.Equals(p.Id, dnsId, StringComparison.OrdinalIgnoreCase) ||
@@ -549,10 +605,17 @@ public static class Program
                 return 1;
             }
 
-            Console.WriteLine($"[EXECUTE] Setting DNS to {provider.Name} ({provider.PrimaryDns}, {provider.SecondaryDns})...");
-            bool success = await dnsService.ApplyDnsAsync(provider);
-            Console.WriteLine($"[RESULT] {(success ? "Success" : "Failed")}");
-            return success ? 0 : 1;
+            int adapterArg = Array.IndexOf(args, "--adapter");
+            int? index = adapterArg >= 0 ? int.Parse(args[adapterArg + 1]) : null;
+            bool doh = args.Contains("--doh");
+            _ = DnsService.BuildApplyScript(provider, index ?? 1, doh);
+            if (isDryRun) { Console.WriteLine($"[DRY RUN] Would set DNS to {provider.Name}, adapter {index?.ToString() ?? "automatic"}, DoH={doh}. No changes made."); return 0; }
+            Console.WriteLine($"[EXECUTE] Setting DNS to {provider.Name}...");
+            var result = index is int selected
+                ? await dnsService.ApplyDnsWithResultAsync(provider, selected, doh)
+                : await dnsService.ApplyDnsWithResultAsync(provider, doh);
+            Console.WriteLine($"[RESULT] {(result.Success ? "Success" : "Failed")}: {result.Message}");
+            return result.Success ? 0 : 1;
         }
 
         // 5. Updates Mode: --update-mode <Default|Security|DisableAll>
@@ -566,6 +629,7 @@ public static class Program
                 return 1;
             }
 
+            if (isDryRun) { Console.WriteLine($"[DRY RUN] Would set update mode: {mode}. No changes made."); return 0; }
             IUpdateModeService updateService = new UpdateModeService(registry, services, tasks, journal);
             Console.WriteLine($"[EXECUTE] Applying update mode: {mode}...");
             var report = await updateService.ApplyModeAsync(mode, opRunner);
@@ -579,6 +643,8 @@ public static class Program
         {
             string fixId = args[fixIdx + 1];
             IFixService fixService = new FixService(shell);
+            if (!fixService.GetAvailableFixes().Any(f => f.Id.Equals(fixId, StringComparison.OrdinalIgnoreCase))) { Console.Error.WriteLine("[ERROR] Unknown fix: " + fixId); return 1; }
+            if (isDryRun) { Console.WriteLine($"[DRY RUN] Would run fix {fixId}. No changes made."); return 0; }
             Console.WriteLine($"[EXECUTE] Running system fix: {fixId}...");
             var report = await fixService.RunFixAsync(fixId, opRunner);
             Console.WriteLine($"[RESULT] {report.Summary}");
@@ -679,10 +745,10 @@ public static class Program
                     }
                     if (plan.Dns != null)
                     {
-                        bool ok = config.DnsAdapterIndex is int index
-                            ? await dnsService.ApplyDnsAsync(plan.Dns, index, config.UseDnsOverHttps)
-                            : await dnsService.ApplyDnsAsync(plan.Dns);
-                        Console.WriteLine("[DNS] " + (ok ? "Applied" : "Failed")); if (!ok) failures++;
+                        var dnsResult = config.DnsAdapterIndex is int index
+                            ? await dnsService.ApplyDnsWithResultAsync(plan.Dns, index, config.UseDnsOverHttps)
+                            : await dnsService.ApplyDnsWithResultAsync(plan.Dns, config.UseDnsOverHttps);
+                        Console.WriteLine("[DNS] " + (dnsResult.Success ? "Applied: " : "Failed: ") + dnsResult.Message); if (!dnsResult.Success) failures++;
                     }
                     if (plan.Updates is UpdateProfileMode mode)
                     {
@@ -715,8 +781,8 @@ public static class Program
             return 0;
         }
 
-        Console.WriteLine("\n[NOTE] Use --help to view available commands.");
-        return 0;
+        Console.Error.WriteLine("[ERROR] No operation selected. Use --help.");
+        return 1;
     }
 
     private static List<TweakDefinition> AppliedTweaks(IEnumerable<TweakDefinition> tweaks, BatchExecutionReport report)
@@ -1491,6 +1557,9 @@ public static class Program
 
     private static void PrintUsage()
     {
+        Console.WriteLine("  --interactive                   Keep the CLI open and enter commands interactively");
+        Console.WriteLine("  --dns-status [--adapter <index>] Read current DNS and enabled IP protocols");
+        Console.WriteLine("  --dns <provider> [--adapter <index>] [--doh] [--dry-run]");
         Console.WriteLine("Usage:");
         Console.WriteLine("  winvelo-cli --info <tweakId>             Show detailed technical specification and exact changes");
         Console.WriteLine("  winvelo-cli --self-test --level 1        HKCU apply/undo self-test (simulation; add --real-mode for this PC)");

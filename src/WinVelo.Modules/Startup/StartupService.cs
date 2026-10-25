@@ -209,7 +209,7 @@ public sealed class StartupService : IStartupService
         HashSet<string> seenFileNames = new(StringComparer.OrdinalIgnoreCase);
 
         // Scan actual files on disk if directory exists
-        if (Directory.Exists(folderPath))
+        if (!WinVelo.Core.Safety.TestModeManager.IsTestMode && Directory.Exists(folderPath))
         {
             try
             {
@@ -217,6 +217,7 @@ public sealed class StartupService : IStartupService
                 foreach (string file in files)
                 {
                     string fileName = Path.GetFileName(file);
+                    if (fileName.Equals("desktop.ini", StringComparison.OrdinalIgnoreCase)) continue;
                     seenFileNames.Add(fileName);
                     string name = Path.GetFileNameWithoutExtension(file);
 
@@ -268,6 +269,7 @@ public sealed class StartupService : IStartupService
                 var valNames = _registry.GetValueNames(approvedHive, approvedKey);
                 foreach (string valName in valNames)
                 {
+                    if (valName.Equals("desktop.ini", StringComparison.OrdinalIgnoreCase)) continue;
                     if (seenFileNames.Contains(valName)) continue;
                     string name = Path.GetFileNameWithoutExtension(valName);
                     string fakePath = Path.Combine(folderPath, valName);

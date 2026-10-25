@@ -6,6 +6,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.7] - 2026-10-25
+
+### Fixed
+- Respect disabled IPv4/IPv6 bindings when applying, verifying or resetting DNS. Prevent false Google DNS failures on IPv4-only adapters.
+- Preserve native DNS errors, capture rollback baselines before writes, serialize DNS journal changes, verify address readback and verify restored address settings after a failed change. Keep incomplete rollback records recoverable.
+- Configure and verify DoH only for enabled protocol families. Reset to DHCP from the GUI regardless of the previous DoH checkbox selection.
+- Prevent overlapping GUI DNS writes, wrap long DNS status messages, and distinguish simulated success from real verification.
+- Honor CLI `--dry-run` for tweaks, tools, recovery and profiles; reject unknown, missing, duplicate or conflicting options with a readable error and nonzero exit code.
+- Keep a no-argument CLI console open with an interactive prompt; preserve it after invalid commands. Add `--interactive`, read-only `--dns-status`, `--adapter` and `--doh` options.
+- Add DNS protocol/DoH/rollback, CLI validation/dry-run and GUI DNS regression coverage.
+- Preserve Startup row containers and focus after toggles; make accessibility toggles execute the same command as a click. Exclude desktop.ini from Startup apps and keep simulated Startup folder entries separate from the host's files.
+
 ## [1.0.6] - 2026-10-23
 
 ### Fixed

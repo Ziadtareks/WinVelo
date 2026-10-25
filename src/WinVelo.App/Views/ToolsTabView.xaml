@@ -4,6 +4,7 @@
              xmlns:loc="clr-namespace:WinVelo.App.Localization"
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              xmlns:vm="clr-namespace:WinVelo.App.ViewModels"
+             xmlns:controls="clr-namespace:WinVelo.App.Controls"
              xmlns:views="clr-namespace:WinVelo.App.Views"
              AutomationProperties.AutomationId="ToolsTabView"
              AutomationProperties.Name="System Tools and Utilities">
@@ -344,7 +345,7 @@
                                         <Border Grid.Column="1" Background="{DynamicResource StatusDefaultBgBrush}" CornerRadius="4" Padding="6,2" VerticalAlignment="Center">
                                             <TextBlock Text="{Binding Impact, Converter={StaticResource Tr}, StringFormat={loc:Tr Tools_Impact0}}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" />
                                         </Border>
-                                        <CheckBox Grid.Column="3" IsChecked="{Binding IsEnabled, Mode=OneWay}"
+                                        <controls:CommandCheckBox Grid.Column="3" IsChecked="{Binding IsEnabled, Mode=OneWay}"
                                                   AutomationProperties.Name="{Binding Name, StringFormat='Toggle startup for {0}'}"
                                                   AutomationProperties.AutomationId="{Binding Name, StringFormat='StartupToggle_{0}'}"
                                                   IsEnabled="{Binding IsNotToggling}"
@@ -501,14 +502,14 @@
                                 <TextBlock Text="{loc:Tr Tools_SecureDnsLatencyBenchmark}" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" />
                                 <TextBlock Text="{loc:Tr Tools_TestResponseTimesToMajor}"
                                            Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,2,0,4" />
-                                <TextBlock Text="{Binding ToolboxVM.DnsStatusText}" FontSize="12" Foreground="{DynamicResource AccentPrimaryBrush}" />
+                                <TextBlock AutomationProperties.AutomationId="DnsStatusText" Text="{Binding ToolboxVM.DnsStatusText}" TextWrapping="Wrap" FontSize="12" Foreground="{DynamicResource AccentPrimaryBrush}" />
                             </StackPanel>
                             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
                                 <Button Content="{loc:Tr Tools_BenchmarkAll}" AutomationProperties.Name="Benchmark All DNS Providers" Style="{DynamicResource ModernSecondaryBtn}"
                                         Command="{Binding ToolboxVM.BenchmarkAllDnsCommand}" Margin="0,0,8,0" />
                                 <Button Content="{loc:Tr Tools_ApplyFastest}" AutomationProperties.Name="Apply Fastest DNS" Style="{DynamicResource ModernPrimaryBtn}"
                                         Command="{Binding ToolboxVM.ApplyFastestDnsCommand}" Margin="0,0,8,0" />
-                                <Button Content="{loc:Tr Tools_ResetToDhcp}" AutomationProperties.Name="Reset DNS to DHCP" Style="{DynamicResource ModernGhostBtn}"
+                                <Button AutomationProperties.AutomationId="ResetDnsButton" Content="{loc:Tr Tools_ResetToDhcp}" AutomationProperties.Name="Reset DNS to DHCP" Style="{DynamicResource ModernGhostBtn}"
                                         Command="{Binding ToolboxVM.ResetDnsToDhcpCommand}" />
                             </StackPanel>
                         </DockPanel>
@@ -518,7 +519,7 @@
                         <TextBlock Text="{loc:Tr Tools_NetworkAdapter}" VerticalAlignment="Center" Margin="0,0,10,0" />
                         <ComboBox ItemsSource="{Binding ToolboxVM.DnsAdapters}" DisplayMemberPath="Name"
                                   SelectedItem="{Binding ToolboxVM.SelectedDnsAdapter}" MinWidth="220" AutomationProperties.Name="DNS network adapter" />
-                        <CheckBox AutomationProperties.Name="{loc:Tr Tools_UseDoh}" Content="{loc:Tr Tools_UseDoh}" IsChecked="{Binding ToolboxVM.UseDnsOverHttps}" Margin="16,0,0,0" VerticalAlignment="Center" />
+                        <CheckBox AutomationProperties.AutomationId="UseDnsOverHttpsCheckBox" AutomationProperties.Name="{loc:Tr Tools_UseDoh}" Content="{loc:Tr Tools_UseDoh}" IsChecked="{Binding ToolboxVM.UseDnsOverHttps}" Margin="16,0,0,0" VerticalAlignment="Center" />
                     </StackPanel>
                     <!-- Nagle's Algorithm Toggle -->
                     <Border Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
@@ -564,7 +565,7 @@
                                         <Button Grid.Column="1" Content="{loc:Tr Tools_TestDns}" AutomationProperties.Name="{Binding Name, StringFormat='Ping {0}'}" Style="{DynamicResource ModernGhostBtn}" VerticalAlignment="Center"
                                                 Command="{Binding DataContext.ToolboxVM.TestDnsLatencyCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                 CommandParameter="{Binding}" />
-                                        <Button Grid.Column="3" Content="{loc:Tr Tools_Apply}" AutomationProperties.Name="{Binding Name, StringFormat='Apply {0} DNS'}" Style="{DynamicResource ModernSecondaryBtn}" VerticalAlignment="Center"
+                                        <Button Grid.Column="3" AutomationProperties.AutomationId="{Binding Id, StringFormat='ApplyDns_{0}'}" Content="{loc:Tr Tools_Apply}" AutomationProperties.Name="{Binding Name, StringFormat='Apply {0} DNS'}" Style="{DynamicResource ModernSecondaryBtn}" VerticalAlignment="Center"
                                                 Command="{Binding DataContext.ToolboxVM.ApplyDnsCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                 CommandParameter="{Binding}" />
                                     </Grid>

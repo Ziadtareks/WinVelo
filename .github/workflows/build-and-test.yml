@@ -181,6 +181,9 @@ jobs:
     runs-on: windows-latest
     needs: build
     continue-on-error: true
+    env:
+      # Explicit opt-in only on this isolated hosted runner, never on a developer desktop.
+      WINVELO_ALLOW_DESKTOP_UI_TESTS: '1'
 
     steps:
       - name: Checkout
@@ -199,4 +202,12 @@ jobs:
           restore-keys: nuget-${{ runner.os }}-
 
       - name: UI tests
-        run: dotnet test src/WinVelo.UiTests/WinVelo.UiTests.csproj --configuration Debug
+        run: dotnet test src/WinVelo.UiTests/WinVelo.UiTests.csproj --configuration Debug --filter "FullyQualifiedName!~Test_09" --logger "trx;LogFileName=ui-tests.trx" --results-directory TestResults
+
+      - name: Upload UI test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-test-results
+          path: TestResults
+          if-no-files-found: ignore

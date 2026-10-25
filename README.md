@@ -180,10 +180,15 @@ $zip = "WinVelo-v<version>-portable.zip"
 
 `winvelo-cli.exe` ships in the same zip. It runs in **simulation mode by default**. Add `--real-mode` to change the real system.
 
+Double-clicking it without arguments opens an interactive prompt. Enter `--help` to see commands and `exit` to close it. You can also start this prompt explicitly with `winvelo-cli --interactive`. Each command chooses its own mode; simulation state is recreated for each command. Read-only `--detect-all` and `--dns-status` inspect the real PC by default; add `--test-mode` for simulated queries.
+
 ```powershell
 winvelo-cli --list                                # list all tweaks
 winvelo-cli --info privacy.advertising.advertising-id   # details and exact changes
 winvelo-cli --detect-all                          # read-only status of every tweak
+winvelo-cli --dns-status                          # adapters, active DNS and enabled IP protocols
+winvelo-cli --dns Google --adapter 16 --dry-run    # preview only; replace 16 with your adapter index
+winvelo-cli --dns Google --adapter 16 --real-mode  # apply to that adapter from an elevated terminal
 winvelo-cli --preset privacy --dry-run            # preview a preset
 winvelo-cli --tweak ui.explorer.show-file-extensions --apply --real-mode
 winvelo-cli --tweak ui.explorer.show-file-extensions --undo --real-mode
@@ -191,6 +196,8 @@ winvelo-cli --diagnostics WinVelo-Diagnostics.zip # anonymised bundle for bug re
 ```
 
 Run `winvelo-cli --help` for every option.
+
+`--dry-run` takes precedence over execution flags and previews changes. DNS changes respect disabled IP protocols, verify the resulting Windows settings, and preserve a rollback baseline. `--doh` requests DNS over HTTPS for a provider that supports it; unsupported Windows versions report a specific error. In the GUI, resetting DNS to DHCP also works when the DoH checkbox was previously selected.
 
 ---
 
@@ -212,6 +219,8 @@ dotnet run --project src/WinVelo.App/WinVelo.App.csproj -- --test-mode
 # build the portable package into dist\
 .\build\publish.ps1
 ```
+
+Ordinary tests do not open the desktop app. The FlaUI suite is disabled unless `WINVELO_ALLOW_DESKTOP_UI_TESTS=1` is explicitly set. CI enables it only in the isolated GitHub Windows UI job. Run that suite on a dedicated Windows runner or VM because it opens windows and can take input focus.
 
 ### Adding a tweak
 

@@ -162,6 +162,8 @@ public sealed partial class WinVeloUiTests
 
     private static (Application App, UIA3Automation Automation, Window Window) LaunchAppInTestMode()
     {
+        if (Environment.GetEnvironmentVariable("WINVELO_ALLOW_DESKTOP_UI_TESTS") != "1")
+            throw new InvalidOperationException("Visible UI automation requires an explicitly enabled isolated Windows runner.");
         string solutionDir = FindSolutionRoot();
         string exePath = Environment.GetEnvironmentVariable("WINVELO_UI_TEST_EXE") ??
             Path.Combine(solutionDir, "src", "WinVelo.App", "bin", "Debug", "net10.0-windows", "WinVelo.exe");
@@ -209,15 +211,11 @@ public sealed partial class WinVeloUiTests
         }
         catch
         {
-            try
-            {
-                Capture.Screen().ToFile(target);
-            }
-            catch { }
+            // Never fall back to capturing unrelated applications on the desktop.
         }
     }
 
-    [Fact]
+    [DesktopUiFact]
     public void Test_01_HomePage_LoadsCalmStatus()
     {
         var (app, automation, window) = LaunchAppInTestMode();
@@ -255,7 +253,7 @@ public sealed partial class WinVeloUiTests
         }
     }
 
-    [Fact]
+    [DesktopUiFact]
     public void Test_02_TweaksPage_LoadsFiltersAndCatalog()
     {
         var (app, automation, window) = LaunchAppInTestMode();
@@ -287,7 +285,7 @@ public sealed partial class WinVeloUiTests
         }
     }
 
-    [Fact]
+    [DesktopUiFact]
     public void Test_03_AppsPage_LoadsCatalogAndSearch()
     {
         var (app, automation, window) = LaunchAppInTestMode();
@@ -310,7 +308,7 @@ public sealed partial class WinVeloUiTests
         }
     }
 
-    [Fact]
+    [DesktopUiFact]
     public void Test_04_ToolsPage_SwitchesSubTools()
     {
         var (app, automation, window) = LaunchAppInTestMode();
@@ -343,7 +341,7 @@ public sealed partial class WinVeloUiTests
         }
     }
 
-    [Fact]
+    [DesktopUiFact]
     public void Test_05_HistoryPage_DisplaysSessionsAndRestorePoints()
     {
         var (app, automation, window) = LaunchAppInTestMode();
@@ -366,7 +364,7 @@ public sealed partial class WinVeloUiTests
         }
     }
 
-    [Fact]
+    [DesktopUiFact]
     public void Test_06_Flow_PreviewApplyAndUndoToast()
     {
         var (app, automation, window) = LaunchAppInTestMode();
@@ -429,7 +427,7 @@ public sealed partial class WinVeloUiTests
         }
     }
 
-    [Fact]
+    [DesktopUiFact]
     public void FullAuditUiTestSuite_All5TabsAndControls()
     {
         string solutionDir = FindSolutionRoot();
@@ -488,7 +486,7 @@ public sealed partial class WinVeloUiTests
         }
     }
 
-    [Fact]
+    [DesktopUiFact]
     public void Test_07_Accessibility_InteractiveControlsHaveAutomationName()
     {
         var (app, automation, window) = LaunchAppInTestMode();
@@ -551,7 +549,7 @@ public sealed partial class WinVeloUiTests
         }
     }
 
-    [Fact]
+    [DesktopUiFact]
     public void Test_08_FirstRunWizard_ModalAndKeyboardNavigation()
     {
         string solutionDir = FindSolutionRoot();
@@ -619,7 +617,7 @@ public sealed partial class WinVeloUiTests
         }
     }
 
-    [Fact]
+    [DesktopUiFact]
     public void Test_09_UiReviewVerification_Screenshots_Responsiveness_Contrast()
     {
         string solutionDir = FindSolutionRoot();

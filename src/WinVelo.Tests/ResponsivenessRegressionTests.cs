@@ -98,7 +98,8 @@ public sealed class ResponsivenessRegressionTests
         XNamespace ns = "http://schemas.microsoft.com/winfx/2006/xaml/presentation";
         var list = doc.Descendants(ns + "ItemsControl").Single(e => ((string?)e.Attribute("ItemsSource"))?.Contains("StartupVM.") == true);
         Assert.Equal("{Binding StartupVM.FilteredApps}", (string?)list.Attribute("ItemsSource"));
-        var toggle = list.Descendants(ns + "CheckBox").Single();
+        XNamespace controls = "clr-namespace:WinVelo.App.Controls";
+        var toggle = list.Descendants(controls + "CommandCheckBox").Single();
         Assert.Contains("StartupVM.ToggleAppCommand", (string?)toggle.Attribute("Command"));
         Assert.Contains("Mode=OneWay", (string?)toggle.Attribute("IsChecked"));
     }

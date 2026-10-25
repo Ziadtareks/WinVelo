@@ -908,5 +908,9 @@
   "Windows feature": "ميزة ويندوز",
   "Unable to refresh features: {0}": "تعذّر تحديث حالة الميزات: {0}",
   "Unable to read network adapters: {0}": "تعذّرت قراءة محوّلات الشبكة: {0}",
-  "Scan cancelled.": "تم إلغاء الفحص."
+  "Scan cancelled.": "تم إلغاء الفحص.",
+  "DNS change failed: {0}": "تعذّر تغيير DNS: {0}",
+  "IPv6 is disabled on this adapter; only IPv4 DNS was updated.": "بروتوكول IPv6 معطّل على هذا المحوّل؛ تم تحديث DNS لـIPv4 فقط.",
+  "DNS settings verified successfully.": "تم التحقق من إعدادات DNS بنجاح.",
+  "Simulation completed; no network settings were changed.": "اكتملت المحاكاة؛ لم تتغير إعدادات الشبكة."
 }

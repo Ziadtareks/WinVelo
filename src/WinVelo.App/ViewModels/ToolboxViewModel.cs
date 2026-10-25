@@ -268,27 +268,40 @@ public sealed partial class ToolboxViewModel : ObservableObject
             : LocalizationManager.T("Repair finished with notes: {0}.", report.Summary);
     }
 
-    [RelayCommand]
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(ApplyDnsCommand))]
+    [NotifyCanExecuteChangedFor(nameof(ApplyFastestDnsCommand))]
+    [NotifyCanExecuteChangedFor(nameof(ResetDnsToDhcpCommand))]
+    private bool _isApplyingDns;
+
+    private bool CanChangeDns() => !IsApplyingDns;
+
+    [RelayCommand(CanExecute = nameof(CanChangeDns))]
     private async Task ApplyDnsAsync(DnsProviderDefinition provider)
     {
+        if (provider == null || IsApplyingDns) return;
         if (!WinVelo.App.Services.AppAdminGuard.EnsureAdmin("change DNS settings"))
         {
             DnsStatusText = LocalizationManager.T("Administrator privileges required to change DNS settings.");
             return;
         }
-
-        if (SelectedDnsAdapter == null) await RefreshDnsAdaptersAsync();
-        if (SelectedDnsAdapter == null) { DnsStatusText = LocalizationManager.T("Select a network adapter."); return; }
-        int adapterIndex = SelectedDnsAdapter.Index;
-        DnsStatusText = LocalizationManager.T("Applying {0} ({1})...", provider.Name, provider.PrimaryDns);
-        await Task.Yield();
+        IsApplyingDns = true;
         try
         {
-            bool ok = await Task.Run(async () => await _dnsService.ApplyDnsAsync(provider, adapterIndex, UseDnsOverHttps));
-            await RefreshActiveDnsAsync(adapterIndex);
-            DnsStatusText = ok ? LocalizationManager.T("Applied {0} successfully.", provider.Name) : LocalizationManager.T("Failed to apply {0}.", provider.Name);
+            if (SelectedDnsAdapter == null) await RefreshDnsAdaptersAsync();
+            if (SelectedDnsAdapter == null) { DnsStatusText = LocalizationManager.T("Select a network adapter."); return; }
+            int adapterIndex = SelectedDnsAdapter.Index;
+            bool useDoh = UseDnsOverHttps && provider.PrimaryDns != "DHCP";
+            DnsStatusText = LocalizationManager.T("Applying {0} ({1})...", provider.Name, provider.PrimaryDns);
+            var result = await Task.Run(() => _dnsService.ApplyDnsWithResultAsync(provider, adapterIndex, useDoh));
+            // Readback decoration must not replace the outcome of an already completed change.
+            try { await RefreshActiveDnsAsync(adapterIndex); } catch { }
+            DnsStatusText = result.Success
+                ? LocalizationManager.T("Applied {0} successfully.", provider.Name) + " " + LocalizationManager.T(result.Message)
+                : LocalizationManager.T("DNS change failed: {0}", result.Message);
         }
-        catch (Exception ex) { DnsStatusText = ex.Message; }
+        catch (Exception ex) { DnsStatusText = LocalizationManager.T("DNS change failed: {0}", ex.Message); }
+        finally { IsApplyingDns = false; }
     }
 
     [RelayCommand]
@@ -355,7 +368,7 @@ public sealed partial class ToolboxViewModel : ObservableObject
         }
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanChangeDns))]
     private async Task ApplyFastestDnsAsync()
     {
         if (!WinVelo.App.Services.AppAdminGuard.EnsureAdmin("apply DNS settings"))
@@ -382,7 +395,7 @@ public sealed partial class ToolboxViewModel : ObservableObject
         }
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanChangeDns))]
     private async Task ResetDnsToDhcpAsync()
     {
         if (!WinVelo.App.Services.AppAdminGuard.EnsureAdmin("reset DNS settings"))

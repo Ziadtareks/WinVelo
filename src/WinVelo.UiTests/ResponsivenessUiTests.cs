@@ -10,6 +10,28 @@ namespace WinVelo.UiTests;
 
 public sealed partial class WinVeloUiTests
 {
+    [DesktopUiFact]
+    public void DnsRegression_GoogleAndDhcpCompleteAndNavigationWorks()
+    {
+        var (app, automation, window) = LaunchAppInTestMode();
+        try
+        {
+            NavigateTab(window, "Tools");
+            SafeInvoke(WaitVisible(window, "Tool_DNS"));
+            SafeInvoke(WaitVisible(window, "UseDnsOverHttpsCheckBox"));
+            var google = WaitVisible(window, "ApplyDns_dns.google.public");
+            SafeInvoke(google);
+            Assert.True(Retry.WhileTrue(() => !WaitVisible(window, "DnsStatusText").Name.Contains("no network settings were changed"), TimeSpan.FromSeconds(15)).Result);
+            Assert.True(google.IsEnabled);
+            SafeInvoke(WaitVisible(window, "ResetDnsButton"));
+            Assert.True(Retry.WhileTrue(() => !WaitVisible(window, "DnsStatusText").Name.Contains("Automatic (DHCP) successfully"), TimeSpan.FromSeconds(15)).Result);
+            NavigateTab(window, "Home");
+            NavigateTab(window, "Tweaks");
+            AssertNoErrorDialogs(app, automation);
+        }
+        finally { app.Close(); automation.Dispose(); }
+    }
+
     private static AutomationElement WaitVisible(Window window, string id)
     {
         var result = Retry.WhileNull(() =>
@@ -21,7 +43,7 @@ public sealed partial class WinVeloUiTests
         return result;
     }
 
-    [Fact]
+    [DesktopUiFact]
     public void StartupRegression_ListToggleRefreshAndNavigation()
     {
         var (app, automation, window) = LaunchAppInTestMode();
@@ -30,12 +52,16 @@ public sealed partial class WinVeloUiTests
             NavigateTab(window, "Tools");
             SafeInvoke(WaitVisible(window, "Tool_Startup"));
             var checkbox = WaitVisible(window, "StartupToggle_Discord").AsCheckBox();
+            Assert.True(Retry.WhileTrue(() => !checkbox.IsEnabled, TimeSpan.FromSeconds(10)).Result);
             var initial = checkbox.ToggleState;
-            checkbox.Click();
-            var changed = Retry.WhileTrue(() => checkbox.ToggleState == initial, TimeSpan.FromSeconds(10));
+            window.Focus();
+            // Exercise the accessible control action, including its OS command.
+            checkbox.Patterns.Toggle.Pattern.Toggle();
+            // Check the currently visible row rather than a cached UIA value.
+            var changed = Retry.WhileTrue(() => WaitVisible(window, "StartupToggle_Discord").AsCheckBox().ToggleState == initial, TimeSpan.FromSeconds(10));
             Assert.True(changed.Result, "Startup toggle did not change its real displayed state.");
-            Assert.NotEqual(initial, checkbox.ToggleState);
-            var expected = checkbox.ToggleState;
+            var expected = WaitVisible(window, "StartupToggle_Discord").AsCheckBox().ToggleState;
+            Assert.NotEqual(initial, expected);
             SafeInvoke(WaitVisible(window, "RefreshStartupButton"));
             Thread.Sleep(600);
             Assert.Equal(expected, WaitVisible(window, "StartupToggle_Discord").AsCheckBox().ToggleState);
@@ -46,7 +72,7 @@ public sealed partial class WinVeloUiTests
         finally { app.Close(); automation.Dispose(); }
     }
 
-    [Fact]
+    [DesktopUiFact]
     public void ApplyRegression_ProfileCompletesAndNavigationRemainsResponsive()
     {
         var (app, automation, window) = LaunchAppInTestMode();

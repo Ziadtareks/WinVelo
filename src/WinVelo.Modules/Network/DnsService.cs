@@ -32,6 +32,25 @@ public sealed class DnsProviderDefinition : ObservableObject
 
 public sealed record DnsAdapter(int Index, string Name, bool IsDefault);
 
+public sealed record DnsChangeResult(bool Success, string Message);
+
+public sealed record DnsAdapterState(bool IPv4Enabled, bool IPv6Enabled, bool IPv4Automatic, bool IPv6Automatic,
+    IReadOnlyList<string> IPv4Servers, IReadOnlyList<string> IPv6Servers)
+{
+    public bool Matches(DnsProviderDefinition provider)
+    {
+        if (!IPv4Enabled && !IPv6Enabled) return false;
+        if (provider.PrimaryDns.Equals("DHCP", StringComparison.OrdinalIgnoreCase))
+            return (!IPv4Enabled || IPv4Automatic) && (!IPv6Enabled || IPv6Automatic);
+        static string[] Normalize(IEnumerable<string> addresses) => addresses.Where(a => !string.IsNullOrWhiteSpace(a)).Select(a => IPAddress.Parse(a).ToString()).ToArray();
+        var v4 = Normalize(new[] { provider.PrimaryDns, provider.SecondaryDns });
+        var v6 = Normalize(new[] { provider.Primary6Dns, provider.Secondary6Dns });
+        return (IPv4Enabled && v4.Length > 0 || IPv6Enabled && v6.Length > 0)
+            && (!IPv4Enabled || v4.Length == 0 || Normalize(IPv4Servers).SequenceEqual(v4, StringComparer.OrdinalIgnoreCase))
+            && (!IPv6Enabled || v6.Length == 0 || Normalize(IPv6Servers).SequenceEqual(v6, StringComparer.OrdinalIgnoreCase));
+    }
+}
+
 public interface IDnsService
 {
     IReadOnlyList<DnsProviderDefinition> GetProviders();
@@ -40,6 +59,11 @@ public interface IDnsService
     Task<bool> ApplyDnsAsync(DnsProviderDefinition provider, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<DnsAdapter>> GetAdaptersAsync(CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<DnsAdapter>>(Array.Empty<DnsAdapter>());
     Task<bool> ApplyDnsAsync(DnsProviderDefinition provider, int adapterIndex, bool useDoh, CancellationToken cancellationToken = default) => ApplyDnsAsync(provider, cancellationToken);
+    async Task<DnsChangeResult> ApplyDnsWithResultAsync(DnsProviderDefinition provider, int adapterIndex, bool useDoh, CancellationToken cancellationToken = default)
+    {
+        bool ok = await ApplyDnsAsync(provider, adapterIndex, useDoh, cancellationToken);
+        return new(ok, ok ? "DNS change completed." : "The DNS operation failed.");
+    }
 }
 
 public sealed class DnsService : IDnsService
@@ -84,35 +108,57 @@ public sealed class DnsService : IDnsService
         return result;
     }
 
+    private static string AdapterPrefix(int adapterIndex)
+    {
+        if (adapterIndex <= 0) throw new ArgumentException("Select a network adapter.");
+        return $"$index={adapterIndex}; $a=Get-NetAdapter -IncludeHidden | Where-Object ifIndex -eq $index | Select-Object -First 1; if(-not $a){{throw 'Network adapter is unavailable.'}}; " +
+            "$name=[System.Management.Automation.WildcardPattern]::Escape($a.Name); " +
+            "$v4=[bool](Get-NetAdapterBinding -Name $name -ComponentID ms_tcpip -IncludeHidden -ErrorAction Stop).Enabled; " +
+            "$v6=[bool](Get-NetAdapterBinding -Name $name -ComponentID ms_tcpip6 -IncludeHidden -ErrorAction Stop).Enabled; " +
+            "if(-not ($v4 -or $v6)){throw 'No enabled IP protocol was found on this adapter.'}; ";
+    }
+
+    public static string BuildReadScript(int adapterIndex) => AdapterPrefix(adapterIndex) +
+        "$guid=([guid]$a.InterfaceGuid).ToString('B'); " +
+        "$static4=[string](Get-ItemProperty -LiteralPath \"HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\Interfaces\\$guid\" -Name NameServer -ErrorAction SilentlyContinue).NameServer; " +
+        "$static6=[string](Get-ItemProperty -LiteralPath \"HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip6\\Parameters\\Interfaces\\$guid\" -Name NameServer -ErrorAction SilentlyContinue).NameServer; " +
+        "[pscustomobject]@{IPv4Enabled=$v4; IPv6Enabled=$v6; IPv4Automatic=[string]::IsNullOrWhiteSpace($static4); IPv6Automatic=[string]::IsNullOrWhiteSpace($static6); " +
+        "IPv4Servers=@(if($v4){(Get-DnsClientServerAddress -InterfaceIndex $index -AddressFamily IPv4 -ErrorAction Stop).ServerAddresses}); " +
+        "IPv6Servers=@(if($v6){(Get-DnsClientServerAddress -InterfaceIndex $index -AddressFamily IPv6 -ErrorAction Stop).ServerAddresses})} | ConvertTo-Json -Compress";
+
+    public async Task<DnsAdapterState> ReadAdapterStateAsync(int adapterIndex, CancellationToken cancellationToken = default)
+    {
+        var result = await _shell.ExecutePowerShellAsync(BuildReadScript(adapterIndex), 30, cancellationToken);
+        if (!result.Success) throw new InvalidOperationException("Could not read DNS settings: " + Describe(result));
+        using var doc = JsonDocument.Parse(result.StdOut);
+        var root = doc.RootElement;
+        string[] Read(string name) => root.GetProperty(name).EnumerateArray().Select(v => IPAddress.Parse(v.GetString()!).ToString()).ToArray();
+        return new(root.GetProperty("IPv4Enabled").GetBoolean(), root.GetProperty("IPv6Enabled").GetBoolean(),
+            root.GetProperty("IPv4Automatic").GetBoolean(), root.GetProperty("IPv6Automatic").GetBoolean(), Read("IPv4Servers"), Read("IPv6Servers"));
+    }
+
     public async Task<string?> GetCurrentProviderIdAsync(int adapterIndex, CancellationToken cancellationToken = default)
     {
         if (adapterIndex <= 0 || !_shell.SupportsSystemQueries) return null;
-        string script = $"$a=Get-NetAdapter | Where-Object ifIndex -eq {adapterIndex} | Select-Object -First 1; if(-not $a){{throw 'Adapter is unavailable.'}}; $guid=([guid]$a.InterfaceGuid).ToString('B'); $static=@('Tcpip','Tcpip6') | ForEach-Object {{ [string](Get-ItemProperty -LiteralPath \"HKLM:\\SYSTEM\\CurrentControlSet\\Services\\$_\\Parameters\\Interfaces\\$guid\" -Name NameServer -ErrorAction SilentlyContinue).NameServer }}; [pscustomobject]@{{Dhcp=(-not ($static | Where-Object {{-not [string]::IsNullOrWhiteSpace($_)}})); Servers=@((Get-DnsClientServerAddress -InterfaceIndex {adapterIndex} -ErrorAction Stop).ServerAddresses)}} | ConvertTo-Json -Compress";
-        var result = await _shell.ExecutePowerShellAsync(script, 30, cancellationToken);
-        if (!result.Success) return null;
-        try
-        {
-            using var doc = JsonDocument.Parse(result.StdOut);
-            if (doc.RootElement.GetProperty("Dhcp").GetBoolean()) return "dns.dhcp.default";
-            var servers = doc.RootElement.GetProperty("Servers").EnumerateArray().Select(v => IPAddress.Parse(v.GetString()!).ToString()).ToHashSet(StringComparer.OrdinalIgnoreCase);
-            return GetProviders().FirstOrDefault(p => p.PrimaryDns != "DHCP" && servers.SetEquals(new[] { p.PrimaryDns, p.SecondaryDns, p.Primary6Dns, p.Secondary6Dns }.Where(ip => !string.IsNullOrWhiteSpace(ip)).Select(ip => IPAddress.Parse(ip).ToString())))?.Id;
-        }
-        catch (Exception ex) when (ex is JsonException or KeyNotFoundException or FormatException or InvalidOperationException) { return null; }
+        var state = await ReadAdapterStateAsync(adapterIndex, cancellationToken);
+        var automatic = GetProviders().First(p => p.PrimaryDns == "DHCP");
+        return state.Matches(automatic) ? automatic.Id : GetProviders().FirstOrDefault(p => p.PrimaryDns != "DHCP" && state.Matches(p))?.Id;
     }
 
     public async Task<IReadOnlyList<DnsAdapter>> GetAdaptersAsync(CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        if (TestModeManager.IsTestMode) return new[] { new DnsAdapter(1, "Simulation adapter", true) };
-        var result = await _shell.ExecutePowerShellAsync("@(Get-NetIPConfiguration | Where-Object { $_.NetAdapter.Status -eq 'Up' } | ForEach-Object { [pscustomobject]@{Index=$_.InterfaceIndex; Name=$_.InterfaceAlias; IsDefault=[bool]($_.IPv4DefaultGateway -or $_.IPv6DefaultGateway)} }) | ConvertTo-Json -Compress", 30);
-        if (!result.Success) return Array.Empty<DnsAdapter>();
+        if (TestModeManager.IsTestMode || !_shell.SupportsSystemQueries) return new[] { new DnsAdapter(1, "Simulation adapter", true) };
+        var result = await _shell.ExecutePowerShellAsync("@(Get-NetIPConfiguration | Where-Object { $_.NetAdapter.Status -eq 'Up' } | ForEach-Object { [pscustomobject]@{Index=$_.InterfaceIndex; Name=$_.InterfaceAlias; IsDefault=[bool]($_.IPv4DefaultGateway -or $_.IPv6DefaultGateway)} }) | ConvertTo-Json -Compress", 30, cancellationToken);
+        if (!result.Success) throw new InvalidOperationException("Could not list network adapters: " + Describe(result));
+        if (string.IsNullOrWhiteSpace(result.StdOut) || result.StdOut.Trim() == "null") return Array.Empty<DnsAdapter>();
         try
         {
             using var doc = JsonDocument.Parse(result.StdOut);
             var items = doc.RootElement.ValueKind == JsonValueKind.Array ? doc.RootElement.EnumerateArray().ToArray() : new[] { doc.RootElement };
             return items.Select(v => new DnsAdapter(v.GetProperty("Index").GetInt32(), v.GetProperty("Name").GetString() ?? "", v.GetProperty("IsDefault").GetBoolean())).OrderByDescending(a => a.IsDefault).ToList();
         }
-        catch (Exception ex) when (ex is JsonException or KeyNotFoundException or InvalidOperationException) { return Array.Empty<DnsAdapter>(); }
+        catch (Exception ex) when (ex is JsonException or KeyNotFoundException or InvalidOperationException) { throw new InvalidOperationException("Invalid network adapter response: " + ex.Message, ex); }
     }
 
     /// <summary>Measures an actual UDP DNS query round trip; does not measure ICMP reachability.</summary>
@@ -138,83 +184,155 @@ public sealed class DnsService : IDnsService
     }
 
     public async Task<bool> ApplyDnsAsync(DnsProviderDefinition provider, CancellationToken cancellationToken = default)
+        => (await ApplyDnsWithResultAsync(provider, cancellationToken)).Success;
+
+    public Task<DnsChangeResult> ApplyDnsWithResultAsync(DnsProviderDefinition provider, CancellationToken cancellationToken = default)
+        => ApplyDnsWithResultAsync(provider, false, cancellationToken);
+
+    public async Task<DnsChangeResult> ApplyDnsWithResultAsync(DnsProviderDefinition provider, bool useDoh, CancellationToken cancellationToken = default)
     {
-        var adapters = await GetAdaptersAsync(cancellationToken);
-        var defaults = adapters.Where(a => a.IsDefault).ToList();
-        var adapter = defaults.Count == 1 ? defaults[0] : adapters.Count == 1 ? adapters[0] : null;
-        return adapter != null && await ApplyDnsAsync(provider, adapter.Index, false, cancellationToken);
+        try
+        {
+            var adapters = await GetAdaptersAsync(cancellationToken);
+            var defaults = adapters.Where(a => a.IsDefault).ToList();
+            var adapter = defaults.Count == 1 ? defaults[0] : adapters.Count == 1 ? adapters[0] : null;
+            return adapter == null ? new(false, "Select a network adapter; no unique default adapter was found.")
+                : await ApplyDnsWithResultAsync(provider, adapter.Index, useDoh, cancellationToken);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException) { return new(false, ex.Message); }
     }
+
+    private static string[] Addresses(DnsProviderDefinition provider, bool ipv6) =>
+        (ipv6 ? new[] { provider.Primary6Dns, provider.Secondary6Dns } : new[] { provider.PrimaryDns, provider.SecondaryDns })
+        .Where(a => !string.IsNullOrWhiteSpace(a)).Select(a => IPAddress.Parse(a).ToString()).ToArray();
+    private static string Quote(IEnumerable<string> addresses) => string.Join(',', addresses.Select(a => "'" + IPAddress.Parse(a).ToString() + "'"));
 
     public static string BuildApplyScript(DnsProviderDefinition provider, int adapterIndex, bool useDoh)
     {
-        if (adapterIndex <= 0) throw new ArgumentException("Select a network adapter.");
-        string prefix = $"$index={adapterIndex}; ";
+        string prefix = AdapterPrefix(adapterIndex);
         if (provider.PrimaryDns.Equals("DHCP", StringComparison.OrdinalIgnoreCase))
-            return prefix + "Get-DnsClientServerAddress -InterfaceIndex $index | Set-DnsClientServerAddress -ResetServerAddresses -ErrorAction Stop";
-        string[] v4 = new[] { provider.PrimaryDns, provider.SecondaryDns }.Where(s => !string.IsNullOrWhiteSpace(s)).ToArray();
-        string[] v6 = new[] { provider.Primary6Dns, provider.Secondary6Dns }.Where(s => !string.IsNullOrWhiteSpace(s)).ToArray();
-        if (v4.Concat(v6).Any(ip => !SafeCommands.IsValidIp(ip))) throw new ArgumentException("Invalid DNS server address.");
-        string quoted(IEnumerable<string> addresses) => string.Join(',', addresses.Select(ip => "'" + IPAddress.Parse(ip).ToString() + "'"));
+        {
+            if (useDoh) throw new ArgumentException("DNS over HTTPS cannot be configured for automatic DHCP DNS.");
+            return prefix + "if($v4){Get-DnsClientServerAddress -InterfaceIndex $index -AddressFamily IPv4 | Set-DnsClientServerAddress -ResetServerAddresses -ErrorAction Stop}; " +
+                "if($v6){Get-DnsClientServerAddress -InterfaceIndex $index -AddressFamily IPv6 | Set-DnsClientServerAddress -ResetServerAddresses -ErrorAction Stop}";
+        }
+        string[] v4; string[] v6;
+        try { v4 = Addresses(provider, false); v6 = Addresses(provider, true); }
+        catch (FormatException) { throw new ArgumentException("Invalid DNS server address."); }
+        if (v4.Length + v6.Length == 0 || v4.Any(a => IPAddress.Parse(a).AddressFamily != AddressFamily.InterNetwork) || v6.Any(a => IPAddress.Parse(a).AddressFamily != AddressFamily.InterNetworkV6))
+            throw new ArgumentException("Invalid DNS server address family.");
+        prefix += $"$ips=@(if($v4){{@({Quote(v4)})}}; if($v6){{@({Quote(v6)})}}); if($ips.Count -eq 0){{throw 'This DNS provider has no addresses for the enabled IP protocols.'}}; ";
         if (useDoh)
         {
             if (!Uri.TryCreate(provider.DohTemplate, UriKind.Absolute, out var uri) || uri.Scheme != "https") throw new ArgumentException("This provider has no HTTPS DNS template.");
-            prefix += "if (-not (Get-Command Add-DnsClientDohServerAddress -ErrorAction SilentlyContinue)) { throw 'DNS over HTTPS is not supported on this Windows version.' }; ";
-            foreach (string ip in v4.Concat(v6)) prefix += $"if (Get-DnsClientDohServerAddress -ServerAddress '{ip}' -ErrorAction SilentlyContinue) {{ Set-DnsClientDohServerAddress -ServerAddress '{ip}' -DohTemplate '{uri.AbsoluteUri.Replace("'", "''")}' -AutoUpgrade $true -AllowFallbackToUdp $false -ErrorAction Stop }} else {{ Add-DnsClientDohServerAddress -ServerAddress '{ip}' -DohTemplate '{uri.AbsoluteUri.Replace("'", "''")}' -AutoUpgrade $true -AllowFallbackToUdp $false -ErrorAction Stop }}; ";
+            prefix += "if(-not(Get-Command Add-DnsClientDohServerAddress -ErrorAction SilentlyContinue)){throw 'DNS over HTTPS is not supported on this Windows version.'}; ";
+            string template = uri.AbsoluteUri.Replace("'", "''");
+            prefix += $"foreach($ip in $ips){{if(Get-DnsClientDohServerAddress -ServerAddress $ip -ErrorAction SilentlyContinue){{Set-DnsClientDohServerAddress -ServerAddress $ip -DohTemplate '{template}' -AutoUpgrade $true -AllowFallbackToUdp $false -ErrorAction Stop}}else{{Add-DnsClientDohServerAddress -ServerAddress $ip -DohTemplate '{template}' -AutoUpgrade $true -AllowFallbackToUdp $false -ErrorAction Stop}}}}; ";
+            prefix += $"foreach($ip in $ips){{$entry=Get-DnsClientDohServerAddress -ServerAddress $ip -ErrorAction Stop; if(-not $entry -or $entry.DohTemplate -ne '{template}' -or -not $entry.AutoUpgrade -or $entry.AllowFallbackToUdp){{throw 'Windows did not retain the requested DNS over HTTPS settings.'}}}}; ";
         }
-        prefix += $"Get-DnsClientServerAddress -InterfaceIndex $index -AddressFamily IPv4 | Set-DnsClientServerAddress -ServerAddresses @({quoted(v4)}) -ErrorAction Stop; ";
-        if (v6.Length > 0) prefix += $"Get-DnsClientServerAddress -InterfaceIndex $index -AddressFamily IPv6 | Set-DnsClientServerAddress -ServerAddresses @({quoted(v6)}) -ErrorAction Stop; ";
+        if (v4.Length > 0) prefix += $"if($v4){{Get-DnsClientServerAddress -InterfaceIndex $index -AddressFamily IPv4 | Set-DnsClientServerAddress -ServerAddresses @({Quote(v4)}) -ErrorAction Stop}}; ";
+        if (v6.Length > 0) prefix += $"if($v6){{Get-DnsClientServerAddress -InterfaceIndex $index -AddressFamily IPv6 | Set-DnsClientServerAddress -ServerAddresses @({Quote(v6)}) -ErrorAction Stop}}; ";
         return prefix;
     }
 
     public async Task<bool> ApplyDnsAsync(DnsProviderDefinition provider, int adapterIndex, bool useDoh, CancellationToken cancellationToken = default)
+        => (await ApplyDnsWithResultAsync(provider, adapterIndex, useDoh, cancellationToken)).Success;
+
+    private static List<ActionItem> CreateUndo(DnsAdapterState state, DnsProviderDefinition provider, int index)
+    {
+        var undo = new List<ActionItem>();
+        bool automatic = provider.PrimaryDns == "DHCP";
+        void Add(string family, bool enabled, bool wasAutomatic, IReadOnlyList<string> servers, bool changesFamily)
+        {
+            if (!enabled || !changesFamily) return;
+            if (!wasAutomatic && servers.Count == 0) throw new InvalidOperationException("Cannot capture a nonempty static DNS baseline for " + family);
+            string action = wasAutomatic ? "-ResetServerAddresses" : "-ServerAddresses @(" + Quote(servers) + ")";
+            undo.Add(ModuleJournal.UndoScript($"Get-DnsClientServerAddress -InterfaceIndex {index} -AddressFamily {family} | Set-DnsClientServerAddress {action} -ErrorAction Stop"));
+        }
+        Add("IPv4", state.IPv4Enabled, state.IPv4Automatic, state.IPv4Servers, automatic || Addresses(provider, false).Length > 0);
+        Add("IPv6", state.IPv6Enabled, state.IPv6Automatic, state.IPv6Servers, automatic || Addresses(provider, true).Length > 0);
+        return undo;
+    }
+
+    private static string Describe(PowerShellResult result) => result.Cancelled ? "Operation cancelled." : result.TimedOut ? "Windows command timed out." :
+        !string.IsNullOrWhiteSpace(result.StdErr) ? result.StdErr.Trim() : $"Windows command failed (exit {result.ExitCode}). {result.StdOut.Trim()}";
+
+    public async Task<DnsChangeResult> ApplyDnsWithResultAsync(DnsProviderDefinition provider, int adapterIndex, bool useDoh, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         string script;
-        try { script = BuildApplyScript(provider, adapterIndex, useDoh); } catch (ArgumentException) { return false; }
+        try { script = BuildApplyScript(provider, adapterIndex, useDoh); }
+        catch (ArgumentException ex) { return new(false, ex.Message); }
+        if (_journal != null) await _journal.OperationGate.WaitAsync(cancellationToken);
         var undo = new List<ActionItem>();
-        if (_journal != null && !TestModeManager.IsTestMode)
+        JournalActionRecord? record = null;
+        bool started = false;
+        DnsAdapterState? before = null;
+        try
         {
-            string servers = string.Join(',', new[] { provider.PrimaryDns, provider.SecondaryDns, provider.Primary6Dns, provider.Secondary6Dns }.Where(SafeCommands.IsValidIp).Select(s => "'" + IPAddress.Parse(s) + "'"));
-            string capture = $"$a=Get-NetAdapter | Where-Object ifIndex -eq {adapterIndex} | Select-Object -First 1; if(-not $a){{throw 'Network adapter is unavailable.'}}; $guid=([guid]$a.InterfaceGuid).ToString('B'); $families=@('IPv4','IPv6'); @($families | ForEach-Object {{ $family=$_; $stack=if($family -eq 'IPv4'){{'Tcpip'}}else{{'Tcpip6'}}; $key=\"HKLM:\\SYSTEM\\CurrentControlSet\\Services\\$stack\\Parameters\\Interfaces\\$guid\"; [pscustomobject]@{{Family=$family; Static=[string](Get-ItemProperty -LiteralPath $key -Name NameServer -ErrorAction SilentlyContinue).NameServer; Servers=@((Get-DnsClientServerAddress -InterfaceIndex {adapterIndex} -AddressFamily $family).ServerAddresses)}} }}) | ConvertTo-Json -Compress -Depth 5";
-            var snapshot = await _shell.ExecutePowerShellAsync(capture, 30, cancellationToken);
-            if (!snapshot.Success) return false;
-            try
+            if (_shell.SupportsSystemQueries && !TestModeManager.IsTestMode)
+                before = await ReadAdapterStateAsync(adapterIndex, cancellationToken);
+            if (before != null)
             {
-                using var doc = JsonDocument.Parse(snapshot.StdOut);
-                foreach (var item in doc.RootElement.EnumerateArray())
+                undo = CreateUndo(before, provider, adapterIndex);
+                if (undo.Count == 0) return new(false, "This DNS provider has no addresses for the enabled IP protocols.");
+                if (useDoh)
                 {
-                    string family = item.GetProperty("Family").GetString() == "IPv4" ? "IPv4" : "IPv6";
-                    string restore = $"Get-DnsClientServerAddress -InterfaceIndex {adapterIndex} -AddressFamily {family} | Set-DnsClientServerAddress ";
-                    if (string.IsNullOrWhiteSpace(item.GetProperty("Static").GetString())) restore += "-ResetServerAddresses -ErrorAction Stop";
-                    else
-                    {
-                        var addresses = item.GetProperty("Servers").EnumerateArray().Select(v => v.GetString() ?? "").ToArray();
-                        if (addresses.Length == 0 || addresses.Any(ip => !SafeCommands.IsValidIp(ip))) return false;
-                        restore += "-ServerAddresses @(" + string.Join(',', addresses.Select(ip => "'" + IPAddress.Parse(ip) + "'")) + ") -ErrorAction Stop";
-                    }
-                    undo.Add(ModuleJournal.UndoScript(restore));
-                }
-                if (useDoh && servers.Length > 0)
-                {
-                    var dohSnapshot = await _shell.ExecutePowerShellAsync($"@(@({servers}) | ForEach-Object {{ $ip=$_; $entry=Get-DnsClientDohServerAddress -ServerAddress $ip -ErrorAction SilentlyContinue; [pscustomobject]@{{IP=$ip; Exists=[bool]$entry; Template=[string]$entry.DohTemplate; Auto=[bool]$entry.AutoUpgrade; Fallback=[bool]$entry.AllowFallbackToUdp}} }}) | ConvertTo-Json -Compress", 30);
-                    if (!dohSnapshot.Success) return false;
-                    using var doh = JsonDocument.Parse(dohSnapshot.StdOut);
-                    foreach (var item in doh.RootElement.EnumerateArray())
+                    string ips = Quote((before.IPv4Enabled ? Addresses(provider, false) : []).Concat(before.IPv6Enabled ? Addresses(provider, true) : []));
+                    var capture = await _shell.ExecutePowerShellAsync($"if(-not(Get-Command Get-DnsClientDohServerAddress -ErrorAction SilentlyContinue)){{throw 'DNS over HTTPS is not supported on this Windows version.'}}; @(@({ips}) | ForEach-Object {{ $ip=$_; $e=Get-DnsClientDohServerAddress -ServerAddress $ip -ErrorAction SilentlyContinue; [pscustomobject]@{{IP=$ip; Exists=[bool]$e; Template=[string]$e.DohTemplate; Auto=[bool]$e.AutoUpgrade; Fallback=[bool]$e.AllowFallbackToUdp}} }}) | ConvertTo-Json -Compress", 30, cancellationToken);
+                    if (!capture.Success) return new(false, "Could not capture DNS over HTTPS settings: " + Describe(capture));
+                    using var doh = JsonDocument.Parse(capture.StdOut);
+                    foreach (var item in doh.RootElement.ValueKind == JsonValueKind.Array ? doh.RootElement.EnumerateArray().ToArray() : new[] { doh.RootElement })
                     {
                         string ip = IPAddress.Parse(item.GetProperty("IP").GetString()!).ToString();
                         string restore = item.GetProperty("Exists").GetBoolean()
                             ? $"Set-DnsClientDohServerAddress -ServerAddress '{ip}' -DohTemplate '{(item.GetProperty("Template").GetString() ?? "").Replace("'", "''")}' -AutoUpgrade ${item.GetProperty("Auto").GetBoolean().ToString().ToLowerInvariant()} -AllowFallbackToUdp ${item.GetProperty("Fallback").GetBoolean().ToString().ToLowerInvariant()} -ErrorAction Stop"
-                            : $"Remove-DnsClientDohServerAddress -ServerAddress '{ip}' -ErrorAction Stop";
+                            : $"if(Get-DnsClientDohServerAddress -ServerAddress '{ip}' -ErrorAction SilentlyContinue){{Remove-DnsClientDohServerAddress -ServerAddress '{ip}' -ErrorAction Stop}}; if(Get-DnsClientDohServerAddress -ServerAddress '{ip}' -ErrorAction SilentlyContinue){{throw 'DNS over HTTPS rollback verification failed.'}}";
                         undo.Add(ModuleJournal.UndoScript(restore));
                     }
                 }
             }
-            catch (Exception ex) when (ex is JsonException or FormatException or InvalidOperationException or KeyNotFoundException) { return false; }
+            else undo.Add(ModuleJournal.UndoScript("# Simulated DNS baseline"));
+            if (_journal != null)
+            {
+                _journal.StartSession();
+                record = new JournalActionRecord { TweakId = $"tools.dns.adapter-{adapterIndex}", ActionType = "PowerShell", TargetIdentifier = "powershell://dns/" + adapterIndex, UndoActions = undo };
+                _journal.RecordActionWriteAhead(record);
+            }
+            started = true;
+            var result = await _shell.ExecutePowerShellAsync(script, 60, cancellationToken);
+            if (!result.Success) throw new InvalidOperationException(Describe(result));
+            if (before != null)
+            {
+                var actual = await ReadAdapterStateAsync(adapterIndex, cancellationToken);
+                if (!actual.Matches(provider)) throw new InvalidOperationException("Windows did not retain the requested DNS settings. A policy or network service may override them.");
+            }
+            _journal?.CompleteSession();
+            return new(true, before == null ? "Simulation completed; no network settings were changed." : before is { IPv4Enabled: true, IPv6Enabled: false } ? "IPv6 is disabled on this adapter; only IPv4 DNS was updated." : "DNS settings verified successfully.");
         }
-        if (TestModeManager.IsTestMode) undo.Add(ModuleJournal.UndoScript("# Simulated DNS baseline"));
-        var result = await ModuleJournal.RunScriptAsync(_shell, _journal, $"tools.dns.adapter-{adapterIndex}", script, undo, 60, cancellationToken);
-        if (!result.Success || !_shell.SupportsSystemQueries) return result.Success;
-        string? actual = await GetCurrentProviderIdAsync(adapterIndex, cancellationToken);
-        return actual == provider.Id || (provider.Id == "custom" && result.Success);
+        catch (Exception ex)
+        {
+            if (!started) return new(false, "DNS preflight failed: " + ex.Message);
+            bool restored = before != null && undo.Count > 0;
+            if (before != null) foreach (var action in undo.AsEnumerable().Reverse())
+            {
+                try { restored &= (await _shell.ExecutePowerShellAsync(action.Script!, 30, CancellationToken.None)).Success; }
+                catch { restored = false; }
+            }
+            if (restored && before != null)
+            {
+                try
+                {
+                    var actual = await ReadAdapterStateAsync(adapterIndex, CancellationToken.None);
+                    restored = actual.IPv4Enabled == before.IPv4Enabled && actual.IPv6Enabled == before.IPv6Enabled
+                        && (!before.IPv4Enabled || actual.IPv4Automatic == before.IPv4Automatic && (before.IPv4Automatic || actual.IPv4Servers.SequenceEqual(before.IPv4Servers, StringComparer.OrdinalIgnoreCase)))
+                        && (!before.IPv6Enabled || actual.IPv6Automatic == before.IPv6Automatic && (before.IPv6Automatic || actual.IPv6Servers.SequenceEqual(before.IPv6Servers, StringComparer.OrdinalIgnoreCase)));
+                }
+                catch { restored = false; }
+            }
+            if (restored && record != null) { _journal!.MarkRecordsReverted([record]); _journal.CompleteSession(); }
+            return new(false, "DNS change failed: " + ex.Message + (restored ? " Previous settings restored." : before != null ? " Rollback is incomplete; inspect History before retrying." : ""));
+        }
+        finally { _journal?.OperationGate.Release(); }
     }
 }
