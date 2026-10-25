@@ -12,7 +12,7 @@
 - Release unit/integration suite: **467 passed, 0 failed, 0 skipped**. Includes native process timeout/context tests, DNS protocol/DoH script checks, rollback/error cases, CLI argument/dry-run cases and Startup accessibility/container preservation.
 - CLI subprocess matrix: **56 passed**. Covers help/list/info, invalid arguments, tweak/preset apply, feature enable/disable, all cleaner categories, nine DNS providers, DoH, configuration sections, health, repairs, updates, diagnostics, detection, recovery preview and interactive persistence. Mutating scenarios use simulation. The CLI self-test completed **54 apply/undo round trips** against fake registry services.
 - Native Google DNS regression: preconditions required the active adapter to already use static 8.8.8.8 / 8.8.4.4 with IPv6 disabled. Reapplying those same settings returned success; readback confirmed unchanged IPv4 addresses and a still-disabled IPv6 binding. No alternate DNS provider or protocol binding was applied to the host.
-- The DNS/DoH/DHCP GUI scenario passed in simulation. After fixing row preservation and accessible command invocation, the targeted Startup toggle/refresh/navigation GUI regression passed.
+- The Google DNS apply/DHCP reset GUI scenario passed in simulation. DoH protocol branches passed the PowerShell stub tests; no full real-mode DoH GUI pass is claimed. After fixing row preservation and accessible command invocation, the targeted Startup toggle/refresh/navigation GUI regression passed.
 - Release solution build with warnings treated as errors: **0 warnings, 0 errors**.
 - Catalog validator: **142 tweaks, 6 presets, 242 apps, 0 errors**.
 
